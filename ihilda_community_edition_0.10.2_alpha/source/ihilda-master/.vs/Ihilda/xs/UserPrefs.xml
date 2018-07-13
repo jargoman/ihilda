@@ -1,0 +1,22 @@
+﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/JsonWallet.cs">
+    <Files>
+      <File FileName="Source/gui-classes/Widgets/WalletUI/WalletManagerWidget.cs" Line="1" Column="1" />
+      <File FileName="Source/util/LeIceSense.cs" Line="598" Column="76" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Transactions/TxTypes/RippleAccountSetTransaction.cs" Line="1" Column="1" />
+      <File FileName="LICENSE.txt" Line="29" Column="88" />
+      <File FileName="Source/gui-classes/Dialogs/RandomSeedGenerator.cs" Line="1" Column="1" />
+      <File FileName="Source/bot/OrderSubmitter.cs" Line="39" Column="6" />
+      <File FileName="RippleWallet.cs" Line="508" Column="29" />
+      <File FileName="Source/JsonWallet.cs" Line="5" Column="15" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.RippleLibSharp PreferredExecutionTarget="MonoDevelop.Default" />
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.IhildaWallet PreferredExecutionTarget="MonoDevelop.Default" />
+</Properties>

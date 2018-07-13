@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E5AE1E9D-3996-42A3-9198-E3E86DEBA932}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>RippleLibSharp</RootNamespace>
+    <AssemblyName>riplibsharp</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <ReleaseVersion>
+    </ReleaseVersion>
+    <SynchReleaseVersion>false</SynchReleaseVersion>
+    <StartupObject>Source.UnitTesting.RLSTest</StartupObject>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="Mono.Posix" />
+    <Reference Include="System.Security" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="SuperSocket.ClientEngine">
+      <HintPath>..\packages\SuperSocket.ClientEngine.Core.0.10.0\lib\net45\SuperSocket.ClientEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="WebSocket4Net">
+      <HintPath>..\packages\WebSocket4Net.0.15.2\lib\net45\WebSocket4Net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp">
+      <HintPath>..\..\..\..\..\..\usr\lib\mono\4.5.1-api\Microsoft.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Posix">
+      <HintPath>..\..\..\..\..\..\usr\lib\mono\4.5.1-api\Mono.Posix.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib">
+      <HintPath>..\..\..\..\..\..\usr\lib\mono\4.5.1-api\mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>..\..\..\..\..\..\usr\lib\mono\4.5.1-api\System.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <HintPath>..\..\..\..\..\..\usr\lib\mono\4.5.1-api\System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <HintPath>..\..\..\..\..\..\usr\lib\mono\4.5.1-api\System.Runtime.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security">
+      <HintPath>..\..\..\..\..\..\usr\lib\mono\4.5.1-api\System.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml">
+      <HintPath>..\..\..\..\..\..\usr\lib\mono\4.5.1-api\System.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <HintPath>..\..\..\..\..\..\usr\lib\mono\4.5.1-api\System.Xml.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>..\packages\BouncyCastle.1.8.2\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>bin\Debug\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Source\Binary\Base58.cs" />
+    <Compile Include="Source\Binary\bigDecimal.cs" />
+    <Compile Include="Source\Binary\BigEndianReader.cs" />
+    <Compile Include="Source\Binary\BigEndianWriter.cs" />
+    <Compile Include="Source\Binary\BinaryFieldType.cs" />
+    <Compile Include="Source\Binary\BinarySerializer.cs" />
+    <Compile Include="Source\Binary\BinaryType.cs" />
+    <Compile Include="Source\Binary\BinaryFormatter.cs" />
+    <Compile Include="Source\Binary\ECDSASignature.cs" />
+    <Compile Include="Source\Third-Party\DynamicJson.cs" />
+    <Compile Include="Source\Keys\RippleIdentifier.cs" />
+    <Compile Include="Source\Keys\RippleDeterministicKeyGenerator.cs" />
+    <Compile Include="Source\Keys\RipplePrivateKey.cs" />
+    <Compile Include="Source\Keys\RipplePublicKey.cs" />
+    <Compile Include="Source\Binary\RippleBinaryObject.cs" />
+    <Compile Include="Source\Keys\RippleSeedAddress.cs" />
+    <Compile Include="Source\Keys\RipplePublicGeneratorAddress.cs" />
+    <Compile Include="Source\Binary\RippleSigner.cs" />
+    <Compile Include="Source\Util\DebugRippleLibSharp.cs" />
+    <Compile Include="Source\Util\Logging.cs" />
+    <Compile Include="Source\Network\NetworkInterface.cs" />
+    <Compile Include="Source\Binary\RippleTxSigner.cs" />
+    <Compile Include="Source\Transactions\RippleTxStructure.cs" />
+    <Compile Include="Source\Transactions\RippleTxMeta.cs" />
+    <Compile Include="Source\Result\ServerInfoResult.cs" />
+    <Compile Include="Source\Result\ServerStateResult.cs" />
+    <Compile Include="Source\Result\AccountCurrenciesResult.cs" />
+    <Compile Include="Source\Result\AccountInfoResult.cs" />
+    <Compile Include="Source\Result\AccountLinesResult.cs" />
+    <Compile Include="Source\Result\AccountOffersResult.cs" />
+    <Compile Include="Source\Nodes\RippleNode.cs" />
+    <Compile Include="Source\Nodes\RippleNodeGroup.cs" />
+    <Compile Include="Source\Nodes\RippleFieldGroup.cs" />
+    <Compile Include="Source\Network\NetworkRequestTask.cs" />
+    <Compile Include="Source\Commands\Accounts\AccountCurrencies.cs" />
+    <Compile Include="Source\Commands\Accounts\AccountInfo.cs" />
+    <Compile Include="Source\Commands\Accounts\AccountLines.cs" />
+    <Compile Include="Source\Commands\Accounts\AccountOffers.cs" />
+    <Compile Include="Source\Commands\Server\ServerInfo.cs" />
+    <Compile Include="Source\Commands\Accounts\AccountTx.cs" />
+    <Compile Include="Source\Commands\Server\ServerState.cs" />
+    <Compile Include="Source\Paths\RipplePathElement.cs" />
+    <Compile Include="Source\Transactions\TxTypes\IOUPaymentTransaction.cs" />
+    <Compile Include="Source\Transactions\TxTypes\RippleAccountSetTransaction.cs" />
+    <Compile Include="Source\Transactions\TxTypes\RippleOfferTransaction.cs" />
+    <Compile Include="Source\Transactions\TxTypes\RipplePaymentTransaction.cs" />
+    <Compile Include="Source\Transactions\TxTypes\RippleTransaction.cs" />
+    <Compile Include="Source\Transactions\TxTypes\RippleTransactionType.cs" />
+    <Compile Include="Source\Transactions\TxTypes\RippleTrustSetTransaction.cs" />
+    <Compile Include="Source\Transactions\Offer.cs" />
+    <Compile Include="Source\Transactions\RippleCurrency.cs" />
+    <Compile Include="Source\Transactions\RippleMemo.cs" />
+    <Compile Include="Source\Trust\TrustLine.cs" />
+    <Compile Include="Source\Transactions\TxTypes\RippleSetRegularKey.cs" />
+    <Compile Include="Source\Commands\Stipulate\BookOffers.cs" />
+    <Compile Include="Source\Result\BookOfferResult.cs" />
+    <Compile Include="Source\Network\PingObject.cs" />
+    <Compile Include="Source\Commands\Server\Ping.cs" />
+    <Compile Include="Source\Commands\Stipulate\PathFind.cs" />
+    <Compile Include="Source\Result\PathFindResult.cs" />
+    <Compile Include="Source\Unit-Testing\RLSTest.cs" />
+    <Compile Include="Source\Transactions\OrderChange.cs" />
+    <Compile Include="Source\Util\TextHighlighter.cs" />
+    <Compile Include="Source\Result\RippleSubmitTxResult.cs" />
+    <Compile Include="Source\Util\ByteProtector.cs" />
+    <Compile Include="Source\Util\SecureStringExtentions.cs" />
+    <Compile Include="Source\LocalRippled\CommandLineExecuter.cs" />
+    <Compile Include="Source\Commands\Tx\tx.cs" />
+    <Compile Include="Source\Result\AccountTxResult.cs" />
+    <Compile Include="Source\Commands\Accounts\LocalRippledWalletPropose.cs" />
+    <Compile Include="Source\Result\RpcWalletProposeResult.cs" />
+    <Compile Include="Source\Keys\RippleAddress.cs">
+      <DeployService-Deploy>True</DeployService-Deploy>
+    </Compile>
+    <Compile Include="Source\Network\ConnectionSettings.cs" />
+    <Compile Include="Source\Transactions\TxTypes\RippleCancelTransaction.cs" />
+    <Compile Include="Source\Result\Marker.cs" />
+    <Compile Include="Source\Result\IRawJsonInterface.cs" />
+    <Compile Include="Source\Result\Ter.cs" />
+    <Compile Include="Source\Util\TimeHeler.cs" />
+    <Compile Include="Source\Network\DataApi.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Source\" />
+    <Folder Include="Source\Binary\" />
+    <Folder Include="Source\Third-Party\" />
+    <Folder Include="Source\Keys\" />
+    <Folder Include="Source\Transactions\" />
+    <Folder Include="Source\Util\" />
+    <Folder Include="Source\Network\" />
+    <Folder Include="Source\Commands\" />
+    <Folder Include="Source\Result\" />
+    <Folder Include="Source\Nodes\" />
+    <Folder Include="Source\Commands\Accounts\" />
+    <Folder Include="Source\Commands\Server\" />
+    <Folder Include="Source\Paths\" />
+    <Folder Include="Source\Transactions\TxTypes\" />
+    <Folder Include="Source\Trust\" />
+    <Folder Include="Source\Commands\Stipulate\" />
+    <Folder Include="Source\Unit-Testing\" />
+    <Folder Include="Source\LocalRippled\" />
+    <Folder Include="Source\Commands\Tx\" />
+    <Folder Include="Source\new\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\Network\NetworkUsage.txt" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Deployment.LinuxDeployData generateScript="False" />
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+</Project>
