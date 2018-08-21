@@ -9,11 +9,18 @@ namespace RippleLibSharp.Commands.Stipulate
 {
 	public static class PathFind
 	{
-		public static  Task<Response<PathFindResult>> GetResult ( string source_account, string destination_account, RippleCurrency destination_amount, NetworkInterface ni) {
+		public static  Task<Response<PathFindResult>> GetResult ( string source_account, string destination_account, RippleCurrency destination_amount, NetworkInterface ni, IdentifierTag identifierTag = null) {
 
-			int id = NetworkRequestTask.ObtainTicket();
+			if (identifierTag == null) {
+				identifierTag = new IdentifierTag {
+					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+				};
+			}
+
+
+
 			object o = new {
-				id,
+				id = identifierTag,
 				command = "path_find",
 				subcommand = "create",
 				source_account,
@@ -23,7 +30,7 @@ namespace RippleLibSharp.Commands.Stipulate
 
 			string request = DynamicJson.Serialize (o);
 
-			Task< Response<PathFindResult>> task = NetworkRequestTask.RequestResponse <PathFindResult> (id, request, ni);
+			Task< Response<PathFindResult>> task = NetworkRequestTask.RequestResponse <PathFindResult> (identifierTag, request, ni);
 
 			return task;
 		}

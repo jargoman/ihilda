@@ -6,11 +6,11 @@ using RippleLibSharp.Transactions.TxTypes;
 
 namespace RippleLibSharp.Network
 {
-	public class PingObject
+	public class PingObject : Identifiable
 	{
 
 #pragma warning disable IDE1006 // Naming Styles
-		public int id { get; set; }
+		public IdentifierTag id { get; set; }
 
 
 		public string status { get; set; }

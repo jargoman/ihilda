@@ -31,6 +31,10 @@ namespace RippleLibSharp.Transactions
 			set;
 		}
 
+		public MemoIndice[] Memos {
+			get;
+			set;
+		}
 
 
 		public RippleCurrency TakerGets { 
@@ -118,7 +122,9 @@ namespace RippleLibSharp.Transactions
 				taker_gets_funded = this.taker_gets_funded,
 				taker_pays_funded = this.taker_pays_funded,
 
-				Expiration = this.Expiration
+				Expiration = this.Expiration,
+
+				Memos = this.Memos
 			};
 			return ret;
 		}

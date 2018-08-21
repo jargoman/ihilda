@@ -62,13 +62,15 @@ namespace RippleLibSharp.Transactions.TxTypes
 		}
 
 
-		public RippleMemo [] Memos {
+		public MemoIndice [] Memos {
 			get;
 			set;
 		}
 		public RippleCurrency fee {
 			get { return _fee; }
-			set { _fee = value; }
+			set {
+				
+				_fee = value; }
 		}
 
 		public RippleCurrency Fee {
@@ -77,9 +79,22 @@ namespace RippleLibSharp.Transactions.TxTypes
 		}
 
 		private RippleCurrency _fee {
-			get;
-			set;
+			get { return _fee_;}
+			set {
+				if (!value.IsNative) {
+					throw new FormatException ("Fee must be native currenct " + RippleCurrency.NativeCurrency);
+				}
+
+				if (value.amount > MAXFEE) {
+					throw new FormatException ("Fee must be less than " + MAXFEE.ToString ());
+				}
+				_fee_ = value;
+			}
 		}
+
+		private const int MAXFEE = 2000000;
+
+		private RippleCurrency _fee_ = null;
 		public string ledger_index {
 			get;
 			set;
@@ -306,16 +321,17 @@ namespace RippleLibSharp.Transactions.TxTypes
 				return null;
 			}
 
-			Response<RippleSubmitTxResult> r = DynamicJson.Parse (output);
+			Response<RippleSubmitTxResult> response = DynamicJson.Parse (output);
 
-			if (r.error != null) {
+			if (response.error != null) {
 
-				Logging.WriteLog (r.error_message);
+				Logging.WriteLog (response.error_message);
 				return null;
 			}
 
-			this.SignedTransactionBlob = r.result.tx_blob;
-			this.hash = r.result.tx_json.hash;
+
+			this.SignedTransactionBlob = response.result.tx_blob;
+			this.hash = response?.result?.tx_json?.hash;
 
 			Logging.WriteLog ("blob = " + this.SignedTransactionBlob);
 
@@ -355,7 +371,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 		}
 
 
-		protected Response<T> SubmitToNetwork<T> (NetworkInterface ni)
+		protected Response<T> SubmitToNetwork<T> (NetworkInterface ni, IdentifierTag identifierTag = null)
 		{
 
 			if (this.SignedTransactionBlob == null) {
@@ -363,10 +379,16 @@ namespace RippleLibSharp.Transactions.TxTypes
 				return null;
 			}
 
-			int ticket = NetworkRequestTask.ObtainTicket ();
+			if (identifierTag == null) {
+				identifierTag = new IdentifierTag {
+					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+				};
+			}
+
+			//int ticket = NetworkRequestTask.ObtainTicket ();
 
 			object ob = new {
-				id = ticket,
+				id = identifierTag,
 				command = "submit",
 				tx_blob = this.SignedTransactionBlob
 			};
@@ -387,7 +409,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 
 
-			var tsk = NetworkRequestTask.RequestResponse<T> (ticket, json, ni);
+			var tsk = NetworkRequestTask.RequestResponse<T> (identifierTag, json, ni);
 
 			tsk.Wait ();
 

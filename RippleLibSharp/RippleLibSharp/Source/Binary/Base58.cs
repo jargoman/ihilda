@@ -16,6 +16,7 @@
 */
 
 using System;
+using System.Linq;
 using System.Text;
 using Org.BouncyCastle.Math;
 using RippleLibSharp.Util;
@@ -274,6 +275,30 @@ namespace RippleLibSharp.Binary
 
 			return bigInt;
 
+		}
+
+		public static string StringToHex ( string str)
+		{
+			return ByteArrayToHexString ( Encoding.ASCII.GetBytes (str) );
+
+		}
+
+		public static string HexToAscii ( string hex )
+		{
+			byte [] bytes = StringToByteArray (hex);
+
+			return Encoding.ASCII.GetString (bytes);
+
+
+
+		}
+
+		public static byte [] StringToByteArray (string hex)
+		{
+			return Enumerable.Range (0, hex.Length)
+					 .Where (x => x % 2 == 0)
+					 .Select (x => Convert.ToByte (hex.Substring (x, 2), 16))
+					 .ToArray ();
 		}
 
 

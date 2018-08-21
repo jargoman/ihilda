@@ -122,6 +122,11 @@ namespace RippleLibSharp.Nodes
 			get;
 			set;
 		}
+
+		public MemoIndice [] Memos {
+			get;
+			set;
+		}
 	}
 }
 

@@ -11,7 +11,7 @@ namespace RippleLibSharp.Network
 		{
 #if DEBUG
 			String method_sig = clsstr + nameof (ConnectionSettings) + DebugRippleLibSharp.both_parentheses;
-			if (DebugRippleLibSharp.ConnectionInfo) {
+			if (DebugRippleLibSharp.ConnectionSettings) {
 				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
 			}
 #endif
@@ -29,13 +29,13 @@ namespace RippleLibSharp.Network
 		{
 #if DEBUG
 			String method_sig = clsstr + nameof (Equals) + DebugRippleLibSharp.left_parentheses + nameof (Object) + DebugRippleLibSharp.space_char + nameof(obj) + DebugRippleLibSharp.equals +  DebugRippleLibSharp.ToAssertString(obj) + DebugRippleLibSharp.right_parentheses;
-			if (DebugRippleLibSharp.ConnectionInfo) {
+			if (DebugRippleLibSharp.ConnectionSettings) {
 				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
 			}
 #endif
 			if (obj == null) {
 #if DEBUG
-				if (DebugRippleLibSharp.ConnectionInfo) {
+				if (DebugRippleLibSharp.ConnectionSettings) {
 					Logging.WriteLog(method_sig + "o == null, returning false");
 				}
 #endif
@@ -46,7 +46,7 @@ namespace RippleLibSharp.Network
 
 			if (ci == null) {
 #if DEBUG
-				if (DebugRippleLibSharp.ConnectionInfo) {
+				if (DebugRippleLibSharp.ConnectionSettings) {
 					Logging.WriteLog(method_sig + nameof (obj) + " is not an instance of ConnectionInfo, returning false");
 				}
 #endif
@@ -60,13 +60,13 @@ namespace RippleLibSharp.Network
 		{
 #if DEBUG
 			String method_sig = clsstr + nameof (Equals) + DebugRippleLibSharp.left_parentheses + nameof (ConnectionSettings) + DebugRippleLibSharp.space_char + nameof (conInf) + DebugRippleLibSharp.equals + DebugRippleLibSharp.ToAssertString(conInf) + DebugRippleLibSharp.right_parentheses;
-			if (DebugRippleLibSharp.ConnectionInfo) {
+			if (DebugRippleLibSharp.ConnectionSettings) {
 				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
 			}
 #endif
 			if (conInf == null) {
 #if DEBUG
-				if (DebugRippleLibSharp.ConnectionInfo) {
+				if (DebugRippleLibSharp.ConnectionSettings) {
 					Logging.WriteLog(method_sig + "conInf == null, returning false");
 				}
 #endif
@@ -75,7 +75,7 @@ namespace RippleLibSharp.Network
 
 			if ((conInf.ServerUrls != null && this.ServerUrls == null) || (conInf.ServerUrls == null && this.ServerUrls != null)) {
 #if DEBUG
-				if (DebugRippleLibSharp.ConnectionInfo) {
+				if (DebugRippleLibSharp.ConnectionSettings) {
 					Logging.WriteLog(method_sig + "server lists differ, returning false");
 				}
 #endif
@@ -85,14 +85,14 @@ namespace RippleLibSharp.Network
 
 			if (conInf.ServerUrls != null) {
 #if DEBUG
-				if (DebugRippleLibSharp.ConnectionInfo) {
+				if (DebugRippleLibSharp.ConnectionSettings) {
 					Logging.WriteLog(method_sig + "conInf.servers != null");
 				}
 #endif
 
 				if (conInf.ServerUrls.Length != this.ServerUrls.Length) {
 #if DEBUG
-					if (DebugRippleLibSharp.ConnectionInfo) {
+					if (DebugRippleLibSharp.ConnectionSettings) {
 						Logging.WriteLog(method_sig + "conInf.servers.Length != this.servers.Length, servers differ, returning false");
 					}
 #endif
@@ -101,14 +101,14 @@ namespace RippleLibSharp.Network
 
 				for (int i = 0; i < conInf.ServerUrls.Length; i++) {
 #if DEBUG
-					if (DebugRippleLibSharp.ConnectionInfo) {
+					if (DebugRippleLibSharp.ConnectionSettings) {
 						Logging.WriteLog(method_sig + "for loop, i = " + i.ToString());
 					}
 #endif
 
 					if ((conInf.ServerUrls [i] == null && this.ServerUrls [i] != null) || (conInf.ServerUrls [i] != null && this.ServerUrls [i] == null)) {
 #if DEBUG
-						if (DebugRippleLibSharp.ConnectionInfo) {
+						if (DebugRippleLibSharp.ConnectionSettings) {
 							Logging.WriteLog(method_sig + "servers " + i.ToString() + "differ, returning false" );
 						}
 #endif
@@ -118,7 +118,7 @@ namespace RippleLibSharp.Network
 					if (conInf.ServerUrls [i] == null) {
 						// if one's null they both are
 #if DEBUG
-						if (DebugRippleLibSharp.ConnectionInfo) {
+						if (DebugRippleLibSharp.ConnectionSettings) {
 							Logging.WriteLog(method_sig + "conInf.servers[i] == null, continuing");
 						}
 #endif
@@ -127,7 +127,7 @@ namespace RippleLibSharp.Network
 
 					if (!conInf.ServerUrls [i].Equals (this.ServerUrls [i])) {
 #if DEBUG
-						if (DebugRippleLibSharp.ConnectionInfo) {
+						if (DebugRippleLibSharp.ConnectionSettings) {
 							Logging.WriteLog(method_sig + "servers " + i.ToString() + " aren't equal returning null");
 						}
 #endif
@@ -140,7 +140,7 @@ namespace RippleLibSharp.Network
 
 			if (conInf.LocalUrl == null && this.LocalUrl != null || this.LocalUrl == null && conInf.LocalUrl != null) {
 #if DEBUG
-				if ( DebugRippleLibSharp.ConnectionInfo ){
+				if ( DebugRippleLibSharp.ConnectionSettings ){
 					Logging.WriteLog(method_sig + "local urls differ, returning false");
 				}
 #endif
@@ -149,14 +149,14 @@ namespace RippleLibSharp.Network
 
 			if (conInf.LocalUrl != null) {
 #if DEBUG
-				if (DebugRippleLibSharp.ConnectionInfo) {
+				if (DebugRippleLibSharp.ConnectionSettings) {
 					Logging.WriteLog(method_sig + "conInf.local != null");
 				}
 #endif
 
 				if (!(conInf.LocalUrl.Equals (this.LocalUrl))) {
 #if DEBUG
-					if (DebugRippleLibSharp.ConnectionInfo) {
+					if (DebugRippleLibSharp.ConnectionSettings) {
 						Logging.WriteLog(method_sig + "!(conInf.local.Equals(this.local)), returning false");
 					}
 #endif
@@ -168,7 +168,7 @@ namespace RippleLibSharp.Network
 
 			if (conInf.UserAgent == null && this.UserAgent != null || this.UserAgent == null && conInf.UserAgent != null) {
 #if DEBUG
-				if (DebugRippleLibSharp.ConnectionInfo) {
+				if (DebugRippleLibSharp.ConnectionSettings) {
 					Logging.WriteLog(method_sig + "conInf.userAgent == null && this.userAgent != null || this.userAgent == null && conInf.userAgent != null, returning false"); // I know, getting lazy, yawn... 3:36 am -_-
 
 				}
@@ -178,14 +178,14 @@ namespace RippleLibSharp.Network
 
 			if (conInf.UserAgent != null) {
 #if DEBUG
-				if (DebugRippleLibSharp.ConnectionInfo) {
+				if (DebugRippleLibSharp.ConnectionSettings) {
 					Logging.WriteLog( method_sig + "conInf.userAgent != null");
 				}
 #endif
 
 				if (!conInf.UserAgent.Equals (this.UserAgent)) {
 #if DEBUG
-					if (DebugRippleLibSharp.ConnectionInfo) {
+					if (DebugRippleLibSharp.ConnectionSettings) {
 						Logging.WriteLog(method_sig + "conInf.userAgent != this.userAgent, returning null");
 					}
 #endif
@@ -197,7 +197,7 @@ namespace RippleLibSharp.Network
 
 			if (conInf.Reconnect != this.Reconnect) {
 #if DEBUG
-				if (DebugRippleLibSharp.ConnectionInfo) {
+				if (DebugRippleLibSharp.ConnectionSettings) {
 					Logging.WriteLog ( method_sig + "conInf.reconnect == this.reconnect" );
 				}
 #endif

@@ -9,17 +9,21 @@ namespace RippleLibSharp.Commands.Server
 	public static class ServerInfo
 	{
 
-		public static  Task<Response<ServerInfoResult>> GetResult (NetworkInterface ni) {
+		public static  Task<Response<ServerInfoResult>> GetResult (NetworkInterface ni, IdentifierTag identifierTag = null) {
+			if (identifierTag == null) {
+				identifierTag = new IdentifierTag {
+					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+				};
+			}
 
-			int id = NetworkRequestTask.ObtainTicket();
 			object o = new {
-				id,
+				id = identifierTag,
 				command = "server_info",
 			};
 
 			string request = DynamicJson.Serialize (o);
 
-			Task< Response<ServerInfoResult>> task = NetworkRequestTask.RequestResponse <ServerInfoResult> (id, request, ni);
+			Task< Response<ServerInfoResult>> task = NetworkRequestTask.RequestResponse <ServerInfoResult> ( identifierTag, request, ni );
 
 		
 			return task;

@@ -12,18 +12,23 @@ namespace RippleLibSharp.Commands.Accounts
 	{
 		
 
-		public static Task<Response<AccountInfoResult>> GetResult ( string account, NetworkInterface ni ) {
+		public static Task<Response<AccountInfoResult>> GetResult ( string account, NetworkInterface ni, IdentifierTag identifierTag = null ) {
 
-			int id = NetworkRequestTask.ObtainTicket();
+			if (identifierTag == null) {
+				identifierTag = new IdentifierTag {
+					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+				};
+			}
+
 			object o = new {
-				id,
+				id = identifierTag,
 				command = "account_info",
 				account
 			};
 
 			string request = DynamicJson.Serialize (o);
 
-			Task<Response<AccountInfoResult>> task = NetworkRequestTask.RequestResponse <AccountInfoResult> (id, request, ni);
+			Task<Response<AccountInfoResult>> task = NetworkRequestTask.RequestResponse <AccountInfoResult> (identifierTag, request, ni);
 
 			//task.Wait ();
 			//return task.Result;

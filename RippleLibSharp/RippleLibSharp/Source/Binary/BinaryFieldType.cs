@@ -15,6 +15,7 @@ namespace RippleLibSharp.Binary
 
 		public static readonly BinaryFieldType LedgerEntryType = new BinaryFieldType (new BinaryType(BinaryType.UINT16), 0x01);
 		public static readonly BinaryFieldType TransactionType = new BinaryFieldType (new BinaryType(BinaryType.UINT16), 0x02);
+		public static readonly BinaryFieldType SignerWeight = new BinaryFieldType (new BinaryType(BinaryType.UINT16), 0x03);
 
 		public static readonly BinaryFieldType Flags = new BinaryFieldType (new BinaryType(BinaryType.UINT32), 0x02);
 		public static readonly BinaryFieldType SourceTag = new BinaryFieldType (new BinaryType(BinaryType.UINT32), 0x03);
@@ -49,6 +50,11 @@ namespace RippleLibSharp.Binary
 		public static readonly BinaryFieldType ReserveIncrement = new BinaryFieldType (new BinaryType(BinaryType.UINT32),0x20);
 		public static readonly BinaryFieldType SetFlag = new BinaryFieldType (new BinaryType(BinaryType.UINT32),0x21);
 		public static readonly BinaryFieldType ClearFlag = new BinaryFieldType (new BinaryType(BinaryType.UINT32),0x22);
+		public static readonly BinaryFieldType SignerQuorum = new BinaryFieldType (new BinaryType (BinaryType.UINT32), 35);
+		public static readonly BinaryFieldType CancelAfter = new BinaryFieldType (new BinaryType (BinaryType.UINT32), 36);
+		public static readonly BinaryFieldType FinishAfter = new BinaryFieldType (new BinaryType (BinaryType.UINT32), 37);
+		public static readonly BinaryFieldType SignerListID = new BinaryFieldType (new BinaryType (BinaryType.UINT32), 38);
+		public static readonly BinaryFieldType SettleDelay = new BinaryFieldType (new BinaryType (BinaryType.UINT32), 39);
 
 		public static readonly BinaryFieldType IndexNext = new BinaryFieldType (new BinaryType(BinaryType.UINT64),0x01);
 		public static readonly BinaryFieldType IndexPrevious = new BinaryFieldType (new BinaryType(BinaryType.UINT64),0x02);
@@ -58,9 +64,15 @@ namespace RippleLibSharp.Binary
 		public static readonly BinaryFieldType ExchangeRate = new BinaryFieldType (new BinaryType(BinaryType.UINT64),0x06);
 		public static readonly BinaryFieldType LowNode = new BinaryFieldType (new BinaryType(BinaryType.UINT64),0x07);
 		public static readonly BinaryFieldType HighNode = new BinaryFieldType (new BinaryType(BinaryType.UINT64),0x08);
-
+		public static readonly BinaryFieldType DestinationNode = new BinaryFieldType (new BinaryType (BinaryType.UINT64), 9);
+		public static readonly BinaryFieldType Cookie = new BinaryFieldType (new BinaryType (BinaryType.UINT64), 10);
 
 		public static readonly BinaryFieldType EmailHash = new BinaryFieldType (new BinaryType(BinaryType.HASH128),0x01);
+
+		public static readonly BinaryFieldType TakerPaysCurrency = new BinaryFieldType (new BinaryType (BinaryType.HASH160), 0x01);
+		public static readonly BinaryFieldType TakerPaysIssuer = new BinaryFieldType (new BinaryType (BinaryType.HASH160), 0x02);
+		public static readonly BinaryFieldType TakerGetsCurrency = new BinaryFieldType (new BinaryType (BinaryType.HASH160), 0x03);
+		public static readonly BinaryFieldType TakerGetsIssuer = new BinaryFieldType (new BinaryType (BinaryType.HASH160), 0x04);
 
 
 		public static readonly BinaryFieldType LedgerHash = new BinaryFieldType (new BinaryType(BinaryType.HASH256),0x01);
@@ -71,16 +83,22 @@ namespace RippleLibSharp.Binary
 		public static readonly BinaryFieldType LedgerIndex = new BinaryFieldType (new BinaryType(BinaryType.HASH256),0x06);
 		public static readonly BinaryFieldType WalletLocator = new BinaryFieldType (new BinaryType(BinaryType.HASH256),0x07);
 		public static readonly BinaryFieldType RootIndex = new BinaryFieldType (new BinaryType(BinaryType.HASH256),0x08);
+
+
+
 		public static readonly BinaryFieldType BookDirectory = new BinaryFieldType (new BinaryType(BinaryType.HASH256),0x10);
 		public static readonly BinaryFieldType InvoiceID = new BinaryFieldType (new BinaryType(BinaryType.HASH256),0x11);
 		public static readonly BinaryFieldType Nickname = new BinaryFieldType (new BinaryType(BinaryType.HASH256),0x12);
-		public static readonly BinaryFieldType Feature = new BinaryFieldType (new BinaryType(BinaryType.HASH256),0x13);
+
+		public static readonly BinaryFieldType Amendment = new BinaryFieldType (new BinaryType (BinaryType.HASH256), 19);
+		public static readonly BinaryFieldType TicketID = new BinaryFieldType (new BinaryType (BinaryType.HASH256), 20); 
+		public static readonly BinaryFieldType Digest = new BinaryFieldType (new BinaryType (BinaryType.HASH256), 21);
+		public static readonly BinaryFieldType Channel = new BinaryFieldType (new BinaryType (BinaryType.HASH256), 22);
+		public static readonly BinaryFieldType ConsensusHash = new BinaryFieldType (new BinaryType (BinaryType.HASH256), 23);
+		public static readonly BinaryFieldType CheckID = new BinaryFieldType (new BinaryType (BinaryType.HASH256), 24);
+		//public static readonly BinaryFieldType Feature = new BinaryFieldType (new BinaryType(BinaryType.HASH256),0x13);
 
 
-		public static readonly BinaryFieldType TakerPaysCurrency = new BinaryFieldType (new BinaryType(BinaryType.HASH160),0x01);
-		public static readonly BinaryFieldType TakerPaysIssuer = new BinaryFieldType (new BinaryType(BinaryType.HASH160),0x02);
-		public static readonly BinaryFieldType TakerGetsCurrency = new BinaryFieldType (new BinaryType(BinaryType.HASH160),0x03);
-		public static readonly BinaryFieldType TakerGetsIssuer = new BinaryFieldType (new BinaryType(BinaryType.HASH160),0x04);
 
 		public static readonly BinaryFieldType Amount = new BinaryFieldType (new BinaryType(BinaryType.AMOUNT),0x01);
 		public static readonly BinaryFieldType Balance = new BinaryFieldType (new BinaryType(BinaryType.AMOUNT),0x02);
@@ -91,12 +109,18 @@ namespace RippleLibSharp.Binary
 		public static readonly BinaryFieldType HighLimit = new BinaryFieldType (new BinaryType(BinaryType.AMOUNT),0x07);
 		public static readonly BinaryFieldType Fee = new BinaryFieldType (new BinaryType(BinaryType.AMOUNT),0x08);
 		public static readonly BinaryFieldType SendMax = new BinaryFieldType (new BinaryType(BinaryType.AMOUNT),0x09);
+		public static readonly BinaryFieldType DeliverMin = new BinaryFieldType (new BinaryType (BinaryType.AMOUNT), 10);
+
+
 		public static readonly BinaryFieldType MinimumOffer = new BinaryFieldType (new BinaryType(BinaryType.AMOUNT),0x10);
 		public static readonly BinaryFieldType RippleEscrow = new BinaryFieldType (new BinaryType(BinaryType.AMOUNT),0x11);
+		public static readonly BinaryFieldType DeliveredAmount = new BinaryFieldType (new BinaryType (BinaryType.AMOUNT), 18);
 
 		public static readonly BinaryFieldType PublicKey = new BinaryFieldType (new BinaryType(BinaryType.VARIABLE_LENGTH),0x01);
+		public static readonly BinaryFieldType SigningPubKey = new BinaryFieldType (new BinaryType (BinaryType.VARIABLE_LENGTH), 0x03);
+		// TODO Signature
 		public static readonly BinaryFieldType MessageKey = new BinaryFieldType (new BinaryType(BinaryType.VARIABLE_LENGTH),0x02);
-		public static readonly BinaryFieldType SigningPubKey = new BinaryFieldType (new BinaryType(BinaryType.VARIABLE_LENGTH),0x03);
+
 		public static readonly BinaryFieldType TxnSignature = new BinaryFieldType (new BinaryType(BinaryType.VARIABLE_LENGTH),0x04);
 		public static readonly BinaryFieldType Generator = new BinaryFieldType (new BinaryType(BinaryType.VARIABLE_LENGTH),0x05);
 		public static readonly BinaryFieldType Signature = new BinaryFieldType (new BinaryType(BinaryType.VARIABLE_LENGTH),0x06);
@@ -105,6 +129,14 @@ namespace RippleLibSharp.Binary
 		public static readonly BinaryFieldType RemoveCode = new BinaryFieldType (new BinaryType(BinaryType.VARIABLE_LENGTH),0x09);
 		public static readonly BinaryFieldType ExpireCode = new BinaryFieldType (new BinaryType(BinaryType.VARIABLE_LENGTH),0x0a);
 		public static readonly BinaryFieldType CreateCode = new BinaryFieldType (new BinaryType(BinaryType.VARIABLE_LENGTH),0x0b);
+
+		public static readonly BinaryFieldType MemoType = new BinaryFieldType ( new BinaryType (BinaryType.VARIABLE_LENGTH), 12);
+		public static readonly BinaryFieldType MemoData = new BinaryFieldType (new BinaryType (BinaryType.VARIABLE_LENGTH), 13);
+		public static readonly BinaryFieldType MemoFormat = new BinaryFieldType (new BinaryType (BinaryType.VARIABLE_LENGTH), 14);
+
+		public static readonly BinaryFieldType Fulfillment = new BinaryFieldType (new BinaryType (BinaryType.VARIABLE_LENGTH), 16);
+		public static readonly BinaryFieldType Condition = new BinaryFieldType (new BinaryType (BinaryType.VARIABLE_LENGTH), 17);
+		//public static readonly BinaryFieldType MasterSignature = new BinaryFieldType (new BinaryType (BinaryType.VARIABLE_LENGTH), 18);
 
 		public static readonly BinaryFieldType Account = new BinaryFieldType (new BinaryType(BinaryType.ACCOUNT),0x01);
 		public static readonly BinaryFieldType Owner = new BinaryFieldType (new BinaryType(BinaryType.ACCOUNT),0x02);
@@ -129,6 +161,8 @@ namespace RippleLibSharp.Binary
 		public static readonly BinaryFieldType FinalFields = new BinaryFieldType (new BinaryType(BinaryType.OBJECT), 0x07);
 		public static readonly BinaryFieldType NewFields = new BinaryFieldType (new BinaryType(BinaryType.OBJECT), 0x08);
 		public static readonly BinaryFieldType TemplateEntry= new BinaryFieldType (new BinaryType(BinaryType.OBJECT), 0x09);
+		public static readonly BinaryFieldType Memo = new BinaryFieldType (new BinaryType (BinaryType.OBJECT), 10);
+		public static readonly BinaryFieldType SignerEntry = new BinaryFieldType (new BinaryType (BinaryType.OBJECT), 11);
 
 		public static readonly BinaryFieldType SigningAccounts= new BinaryFieldType (new BinaryType(BinaryType.ARRAY), 0x02);
 		public static readonly BinaryFieldType TxnSignatures= new BinaryFieldType (new BinaryType(BinaryType.ARRAY), 0x03);
@@ -136,8 +170,8 @@ namespace RippleLibSharp.Binary
 		public static readonly BinaryFieldType Template= new BinaryFieldType (new BinaryType(BinaryType.ARRAY), 0x05);
 		public static readonly BinaryFieldType Necessary= new BinaryFieldType (new BinaryType(BinaryType.ARRAY), 0x06);
 		public static readonly BinaryFieldType Sufficient= new BinaryFieldType (new BinaryType(BinaryType.ARRAY), 0x07);
-        public static readonly BinaryFieldType AffectedNodes= new BinaryFieldType (new BinaryType(BinaryType.ARRAY), 0x08);
-
+      		public static readonly BinaryFieldType AffectedNodes= new BinaryFieldType (new BinaryType(BinaryType.ARRAY), 0x08);
+		public static readonly BinaryFieldType Memos = new BinaryFieldType (new BinaryType (BinaryType.ARRAY), 9);
 
 		public static BinaryFieldType[] GetValues ()
 		{
@@ -145,7 +179,7 @@ namespace RippleLibSharp.Binary
 			if (valuesCache == null) {
 				valuesCache = new BinaryFieldType[] {
 
-				// poor mans ENUM object // note this is the Enumarable order
+				// note this is the Enumarable order
 				CloseResolution,
 				TemplateEntryType,
 				TransactionResult,
@@ -207,7 +241,7 @@ namespace RippleLibSharp.Binary
 				BookDirectory,
 				InvoiceID ,
 				Nickname,
-				Feature,
+				//Feature,
 
 
 				TakerPaysCurrency,
@@ -508,9 +542,11 @@ namespace RippleLibSharp.Binary
 				return "Nickname";
 			}
 
+			/*
 			if (typ == Feature) {
 				return "Feature";
 			}
+			*/
 
 			if (typ == TakerPaysCurrency) {
 				return "TakerPaysCurrency";

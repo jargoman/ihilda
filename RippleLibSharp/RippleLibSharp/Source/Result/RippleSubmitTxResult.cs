@@ -1,5 +1,6 @@
 ﻿using System;
 using Codeplex.Data;
+using RippleLibSharp.Network;
 using RippleLibSharp.Transactions.TxTypes;
 
 namespace RippleLibSharp.Transactions
@@ -62,10 +63,10 @@ namespace RippleLibSharp.Transactions
 		public string hash { get; set; }
 	}
 
-	public class Request
+	public class Request : Identifiable 
 	{
 		public string command { get; set; }
-		public int id { get; set; }
+		public IdentifierTag id { get; set; }
 		public string secret { get; set; }
 		public TxJson tx_json { get; set; }
 

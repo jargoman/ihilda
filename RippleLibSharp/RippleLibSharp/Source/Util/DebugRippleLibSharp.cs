@@ -25,17 +25,19 @@ namespace RippleLibSharp.Util
 
 		public static bool AccountOffers = false;
 
-		public static bool AccountTx = true;
+		public static bool AccountRCLSettingsWindow = false;
+
+		public static bool AccountTx = false;
 
 		public static bool allowInsecureDebugging = false; // VERY IMPORTANT. IF SET SEED / OR PASSWORDS WILL BE INCLUDED IN DEBUGGING INFORMATION
 
 		public static bool Base58 = false;
 
-		public static bool BinarySerializer = true;
+		public static bool BinarySerializer = false;
 
 		public static bool BinaryType = false;
 
-		public static bool ConnectionInfo = false;
+		public static bool ConnectionSettings = false;
 
 		public static bool DataAPI = false;
 
@@ -43,9 +45,9 @@ namespace RippleLibSharp.Util
 
 		public static bool DynamicJson = false;
 
-		public static bool NetworkInterface = true;
+		public static bool NetworkInterface = false;
 
-		public static bool NetworkRequestTask = true;
+		public static bool NetworkRequestTask = false;
 
 
 

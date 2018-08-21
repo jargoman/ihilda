@@ -12,23 +12,28 @@ namespace RippleLibSharp.Commands.Accounts
 {
 	public static class AccountTx
 	{
-		
 
-		public static  Task<Response<AccountTxResult>> GetResult ( 
-			string account, 
-			string ledger_index_min, 
+
+		public static Task<Response<AccountTxResult>> GetResult (
+			string account,
+			string ledger_index_min,
 			string ledger_index_max,
 			int? limit,
 
 			/*count = false,*/
-		
-			bool forward,
-			NetworkInterface ni
-		) {
 
-			int id = NetworkRequestTask.ObtainTicket();
+			bool forward,
+			NetworkInterface ni,
+			IdentifierTag identifierTag = null
+		) {
+			if (identifierTag == null) {
+				identifierTag = new IdentifierTag {
+					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+				};
+			}
+
 			object o = new {
-				id,
+				id = identifierTag,
 				command = "account_tx",
 				account,
 				ledger_index_min,
@@ -42,7 +47,7 @@ namespace RippleLibSharp.Commands.Accounts
 			string request = DynamicJson.Serialize (o);
 
 			Task< Response<AccountTxResult>> task = 
-				NetworkRequestTask.RequestResponse < AccountTxResult> (id, request, ni);
+				NetworkRequestTask.RequestResponse < AccountTxResult> (identifierTag, request, ni);
 
 
 			return task;
@@ -66,6 +71,8 @@ namespace RippleLibSharp.Commands.Accounts
 			//int limit,
 
 			NetworkInterface ni
+			//IdentifierTag identifierTag = null
+
 		) 
 
 		 {
@@ -74,9 +81,15 @@ namespace RippleLibSharp.Commands.Accounts
 					bool forward = true; // almost certain it has to be true
 					List<Response<AccountTxResult>> list = new List<Response<AccountTxResult>>();
 
-					int id = NetworkRequestTask.ObtainTicket();
+
+
+					IdentifierTag identifierTag= new IdentifierTag {
+						IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+					};
+
+
 					object o = new {
-						id,
+						id = identifierTag,
 						command = "account_tx",
 						account,
 						ledger_index_min,
@@ -89,7 +102,7 @@ namespace RippleLibSharp.Commands.Accounts
 					string request = DynamicJson.Serialize (o);
 
 					Task< Response<AccountTxResult>> task = 
-						NetworkRequestTask.RequestResponse < AccountTxResult> (id, request, ni);
+						NetworkRequestTask.RequestResponse < AccountTxResult> (identifierTag, request, ni);
 
 					if (task == null) {
 						//TODO
@@ -111,9 +124,14 @@ namespace RippleLibSharp.Commands.Accounts
 
 					while (accountTx?.marker != null) {
 						//Thread.Sleep(18000);
-						id = NetworkRequestTask.ObtainTicket();
+
+						identifierTag = new IdentifierTag {
+							IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+						};
+
+
 						o = new {
-							id,
+							id = identifierTag,
 							command = "account_tx",
 							account,
 							//ledger_index_min = accountTx.marker,
@@ -126,7 +144,7 @@ namespace RippleLibSharp.Commands.Accounts
 
 						request = DynamicJson.Serialize (o);
 						task = null; // set it to null so you know it failed rather than still having old value
-						task = NetworkRequestTask.RequestResponse < AccountTxResult> (id, request, ni);
+						task = NetworkRequestTask.RequestResponse < AccountTxResult> (identifierTag, request, ni);
 
 
 						if (task == null) {

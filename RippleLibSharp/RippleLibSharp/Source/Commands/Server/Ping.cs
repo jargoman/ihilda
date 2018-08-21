@@ -9,17 +9,21 @@ namespace RippleLibSharp.Commands.Server
 	public static class Ping
 	{
 
-		public static  Task<Response<PingObject>> getResult (NetworkInterface ni) {
+		public static  Task<Response<PingObject>> getResult (NetworkInterface ni, IdentifierTag identifierTag = null) {
+			if (identifierTag == null) {
+				identifierTag = new IdentifierTag {
+					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+				};
+			}
 
-			int id = NetworkRequestTask.ObtainTicket();
 			object o = new {
-				id,
+				id = identifierTag,
 				command = "ping",
 			};
 
 			string request = DynamicJson.Serialize (o);
 
-			Task< Response<PingObject>> task = NetworkRequestTask.RequestResponse <PingObject> (id, request, ni);
+			Task< Response<PingObject>> task = NetworkRequestTask.RequestResponse <PingObject> (identifierTag, request, ni);
 
 			return task;
 		}

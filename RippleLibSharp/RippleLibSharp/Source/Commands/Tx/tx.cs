@@ -17,12 +17,17 @@ namespace RippleLibSharp.Commands.Tx
 	public static class tx
 #pragma warning restore IDE1006 // Naming Styles
 	{
-		public static Task<Response<RippleTransaction>> GetRequest ( string tx_id, NetworkInterface ni )
+		public static Task<Response<RippleTransaction>> GetRequest ( string tx_id, NetworkInterface ni, IdentifierTag identifierTag = null)
 		{
-			int id = NetworkRequestTask.ObtainTicket();
+			if (identifierTag == null) {
+				identifierTag = new IdentifierTag {
+					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+				};
+			}
+
 			object o =
 				new {
-				id,
+				id = identifierTag,
 				command = "tx",
 				transaction = tx_id
 			};
@@ -30,7 +35,7 @@ namespace RippleLibSharp.Commands.Tx
 			string request = DynamicJson.Serialize (o);
 
 			Task< Response<RippleTransaction>> task = 
-				NetworkRequestTask.RequestResponse < RippleTransaction> (id, request, ni);
+				NetworkRequestTask.RequestResponse < RippleTransaction> (identifierTag, request, ni);
 
 
 			return task;
@@ -42,14 +47,39 @@ namespace RippleLibSharp.Commands.Tx
 		public static Task<Response<string>> GetRequestDataApi (string tx_id) {
 			return Task.Run (
 				delegate {
-					string req = api + tx_id + options;
-					Response<string> resp = DataApi.GetResponseObject <Response<string>>(req);
 
+					//int attempt = 0;
+					//while (attempt++ < 3) {
+						// limit data api calls to avoid getting 
+						if (last_call_time == default (DateTime)) {
+							last_call_time = DateTime.Now;
+						} else {
+
+							while ((((TimeSpan)(DateTime.Now - last_call_time)).TotalMilliseconds) < 1000) {
+								Thread.Sleep (100);
+							}
+						}
+
+
+
+						last_call_time = DateTime.Now;
+
+
+
+						string req = api + tx_id + options;
+						Response<string> resp = DataApi.GetResponseObject<Response<string>> (req);
+
+						//if () {
+
+						//}
+					//}
 					return resp;
 				}
 			);
 
 		}
+
+		private static DateTime last_call_time = default (DateTime);
 
 
 		static string api = "https://data.ripple.com/v2/transactions/";

@@ -1,10 +1,11 @@
 ﻿using System;
 using RippleLibSharp.Paths;
 using RippleLibSharp.Transactions;
+using RippleLibSharp.Network;
 
 namespace RippleLibSharp.Result
 {
-	public class PathFindResult
+	public class PathFindResult : Identifiable
 	{
 		/*
 		public PathFindResult ()
@@ -18,7 +19,7 @@ namespace RippleLibSharp.Result
 		public string destination_account { get; set; }
 		public RippleCurrency destination_amount { get; set; }
 		public bool full_reply { get; set; }
-		public int id { get; set; }
+		public IdentifierTag id { get; set; }
 		public string source_account { get; set; }
 	
 

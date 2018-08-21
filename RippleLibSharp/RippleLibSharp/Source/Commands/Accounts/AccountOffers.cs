@@ -12,11 +12,15 @@ namespace RippleLibSharp.Commands.Accounts
 	public static class AccountOffers
 	{
 
-		public static  Task< Response<AccountOffersResult>> GetResult ( string account, NetworkInterface ni ) {
+		public static  Task< Response<AccountOffersResult>> GetResult ( string account, NetworkInterface ni, IdentifierTag identifierTag = null ) {
+			if (identifierTag == null) {
+				identifierTag = new IdentifierTag {
+					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+				};
+			}
 
-			int id = NetworkRequestTask.ObtainTicket();
 			object o = new {
-				id,
+				id = identifierTag,
 				command = "account_offers",
 				account,
 				ledger = "current"
@@ -24,7 +28,7 @@ namespace RippleLibSharp.Commands.Accounts
 
 			string request = DynamicJson.Serialize (o);
 
-			Task< Response<AccountOffersResult>> task = NetworkRequestTask.RequestResponse <AccountOffersResult> (id, request, ni);
+			Task< Response<AccountOffersResult>> task = NetworkRequestTask.RequestResponse <AccountOffersResult> (identifierTag, request, ni);
 
 			//task.Wait ();
 			//return task.Result;
@@ -36,6 +40,9 @@ namespace RippleLibSharp.Commands.Accounts
 			return Task.Run ( delegate {  
 
 				List<Response<AccountOffersResult>> list = new List<Response<AccountOffersResult>> ();
+				IdentifierTag identifierTag = new IdentifierTag {
+					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+				};
 
 				Task<Response<AccountOffersResult>> task = GetResult (account, ni);
 
@@ -62,9 +69,15 @@ namespace RippleLibSharp.Commands.Accounts
 
 
 				while ( response?.result?.marker != null) {
-					int id = NetworkRequestTask.ObtainTicket ();
+
+
+					identifierTag = new IdentifierTag {
+						IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+					};
+
+
 					object o = new {
-						id,
+						id = identifierTag,
 						command = "account_offers",
 						account,
 						ledger = "current",
@@ -72,7 +85,7 @@ namespace RippleLibSharp.Commands.Accounts
 					};
 
 					string request = DynamicJson.Serialize (o);
-					task = NetworkRequestTask.RequestResponse <AccountOffersResult> (id, request, ni);
+					task = NetworkRequestTask.RequestResponse <AccountOffersResult> (identifierTag, request, ni);
 					task.Wait ();
 
 					response = task?.Result;

@@ -19,11 +19,16 @@ namespace RippleLibSharp.Commands.Accounts
 	{
 		
 
-		public static Task<Response<AccountLinesResult>> GetResult ( string account, NetworkInterface ni ) {
+		public static Task<Response<AccountLinesResult>> GetResult ( string account, NetworkInterface ni, IdentifierTag identifierTag = null ) {
 
-			int id = NetworkRequestTask.ObtainTicket();
+			if (identifierTag == null) {
+				identifierTag = new IdentifierTag {
+					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+				};
+			}
+
 			object o = new {
-				id,
+				id = identifierTag,
 				command = "account_lines",
 				account,
 				ledger = "current"
@@ -32,7 +37,7 @@ namespace RippleLibSharp.Commands.Accounts
 			string request = DynamicJson.Serialize (o);
 
 			Task< Response<AccountLinesResult>> task = 
-				NetworkRequestTask.RequestResponse <AccountLinesResult> (id, request, ni);
+				NetworkRequestTask.RequestResponse <AccountLinesResult> ( identifierTag, request, ni );
 
 			//task.Wait ();
 
@@ -64,9 +69,12 @@ namespace RippleLibSharp.Commands.Accounts
 
 			while (res?.marker != null) {
 				
-				int id = NetworkRequestTask.ObtainTicket();
+				IdentifierTag identifierTag = new IdentifierTag {
+					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
+				};
+
 				object o = new {
-					id,
+					id = identifierTag,
 					command = "account_lines",
 					account,
 					ledger = "current",
@@ -76,7 +84,7 @@ namespace RippleLibSharp.Commands.Accounts
 				string request = DynamicJson.Serialize (o);
 
 				Task< Response<AccountLinesResult>> task2 = 
-					NetworkRequestTask.RequestResponse <AccountLinesResult> (id, request, ni);
+					NetworkRequestTask.RequestResponse <AccountLinesResult> (identifierTag, request, ni);
 				
 				task2.Wait ();
 

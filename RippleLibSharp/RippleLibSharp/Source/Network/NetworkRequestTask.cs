@@ -14,7 +14,7 @@ namespace RippleLibSharp.Network
 	{
 
 
-		public static Task<Response<T>> RequestResponse<T> (int ticket, string request, NetworkInterface networkInterface)
+		public static Task<Response<T>> RequestResponse<T> (IdentifierTag identifierTag, string request, NetworkInterface networkInterface)
 		{
 			return Task.Run (
 				delegate {
@@ -26,9 +26,9 @@ namespace RippleLibSharp.Network
 						+ typeof (T).ToString ()
 						+ " > "
 								   + DebugRippleLibSharp.left_parentheses
-								   + nameof (ticket)
+						            + nameof (identifierTag)
 								   + DebugRippleLibSharp.equals
-								   + ticket.ToString ()
+						            + identifierTag?.ToString () ?? "null"
 								   + "..."
 								   + DebugRippleLibSharp.right_parentheses;
 #endif
@@ -37,6 +37,8 @@ namespace RippleLibSharp.Network
 
 						return null;
 					}
+
+					int ticket = identifierTag.IdentificationNumber;
 
 					TicketStub stub = new TicketStub {
 						Handle = new ManualResetEvent (true)
@@ -161,7 +163,8 @@ namespace RippleLibSharp.Network
 #endif
 
 				// Exctract the id from the json to try and recover from the error
-				string idPattern = "{\"id\":";
+				//string idPattern = "{\"id\":";
+				string idPattern = "{\"id\":{ \"IdentificationNumber\":";
 				//if (sp.str.StartsWith(idPattern)) {
 				if (sp.str.StartsWith (idPattern, StringComparison.CurrentCulture)) {
 					// might seem overkill parsing though strings but it's worth handling this gracefully 
@@ -202,7 +205,12 @@ namespace RippleLibSharp.Network
 				//Response<Json_Response> d = DynamicJson.Parse(sp.str);
 
 				//Ping p = d;
-				int tick = d.id;
+
+				IdentifierTag identifier = d.id;
+
+				int tick = identifier.IdentificationNumber;
+
+
 #if DEBUG
 
 				if (DebugRippleLibSharp.NetworkRequestTask) {
