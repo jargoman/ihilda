@@ -57,6 +57,20 @@ namespace IhildaWallet
 
 			SetComboBox ();
 
+
+			fromhexbutton.Clicked += (object sender, EventArgs e) => {
+				RippleSeedAddress rippleSeedAddress = SeedFromHexDialog.DoDialog ();
+
+				if (rippleSeedAddress == null) {
+					return;
+				}
+
+				secretentry.Text = rippleSeedAddress.ToString ();
+			
+			};
+
+
+
 			secretentry.Changed += (object sender, EventArgs e) => {
 
 #if DEBUG

@@ -584,6 +584,8 @@
     <Compile Include="Source\gui-classes\Windows\AccountRCLSettingsWindow.cs" />
     <Compile Include="gtk-gui\IhildaWallet.AccountRCLSettingsWindow.cs" />
     <Compile Include="Source\bot\MarkAsCommand.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\SeedFromHexDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.SeedFromHexDialog.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
