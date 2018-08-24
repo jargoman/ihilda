@@ -1,5 +1,15 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/util/TradePairManager.cs">
+    <Files>
+      <File FileName="Source/gui-classes/Widgets/Trees/TradePairTree.cs" Line="191" Column="15" />
+      <File FileName="Source/util/TradePairManager.cs" Line="184" Column="40" />
+      <File FileName="Source/gui-classes/Dialogs/TradePairCreateDialog.cs" Line="32" Column="44" />
+      <File FileName="Source/gui-classes/Widgets/TradeUI/TradePairEntryWidget.cs" Line="43" Column="62" />
+      <File FileName="Source/gui-classes/Widgets/TradeUI/CascadedBuyWidget.cs" Line="326" Column="91" />
+      <File FileName="Source/Program.cs" Line="167" Column="1" />
+      <File FileName="Source/gui-classes/Windows/TradePairManagerWindow.cs" Line="232" Column="37" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

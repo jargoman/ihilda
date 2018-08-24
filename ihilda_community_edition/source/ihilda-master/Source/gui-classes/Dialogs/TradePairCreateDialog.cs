@@ -41,9 +41,10 @@ namespace IhildaWallet
 		public static TradePair DoDialog (TradePair preset)
 		{
 
-			using (TradePairCreateDialog tpcd = new TradePairCreateDialog (preset)) {
 
+			using (TradePairCreateDialog tpcd = new TradePairCreateDialog (preset)) {
 				while (true) {
+
 					TradePair tp = null;
 
 					tpcd.Show ();

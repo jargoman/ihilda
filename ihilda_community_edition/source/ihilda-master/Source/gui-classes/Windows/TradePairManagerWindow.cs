@@ -153,21 +153,37 @@ namespace IhildaWallet
 		}
 
 		public void EditTradePair ( object sender, EventArgs args ) {
+
+
+			string method_sig = clsstr + nameof (EditTradePair) + DebugRippleLibSharp.both_parentheses;
+
+
 			TradePair oldtp = TradePairManager.SelectedTradePair;
 
 			if (oldtp == null) {
+				MessageDialog.ShowMessage ("You must first select a tradepair to edit.");
 				return;
 			}
 
 			TradePair newtp = TradePairCreateDialog.DoDialog (oldtp);
 
 			if (newtp == null) {
+				//MessageDialog.ShowMessage ("");
+				return;
+			}
+
+			if (newtp.Currency_Base == null) {
+				return;
+			}
+
+			if (newtp.Currency_Base == null) {
 				return;
 			}
 
 			tpm.RemoveTradePair (oldtp);
 			tpm.AddTradePair (newtp);
 			tpm.SaveTradePairs ();
+
 			UpdateUI ();
 
 		}
