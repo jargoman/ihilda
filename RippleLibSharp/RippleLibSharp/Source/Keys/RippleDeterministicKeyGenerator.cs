@@ -154,7 +154,7 @@ namespace RippleLibSharp.Keys
 
 		public RipplePrivateKey GetAccountPrivateKey (int accountNumber)
 		{
-			BigInteger privateRootKeyBI = new BigInteger (1, GetPrivateRootKeyBytes ());
+			BigInteger privateRootKeyBI = new BigInteger ( 1, GetPrivateRootKeyBytes () );
 			// TODO factor out the common part with the public key
 
 			ECPoint publicGeneratorPoint = GetPublicGeneratorPoint ();
@@ -183,7 +183,7 @@ namespace RippleLibSharp.Keys
 				mem.Flush ();
 
 				byte [] pubGenAccountSubSeqBytes = mem.ToArray ();
-				byte [] publicGeneratorAccountSeqHashBytes = HalfSHA512 (pubGenAccountSubSeqBytes);
+				byte [] publicGeneratorAccountSeqHashBytes = HalfSHA512 ( pubGenAccountSubSeqBytes );
 
 				pubGenSeqSubSeqHashBI = new BigInteger (1, publicGeneratorAccountSeqHashBytes);
 				if (pubGenSeqSubSeqHashBI.CompareTo (SECP256k1_PARAMS.N) == -1 && !pubGenSeqSubSeqHashBI.Equals (BigInteger.Zero)) {

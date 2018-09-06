@@ -118,6 +118,7 @@ namespace IhildaWallet
 			this.selectbutton.Clicked += Selectbutton_Clicked;
 
 
+
 			this.treeview1.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
 #if DEBUG
 				if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
@@ -156,6 +157,8 @@ namespace IhildaWallet
 					//args.Event.
 				}
 			};
+
+
 
 		}
 
@@ -584,6 +587,8 @@ namespace IhildaWallet
 
 
 			treeview1.Model = Liststore;
+
+			Analysisbutton_Clicked (null,null);
 
 
 		}

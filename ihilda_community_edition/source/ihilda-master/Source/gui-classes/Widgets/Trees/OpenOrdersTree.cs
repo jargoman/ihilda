@@ -135,7 +135,9 @@ namespace IhildaWallet
 						uint se = Convert.ToUInt32 (AccountInfo.GetSequence (ao.Account, networkInterface));
 
 						RippleSeedAddress rippleSeedAddress = _rippleWallet.GetDecryptedSeed ();
-						CancelOrderAtIndex (index, se, networkInterface, rippleSeedAddress);
+
+						//bool b = CancelOrderAtIndex ( _rippleWallet.GetStoredReceiveAddress(), se, networkInterface, rippleSeedAddress );
+						CancelOrderAtIndex (_rippleWallet.GetStoredReceiveAddress (), index, se, networkInterface, rippleSeedAddress);
 					}
 				);
 
@@ -246,7 +248,7 @@ namespace IhildaWallet
 		}
 
 
-		public bool CancelOrderAtIndex (int index, uint sequence, NetworkInterface ni, RippleSeedAddress rsa)
+		public bool CancelOrderAtIndex (string account, int index, uint sequence, NetworkInterface ni, RippleSeedAddress rsa)
 		{
 
 #if DEBUG
@@ -269,8 +271,11 @@ namespace IhildaWallet
 					return false;
 				}
 
-				if (!signingAccount.Equals (off.Account)) {
-					MessageDialog.ShowMessage ("Invalid Seed", "Order does not belong to signing seed");
+
+
+				if (!signingAccount.Equals (off.Account) && account != off.Account) {
+					MessageDialog.ShowMessage ("Wrong Wallet!!", "Order's master account does not belong to signing seed. ");
+					//bool answ = AreYouSure.AskQuestion ();
 					return false;
 				}
 

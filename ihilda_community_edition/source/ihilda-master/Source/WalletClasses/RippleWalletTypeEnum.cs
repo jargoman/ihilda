@@ -3,8 +3,8 @@ namespace IhildaWallet
 {
 	public enum RippleWalletTypeEnum
 	{
-		NONE,
 		Master,
 		Regular
+		//HexPrivateKey // only if tx signing 
 	}
 }

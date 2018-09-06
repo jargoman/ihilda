@@ -135,7 +135,7 @@ namespace IhildaWallet
 			string method_sig = clsstr + nameof (Entry_Changed) + DebugRippleLibSharp.both_parentheses;
 			string str = combobox1.ActiveText;
 #endif
-			RippleWalletTypeEnum walletTypeEnum = RippleWalletTypeEnum.NONE;
+			RippleWalletTypeEnum walletTypeEnum = default (RippleWalletTypeEnum);
 
 			try {
 				walletTypeEnum = (RippleWalletTypeEnum)Enum.Parse (typeof (RippleWalletTypeEnum), str);
@@ -152,9 +152,12 @@ namespace IhildaWallet
 			}
 
 			switch (walletTypeEnum) {
-			case RippleWalletTypeEnum.NONE:
-				//combobox1.Entry.Text = "";
+			/*
+			case RippleWalletTypeEnum.HexPrivateKey:
+				label5.Visible = false;
+				comboboxentry2.Visible = false;
 				return;
+				*/
 			case RippleWalletTypeEnum.Regular:
 				label5.Visible = true;
 				comboboxentry2.Visible = true;
@@ -483,7 +486,7 @@ namespace IhildaWallet
 				String selection = this.combobox2.ActiveText;
 
 				string walletType = this.combobox1.ActiveText;
-				RippleWalletTypeEnum walletTypeEnum = RippleWalletTypeEnum.NONE;
+					RippleWalletTypeEnum walletTypeEnum = default (RippleWalletTypeEnum);
 
 				try {
 					walletTypeEnum = (IhildaWallet.RippleWalletTypeEnum)Enum.Parse (typeof (RippleWalletTypeEnum), walletType);
@@ -493,6 +496,8 @@ namespace IhildaWallet
 						Logging.ReportException (method_sig, e);
 
 					}
+
+						return null;
 				}
 				RippleWallet rw = null;
 				try {
@@ -515,6 +520,7 @@ namespace IhildaWallet
 
 
 					MessageDialog.ShowMessage ("Invalid seed");
+					return null;
 				}
 
 

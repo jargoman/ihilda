@@ -288,8 +288,8 @@
     <EmbeddedResource Include="Images\cooltext119298857483375.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Images\ihilda_logo_black_sans_150.png" />
-    <EmbeddedResource Include="Images\ihilda_logo_black_sans.png" />
+    <EmbeddedResource Include="..\..\..\..\ihildaplain.png" />
+    <EmbeddedResource Include="..\..\..\..\ihildaplain-100-wide.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="gtk-gui\generated.cs" />

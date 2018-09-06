@@ -223,7 +223,7 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 2;
+			this.notebook1.CurrentPage = 0;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.vbox5 = new global::Gtk.VBox();
 			this.vbox5.Name = "vbox5";
@@ -294,7 +294,7 @@ namespace IhildaWallet
 			// Container child eventbox1.Gtk.Container+ContainerChild
 			this.image1 = new global::Gtk.Image();
 			this.image1.Name = "image1";
-			this.image1.Pixbuf = global::Gdk.Pixbuf.LoadFromResource("IhildaWallet.Images.ihilda_logo_black_sans_150.png");
+			this.image1.Pixbuf = global::Gdk.Pixbuf.LoadFromResource("IhildaWallet.ihildaplain-100-wide.png");
 			this.eventbox1.Add(this.image1);
 			this.vbox5.Add(this.eventbox1);
 			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox5[this.eventbox1]));

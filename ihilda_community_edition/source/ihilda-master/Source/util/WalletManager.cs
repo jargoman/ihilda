@@ -637,7 +637,7 @@ namespace IhildaWallet
 				}
 
 
-				RippleWalletTypeEnum walletTypeEnum = RippleWalletTypeEnum.NONE;
+				RippleWalletTypeEnum walletTypeEnum = default(RippleWalletTypeEnum);
 
 				try {
 					walletTypeEnum = (IhildaWallet.RippleWalletTypeEnum)Enum.Parse (typeof (RippleWalletTypeEnum), jwallet.AccountType);

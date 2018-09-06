@@ -165,7 +165,7 @@ namespace IhildaWallet
 				}
 
 
-				bool suceeded = this.openorderstree1.CancelOrderAtIndex ( index, se++, ni, rsa );
+				bool suceeded = this.openorderstree1.CancelOrderAtIndex ( rw.GetStoredReceiveAddress(), index, se++, ni, rsa );
 				if (!suceeded) {
 					return;
 				}

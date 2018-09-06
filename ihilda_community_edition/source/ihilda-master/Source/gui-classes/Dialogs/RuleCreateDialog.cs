@@ -10,6 +10,12 @@ namespace IhildaWallet
 		{
 			this.Build ();
 
+			this.label16.Text = "";
+			this.label17.Text = "";
+			this.label18.Text = "";
+			this.label19.Text = "";
+			this.label20.Text = "";
+
 			if (tradepairentrywidget1 == null) {
 				tradepairentrywidget1 = new TradePairEntryWidget ();
 

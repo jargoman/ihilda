@@ -212,11 +212,9 @@ namespace IhildaWallet
 					if ( rule.DetermineMatch( o ) ) {
 						AutomatedOrder ao = Profiteer.GetBuyBack ( o, rule.RefillMod );
 
-						if ( rule.MarkAs == "*" ) {
-							ao.BotMarking = o.BotMarking;
-						}
+						string markNext = MarkAsCommand.DoNextMark (o.BotMarking, rule.MarkAs);
+						ao.BotMarking = markNext;
 
-						ao.BotMarking = rule.MarkAs;
 						backs.AddLast (ao);
 					}
 				}	

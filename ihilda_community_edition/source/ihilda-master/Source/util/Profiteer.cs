@@ -68,6 +68,8 @@ namespace IhildaWallet
 			Decimal getsSpec = Decimal.Zero;
 			Decimal paysSpec = Decimal.Zero;
 			if (strategy.Speculate > Decimal.One) {
+
+
 				SentimentManager sentimentManager = new SentimentManager (off.Account);
 				sentimentManager.LoadSentiments ();
 				string getsCur = off.taker_pays.currency; // opposite is intended
@@ -112,6 +114,7 @@ namespace IhildaWallet
 				}
 
 				expl = (Decimal)(Math.Pow ((double)strategy.Exp_Pay_Less, (double)number));
+				expl -= 1;
 			}
 
 			if ( strategy.Exp_Get_More != Decimal.Zero ) {
@@ -120,6 +123,7 @@ namespace IhildaWallet
 				}
 
 				exgm = (Decimal)(Math.Pow ((double)strategy.Exp_Get_More, (double)number));
+				exgm -= 1;
 			}
 
 

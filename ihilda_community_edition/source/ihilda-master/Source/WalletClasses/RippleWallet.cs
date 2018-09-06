@@ -16,14 +16,16 @@ namespace IhildaWallet
 	{
 		public RippleWallet (String secret, RippleWalletTypeEnum wallettype)
 		{
-			
+
 			if (wallettype == RippleWalletTypeEnum.Master) {
 				this.Seed = new RippleSeedAddress (secret);
 				this.Account = Seed.GetPublicRippleAddress ().ToString ();
 			} else if (wallettype == RippleWalletTypeEnum.Regular) {
 				this.Regular_Seed = new RippleSeedAddress (secret);
 				this.Regular_Key_Account = Regular_Seed.GetPublicRippleAddress ().ToString ();
-			}
+			} /*else if (wallettype == RippleWalletTypeEnum.HexPrivateKey) {
+
+			}*/
 
 			this.AccountType = wallettype;
 

@@ -1,46 +1,20 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../../RippleLibSharp/RippleLibSharp/Source/Binary/Base58.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Widgets/WalletUI/WalletManagerWidget.cs">
     <Files>
-      <File FileName="Source/gui-classes/Widgets/Trees/TradePairTree.cs" Line="191" Column="15" />
-      <File FileName="Source/util/TradePairManager.cs" Line="184" Column="40" />
-      <File FileName="Source/gui-classes/Dialogs/TradePairCreateDialog.cs" Line="32" Column="44" />
-      <File FileName="Source/gui-classes/Widgets/TradeUI/TradePairEntryWidget.cs" Line="43" Column="62" />
-      <File FileName="Source/gui-classes/Widgets/TradeUI/CascadedBuyWidget.cs" Line="326" Column="91" />
-      <File FileName="Source/Program.cs" Line="167" Column="1" />
-      <File FileName="Source/gui-classes/Windows/TradePairManagerWindow.cs" Line="232" Column="37" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Keys/RippleSeedAddress.cs" Line="9" Column="43" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Keys/RippleIdentifier.cs" Line="23" Column="15" />
-      <File FileName="Source/gui-classes/Dialogs/FromSecretDialog.cs" Line="62" Column="5" />
-      <File FileName="Source/gui-classes/Dialogs/SeedFromHexDialog.cs" Line="25" Column="18" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Binary/Base58.cs" Line="286" Column="24" />
+      <File FileName="Source/gui-classes/Widgets/OptionSettingsWidget/FeeOptionsWidget.cs" Line="28" Column="56" />
+      <File FileName="Source/gui-classes/Widgets/TradeUI/CascadedSellWidget.cs" Line="317" Column="41" />
+      <File FileName="Source/gui-classes/Widgets/TradeUI/CascadedBuyWidget.cs" Line="538" Column="14" />
+      <File FileName="Source/bot/OrderManagementBot.cs" Line="212" Column="16" />
+      <File FileName="Source/bot/MarkAsCommand.cs" Line="186" Column="6" />
+      <File FileName="Source/util/Profiteer.cs" Line="62" Column="32" />
+      <File FileName="Source/bot/OrderFilledRule.cs" Line="277" Column="24" />
+      <File FileName="Source/gui-classes/Dialogs/RuleCreateDialog.cs" Line="20" Column="46" />
+      <File FileName="Source/gui-classes/Widgets/OrderPreviewSubmitWidget.cs" Line="580" Column="7" />
+      <File FileName="Source/gui-classes/Widgets/Trees/OpenOrdersTree.cs" Line="140" Column="74" />
+      <File FileName="Source/gui-classes/Widgets/Views/OrdersTreeWidget.cs" Line="168" Column="92" />
+      <File FileName="Source/WalletClasses/RippleWallet.cs" Line="121" Column="17" />
+      <File FileName="Source/gui-classes/Widgets/WalletUI/WalletManagerWidget.cs" Line="1" Column="1" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State name="__root__">
-          <Node name="Ihilda" expanded="True">
-            <Node name="IhildaWallet" expanded="True">
-              <Node name="Source" expanded="True">
-                <Node name="gui-classes" expanded="True">
-                  <Node name="Dialogs" expanded="True" />
-                  <Node name="Widgets" expanded="True">
-                    <Node name="TradeUI" expanded="True" />
-                  </Node>
-                  <Node name="Windows" expanded="True" />
-                </Node>
-              </Node>
-            </Node>
-            <Node name="RippleLibSharp" expanded="True">
-              <Node name="Source" expanded="True">
-                <Node name="Binary" expanded="True">
-                  <Node name="Base58.cs" selected="True" />
-                </Node>
-                <Node name="Keys" expanded="True" />
-              </Node>
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

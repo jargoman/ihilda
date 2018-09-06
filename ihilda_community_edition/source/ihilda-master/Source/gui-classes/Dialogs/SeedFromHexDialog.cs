@@ -27,11 +27,14 @@ namespace IhildaWallet
 			byte[] bytes = Base58.StringToByteArray (hexstr);
 
 			try {
-
+				
 				RippleSeedAddress rippleSeedAddress = new RippleSeedAddress (bytes);
 
 				return rippleSeedAddress;
 			} catch (Exception e) {
+
+
+
 				return null;
 			}
 
@@ -40,14 +43,19 @@ namespace IhildaWallet
 
 		public static RippleSeedAddress DoDialog ()
 		{
-			SeedFromHexDialog seedFromHexDialog = new SeedFromHexDialog ();
+			using (SeedFromHexDialog seedFromHexDialog = new SeedFromHexDialog ()) {
+				
+				Gtk.ResponseType reponse = (ResponseType)seedFromHexDialog.Run ();
+				RippleSeedAddress seedAddress = seedFromHexDialog.GetSeed ();
+				seedFromHexDialog.Destroy ();
 
-			Gtk.ResponseType reponse = (ResponseType)seedFromHexDialog.Run ();
-			if (reponse == ResponseType.Ok) {
-				return seedFromHexDialog.GetSeed ();
+				if (reponse == ResponseType.Ok) {
+					return seedFromHexDialog.GetSeed ();
+				}
+
+				return null;
 			}
-
-			return null;
+		
 
 		}
 	}
