@@ -174,7 +174,7 @@ namespace IhildaWallet
 			this.label11 = new global::Gtk.Label();
 			this.label11.Name = "label11";
 			this.label11.Xalign = 0F;
-			this.label11.LabelProp = global::Mono.Unix.Catalog.GetString("Mark As");
+			this.label11.LabelProp = global::Mono.Unix.Catalog.GetString("Mark Once");
 			this.table1.Add(this.label11);
 			global::Gtk.Table.TableChild w9 = ((global::Gtk.Table.TableChild)(this.table1[this.label11]));
 			w9.TopAttach = ((uint)(7));
@@ -185,7 +185,7 @@ namespace IhildaWallet
 			this.label12 = new global::Gtk.Label();
 			this.label12.Name = "label12";
 			this.label12.Xalign = 0F;
-			this.label12.LabelProp = global::Mono.Unix.Catalog.GetString("Mark As Modifyer");
+			this.label12.LabelProp = global::Mono.Unix.Catalog.GetString("Mark Repeat");
 			this.table1.Add(this.label12);
 			global::Gtk.Table.TableChild w10 = ((global::Gtk.Table.TableChild)(this.table1[this.label12]));
 			w10.TopAttach = ((uint)(8));

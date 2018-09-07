@@ -22,6 +22,39 @@ namespace IhildaWallet
 				table1.Attach (tradepairentrywidget1, 1, 2, 0, 3);
 			}
 
+			tradepairentrywidget1.WidgetChanged += (object sender, EventArgs e) => {
+				TradePair tradePair = tradepairentrywidget1.GetTradePair ();
+
+				if (tradePair == null) {
+					return;
+				}
+
+				if (string.IsNullOrWhiteSpace (tradePair.Currency_Base?.currency)) {
+					label16.Text = "";
+					label16.Visible = false;
+					label18.Text = "";
+					label18.Visible = false;
+				} else {
+					label16.Text = tradePair.Currency_Base.currency;
+					label16.Visible = true;
+					label18.Text = tradePair.Currency_Base.currency;
+					label18.Visible = true;
+				}
+
+				if (string.IsNullOrWhiteSpace (tradePair.Currency_Counter?.currency)) {
+					label17.Text = "";
+					label17.Visible = false;
+					label19.Text = "";
+					label19.Visible = false;
+				} else {
+					label17.Text = tradePair.Currency_Counter.currency;
+					label17.Visible = true;
+					label19.Text = tradePair.Currency_Counter.currency;
+					label19.Visible = true;
+
+				}
+			};
+
 			Modal = true;
 
 

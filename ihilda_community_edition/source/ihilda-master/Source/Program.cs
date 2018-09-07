@@ -204,6 +204,8 @@ namespace IhildaWallet
 			Task t1 = InitSplash ();
 
 			t1.Wait ();
+			Thread.Sleep (1000);
+
 
 #if DEBUG
 			DebugIhildaWallet.InitExceptionCatching ();

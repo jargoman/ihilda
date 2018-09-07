@@ -18,10 +18,14 @@ namespace IhildaWallet
 				string cur = basecurrencycombobox.ActiveText;
 				if (RippleCurrency.NativeCurrency == cur) {
 					baseissuercombobox.Visible = false;
-					return;
+
+				} else {
+					baseissuercombobox.Visible = true;
 				}
 
-				baseissuercombobox.Visible = true;
+				OnWidgetChanged (e);
+
+
 			};
 
 			this.countercurrencycombobox.Changed += (object sender, EventArgs e) => {
@@ -29,24 +33,41 @@ namespace IhildaWallet
 				string cur = countercurrencycombobox.ActiveText;
 				if (RippleCurrency.NativeCurrency == cur) {
 					countercurrencycombobox1.Visible = false;
-					return;
+
+				} else {
+					countercurrencycombobox1.Visible = true;
 				}
 
-				countercurrencycombobox1.Visible = true;
+				OnWidgetChanged (e);
+
 			};
 
-			this.countercurrencycombobox.Changed += (object sender, EventArgs e) => {
+			this.baseissuercombobox.Changed += (object sender, EventArgs e) => {
 				countercurrencycombobox.ModifyBase (Gtk.StateType.Normal);
+
+				OnWidgetChanged (e);
 			};
 
 			this.countercurrencycombobox1.Changed += (object sender, EventArgs e) => {
 				countercurrencycombobox1.ModifyBase (Gtk.StateType.Normal);
+
+				OnWidgetChanged (e);
 			};
 
 
 
 
 		}
+
+
+		public event EventHandler WidgetChanged;
+
+		public virtual void OnWidgetChanged (EventArgs eventArgs)
+		{
+			WidgetChanged?.Invoke (this, eventArgs);
+		}
+
+
 
 		public TradePair GetTradePair ()
 		{

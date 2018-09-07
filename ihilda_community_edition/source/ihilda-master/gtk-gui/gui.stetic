@@ -3983,7 +3983,7 @@ drops</property>
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Window" id="IhildaWallet.SplashWindow" design-size="590 663">
+  <widget class="Gtk.Window" id="IhildaWallet.SplashWindow" design-size="600 570">
     <property name="MemberName" />
     <property name="Title" translatable="yes">SplashWindow</property>
     <property name="Icon">resource:IhildaWallet.Images.ice_splash.png</property>
@@ -4011,7 +4011,7 @@ drops</property>
                         <property name="MemberName" />
                         <property name="Xpad">5</property>
                         <property name="Ypad">5</property>
-                        <property name="Pixbuf">resource:IhildaWallet.Images.ihilda_logo_black_sans.png</property>
+                        <property name="Pixbuf">resource:IhildaWallet.ihildaplain-100-wide.png</property>
                       </widget>
                     </child>
                   </widget>
@@ -4053,7 +4053,7 @@ drops</property>
             <child>
               <widget class="Gtk.Image" id="image87">
                 <property name="MemberName" />
-                <property name="Pixbuf">resource:IhildaWallet.Images.xrp_crunched.png</property>
+                <property name="Pixbuf">resource:IhildaWallet.coolio-medium.png</property>
               </widget>
               <packing>
                 <property name="Position">1</property>
@@ -11152,7 +11152,7 @@ example: USD/CAD</property>
               <widget class="Gtk.Label" id="label11">
                 <property name="MemberName" />
                 <property name="Xalign">0</property>
-                <property name="LabelProp" translatable="yes">Mark As</property>
+                <property name="LabelProp" translatable="yes">Mark Once</property>
               </widget>
               <packing>
                 <property name="TopAttach">7</property>
@@ -11172,7 +11172,7 @@ example: USD/CAD</property>
               <widget class="Gtk.Label" id="label12">
                 <property name="MemberName" />
                 <property name="Xalign">0</property>
-                <property name="LabelProp" translatable="yes">Mark As Modifyer</property>
+                <property name="LabelProp" translatable="yes">Mark Repeat</property>
               </widget>
               <packing>
                 <property name="TopAttach">8</property>
@@ -12403,7 +12403,7 @@ example: USD/CAD</property>
               <widget class="Gtk.Label" id="label11">
                 <property name="MemberName" />
                 <property name="Xalign">0</property>
-                <property name="LabelProp" translatable="yes">Mark As</property>
+                <property name="LabelProp" translatable="yes">Mark Once</property>
               </widget>
               <packing>
                 <property name="TopAttach">7</property>
@@ -12423,7 +12423,7 @@ example: USD/CAD</property>
               <widget class="Gtk.Label" id="label12">
                 <property name="MemberName" />
                 <property name="Xalign">0</property>
-                <property name="LabelProp" translatable="yes">Mark Next</property>
+                <property name="LabelProp" translatable="yes">Mark Repeat</property>
               </widget>
               <packing>
                 <property name="TopAttach">8</property>
@@ -13511,7 +13511,7 @@ example: USD/CAD</property>
               <widget class="Gtk.Notebook" id="notebook1">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">0</property>
+                <property name="CurrentPage">1</property>
                 <child>
                   <widget class="Gtk.Table" id="table1">
                     <property name="MemberName" />

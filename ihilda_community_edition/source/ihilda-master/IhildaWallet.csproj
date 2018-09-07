@@ -290,6 +290,8 @@
     </EmbeddedResource>
     <EmbeddedResource Include="..\..\..\..\ihildaplain.png" />
     <EmbeddedResource Include="..\..\..\..\ihildaplain-100-wide.png" />
+    <EmbeddedResource Include="..\..\..\..\ihildabright.png" />
+    <EmbeddedResource Include="..\..\..\..\coolio-medium.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="gtk-gui\generated.cs" />
