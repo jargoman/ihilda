@@ -29,7 +29,7 @@ namespace IhildaWallet
 		public TradePair GetTradePair ()
 		{
 
-			return this.tradepairentrywidget1.GetTradePair ();
+			return this.tradepairentrywidget1.GetTradePair (true);
 		}
 
 

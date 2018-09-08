@@ -69,7 +69,7 @@ namespace IhildaWallet
 
 
 
-		public TradePair GetTradePair ()
+		public TradePair GetTradePair (bool alertUser)
 		{
 #if DEBUG
 			String method_sig = clsstr + nameof(GetTradePair) + DebugRippleLibSharp.both_parentheses;
@@ -78,8 +78,8 @@ namespace IhildaWallet
 			}
 #endif
 			TradePair tp = new TradePair {
-				Currency_Base = GetBaseCurrency (),
-				Currency_Counter = GetCounterCurrency ()
+				Currency_Base = GetRippleCurrencyBase (alertUser),
+				Currency_Counter = GetRippleCurrencyCounter (alertUser)
 			};
 
 			return tp;
@@ -167,21 +167,28 @@ namespace IhildaWallet
 			return orderFilledRule;
 
 		}
-		public RippleCurrency GetBaseCurrency ()
+
+
+		public string GetBaseCurrency ()
+		{
+			return this.basecurrencycombobox.ActiveText;
+		}
+
+		public RippleCurrency GetRippleCurrencyBase (bool alertUser)
 		{
 
 #if DEBUG
-			String method_sig = clsstr + nameof (GetBaseCurrency) + " () : ";
+			String method_sig = clsstr + nameof (GetRippleCurrencyBase) + " () : ";
 
 #endif
 
 			//ManualResetEvent ev = new ManualResetEvent(false);
-			String currency = null;
+			String currency = GetBaseCurrency();
 			String issuer = null;
 
 			//Application.Invoke (
 			//	delegate {
-			currency = this.basecurrencycombobox.ActiveText;
+
 			issuer = this.baseissuercombobox.ActiveText;
 
 			//	ev.Set();
@@ -198,8 +205,10 @@ namespace IhildaWallet
 			if (currency == null || currency.Equals ("")) {
 				// todo currency required
 
-				this.basecurrencycombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
-				MessageDialog.ShowMessage ("You must specify a base currency");
+				if (alertUser) {
+					this.basecurrencycombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
+					MessageDialog.ShowMessage ("You must specify a base currency");
+				}
 				return null;
 			}
 
@@ -207,8 +216,10 @@ namespace IhildaWallet
 
 				if (issuer != null && !issuer.Equals ("")) {
 					// alert user about specifying a native issuer
-					this.baseissuercombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
-					MessageDialog.ShowMessage ("You cannot specify an issuer for native base currency " + RippleCurrency.NativeCurrency);
+					if (alertUser) {
+						this.baseissuercombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
+						MessageDialog.ShowMessage ("You cannot specify an issuer for native base currency " + RippleCurrency.NativeCurrency);
+					}
 					return null;
 				}
 
@@ -216,8 +227,11 @@ namespace IhildaWallet
 				return bob;
 			}
 			if (issuer == null || issuer.Equals ("")) {
-				this.baseissuercombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
-				MessageDialog.ShowMessage ("You must specify an issuer for non native base currency ");
+
+				if (alertUser) {
+					this.baseissuercombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
+					MessageDialog.ShowMessage ("You must specify an issuer for non native base currency ");
+				}
 				return null;
 			}
 
@@ -232,8 +246,11 @@ namespace IhildaWallet
 				e.Message);
 
 #endif
-				this.baseissuercombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
-				MessageDialog.ShowMessage ( "Invalid base issuer address. \n" );
+
+				if (alertUser) {
+					this.baseissuercombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
+					MessageDialog.ShowMessage ("Invalid base issuer address. \n");
+				}
 				return null;
 			}
 
@@ -256,20 +273,27 @@ namespace IhildaWallet
 				e.Message);
 
 #endif
-				this.basecurrencycombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
-				this.baseissuercombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
-				MessageDialog.ShowMessage ("Exception creating base currency address \n");
+				if (alertUser) {
+					this.basecurrencycombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
+					this.baseissuercombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
+					MessageDialog.ShowMessage ("Exception creating base currency address \n");
+				}
 				return null;
 			}
 
 		}
 
-		public RippleCurrency GetCounterCurrency ()
+		public string GetCounterCurrency ()
+		{
+			return this.countercurrencycombobox.ActiveText;
+		}
+
+		public RippleCurrency GetRippleCurrencyCounter (bool alertUser)
 		{
 
 #if DEBUG
 
-			String method_sig = clsstr + "getCounterCurrency () : ";
+			String method_sig = clsstr + nameof (GetRippleCurrencyCounter) + " () : ";
 
 #endif
 
@@ -279,12 +303,14 @@ namespace IhildaWallet
 
 			//Application.Invoke (
 			//	delegate {
-			currency = this.countercurrencycombobox.ActiveText;
+			currency = GetCounterCurrency ();
 			issuer = this.countercurrencycombobox1.ActiveText;
 			if (currency == null || currency.Equals ("")) {
 				// todo currency required
-				this.countercurrencycombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
-				MessageDialog.ShowMessage ("You must specify a counter currency");
+				if (alertUser) {
+					this.countercurrencycombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
+					MessageDialog.ShowMessage ("You must specify a counter currency");
+				}
 				return null;
 			}
 
@@ -301,16 +327,22 @@ namespace IhildaWallet
 				if (issuer != null && !issuer.Equals ("")) {
 					// alert user about specifying a native issuer
 
-					this.countercurrencycombobox1.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
-					MessageDialog.ShowMessage ("You cannot specify an issuer for native counter currency " + RippleCurrency.NativeCurrency);
+					if (alertUser) {
+						this.countercurrencycombobox1.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
+						MessageDialog.ShowMessage ("You cannot specify an issuer for native counter currency " + RippleCurrency.NativeCurrency);
+					}
+					return null;
 				}
 
 				RippleCurrency bob = new RippleCurrency (0.0m);
 				return bob;
 			}
 			if (issuer == null || issuer.Equals ("")) {
-				this.countercurrencycombobox1.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
-				MessageDialog.ShowMessage ("You must specify an issuer for non native counter currency ");
+
+				if (alertUser) {
+					this.countercurrencycombobox1.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
+					MessageDialog.ShowMessage ("You must specify an issuer for non native counter currency ");
+				}
 				return null;
 			}
 
@@ -320,15 +352,17 @@ namespace IhildaWallet
 
 			} catch (Exception e) {
 
-
+				if (alertUser) {
 #if DEBUG
-				// todo debug // look into class RippleAddress to see what exeption to catch
-				this.countercurrencycombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
-				Logging.WriteLog (method_sig + "Exception thrown : " + e.Message);
+					// todo debug // look into class RippleAddress to see what exeption to catch
+
+					this.countercurrencycombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
+					Logging.WriteLog (method_sig + "Exception thrown : " + e.Message);
 
 #endif
 
-				MessageDialog.ShowMessage ("Invalid counter issuer address. \n");
+					MessageDialog.ShowMessage ("Invalid counter issuer address. \n");
+				}
 				return null;
 			}
 
@@ -349,9 +383,11 @@ namespace IhildaWallet
 				Logging.WriteLog (method_sig + "Exception thrown : " + e.Message);
 
 #endif
-				this.countercurrencycombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
-				this.countercurrencycombobox1.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
-				MessageDialog.ShowMessage ("Exception creating counter currency address \n");
+				if (alertUser) {
+					this.countercurrencycombobox.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
+					this.countercurrencycombobox1.ModifyBase (Gtk.StateType.Normal, new Gdk.Color (255, 55, 55));
+					MessageDialog.ShowMessage ("Exception creating counter currency address \n");
+				}
 				return null;
 			}
 

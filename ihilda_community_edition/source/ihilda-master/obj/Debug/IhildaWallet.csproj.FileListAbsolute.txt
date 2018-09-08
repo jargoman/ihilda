@@ -73,6 +73,8 @@
 /home/karim/Documents/ihilda-current/ihilda_community_edition_0.10.2_alpha/source/ihilda-master/obj/Debug/IhildaWallet.csproj.CoreCompileInputs.cache
 /home/karim/Documents/ihilda-current/ihilda_community_edition_0.10.2_alpha/source/ihilda-master/obj/Debug/Ripple-Client-Gtk.exe
 /home/karim/Documents/ihilda-current/ihilda_community_edition_0.10.2_alpha/source/ihilda-master/obj/Debug/Ripple-Client-Gtk.pdb
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/Debug/IhildaWallet.csprojResolveAssemblyReference.cache
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/Debug/IhildaWallet.csproj.CoreCompileInputs.cache
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/Images/icebutton.png
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/Images/ih_alpha.png
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/Images/ice_splash.png
@@ -112,7 +114,5 @@
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/System.EnterpriseServices.dll
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/System.Transactions.dll
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/riplibsharp.pdb
-/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/Debug/IhildaWallet.csprojResolveAssemblyReference.cache
-/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/Debug/IhildaWallet.csproj.CoreCompileInputs.cache
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/Debug/Ripple-Client-Gtk.exe
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/Debug/Ripple-Client-Gtk.pdb

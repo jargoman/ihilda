@@ -1,5 +1,32 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Dialogs/TradePairCreateDialog.cs">
+    <Files>
+      <File FileName="Source/gui-classes/Dialogs/RuleCreateDialog.cs" Line="26" Column="56" />
+      <File FileName="Source/gui-classes/Widgets/TradeUI/TradePairEntryWidget.cs" Line="374" Column="18" />
+      <File FileName="Source/gui-classes/Dialogs/TradePairCreateDialog.cs" Line="32" Column="52" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Ihilda" expanded="True">
+            <Node name="IhildaWallet" expanded="True">
+              <Node name="Packages" expanded="True" />
+              <Node name="Source" expanded="True">
+                <Node name="gui-classes" expanded="True">
+                  <Node name="Dialogs" expanded="True">
+                    <Node name="TradePairCreateDialog.cs" selected="True" />
+                  </Node>
+                  <Node name="Widgets" expanded="True">
+                    <Node name="TradeUI" expanded="True" />
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

@@ -23,33 +23,30 @@ namespace IhildaWallet
 			}
 
 			tradepairentrywidget1.WidgetChanged += (object sender, EventArgs e) => {
-				TradePair tradePair = tradepairentrywidget1.GetTradePair ();
+				string baseCur = tradepairentrywidget1.GetBaseCurrency ();
+				string countCur = tradepairentrywidget1.GetCounterCurrency ();
 
-				if (tradePair == null) {
-					return;
-				}
-
-				if (string.IsNullOrWhiteSpace (tradePair.Currency_Base?.currency)) {
+				if (string.IsNullOrWhiteSpace (baseCur)) {
 					label16.Text = "";
 					label16.Visible = false;
 					label18.Text = "";
 					label18.Visible = false;
 				} else {
-					label16.Text = tradePair.Currency_Base.currency;
+					label16.Text = baseCur;
 					label16.Visible = true;
-					label18.Text = tradePair.Currency_Base.currency;
+					label18.Text = baseCur;
 					label18.Visible = true;
 				}
 
-				if (string.IsNullOrWhiteSpace (tradePair.Currency_Counter?.currency)) {
+				if (string.IsNullOrWhiteSpace (countCur)) {
 					label17.Text = "";
 					label17.Visible = false;
 					label19.Text = "";
 					label19.Visible = false;
 				} else {
-					label17.Text = tradePair.Currency_Counter.currency;
+					label17.Text = countCur;
 					label17.Visible = true;
-					label19.Text = tradePair.Currency_Counter.currency;
+					label19.Text = countCur;
 					label19.Visible = true;
 
 				}
