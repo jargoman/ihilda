@@ -1,9 +1,10 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Dialogs/TradePairCreateDialog.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs">
     <Files>
-      <File FileName="Source/gui-classes/Dialogs/RuleCreateDialog.cs" Line="26" Column="56" />
-      <File FileName="Source/gui-classes/Widgets/TradeUI/TradePairEntryWidget.cs" Line="374" Column="18" />
-      <File FileName="Source/gui-classes/Dialogs/TradePairCreateDialog.cs" Line="32" Column="52" />
+      <File FileName="Source/gui-classes/Dialogs/RuleCreateDialog.cs" Line="49" Column="29" />
+      <File FileName="Source/gui-classes/Widgets/TradeUI/TradePairEntryWidget.cs" Line="306" Column="37" />
+      <File FileName="Source/gui-classes/Dialogs/TradePairCreateDialog.cs" Line="32" Column="56" />
+      <File FileName="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs" Line="9" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -13,10 +14,11 @@
               <Node name="Packages" expanded="True" />
               <Node name="Source" expanded="True">
                 <Node name="gui-classes" expanded="True">
-                  <Node name="Dialogs" expanded="True">
-                    <Node name="TradePairCreateDialog.cs" selected="True" />
-                  </Node>
+                  <Node name="Dialogs" expanded="True" />
                   <Node name="Widgets" expanded="True">
+                    <Node name="RuleWidgets" expanded="True">
+                      <Node name="FilledRuleManagementWindow.cs" selected="True" />
+                    </Node>
                     <Node name="TradeUI" expanded="True" />
                   </Node>
                 </Node>

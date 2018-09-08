@@ -473,7 +473,8 @@ namespace IhildaWallet
 				return;
 			}
 
-			bool ShouldContinue = LeIceSense.LastDitchAttempt (rw, LicenseType.AUTOMATIC);
+			bool ShouldContinue = LeIceSense.DoTrialDialog (rw, LicenseType.MARKETBOT);
+			//bool ShouldContinue = LeIceSense.LastDitchAttempt (rw, LicenseType.AUTOMATIC);
 			if (!ShouldContinue) {
 				return;
 			}
