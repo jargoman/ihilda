@@ -211,6 +211,34 @@ namespace IhildaWallet
 				//window.SetRippleWallet (rippleWallet);
 			};
 
+			this.button135.Clicked += (object sender, EventArgs e) => {
+
+				RippleWallet rippleWallet = WalletManager.GetRippleWallet ();
+				if (rippleWallet == null) {
+					MessageDialog.ShowMessage ("No wallet selected", "You must select a wallet first");
+					return;
+				}
+				RippleSeedAddress seedAddress = rippleWallet.GetDecryptedSeed ();
+				if (seedAddress == null) {
+					// TODO 
+					//MessageDialog.ShowMessage ("invalid seed");
+					return;
+				}
+
+				string secret = seedAddress.ToString ();
+
+				PaperWalletWindow paperWalletWindow = new PaperWalletWindow {
+					Parent = this,
+					Modal = true
+				};
+
+				paperWalletWindow.Show ();
+
+
+				paperWalletWindow.SetSecret (secret);
+
+			};
+
 			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
 			wallettree1.GrabFocus ();
 		}

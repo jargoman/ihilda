@@ -76,6 +76,8 @@ namespace IhildaWallet
 
 		private global::Gtk.Table table1;
 
+		private global::Gtk.Button button135;
+
 		private global::Gtk.Button button66;
 
 		private global::Gtk.Button button67;
@@ -223,7 +225,7 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 0;
+			this.notebook1.CurrentPage = 1;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.vbox5 = new global::Gtk.VBox();
 			this.vbox5.Name = "vbox5";
@@ -309,9 +311,22 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.vbox5, this.label4);
 			this.label4.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.table1 = new global::Gtk.Table(((uint)(8)), ((uint)(1)), true);
+			this.table1 = new global::Gtk.Table(((uint)(9)), ((uint)(1)), true);
 			this.table1.Name = "table1";
 			this.table1.RowSpacing = ((uint)(3));
+			// Container child table1.Gtk.Table+TableChild
+			this.button135 = new global::Gtk.Button();
+			this.button135.CanFocus = true;
+			this.button135.Name = "button135";
+			this.button135.UseUnderline = true;
+			this.button135.Xalign = 0F;
+			this.button135.Label = global::Mono.Unix.Catalog.GetString("Paper Wallet Wizard");
+			this.table1.Add(this.button135);
+			global::Gtk.Table.TableChild w14 = ((global::Gtk.Table.TableChild)(this.table1[this.button135]));
+			w14.TopAttach = ((uint)(7));
+			w14.BottomAttach = ((uint)(8));
+			w14.XOptions = ((global::Gtk.AttachOptions)(4));
+			w14.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.button66 = new global::Gtk.Button();
 			this.button66.CanFocus = true;
@@ -320,11 +335,11 @@ namespace IhildaWallet
 			this.button66.Xalign = 0F;
 			this.button66.Label = global::Mono.Unix.Catalog.GetString("Dec_rypt Wallet");
 			this.table1.Add(this.button66);
-			global::Gtk.Table.TableChild w14 = ((global::Gtk.Table.TableChild)(this.table1[this.button66]));
-			w14.TopAttach = ((uint)(4));
-			w14.BottomAttach = ((uint)(5));
-			w14.XOptions = ((global::Gtk.AttachOptions)(4));
-			w14.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w15 = ((global::Gtk.Table.TableChild)(this.table1[this.button66]));
+			w15.TopAttach = ((uint)(4));
+			w15.BottomAttach = ((uint)(5));
+			w15.XOptions = ((global::Gtk.AttachOptions)(4));
+			w15.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.button67 = new global::Gtk.Button();
 			this.button67.CanFocus = true;
@@ -333,11 +348,11 @@ namespace IhildaWallet
 			this.button67.Xalign = 0F;
 			this.button67.Label = global::Mono.Unix.Catalog.GetString("Encr_ypt Wallet");
 			this.table1.Add(this.button67);
-			global::Gtk.Table.TableChild w15 = ((global::Gtk.Table.TableChild)(this.table1[this.button67]));
-			w15.TopAttach = ((uint)(3));
-			w15.BottomAttach = ((uint)(4));
-			w15.XOptions = ((global::Gtk.AttachOptions)(4));
-			w15.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w16 = ((global::Gtk.Table.TableChild)(this.table1[this.button67]));
+			w16.TopAttach = ((uint)(3));
+			w16.BottomAttach = ((uint)(4));
+			w16.XOptions = ((global::Gtk.AttachOptions)(4));
+			w16.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.deleteButton = new global::Gtk.Button();
 			this.deleteButton.CanFocus = true;
@@ -346,11 +361,11 @@ namespace IhildaWallet
 			this.deleteButton.Xalign = 0F;
 			this.deleteButton.Label = global::Mono.Unix.Catalog.GetString("_Delete Wallet");
 			this.table1.Add(this.deleteButton);
-			global::Gtk.Table.TableChild w16 = ((global::Gtk.Table.TableChild)(this.table1[this.deleteButton]));
-			w16.TopAttach = ((uint)(7));
-			w16.BottomAttach = ((uint)(8));
-			w16.XOptions = ((global::Gtk.AttachOptions)(4));
-			w16.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w17 = ((global::Gtk.Table.TableChild)(this.table1[this.deleteButton]));
+			w17.TopAttach = ((uint)(8));
+			w17.BottomAttach = ((uint)(9));
+			w17.XOptions = ((global::Gtk.AttachOptions)(4));
+			w17.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.editButton = new global::Gtk.Button();
 			this.editButton.CanFocus = true;
@@ -359,11 +374,11 @@ namespace IhildaWallet
 			this.editButton.Xalign = 0F;
 			this.editButton.Label = global::Mono.Unix.Catalog.GetString("_Edit Wallet");
 			this.table1.Add(this.editButton);
-			global::Gtk.Table.TableChild w17 = ((global::Gtk.Table.TableChild)(this.table1[this.editButton]));
-			w17.TopAttach = ((uint)(1));
-			w17.BottomAttach = ((uint)(2));
-			w17.XOptions = ((global::Gtk.AttachOptions)(4));
-			w17.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w18 = ((global::Gtk.Table.TableChild)(this.table1[this.editButton]));
+			w18.TopAttach = ((uint)(1));
+			w18.BottomAttach = ((uint)(2));
+			w18.XOptions = ((global::Gtk.AttachOptions)(4));
+			w18.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.exportButton = new global::Gtk.Button();
 			this.exportButton.CanFocus = true;
@@ -372,11 +387,11 @@ namespace IhildaWallet
 			this.exportButton.Xalign = 0F;
 			this.exportButton.Label = global::Mono.Unix.Catalog.GetString("E_xport Wallet");
 			this.table1.Add(this.exportButton);
-			global::Gtk.Table.TableChild w18 = ((global::Gtk.Table.TableChild)(this.table1[this.exportButton]));
-			w18.TopAttach = ((uint)(6));
-			w18.BottomAttach = ((uint)(7));
-			w18.XOptions = ((global::Gtk.AttachOptions)(4));
-			w18.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w19 = ((global::Gtk.Table.TableChild)(this.table1[this.exportButton]));
+			w19.TopAttach = ((uint)(6));
+			w19.BottomAttach = ((uint)(7));
+			w19.XOptions = ((global::Gtk.AttachOptions)(4));
+			w19.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.importButton = new global::Gtk.Button();
 			this.importButton.CanFocus = true;
@@ -385,11 +400,11 @@ namespace IhildaWallet
 			this.importButton.Xalign = 0F;
 			this.importButton.Label = global::Mono.Unix.Catalog.GetString("_Import Wallet");
 			this.table1.Add(this.importButton);
-			global::Gtk.Table.TableChild w19 = ((global::Gtk.Table.TableChild)(this.table1[this.importButton]));
-			w19.TopAttach = ((uint)(5));
-			w19.BottomAttach = ((uint)(6));
-			w19.XOptions = ((global::Gtk.AttachOptions)(4));
-			w19.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w20 = ((global::Gtk.Table.TableChild)(this.table1[this.importButton]));
+			w20.TopAttach = ((uint)(5));
+			w20.BottomAttach = ((uint)(6));
+			w20.XOptions = ((global::Gtk.AttachOptions)(4));
+			w20.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.newbutton = new global::Gtk.Button();
 			this.newbutton.CanFocus = true;
@@ -398,8 +413,8 @@ namespace IhildaWallet
 			this.newbutton.Xalign = 0F;
 			this.newbutton.Label = global::Mono.Unix.Catalog.GetString("_New Wallet");
 			this.table1.Add(this.newbutton);
-			global::Gtk.Table.TableChild w20 = ((global::Gtk.Table.TableChild)(this.table1[this.newbutton]));
-			w20.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w21 = ((global::Gtk.Table.TableChild)(this.table1[this.newbutton]));
+			w21.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.upgradebutton = new global::Gtk.Button();
 			this.upgradebutton.CanFocus = true;
@@ -408,14 +423,14 @@ namespace IhildaWallet
 			this.upgradebutton.Xalign = 0F;
 			this.upgradebutton.Label = global::Mono.Unix.Catalog.GetString("_Upgrade Wallet");
 			this.table1.Add(this.upgradebutton);
-			global::Gtk.Table.TableChild w21 = ((global::Gtk.Table.TableChild)(this.table1[this.upgradebutton]));
-			w21.TopAttach = ((uint)(2));
-			w21.BottomAttach = ((uint)(3));
-			w21.XOptions = ((global::Gtk.AttachOptions)(4));
-			w21.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w22 = ((global::Gtk.Table.TableChild)(this.table1[this.upgradebutton]));
+			w22.TopAttach = ((uint)(2));
+			w22.BottomAttach = ((uint)(3));
+			w22.XOptions = ((global::Gtk.AttachOptions)(4));
+			w22.YOptions = ((global::Gtk.AttachOptions)(4));
 			this.notebook1.Add(this.table1);
-			global::Gtk.Notebook.NotebookChild w22 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.table1]));
-			w22.Position = 1;
+			global::Gtk.Notebook.NotebookChild w23 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.table1]));
+			w23.Position = 1;
 			// Notebook tab
 			this.label3 = new global::Gtk.Label();
 			this.label3.Name = "label3";
@@ -435,10 +450,10 @@ namespace IhildaWallet
 			this.networkbutton1.Xalign = 0F;
 			this.networkbutton1.Label = global::Mono.Unix.Catalog.GetString("Network _Settings");
 			this.vbox6.Add(this.networkbutton1);
-			global::Gtk.Box.BoxChild w23 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.networkbutton1]));
-			w23.Position = 0;
-			w23.Expand = false;
-			w23.Fill = false;
+			global::Gtk.Box.BoxChild w24 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.networkbutton1]));
+			w24.Position = 0;
+			w24.Expand = false;
+			w24.Fill = false;
 			// Container child vbox6.Gtk.Box+BoxChild
 			this.rclAccountButton = new global::Gtk.Button();
 			this.rclAccountButton.CanFocus = true;
@@ -447,10 +462,10 @@ namespace IhildaWallet
 			this.rclAccountButton.Xalign = 0F;
 			this.rclAccountButton.Label = global::Mono.Unix.Catalog.GetString("RCL Account Settings");
 			this.vbox6.Add(this.rclAccountButton);
-			global::Gtk.Box.BoxChild w24 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.rclAccountButton]));
-			w24.Position = 1;
-			w24.Expand = false;
-			w24.Fill = false;
+			global::Gtk.Box.BoxChild w25 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.rclAccountButton]));
+			w25.Position = 1;
+			w25.Expand = false;
+			w25.Fill = false;
 			// Container child vbox6.Gtk.Box+BoxChild
 			this.optionsbutton1 = new global::Gtk.Button();
 			this.optionsbutton1.CanFocus = true;
@@ -459,10 +474,10 @@ namespace IhildaWallet
 			this.optionsbutton1.Xalign = 0F;
 			this.optionsbutton1.Label = global::Mono.Unix.Catalog.GetString("_Options");
 			this.vbox6.Add(this.optionsbutton1);
-			global::Gtk.Box.BoxChild w25 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.optionsbutton1]));
-			w25.Position = 2;
-			w25.Expand = false;
-			w25.Fill = false;
+			global::Gtk.Box.BoxChild w26 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.optionsbutton1]));
+			w26.Position = 2;
+			w26.Expand = false;
+			w26.Fill = false;
 			// Container child vbox6.Gtk.Box+BoxChild
 			this.consolebutton1 = new global::Gtk.Button();
 			this.consolebutton1.CanFocus = true;
@@ -471,10 +486,10 @@ namespace IhildaWallet
 			this.consolebutton1.Xalign = 0F;
 			this.consolebutton1.Label = global::Mono.Unix.Catalog.GetString("_Console");
 			this.vbox6.Add(this.consolebutton1);
-			global::Gtk.Box.BoxChild w26 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.consolebutton1]));
-			w26.Position = 3;
-			w26.Expand = false;
-			w26.Fill = false;
+			global::Gtk.Box.BoxChild w27 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.consolebutton1]));
+			w27.Position = 3;
+			w27.Expand = false;
+			w27.Fill = false;
 			// Container child vbox6.Gtk.Box+BoxChild
 			this.button91 = new global::Gtk.Button();
 			this.button91.CanFocus = true;
@@ -483,13 +498,13 @@ namespace IhildaWallet
 			this.button91.Xalign = 0F;
 			this.button91.Label = global::Mono.Unix.Catalog.GetString("Debugging");
 			this.vbox6.Add(this.button91);
-			global::Gtk.Box.BoxChild w27 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.button91]));
-			w27.Position = 4;
-			w27.Expand = false;
-			w27.Fill = false;
+			global::Gtk.Box.BoxChild w28 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.button91]));
+			w28.Position = 4;
+			w28.Expand = false;
+			w28.Fill = false;
 			this.notebook1.Add(this.vbox6);
-			global::Gtk.Notebook.NotebookChild w28 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.vbox6]));
-			w28.Position = 2;
+			global::Gtk.Notebook.NotebookChild w29 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.vbox6]));
+			w29.Position = 2;
 			// Notebook tab
 			this.label1 = new global::Gtk.Label();
 			this.label1.Name = "label1";
@@ -498,10 +513,10 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.vbox6, this.label1);
 			this.label1.ShowAll();
 			this.vbox3.Add(this.notebook1);
-			global::Gtk.Box.BoxChild w29 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.notebook1]));
-			w29.Position = 0;
-			w29.Expand = false;
-			w29.Fill = false;
+			global::Gtk.Box.BoxChild w30 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.notebook1]));
+			w30.Position = 0;
+			w30.Expand = false;
+			w30.Fill = false;
 			// Container child vbox3.Gtk.Box+BoxChild
 			this.quitButton = new global::Gtk.Button();
 			this.quitButton.CanFocus = true;
@@ -510,20 +525,20 @@ namespace IhildaWallet
 			this.quitButton.Xalign = 0F;
 			this.quitButton.Label = global::Mono.Unix.Catalog.GetString("_Quit");
 			this.vbox3.Add(this.quitButton);
-			global::Gtk.Box.BoxChild w30 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.quitButton]));
-			w30.PackType = ((global::Gtk.PackType)(1));
-			w30.Position = 1;
-			w30.Expand = false;
-			w30.Fill = false;
+			global::Gtk.Box.BoxChild w31 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.quitButton]));
+			w31.PackType = ((global::Gtk.PackType)(1));
+			w31.Position = 1;
+			w31.Expand = false;
+			w31.Fill = false;
 			w5.Add(this.vbox3);
 			this.scrolledwindow1.Add(w5);
 			this.vbox1.Add(this.scrolledwindow1);
-			global::Gtk.Box.BoxChild w33 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.scrolledwindow1]));
-			w33.Position = 1;
+			global::Gtk.Box.BoxChild w34 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.scrolledwindow1]));
+			w34.Position = 1;
 			this.hpaned1.Add(this.vbox1);
-			global::Gtk.Paned.PanedChild w34 = ((global::Gtk.Paned.PanedChild)(this.hpaned1[this.vbox1]));
-			w34.Resize = false;
-			w34.Shrink = false;
+			global::Gtk.Paned.PanedChild w35 = ((global::Gtk.Paned.PanedChild)(this.hpaned1[this.vbox1]));
+			w35.Resize = false;
+			w35.Shrink = false;
 			// Container child hpaned1.Gtk.Paned+PanedChild
 			this.vbox4 = new global::Gtk.VBox();
 			this.vbox4.Name = "vbox4";
@@ -534,21 +549,21 @@ namespace IhildaWallet
 			this.label5.LabelProp = global::Mono.Unix.Catalog.GetString("<span size=\"x-large\"><b>Wallets</b></span>");
 			this.label5.UseMarkup = true;
 			this.vbox4.Add(this.label5);
-			global::Gtk.Box.BoxChild w35 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.label5]));
-			w35.Position = 0;
-			w35.Expand = false;
-			w35.Fill = false;
+			global::Gtk.Box.BoxChild w36 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.label5]));
+			w36.Position = 0;
+			w36.Expand = false;
+			w36.Fill = false;
 			// Container child vbox4.Gtk.Box+BoxChild
 			this.wallettree1 = new global::IhildaWallet.WalletTree();
 			this.wallettree1.Events = ((global::Gdk.EventMask)(256));
 			this.wallettree1.Name = "wallettree1";
 			this.vbox4.Add(this.wallettree1);
-			global::Gtk.Box.BoxChild w36 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.wallettree1]));
-			w36.Position = 1;
+			global::Gtk.Box.BoxChild w37 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.wallettree1]));
+			w37.Position = 1;
 			this.hpaned1.Add(this.vbox4);
 			this.vbox2.Add(this.hpaned1);
-			global::Gtk.Box.BoxChild w38 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hpaned1]));
-			w38.Position = 1;
+			global::Gtk.Box.BoxChild w39 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hpaned1]));
+			w39.Position = 1;
 			this.Add(this.vbox2);
 			if ((this.Child != null))
 			{

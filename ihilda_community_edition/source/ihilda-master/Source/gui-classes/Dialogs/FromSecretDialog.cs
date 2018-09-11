@@ -127,6 +127,8 @@ namespace IhildaWallet
 
 
 			combobox1.Changed += Entry_Changed;
+
+
 		}
 
 		private void Entry_Changed (object sender, EventArgs e)

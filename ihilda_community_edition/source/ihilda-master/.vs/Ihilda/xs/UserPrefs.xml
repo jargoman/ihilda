@@ -1,10 +1,14 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/WalletClasses/RippleWallet.cs">
     <Files>
-      <File FileName="Source/gui-classes/Dialogs/RuleCreateDialog.cs" Line="49" Column="29" />
-      <File FileName="Source/gui-classes/Widgets/TradeUI/TradePairEntryWidget.cs" Line="306" Column="37" />
-      <File FileName="Source/gui-classes/Dialogs/TradePairCreateDialog.cs" Line="32" Column="56" />
-      <File FileName="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs" Line="9" Column="1" />
+      <File FileName="Source/gui-classes/Windows/PaperWalletWindow.cs" Line="89" Column="52" />
+      <File FileName="Source/gui-classes/Dialogs/FromSecretDialog.cs" Line="131" Column="4" />
+      <File FileName="Source/gui-classes/Widgets/WalletUI/WalletManagerWidget.cs" Line="383" Column="16" />
+      <File FileName="Source/util/WalletManager.cs" Line="1261" Column="30" />
+      <File FileName="Source/gui-classes/Windows/WalletManagerWindow.cs" Line="1" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/Charting/DepthChartWidget.cs" Line="1104" Column="5" />
+      <File FileName="Source/util/EZFontResolver.cs" Line="154" Column="3" />
+      <File FileName="Source/WalletClasses/RippleWallet.cs" Line="716" Column="15" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -16,11 +20,14 @@
                 <Node name="gui-classes" expanded="True">
                   <Node name="Dialogs" expanded="True" />
                   <Node name="Widgets" expanded="True">
-                    <Node name="RuleWidgets" expanded="True">
-                      <Node name="FilledRuleManagementWindow.cs" selected="True" />
-                    </Node>
-                    <Node name="TradeUI" expanded="True" />
+                    <Node name="Charting" expanded="True" />
+                    <Node name="WalletUI" expanded="True" />
                   </Node>
+                  <Node name="Windows" expanded="True" />
+                </Node>
+                <Node name="util" expanded="True" />
+                <Node name="WalletClasses" expanded="True">
+                  <Node name="RippleWallet.cs" selected="True" />
                 </Node>
               </Node>
             </Node>

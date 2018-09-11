@@ -111,7 +111,7 @@ namespace IhildaWallet
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.label4 = new global::Gtk.Label();
 			this.label4.Name = "label4";
-			this.label4.LabelProp = global::Mono.Unix.Catalog.GetString("<b>Automation Status :</b> <b>Stopped</b>");
+			this.label4.LabelProp = global::Mono.Unix.Catalog.GetString("<b>Automation Status :</b> <b><span fgcolor=\"red\">Stopped</span></b>");
 			this.label4.UseMarkup = true;
 			this.hbox4.Add(this.label4);
 			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.label4]));
@@ -315,7 +315,7 @@ namespace IhildaWallet
 			this.label6.Ypad = 5;
 			this.label6.Xalign = 0F;
 			this.label6.Yalign = 0F;
-			this.label6.LabelProp = global::Mono.Unix.Catalog.GetString("Bot output screen :\n");
+			this.label6.LabelProp = global::Mono.Unix.Catalog.GetString("\n\tBot output screen \n\n");
 			this.label6.UseMarkup = true;
 			this.label6.Selectable = true;
 			w22.Add(this.label6);
