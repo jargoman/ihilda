@@ -6,6 +6,9 @@ namespace IhildaWallet
 {
 	public partial class TrippleEntenteDialog : Gtk.Dialog
 	{
+
+
+
 		public TrippleEntenteDialog ()
 		{
 			this.Build ();
@@ -20,7 +23,14 @@ namespace IhildaWallet
 			TrippleEntente te = new TrippleEntente ();
 			
 			string pincode = this.pincodewidget2.GetEntryString ();
-			var v = this.prismwidget1.collectPrisms ();
+			var v = this.prismwidget1.CollectPrisms ();
+			if (v == null) {
+				
+				label6.Markup = "<span fgcolor=\"red\">Invalid Prism Values</span>";
+				this.label6.Show ();
+
+				return null;
+			}
 
 			te.Pincode = pincode;
 			te.ColorCrypt = v.Item1;
@@ -36,6 +46,19 @@ namespace IhildaWallet
 
 		}
 
+		public void HideInfoBarLabels ()
+		{
+			this.label6.Markup = "";
+			this.label6.Hide ();
+			passentry.ModifyBase (StateType.Normal);
+
+			pincodewidget2.HideInfoBarLabels ();
+			prismwidget1.HideInfoBarLabels ();
+
+
+
+		}
+
 
 		public static TrippleEntente DoDialog () {
 
@@ -46,13 +69,14 @@ namespace IhildaWallet
 			mre.Reset ();
 			Application.Invoke( (object sender, EventArgs e) => {
 				using (TrippleEntenteDialog dialog = new TrippleEntenteDialog ()) {
+					dialog.HideInfoBarLabels ();
 					while (true) {
 
-
+						//dialog.HideInfoBarLabels ();
 						ResponseType rt = (ResponseType)dialog.Run ();
-
+						dialog.HideInfoBarLabels ();
 						if (rt != ResponseType.Ok) {
-							
+							//dialog.Destroy ();
 							break;
 						}
 
@@ -60,7 +84,7 @@ namespace IhildaWallet
 
 						if (tripple != null) {
 							break;
-						}
+						} 
 
 					}
 

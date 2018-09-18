@@ -65,6 +65,7 @@ namespace IhildaWallet
 
 			Liststore = new ListStore (
 				typeof (bool),  // Select
+				typeof (string), // Number
 				typeof (string), // Buy 
 				typeof (string), // Sell
 				typeof (string), // Price
@@ -89,13 +90,14 @@ namespace IhildaWallet
 
 			//this.treeview1.AppendColumn ();
 			this.treeview1.AppendColumn ("Select", toggle, "active", 0);
-			this.treeview1.AppendColumn ("Buy", txtr, "markup", 1);
-			this.treeview1.AppendColumn ("Sell", txtr, "markup", 2);
-			this.treeview1.AppendColumn ("Price", txtr, "markup", 3);
-			this.treeview1.AppendColumn ("Cost", txtr, "markup", 4);
-			this.treeview1.AppendColumn ("Mark", txtr, "markup", 5);
-			this.treeview1.AppendColumn ("Status", txtr, "markup", 6);
-			this.treeview1.AppendColumn ("Result", txtr, "markup", 7);
+			this.treeview1.AppendColumn ("#", txtr, "markup", 1);
+			this.treeview1.AppendColumn ("Buy", txtr, "markup", 2);
+			this.treeview1.AppendColumn ("Sell", txtr, "markup", 3);
+			this.treeview1.AppendColumn ("Price", txtr, "markup", 4);
+			this.treeview1.AppendColumn ("Cost", txtr, "markup", 5);
+			this.treeview1.AppendColumn ("Mark", txtr, "markup", 6);
+			this.treeview1.AppendColumn ("Status", txtr, "markup", 7);
+			this.treeview1.AppendColumn ("Result", txtr, "markup", 8);
 
 			this.SubmitButton.Clicked += delegate {
 				//ThreadStart ts = new ThreadStart(  );
@@ -246,7 +248,7 @@ namespace IhildaWallet
 			uint se = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence (rw.GetStoredReceiveAddress (), ni));
 
 
-			RippleSeedAddress rsa = rw.GetDecryptedSeed ();
+			RippleIdentifier rsa = rw.GetDecryptedSeed ();
 			this.SubmitOrderAtIndex ((int)index, se, ni, rsa);
 		}
 
@@ -472,7 +474,7 @@ namespace IhildaWallet
 		{
 			Gtk.Application.Invoke ((object sender, EventArgs e) => {
 				if (Liststore.GetIterFromString (out TreeIter iter, path)) {
-					Liststore.SetValue (iter, 4, message);
+					Liststore.SetValue (iter, 5, message);
 
 
 
@@ -484,7 +486,7 @@ namespace IhildaWallet
 		{
 			Application.Invoke ((object sender, EventArgs e) => {
 				if (Liststore.GetIterFromString (out TreeIter iter, path)) {
-					Liststore.SetValue (iter, 3, message);
+					Liststore.SetValue (iter, 4, message);
 
 
 
@@ -570,6 +572,7 @@ namespace IhildaWallet
 
 				Liststore.AppendValues (
 					o.Selected,
+					(i + 1).ToString(),
 					o.TakerPays.ToString (),
 					o.TakerGets.ToString (),
 
@@ -637,7 +640,7 @@ namespace IhildaWallet
 
 			Gtk.Application.Invoke ((object sender, EventArgs e) => {
 				if (Liststore.GetIterFromString (out TreeIter iter, path)) {
-					Liststore.SetValue (iter, 6, s);
+					Liststore.SetValue (iter, 7, s);
 
 
 
@@ -657,7 +660,7 @@ namespace IhildaWallet
 
 			Application.Invoke ((object sender, EventArgs e) => {
 				if (Liststore.GetIterFromString (out TreeIter iter, path)) {
-					Liststore.SetValue (iter, 7, s);
+					Liststore.SetValue (iter, 8, s);
 				}
 			});
 
@@ -683,15 +686,15 @@ namespace IhildaWallet
 
 			Application.Invoke ((object sender, EventArgs e) => {
 				if (Liststore.GetIterFromString (out TreeIter iter, index.ToString ())) {
-					Liststore.SetValue (iter, 6, "");
 					Liststore.SetValue (iter, 7, "");
+					Liststore.SetValue (iter, 8, "");
 
 
 				}
 			});
 		}
 
-		public bool SubmitOrderAtIndex (int index, uint sequence, NetworkInterface ni, RippleSeedAddress rsa)
+		public bool SubmitOrderAtIndex (int index, uint sequence, NetworkInterface ni, RippleIdentifier rsa)
 		{
 
 #if DEBUG
@@ -1330,7 +1333,7 @@ namespace IhildaWallet
 			//LinkedList< AutomatedOrder > failedorders = new LinkedList<AutomatedOrder>();
 			//LinkedList< AutomatedOrder > filledorders = new LinkedList<AutomatedOrder>();
 			//LinkedList<AutomatedOrder> terQuedorers = new LinkedList<AutomatedOrder> ();
-			RippleSeedAddress rsa = rw.GetDecryptedSeed ();
+			RippleIdentifier rsa = rw.GetDecryptedSeed ();
 			for (int index = 0; index < _offers.Length; index++) {
 
 				if (stop) {

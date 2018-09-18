@@ -120,6 +120,7 @@ namespace IhildaWallet
 				return;
 			}
 
+			/*
 			RippleSeedAddress seed = rw.GetDecryptedSeed ();
 
 			if (seed == null) {
@@ -130,6 +131,7 @@ namespace IhildaWallet
 				#endif
 				return;
 			}
+			*/
 
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread();
 

@@ -255,7 +255,7 @@ namespace IhildaWallet
 
 		private void SetIsRunningUI (bool isRunning)
 		{
-			string message = "Automation Status : " + (String)(isRunning ? "<span fgcolor=\"green\">Running</span>" : "<span fgcolor=\"red\">Stopped</span>");
+			string message = "<b>Automation Status </b>: " + (String)(isRunning ? "<span fgcolor=\"green\">Running</span>" : "<span fgcolor=\"red\">Stopped</span>");
 			Application.Invoke (delegate {
 				walletswitchwidget2.Sensitive = !isRunning;
 				label4.Markup = message;
@@ -458,71 +458,136 @@ namespace IhildaWallet
 		public void DoLogicClicked ()
 		{
 
+			string method_sig = clsstr + nameof (DoLogicClicked) + DebugRippleLibSharp.both_parentheses;
 
-
-			NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
-			if (ni == null) {
-
-				MessageDialog.ShowMessage ("Network Warning", "Could not connect to network");
-				return;
-			}
-			RippleWallet rw = walletswitchwidget2.GetRippleWallet ();
-			if (rw == null) {
-
-				MessageDialog.ShowMessage ("No wallet Selected");
+			if (this.tokenSource != null) {
+				WriteToInfoBox ("A rule script is already running\n");
 				return;
 			}
 
-			bool ShouldContinue = LeIceSense.DoTrialDialog (rw, LicenseType.MARKETBOT);
-			//bool ShouldContinue = LeIceSense.LastDitchAttempt (rw, LicenseType.AUTOMATIC);
-			if (!ShouldContinue) {
-				return;
-			}
+			try {
 
-			Robotics robot = new Robotics (this.RuleManagerObj);
+				this.tokenSource = new CancellationTokenSource ();
 
-			Int32? strt = this.ledgerconstraintswidget1.GetStartFromLedger ();
-			Int32? endStr = this.ledgerconstraintswidget1.GetEndLedger ();
+				CancellationToken token = tokenSource.Token;
+				token.ThrowIfCancellationRequested ();
 
-			int? lim = this.ledgerconstraintswidget1.GetLimit ();
+				this.SetIsRunningUI (true);
 
-			Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = robot.DoLogic (rw, ni, strt, endStr, lim);
+				NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
+				if (ni == null) {
 
-			if (tuple == null) {
-				MessageDialog.ShowMessage ("No filled", "Do logic returned null");
-			}
-
-			if (tuple?.Item1 == null) {
-				MessageDialog.ShowMessage ("No filled", "Filled orders error");
-				return;
-			}
-
-			if (tuple.Item2 == null) {
-				MessageDialog.ShowMessage ("No filled", "Filled orders array is null");
-				return;
-			}
-
-			if (!tuple.Item2.Any ()) {
-				MessageDialog.ShowMessage ("No filled", "There are no new filled orders\n");
-				return;
-			}
-
-			Application.Invoke (delegate {
-				this.ledgerconstraintswidget1.SetLastKnownLedger (tuple.Item1.ToString ()); //this.label9.Text = 
-
-
-
-				LicenseType licenseT = Util.LicenseType.MARKETBOT;
-				if (LeIceSense.IsLicenseExempt (tuple.Item2.ElementAt (0).taker_gets) || LeIceSense.IsLicenseExempt (tuple.Item2.ElementAt (0).taker_pays)) {
-					licenseT = LicenseType.NONE;
+					MessageDialog.ShowMessage ("Network Warning", "Could not connect to network");
+					return;
 				}
 
-				OrderSubmitWindow win = new OrderSubmitWindow (rw, licenseT);
-				win.SetOrders (tuple.Item2);
+				/*
+				WriteToInfoBox ("");
+
+				if (ni.IsConnected()) {
+					WriteToInfoBox ("");
+				}
+				*/
+				RippleWallet rw = walletswitchwidget2.GetRippleWallet ();
+				if (rw == null) {
+					string messg = "No wallet Selected";
+					MessageDialog.ShowMessage (messg);
+					WriteToInfoBox (messg);
+					return;
+				}
+
+				bool ShouldContinue = LeIceSense.DoTrialDialog (rw, LicenseType.MARKETBOT);
+				//bool ShouldContinue = LeIceSense.LastDitchAttempt (rw, LicenseType.AUTOMATIC);
+				if (!ShouldContinue) {
+					WriteToInfoBox ("Stopping");
+					return;
+				}
+
+				Robotics robot = new Robotics (this.RuleManagerObj);
+
+				Int32? strt = this.ledgerconstraintswidget1.GetStartFromLedger ();
+
+				//WriteToInfoBox ("starting at ledger " + strt ?? "null");
+
+				Int32? endStr = this.ledgerconstraintswidget1.GetEndLedger ();
+
+				int? lim = this.ledgerconstraintswidget1.GetLimit ();
+
+
+				this.WriteToInfoBox ("Polling data for " + (string)(rw?.GetStoredReceiveAddress () ?? "null") + "\n");
+				this.WriteToInfoBox ("Starting from ledger " + (string)(strt?.ToString () ?? "null") + "\n");
+				//this.WriteToInfoBox ("");
 
 
 
-			});
+				Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = robot.DoLogic (rw, ni, strt, endStr, lim);
+
+
+				string title = "No filled";
+				string message = null;
+				if (tuple == null) {
+					message = "Do logic returned null";
+					MessageDialog.ShowMessage (title, message);
+					WriteToInfoBox (message);
+				}
+
+				if (tuple?.Item1 == null) {
+					message = "Filled orders error";
+					MessageDialog.ShowMessage (title, message);
+					WriteToInfoBox (message);
+					return;
+				}
+
+				if (tuple.Item2 == null) {
+					message = "Filled orders array is null";
+					MessageDialog.ShowMessage (title, message);
+					WriteToInfoBox (message);
+					return;
+				}
+
+				if (!tuple.Item2.Any ()) {
+					message = "There are no new filled orders\n";
+					MessageDialog.ShowMessage (title, message);
+					WriteToInfoBox (message);
+					return;
+				}
+
+				int num = tuple.Item2.Count ();
+
+				message = num + " suggested orders";
+				WriteToInfoBox (message);
+
+				Application.Invoke (delegate {
+					this.ledgerconstraintswidget1.SetLastKnownLedger (tuple.Item1.ToString ()); //this.label9.Text = 
+
+
+
+					LicenseType licenseT = Util.LicenseType.MARKETBOT;
+					if (LeIceSense.IsLicenseExempt (tuple.Item2.ElementAt (0).taker_gets) || LeIceSense.IsLicenseExempt (tuple.Item2.ElementAt (0).taker_pays)) {
+						licenseT = LicenseType.NONE;
+					}
+
+					OrderSubmitWindow win = new OrderSubmitWindow (rw, licenseT);
+					win.SetOrders (tuple.Item2);
+
+
+
+				});
+			} catch (Exception e) {
+#if DEBUG
+				if (DebugIhildaWallet.FilledRuleManagementWindow) {
+					Logging.ReportException (method_sig, e);
+				}
+#endif
+			} finally {
+				this.tokenSource = null;
+				this.SetIsRunningUI (false);
+
+				Application.Invoke (delegate {
+					progressbar1.Fraction = 0;
+
+				});
+			}
 
 		}
 
@@ -530,9 +595,10 @@ namespace IhildaWallet
 		//private CancellationToken token = this.tokenSource.Token;
 		public void AutomateClicked ()
 		{
-			//if (token != null) {
-			// TODO
-			//}
+			if (this.tokenSource != null) {
+				WriteToInfoBox ("A rule script is already running\n");
+				return;
+			}
 
 			this.tokenSource = new CancellationTokenSource ();
 
@@ -687,7 +753,7 @@ namespace IhildaWallet
 
 				bool success = false;
 
-				RippleSeedAddress rippleSeedAddress = rw.GetDecryptedSeed ();
+				RippleIdentifier rippleSeedAddress = rw.GetDecryptedSeed ();
 
 				do {
 
@@ -839,6 +905,10 @@ namespace IhildaWallet
 			set;
 		}
 
+
+#if DEBUG
+		private const string clsstr = nameof (FilledRuleManagementWindow) + DebugRippleLibSharp.colon;
+#endif
 
 	}
 }

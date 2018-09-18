@@ -10,6 +10,7 @@ using RippleLibSharp.Util;
 using RippleLibSharp.Keys;
 using RippleLibSharp.Result;
 using RippleLibSharp.Commands.Accounts;
+using System.Threading.Tasks;
 
 namespace IhildaWallet
 {
@@ -50,6 +51,19 @@ namespace IhildaWallet
 		}
 
 
+		public void ClearUI ()
+		{
+			entry5.ModifyBase (StateType.Normal);
+			secretentry.ModifyBase (StateType.Normal);
+			combobox1.ModifyBase (StateType.Normal);
+			combobox2.ModifyBase (StateType.Normal);
+			comboboxentry2.ModifyBase (StateType.Normal);
+
+			label6.Markup = "";
+			label6.Hide ();
+		}
+
+
 		public void Initialize ()
 		{
 
@@ -59,14 +73,19 @@ namespace IhildaWallet
 
 
 			fromhexbutton.Clicked += (object sender, EventArgs e) => {
-				RippleSeedAddress rippleSeedAddress = SeedFromHexDialog.DoDialog ();
+				string rippleSigningKey = SeedFromHexDialog.DoDialog ();
 
-				if (rippleSeedAddress == null) {
+				if (rippleSigningKey == null) {
 					return;
 				}
 
-				secretentry.Text = rippleSeedAddress.ToString ();
-			
+				secretentry.Text = rippleSigningKey;
+
+			};
+
+
+			entry5.Changed += (object sender, EventArgs e) => {
+				entry5.ModifyBase (StateType.Normal);
 			};
 
 
@@ -80,12 +99,15 @@ namespace IhildaWallet
 				}
 #endif
 
+				secretentry.ModifyBase (StateType.Normal);
+
 				string s = secretentry.Text;
 				if (s == null || s.Equals ("")) {
 					return;
 				}
 
-				if (!s.StartsWith ("s")) {
+
+				if (!s.StartsWith ("s") && !s.StartsWith ("p")) {
 					TextHighlighter.Highlightcolor = TextHighlighter.RED;
 					this.label2.Markup = TextHighlighter.Highlight ("Secrets start with 's'");
 					return;
@@ -97,36 +119,68 @@ namespace IhildaWallet
 					return;
 				}
 
+				if (s.StartsWith ("s")) {
+					try {
+						RippleWallet rw = new RippleWallet (s, RippleWalletTypeEnum.Master);
+						string address = rw.GetStoredReceiveAddress ();
+						TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
+						this.label2.Markup = TextHighlighter.Highlight (address);
 
-				try {
-					RippleWallet rw = new RippleWallet (s, RippleWalletTypeEnum.Master);
-					string address = rw.GetStoredReceiveAddress ();
-					TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
-					this.label2.Markup = TextHighlighter.Highlight (address);
-
-				}
+					}
 
 #pragma warning disable 0168
 				catch (Exception ex) {
 #pragma warning restore 0168
 
 #if DEBUG
-					if (DebugIhildaWallet.FromSecretDialog) {
-						Logging.ReportException (event_sig, ex);
-					}
+						if (DebugIhildaWallet.FromSecretDialog) {
+							Logging.ReportException (event_sig, ex);
+						}
 #endif
 
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					this.label2.Markup = TextHighlighter.Highlight ("invalid ripple address");
-					return;
+						TextHighlighter.Highlightcolor = TextHighlighter.RED;
+						this.label2.Markup = TextHighlighter.Highlight ("invalid ripple address");
+						return;
+					}
+				} else {
+					try {
+						RipplePrivateKey privateKey = new RipplePrivateKey (s);
+						string address = privateKey.GetPublicKey ().GetAddress ();
+						TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
+						this.label2.Markup = TextHighlighter.Highlight (address);
+
+					} catch (Exception ex) {
+
+#if DEBUG
+						if (DebugIhildaWallet.FromSecretDialog) {
+							Logging.ReportException (event_sig, ex);
+						}
+#endif
+
+						TextHighlighter.Highlightcolor = TextHighlighter.RED;
+						this.label2.Markup = TextHighlighter.Highlight ("invalid private key");
+						return;
+
+					}
 				}
 
+			};
+
+			combobox2.Changed += (object sender, EventArgs e) => {
+				combobox2.ModifyBase (StateType.Normal);
 			};
 
 			verifybutton.Clicked += Verifybutton_Clicked;
 
 
 			combobox1.Changed += Entry_Changed;
+
+
+			comboboxentry2.Changed += (object sender, EventArgs e) => {
+				comboboxentry2.ModifyBase (StateType.Normal);
+			};
+			this.ClearUI ();
+
 
 
 		}
@@ -137,6 +191,9 @@ namespace IhildaWallet
 			string method_sig = clsstr + nameof (Entry_Changed) + DebugRippleLibSharp.both_parentheses;
 			string str = combobox1.ActiveText;
 #endif
+
+			combobox1.ModifyBase (StateType.Normal);
+
 			RippleWalletTypeEnum walletTypeEnum = default (RippleWalletTypeEnum);
 
 			try {
@@ -150,16 +207,20 @@ namespace IhildaWallet
 					Logging.ReportException (method_sig, ex);
 				}
 #endif
+
+				combobox1.ModifyBase (StateType.Normal, new Gdk.Color (218, 112, 214));
+				label6.Markup = "<span fgcolor=\"red\">Not a valid type</span>";
+				label6.Show ();
 				return;
 			}
 
 			switch (walletTypeEnum) {
-			/*
-			case RippleWalletTypeEnum.HexPrivateKey:
+
+			case RippleWalletTypeEnum.MasterPrivateKey:
 				label5.Visible = false;
 				comboboxentry2.Visible = false;
 				return;
-				*/
+
 			case RippleWalletTypeEnum.Regular:
 				label5.Visible = true;
 				comboboxentry2.Visible = true;
@@ -250,11 +311,14 @@ namespace IhildaWallet
 #endif
 
 
+			string [] values = Enum.GetNames (typeof (EncryptionType));
+
 			ListStore store = new ListStore (typeof (string));
 
-			store.AppendValues ("plaintext");
-			store.AppendValues ("Rijndaelio");
+			for (int i = 1; i < values.Length; i++) {
 
+				store.AppendValues (values [i]);
+			}
 			/*
 			//if (PluginController.encryptors != null && PluginController.encryptors.Keys != null) {
 
@@ -290,6 +354,7 @@ namespace IhildaWallet
 			ListStore typeStore = new ListStore (typeof (string));
 			typeStore.AppendValues (nameof (RippleWalletTypeEnum.Master));
 			typeStore.AppendValues (nameof (RippleWalletTypeEnum.Regular));
+			typeStore.AppendValues (nameof (RippleWalletTypeEnum.MasterPrivateKey));
 			this.combobox1.Model = typeStore;
 		}
 
@@ -339,7 +404,7 @@ namespace IhildaWallet
 			}
 			*/
 
-			RippleSeedAddress seed = rippleWallet.GetDecryptedSeed ();
+			RippleIdentifier seed = rippleWallet.GetDecryptedSeed ();
 			this.secretentry.Text = seed.ToString ();
 
 			//if (PluginController.currentInstance!=null) {
@@ -365,13 +430,13 @@ namespace IhildaWallet
 			}
 
 
-			
-				if (combobox1.Model.GetIterFirst (out TreeIter iter2)) {
+
+			if (combobox1.Model.GetIterFirst (out TreeIter iter2)) {
 				do {
 
 					GLib.Value thisRow = new GLib.Value ();
 					combobox1.Model.GetValue (iter2, 0, ref thisRow);
-						if (thisRow.Val is String s && s.Equals (rippleWallet.AccountType.ToString ())) {
+					if (thisRow.Val is String s && s.Equals (rippleWallet.AccountType.ToString ())) {
 						combobox1.SetActiveIter (iter2);
 						break;
 					}
@@ -381,7 +446,7 @@ namespace IhildaWallet
 				//todo debug
 			}
 
-				if (rippleWallet.AccountType == RippleWalletTypeEnum.Regular) {
+			if (rippleWallet.AccountType == RippleWalletTypeEnum.Regular) {
 				comboboxentry2.Entry.Text = rippleWallet?.Account?.ToString () ?? "";
 			}
 
@@ -393,25 +458,36 @@ namespace IhildaWallet
 
 		public RippleWallet GetWallet ()
 		{
+
+
+			Gdk.Color orchid = new Gdk.Color (218, 112, 214);
+
 #if DEBUG
 
 			String method_sig = clsstr + nameof (GetWallet) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.FromSecretDialog) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
+
 #endif
 			try {
 
 				String name = this.entry5.Text;
-				if (name != null) {
+
+				if (!string.IsNullOrWhiteSpace (name)) {
+
 #if DEBUG
 					if (DebugIhildaWallet.FromSecretDialog) {
 						Logging.WriteLog (method_sig + nameof (name) + DebugRippleLibSharp.equals + name);
 					}
 #endif
 
+
 					name = name.Trim ();
+
+
 				} else {
+
 #if DEBUG
 					// Todo needs a name
 					if (DebugIhildaWallet.FromSecretDialog) {
@@ -419,6 +495,11 @@ namespace IhildaWallet
 					}
 #endif
 
+					this.entry5.ModifyBase (StateType.Normal, orchid);
+
+					this.label6.Markup = "<span fgcolor=\"red\">Wallet needs a name</span>";
+
+					this.label6.Show ();
 
 					return null;
 				}
@@ -429,7 +510,11 @@ namespace IhildaWallet
 						Logging.WriteLog (method_sig + "WallerManager.currentInstance == null, returning");
 					}
 #endif
+
+					this.label6.Markup = "<span fgcolor=\"red\">Integral bug. No wallet manager found in application. Definitely a bug</span>";
+					this.label6.Show ();
 					return null;
+
 				}
 
 				String s = NameMaker.RequestName (name, PluginType.WALLET);  // must be a valid name ie path must be available and
@@ -441,6 +526,10 @@ namespace IhildaWallet
 					}
 #endif
 
+
+					this.label6.Markup = "<span fgcolor=\"red\">invalid name</span>";
+					this.label6.Show ();
+					this.entry5.ModifyBase (StateType.Normal, orchid);
 					return null;
 				}
 
@@ -449,6 +538,10 @@ namespace IhildaWallet
 					if (DebugIhildaWallet.FromSecretDialog) {
 						Logging.WriteLog (method_sig + "s != name, returning");
 					}
+
+					this.label6.Markup = "<span fgcolor=\"red\">invalid name</span>";
+					this.label6.Show ();
+					this.entry5.ModifyBase (StateType.Normal, orchid);
 #endif
 					this.entry5.Text = s;
 					return null;
@@ -472,23 +565,37 @@ namespace IhildaWallet
 						Logging.WriteLog (method_sig + "name contains " + ((invalid > 1) ? "invalid characters" : "an invalid character") + ", returning");
 					}
 #endif
+
+					label6.Markup = "<span fgcolor=\"red\">name contains invalid characters</span>";
+					label6.Show ();
+					entry5.ModifyBase (StateType.Normal, orchid);
 					return null;
 				}
 
 				String secret = secretentry.Text;
-				if (secret != null) {
-					secret = secret.Trim ();
+
+
+				if (string.IsNullOrWhiteSpace (secret)) {
+					this.label6.Markup = "<span fgcolor=\"red\">You need to specify a secret</span>";
+					secretentry.ModifyBase (StateType.Normal, orchid);
+					this.label6.Show ();
+					return null;
 				}
+
+				secret = secret.Trim ();
 
 				if (!Base58.IsBase58 (secret)) {
 					// todo show invalid secret message
+					this.label6.Markup = "<span fgcolor=\"red\">Invalid Secret</span>";
+					secretentry.ModifyBase (StateType.Normal, orchid);
+					this.label6.Show ();
 					return null;
 				}
 
 				String selection = this.combobox2.ActiveText;
 
 				string walletType = this.combobox1.ActiveText;
-					RippleWalletTypeEnum walletTypeEnum = default (RippleWalletTypeEnum);
+				RippleWalletTypeEnum walletTypeEnum = default (RippleWalletTypeEnum);
 
 				try {
 					walletTypeEnum = (IhildaWallet.RippleWalletTypeEnum)Enum.Parse (typeof (RippleWalletTypeEnum), walletType);
@@ -499,12 +606,19 @@ namespace IhildaWallet
 
 					}
 
-						return null;
+					this.label6.Markup = "<span fgcolor=\"red\">Invalid Wallet type " + (string)(walletType ?? null) + "</span>";
+					combobox1.ModifyBase (StateType.Normal, orchid);
+					this.label6.Show ();
+					return null;
 				}
+
+
 				RippleWallet rw = null;
-				try {
-					rw = new RippleWallet (secret, walletTypeEnum);
-				}
+
+				if (walletTypeEnum == RippleWalletTypeEnum.Master || walletTypeEnum == RippleWalletTypeEnum.Regular) {
+					try {
+						rw = new RippleWallet (secret, walletTypeEnum);
+					}
 
 #pragma warning disable 0168
 				catch (Exception eg) {
@@ -512,17 +626,41 @@ namespace IhildaWallet
 
 
 #if DEBUG
-					if (DebugIhildaWallet.FromSecretDialog) {
-						Logging.WriteLog (eg.Message);
-						Logging.ReportException (method_sig, eg);
+						if (DebugIhildaWallet.FromSecretDialog) {
+							Logging.WriteLog (eg.Message);
+							Logging.ReportException (method_sig, eg);
 
-					}
+						}
 #endif
 
+						this.label6.Markup = "<span fgcolor=\"red\">Failed to create the wallet. Valid secret??</span>";
+						secretentry.ModifyBase (StateType.Normal, orchid);
+						this.label6.Show ();
+						MessageDialog.ShowMessage ("Invalid seed");
+						return null;
+					}
+				} else if (walletTypeEnum == RippleWalletTypeEnum.MasterPrivateKey) {
+					try {
+						rw = new RippleWallet (secret, RippleWalletTypeEnum.MasterPrivateKey);
+
+					} catch (Exception e) {
+
+#if DEBUG
+						if (DebugIhildaWallet.FromSecretDialog) {
+							Logging.WriteLog (e.Message);
+							Logging.ReportException (method_sig, e);
+
+						}
+#endif
+
+						this.label6.Markup = "<span fgcolor=\"red\">Failed to create the wallet. Valid private key??</span>";
+						secretentry.ModifyBase (StateType.Normal, orchid);
+						this.label6.Show ();
+						MessageDialog.ShowMessage ("Invalid private key");
+						return null;
+					}
 
 
-					MessageDialog.ShowMessage ("Invalid seed");
-					return null;
 				}
 
 
@@ -532,26 +670,31 @@ namespace IhildaWallet
 					if (string.IsNullOrWhiteSpace (mast)) {
 						// TODO are ya sure. limited account capabilities 
 						// I haven't tested regular accounts yet
+
+						this.label6.Markup = "<span fgcolor=\"red\">To create a regular key wallet; you must specify the master account it signs on behalf of</span>";
+						comboboxentry2.ModifyBase (StateType.Normal, orchid);
+						this.label6.Show ();
+						return null;
 					}
 
 					try {
 						RippleAddress rippleAddress = new RippleAddress (mast);
-							rw.Account = rippleAddress;
-						
-						} 
+						rw.Account = rippleAddress;
 
+					} catch (Exception e) {
 
-						catch (Exception e) {
-							
 #if DEBUG
 						if (DebugIhildaWallet.FromSecretDialog) {
-								Logging.ReportException (method_sig, e);
-							}
-#endif
-						return null;
+							Logging.ReportException (method_sig, e);
 						}
+#endif
+						this.label6.Markup = "<span fgcolor=\"red\">Invalid Master account</span>";
+						comboboxentry2.ModifyBase (StateType.Normal, orchid);
+						this.label6.Show ();
+						return null;
+					}
 
-					
+
 
 				}
 
@@ -560,41 +703,120 @@ namespace IhildaWallet
 
 
 
-				if (string.IsNullOrWhiteSpace (selection)
-					|| selection == "plaintext"
-					|| selection == "none") {
+				if (string.IsNullOrWhiteSpace (selection)) {
+					combobox2.ModifyBase (StateType.Normal, orchid);
+					label6.Markup = "<span>Encryption type can not be blank</span>";
+					label6.Show ();
+					return null;
+				}
 
+				string [] values = Enum.GetNames (typeof (EncryptionType));
+
+				bool worked = Enum.TryParse (selection, out EncryptionType encryptionType);
+
+
+				if (!worked) {
+
+					combobox2.ModifyBase (StateType.Normal, orchid);
+					label6.Markup = "<span>Could not determine encryption type</span>";
+					label6.Show ();
+					return null;
+				}
+
+
+				//rw.Encryption_Type = selection;
+
+				if (encryptionType == EncryptionType.None) {
+						combobox2.ModifyBase (StateType.Normal, orchid);
+					label6.Markup = "<span>Encryption type can not be null</span>";
+					label6.Show ();
+					return null;
+				}
+
+				if (encryptionType == EncryptionType.Plaintext) {
 					return rw;
 				}
 
 
-				if (selection == "Rijndaelio") {
 
-					// TODO more encryption was added and the program became more modular. 
-					//string pass = PasswordCreateDialog.doDialog( "Enter your desired new password" );
 
-					//IEncrypt ie = new Rijndaelio( );
-					rw.EncryptWithSideEffects ();
+				//byte[] payload = seed.getBytes();
+
+				RippleSeedAddress throwawayseed = null;
+
+
+
+				using (RandomSeedGenerator rsg = new RandomSeedGenerator ()) {
+					ResponseType rt = ResponseType.None;
+					rt = (ResponseType)rsg.Run ();
+					throwawayseed = rsg.GetGeneratedSeed ();
+					rsg.Destroy ();
+
+					if (rt != ResponseType.Ok) {
+
+						this.label6.Markup = "Wallet creation canceled";
+						this.label6.Show ();
+						return null;
+					}
+
+					if (throwawayseed == null) {
+						// TODO debug
+						return null;
+					}
+
+
+				}
+
+
+
+
+
+
+				byte [] salty = throwawayseed.GetBytes ();
+
+
+				IEncrypt ie = null;
+
+				switch (encryptionType) {
+				case EncryptionType.Plaintext:
+					// TODO alert user, nothing to be done.
 					return rw;
+				case EncryptionType.Rijndaelio:
+					ie = new Rijndaelio ();
+
+
+
+					break;
+
+				case EncryptionType.TrippleEntente:
+					ie = TrippleEntenteCreationDialog.DoDialogGuiThread ();
+
+					break;
 				}
 
 				/*
-				else {
-					if (PluginController.currentInstance != null) {
-						IEncrypt ie = PluginController.currentInstance.lookupEncryption (selection);
-						if (ie != null) {
-							//todo
-							// get password from password dialog
-							rw.encrypt ("password", ie);
-							return rw;
-						}
+			if (rw.Encryption_Type == selection) {
+				bool b = AreYouSure.AskQuestion ("change password", "You haven't changed the encryption type. Therefore do not need to change your password. Do you want to change your password anyway?");
 
-					} else {
-						// todo debug
-						return null;
-					}
+				if (!b) {
+					return rw;
+
 				}
-				*/
+
+			}
+
+			bool succeed = rw.DecryptWithSideEffects ();
+				if (!succeed) {
+				return null;
+			}
+			*/
+				rw._encyptWithSideEffects (ie, salty);
+
+
+
+				return rw;
+
+
 
 
 				// todo add format and crypto expection catchers
@@ -610,7 +832,7 @@ namespace IhildaWallet
 			}
 
 
-			return null;
+			//return null;
 		}
 
 

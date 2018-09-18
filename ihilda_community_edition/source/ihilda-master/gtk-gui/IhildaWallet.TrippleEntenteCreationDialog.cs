@@ -67,7 +67,7 @@ namespace IhildaWallet
 			this.notebook2 = new global::Gtk.Notebook();
 			this.notebook2.CanFocus = true;
 			this.notebook2.Name = "notebook2";
-			this.notebook2.CurrentPage = 0;
+			this.notebook2.CurrentPage = 1;
 			// Container child notebook2.Gtk.Notebook+NotebookChild
 			this.vbox5 = new global::Gtk.VBox();
 			this.vbox5.Name = "vbox5";
@@ -82,6 +82,7 @@ namespace IhildaWallet
 			this.confentry.CanFocus = true;
 			this.confentry.Name = "confentry";
 			this.confentry.IsEditable = true;
+			this.confentry.Visibility = false;
 			this.confentry.InvisibleChar = '●';
 			this.table1.Add(this.confentry);
 			global::Gtk.Table.TableChild w3 = ((global::Gtk.Table.TableChild)(this.table1[this.confentry]));
@@ -165,8 +166,6 @@ namespace IhildaWallet
 			this.vbox7.Add(this.prismwidget2);
 			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.vbox7[this.prismwidget2]));
 			w11.Position = 0;
-			w11.Expand = false;
-			w11.Fill = false;
 			this.notebook2.Add(this.vbox7);
 			global::Gtk.Notebook.NotebookChild w12 = ((global::Gtk.Notebook.NotebookChild)(this.notebook2[this.vbox7]));
 			w12.Position = 2;

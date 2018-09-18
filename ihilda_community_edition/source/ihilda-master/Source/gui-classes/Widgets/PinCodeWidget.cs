@@ -66,8 +66,20 @@ namespace IhildaWallet
 			};
 		}
 
+		public void HideInfoBarLabels ()
+		{
+			this.label13.Markup = "";
+			this.label13.Hide ();
+		}
+
 		public string GetEntryString () {
-			return this.entry.Text;
+
+			string str = this.entry.Text;
+			if (string.IsNullOrWhiteSpace (str)) {
+				this.label13.Markup = "<span fgcolor=\"red\">Pincode can not be blank</span>";
+				this.label13.Show ();
+			};
+			return str;
 		}
 	}
 }

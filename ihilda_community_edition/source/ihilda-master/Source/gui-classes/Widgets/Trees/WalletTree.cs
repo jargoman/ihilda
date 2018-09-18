@@ -33,12 +33,13 @@ namespace IhildaWallet
 
 			this.treeview2.HoverSelection = true;
 
+
 			store = new ListStore (
 				typeof (bool), // Select
 				typeof (string), // Name
 				typeof (string), // Type
 				typeof (string), // Account 
-				typeof (string), // Enryption
+				//typeof (string), // Enryption
 				typeof (string), // Balance
 				typeof (string) // notifications
 			);
@@ -54,9 +55,9 @@ namespace IhildaWallet
 			treeview2.AppendColumn ("Name", renderer, "markup", 1);
 			treeview2.AppendColumn ("Type", renderer, "markup", 2);
 			treeview2.AppendColumn ("Account", renderer, "markup", 3);
-			treeview2.AppendColumn ("Encryption", renderer, "markup", 4);
-			treeview2.AppendColumn ("Balance", renderer, "markup", 5);
-			treeview2.AppendColumn ("Notifications", renderer, "markup", 6);
+			/*treeview2.AppendColumn ("Encryption", renderer, "markup", 4);*/
+			treeview2.AppendColumn ("Balance", renderer, "markup", 4);
+			treeview2.AppendColumn ("Notifications", renderer, "markup", 5);
 
 			currentInstance = this;
 
@@ -368,9 +369,12 @@ namespace IhildaWallet
 #endif
 
 				if (WalletManagerWidget.currentInstance != null) {
+					/*
 					Task.Run (
 						(System.Action)WalletManagerWidget.currentInstance.Edit
 					);
+					*/
+					WalletManagerWidget.currentInstance.Edit ();
 				}
 			};
 
@@ -409,10 +413,13 @@ namespace IhildaWallet
 #endif
 
 				if (WalletManagerWidget.currentInstance != null) {
-
+					/*
 					Task.Run (
 						(System.Action)WalletManagerWidget.currentInstance.Delete
 					);
+					*/
+
+					WalletManagerWidget.currentInstance?.Delete ();
 				}
 			};
 
@@ -585,21 +592,29 @@ namespace IhildaWallet
 
 					sb.Clear ();
 
-					if (rw?.AccountType == RippleWalletTypeEnum.Master) {
+					if (rw?.AccountType == RippleWalletTypeEnum.Master || rw?.AccountType == RippleWalletTypeEnum.MasterPrivateKey) {
 						sb.Append ("<span ");
 						if (b) {
-							sb.Append ("bgcolor=\"antiquewhite\"");
+							sb.Append ("bgcolor=\"lavender\"");
 						}
 
-						sb.Append ("fgcolor=\"green\">");
+						sb.Append ("fgcolor=\"green\"><big>");
+						if (b) {
+							sb.Append ("<b><u>");
+						}
 						sb.Append (rw?.GetStoredReceiveAddress () ?? " ");
-						sb.Append ("</span>");
+						if (b) {
+							sb.Append ("</u></b>");
+						}
+
+
+						sb.Append ("</big></span>");
 					}
 
 					if (rw?.AccountType == RippleWalletTypeEnum.Regular) {
 						sb.Append ("<span ");
 						if (b) {
-							sb.Append ("bgcolor=\"antiquewhite\"");
+							sb.Append ("bgcolor=\"lavender\"");
 						}
 
 						sb.Append ("fgcolor=\"green\">");
@@ -616,14 +631,24 @@ namespace IhildaWallet
 						sb.Append ("</span>");
 
 					}
-					string accType = rw?.AccountType.ToString();
+					//string accType = );
+
+					StringBuilder stringBuilder = new StringBuilder ();
+					stringBuilder.AppendLine (rw?.AccountType.ToString ());
+					stringBuilder.Append (rw?.GetStoredEncryptionType () ?? "");
+
+					string name = rw?.WalletName ?? "";
+					if (b) {
+						name = "<span fgcolor=\"green\" bgcolor=\"lavender\"><b><u>" + name + "</u></b></span>";
+					}
 					store.AppendValues (
 						b,
-						rw?.WalletName ?? "",
-						accType ?? "",
+
+						name,
+						stringBuilder.ToString(),
 						sb?.ToString () ?? "",
 
-						rw?.GetStoredEncryptionType () ?? "",
+
 						rw?.LastKnownNativeBalance?.ToString () ?? "",
 						rw?.Notification ?? ""
 					);

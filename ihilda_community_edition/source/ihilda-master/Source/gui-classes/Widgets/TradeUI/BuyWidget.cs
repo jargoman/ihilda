@@ -284,14 +284,14 @@ namespace IhildaWallet
 				return;
 			}
 
-			RippleSeedAddress seed = rw.GetDecryptedSeed ();
+			//RippleSeedAddress seed = rw.GetDecryptedSeed ();
 
 			#if DEBUG
 			if (DebugIhildaWallet.BuyWidget) {
 				Logging.WriteLog (method_sig + nameof (rw) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString(rw));
 
 				// The log might be aware not to print the secret
-				Logging.WriteLog (method_sig + nameof (seed) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString(seed));
+				//Logging.WriteLog (method_sig + nameof (seed) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString(seed));
 
 			}
 			#endif
@@ -312,12 +312,13 @@ namespace IhildaWallet
 				Logging.WriteLog ("tp.currency_base =" + tp.Currency_Base.ToString());
 				Logging.WriteLog ("tp.currency_counter =" + tp.Currency_Counter.ToString());
 			}
-			#endif
+#endif
 
 
 
-			BuyOffer off = new BuyOffer();
-			off.Account = rw.Account;
+			BuyOffer off = new BuyOffer {
+				Account = rw.Account
+			};
 
 			//off.taker_gets = tp.currency_counter;
 			//off.taker_pays = tp.currency_base;

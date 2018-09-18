@@ -15,7 +15,7 @@ namespace IhildaWallet
 		}
 
 
-		public RippleSeedAddress GetSeed ()
+		public string GetSeed ()
 		{
 			string hexstr = comboboxentry1.ActiveText;
 
@@ -26,31 +26,32 @@ namespace IhildaWallet
 
 			byte[] bytes = Base58.StringToByteArray (hexstr);
 
+			string base58encoded = "test"; //Base58.Encode (bytes);
+
 			try {
-				
-				RippleSeedAddress rippleSeedAddress = new RippleSeedAddress (bytes);
-
-				return rippleSeedAddress;
+				RipplePrivateKey ripplePrivateKey = new RipplePrivateKey (bytes);
+				base58encoded = ripplePrivateKey.ToString ();
 			} catch (Exception e) {
-
-
-
-				return null;
+				return "error";
 			}
+
+
+
+			return base58encoded;
 
 		}
 
 
-		public static RippleSeedAddress DoDialog ()
+		public static string DoDialog ()
 		{
 			using (SeedFromHexDialog seedFromHexDialog = new SeedFromHexDialog ()) {
 				
 				Gtk.ResponseType reponse = (ResponseType)seedFromHexDialog.Run ();
-				RippleSeedAddress seedAddress = seedFromHexDialog.GetSeed ();
+				string seedAddress = seedFromHexDialog.GetSeed ();
 				seedFromHexDialog.Destroy ();
 
 				if (reponse == ResponseType.Ok) {
-					return seedFromHexDialog.GetSeed ();
+					return seedAddress;
 				}
 
 				return null;

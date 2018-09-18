@@ -117,7 +117,7 @@ namespace IhildaWallet
 			uint se = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence ( rw.GetStoredReceiveAddress (), ni) );
 
 
-			RippleSeedAddress rsa = rw.GetDecryptedSeed ();
+			RippleIdentifier rsa = rw.GetDecryptedSeed ();
 			for (int index = 0; index < this.paymentstree1._payments_tuple.Item1.Length; index++) {
 
 

@@ -4,9 +4,10 @@ namespace IhildaWallet
 {
 	public enum EncryptionType
 	{
-		Plaintext = 0,
-		TrippleEntente = 1,
-		Rijndaelio = 2
+		None = 0,
+		Plaintext = 1,
+		TrippleEntente = 2,
+		Rijndaelio = 3
 	}
 }
 

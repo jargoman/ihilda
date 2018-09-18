@@ -334,7 +334,7 @@ namespace IhildaWallet
 				return null;
 			}
 
-			RippleSeedAddress seed = rw.GetDecryptedSeed ();
+			RippleIdentifier seed = rw.GetDecryptedSeed ();
 
 #if DEBUG
 			if (DebugIhildaWallet.AutomatedBuyWidget) {

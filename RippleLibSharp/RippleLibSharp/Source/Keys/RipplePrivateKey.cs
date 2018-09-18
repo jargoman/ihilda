@@ -14,6 +14,10 @@ namespace RippleLibSharp.Keys
 		//Boolean isDeterministic=false;
 		private RipplePublicKey publickey;
 
+		public RipplePrivateKey (string stringID) : base (stringID)
+		{
+
+		}
 
 		public RipplePrivateKey (byte[] privateKeyBytes) : base (privateKeyBytes, 34)
 		{

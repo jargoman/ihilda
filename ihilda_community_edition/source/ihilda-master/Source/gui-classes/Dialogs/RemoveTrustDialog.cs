@@ -77,7 +77,7 @@ namespace IhildaWallet
 #endif
 			}
 
-			RippleSeedAddress rsa = rw.GetDecryptedSeed ();
+			RippleIdentifier rsa = rw.GetDecryptedSeed ();
 
 
 			NetworkInterface ni = NetworkController.CurrentInterface;
@@ -136,6 +136,7 @@ namespace IhildaWallet
 				rts.SignLocalRippled (rsa);
 
 			} else {
+
 
 				rts.Sign (rsa);
 

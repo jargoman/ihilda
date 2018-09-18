@@ -47,7 +47,7 @@ namespace IhildaWallet
 					return;
 				}
 
-				RippleSeedAddress rippleSeedAddress = rw.GetDecryptedSeed ();
+				RippleIdentifier rippleSeedAddress = rw.GetDecryptedSeed ();
 
 				Decimal targetPrice = automatedOrder.TakerPays.GetNativeAdjustedCostAt (automatedOrder.TakerGets);
 				//Decimal targetPrice = automatedOrder.TakerGets.GetNativeAdjustedPriceAt (automatedOrder.TakerPays);

@@ -662,7 +662,7 @@ namespace IhildaWallet
 
 					ResponseType resp = (ResponseType) fsd.Run();
 					fsd.Hide();
-
+					fsd.ClearUI ();
 					if (resp != ResponseType.Ok) {
 						#if DEBUG
 						if (DebugIhildaWallet.ProcessSplash) {
@@ -681,6 +681,7 @@ namespace IhildaWallet
 						#endif
 
 						WalletManagerWidget.ThreadedWalletAdd(rw);
+						fsd.Destroy ();
 						return;
 
 					}
@@ -689,11 +690,11 @@ namespace IhildaWallet
 
 				}
 
-				if (fsd!=null) {
-					//fsd.Hide();
-					fsd.Destroy();
+
+					
+					fsd?.Destroy();
 					fsd = null;
-				}
+
 
 
 
@@ -704,12 +705,14 @@ namespace IhildaWallet
 					WalletManagerWindow.ShowCurrent();
 				}
 
+				/*
 				else {
 					// todo debug debug debug 
 
 					MessageDialog.ShowMessage("");
 					Application.Quit();
 				}
+				*/
 
 
 				//this.Destroy();

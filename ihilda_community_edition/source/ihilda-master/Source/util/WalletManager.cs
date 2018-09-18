@@ -15,7 +15,7 @@ namespace IhildaWallet
 			currentInstance = this; // this MUST appear before loadWallets ();
 #if DEBUG
 			if (DebugIhildaWallet.WalletManager) {
-				Logging.WriteLog(clsstr + "new");
+				Logging.WriteLog (clsstr + "new");
 			}
 #endif
 
@@ -62,7 +62,7 @@ namespace IhildaWallet
 #if DEBUG
 			String method_sig = clsstr + nameof (LoadWallets) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.WalletManager) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.beginn);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
 #endif
 
@@ -73,7 +73,7 @@ namespace IhildaWallet
 			foreach (String path in paths) {
 				if (path == null) {
 #if DEBUG
-					Logging.WriteLog(method_sig + "null path?");
+					Logging.WriteLog (method_sig + "null path?");
 #endif
 					return;
 				}
@@ -84,7 +84,7 @@ namespace IhildaWallet
 					if (File.Exists (path)) {
 #if DEBUG
 						if (DebugIhildaWallet.WalletManager) {
-							Logging.WriteLog(method_sig + "Path exists");
+							Logging.WriteLog (method_sig + "Path exists");
 						}
 #endif
 
@@ -92,21 +92,21 @@ namespace IhildaWallet
 						if (path.EndsWith (".ice", StringComparison.CurrentCulture)) {
 #if DEBUG
 							if (DebugIhildaWallet.WalletManager) {
-								Logging.WriteLog(method_sig + "is an ice file");
+								Logging.WriteLog (method_sig + "is an ice file");
 							}
 #endif
 
 							String wal = File.ReadAllText (path);
 #if DEBUG
 							if (DebugIhildaWallet.WalletManager) {
-								Logging.WriteLog(method_sig + "Wallet contents = " + DebugIhildaWallet.AssertAllowInsecure(wal));
+								Logging.WriteLog (method_sig + "Wallet contents = " + DebugIhildaWallet.AssertAllowInsecure (wal));
 							}
 #endif
 							String name = Path.GetFileNameWithoutExtension (path);
 
 #if DEBUG
 							if (DebugIhildaWallet.WalletManager) {
-								Logging.WriteLog(method_sig + "name = " + DebugIhildaWallet.ToAssertString(name));
+								Logging.WriteLog (method_sig + "name = " + DebugIhildaWallet.ToAssertString (name));
 							}
 #endif
 
@@ -115,7 +115,7 @@ namespace IhildaWallet
 
 							if (rw == null) {
 #if DEBUG
-								Logging.WriteLog(method_sig + "Could not process wallet " + name);
+								Logging.WriteLog (method_sig + "Could not process wallet " + name);
 #endif
 
 								continue;
@@ -123,7 +123,7 @@ namespace IhildaWallet
 
 							if (rw.WalletName == null) {
 #if DEBUG
-								Logging.WriteLog(method_sig + "rw.walletname == null");
+								Logging.WriteLog (method_sig + "rw.walletname == null");
 #endif
 
 								// Todo
@@ -144,15 +144,12 @@ namespace IhildaWallet
 						}
 #endif
 
-					}
-					else {
+					} else {
 						// Todo debug
 						// file doesn't exist
 					}
-				}
-
-				catch (Exception e) {
-					Logging.WriteLog(e.Message);
+				} catch (Exception e) {
+					Logging.WriteLog (e.Message);
 					continue;
 				}
 
@@ -219,7 +216,8 @@ namespace IhildaWallet
 		}
 		*/
 
-		public RippleWallet LookUp (String s) {
+		public RippleWallet LookUp (String s)
+		{
 			//lock (walletLock) {
 			if (!wallets.TryGetValue (s, out RippleWallet rw)) {
 				// todo debug
@@ -231,9 +229,9 @@ namespace IhildaWallet
 		public bool AddWallet (RippleWallet wallet)
 		{
 #if DEBUG
-			String method_sig = clsstr + nameof(AddWallet) + DebugRippleLibSharp.left_parentheses + (wallet?.ToString () ?? "null") + DebugRippleLibSharp.right_parentheses;
+			String method_sig = clsstr + nameof (AddWallet) + DebugRippleLibSharp.left_parentheses + (wallet?.ToString () ?? "null") + DebugRippleLibSharp.right_parentheses;
 			if (DebugIhildaWallet.WalletManager) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.beginn);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
 #endif
 
@@ -241,7 +239,7 @@ namespace IhildaWallet
 				// todo debug
 #if DEBUG
 				if (DebugIhildaWallet.WalletManager) {
-					Logging.WriteLog(method_sig + "wallet == null returning false");
+					Logging.WriteLog (method_sig + "wallet == null returning false");
 				}
 #endif
 				return false;
@@ -253,7 +251,7 @@ namespace IhildaWallet
 			if (wallet.WalletName == null) {
 #if DEBUG
 				if (DebugIhildaWallet.WalletManager) {
-					Logging.WriteLog(method_sig + "wallet.walletname == null, returning false");
+					Logging.WriteLog (method_sig + "wallet.walletname == null, returning false");
 				}
 #endif
 				return false;
@@ -263,66 +261,62 @@ namespace IhildaWallet
 
 			//if ( name.Equals ( wallet.walletname )) {  // are they equal?
 #if DEBUG
-				if (DebugIhildaWallet.WalletManager) {
-					Logging.WriteLog(method_sig + "wallet name is available");
-				}
+			if (DebugIhildaWallet.WalletManager) {
+				Logging.WriteLog (method_sig + "wallet name is available");
+			}
 #endif
 
 
 
-				//String path = FileHelper.getWalletPath(name);
-			String path = FileHelper.GetWalletPath(wallet.WalletName);
-				//if ( File.Exists(path) ) {
-					// TODO OMFG so many debug, this won't happen
-				//	if (Debug.WalletManager) {
-				//		Logging.write(methog_sig + "");
-				//	}
+			//String path = FileHelper.getWalletPath(name);
+			String path = FileHelper.GetWalletPath (wallet.WalletName);
+			//if ( File.Exists(path) ) {
+			// TODO OMFG so many debug, this won't happen
+			//	if (Debug.WalletManager) {
+			//		Logging.write(methog_sig + "");
+			//	}
 
-					// what to do if path of plugin already exists ]
-						// should never happen
-				//}
+			// what to do if path of plugin already exists ]
+			// should never happen
+			//}
 
 			wallet.WalletPath = path;
 
 
 			//lock (walletLock) {
-				try {
-					this.wallets.Add (wallet.WalletName, wallet);
-				}
+			try {
+				this.wallets.Add (wallet.WalletName, wallet);
+			} catch (Exception exc) {
+				Logging.WriteLog (exc.Message);
+				return false;
 
-				catch (Exception exc) {
-					Logging.WriteLog(exc.Message);
-					return false;
+			}
 
-				}
+			if (wallet.Save (path)) // boom shakalaka 
+			{
+				return true;
+			}
 
-				if (wallet.Save(path)) // boom shakalaka 
-				{
-					return true;
-				}
+			try {
+				this.wallets.Remove (wallet.WalletName); // might as well remove it so the name can be reused. 
+			} catch (Exception exb) {
+				Logging.WriteLog (exb.Message);
 
-				try {
-					this.wallets.Remove(wallet.WalletName); // might as well remove it so the name can be reused. 
-				}
-
-				catch (Exception exb) {
-					Logging.WriteLog (exb.Message);
-
-					//Application.Quit(); // or recommend shuttown. 
-				}
+				//Application.Quit(); // or recommend shuttown. 
+			}
 			//}
 			//}
 
 			//else {
-				// yikes this is mess, the wallet name already exists
+			// yikes this is mess, the wallet name already exists
 			//	if (Debug.WalletManager) {
 			//		Logging.write(methog_sig + "walletname already exists");
 			//	}
 
 
-				// todo recover and return true
+			// todo recover and return true
 
-				return false;
+			return false;
 			//}
 
 
@@ -338,19 +332,19 @@ namespace IhildaWallet
 
 		public bool DeleteWallet (String name)
 		{
-			
+
 
 #if DEBUG
 			String method_sig = null;
 			if (DebugIhildaWallet.WalletManager) {
-				method_sig = clsstr + nameof (DeleteWallet) + DebugRippleLibSharp.left_parentheses + DebugIhildaWallet.ToAssertString(name ) + ") : ";
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
+				method_sig = clsstr + nameof (DeleteWallet) + DebugRippleLibSharp.left_parentheses + DebugIhildaWallet.ToAssertString (name) + ") : ";
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
 #endif
 
 			try {
 
-				if (wallets==null) {
+				if (wallets == null) {
 #if DEBUG
 					if (DebugIhildaWallet.WalletManager) {
 						//Logging.write(method_sig + "wallets == null, returning false");
@@ -362,7 +356,7 @@ namespace IhildaWallet
 
 				// Todo delete wallet
 				RippleWallet wall = this.LookUp (name);
-				return DeleteWallet(wall);
+				return DeleteWallet (wall);
 #pragma warning disable 0168
 			} catch (Exception e) {
 #pragma warning restore 0168
@@ -370,7 +364,7 @@ namespace IhildaWallet
 
 #if DEBUG
 				if (DebugIhildaWallet.WalletManager) {
-					Logging.ReportException(method_sig, e);
+					Logging.ReportException (method_sig, e);
 				}
 #endif
 			}
@@ -379,7 +373,8 @@ namespace IhildaWallet
 
 		}
 
-		public bool DeleteWallet (RippleWallet rw) {
+		public bool DeleteWallet (RippleWallet rw)
+		{
 #if DEBUG
 			String method_sig = clsstr + "deleteWallet (rw = " + (rw?.GetStoredReceiveAddress () ?? "null") + " ) ";
 
@@ -388,35 +383,35 @@ namespace IhildaWallet
 			if (rw == null) {
 				// todo debug
 #if DEBUG
-					if (DebugIhildaWallet.WalletManager) {
-						Logging.WriteLog(method_sig + "wall == null, returning false");
-					}
+				if (DebugIhildaWallet.WalletManager) {
+					Logging.WriteLog (method_sig + "wall == null, returning false");
+				}
 #endif
 				return false;
 			}
 
 			//lock (walletLock) {
-			rw.Forget();
-			if ( wallets.Remove( rw.WalletName)) {
+			rw.Forget ();
+			if (wallets.Remove (rw.WalletName)) {
 #if DEBUG
 				if (DebugIhildaWallet.WalletManager) {
-					Logging.WriteLog(method_sig + "wallet successfully removed from dictionary");
+					Logging.WriteLog (method_sig + "wallet successfully removed from dictionary");
 				}
 #endif
 
-						
+
 				return true; // successfully removed
 
 
-					//if (Debug.WalletManager) {
-					//	Logging.write(method_sig + "failed to remove wallet from Dictionary. Attempting to readd to dictionary");
-					//}
+				//if (Debug.WalletManager) {
+				//	Logging.write(method_sig + "failed to remove wallet from Dictionary. Attempting to readd to dictionary");
+				//}
 
-					//if (!addWallet(wall)) { // if it didn't succeed RE-ADD THE WALLET
-						// todo debug. 
-						// wallet only partially removed
+				//if (!addWallet(wall)) { // if it didn't succeed RE-ADD THE WALLET
+				// todo debug. 
+				// wallet only partially removed
 
-					//}
+				//}
 			}
 			//}
 
@@ -426,16 +421,17 @@ namespace IhildaWallet
 		public void InitWallets ()
 		{
 			//lock (walletLock) {
-				if (wallets == null) {
-					wallets = new Dictionary<string, RippleWallet>();//new List<RippleWallet> ();
-				} else {
-					wallets.Clear();
-				}
+			if (wallets == null) {
+				wallets = new Dictionary<string, RippleWallet> ();//new List<RippleWallet> ();
+			} else {
+				wallets.Clear ();
+			}
 			//}
 		}
 
 
-		public static void ImportWallet () {
+		public static void ImportWallet ()
+		{
 #if DEBUG
 			string method_sig = clsstr + nameof (ImportWallet) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.WalletManager) {
@@ -443,7 +439,7 @@ namespace IhildaWallet
 			}
 #endif
 
-			if (currentInstance==null) {
+			if (currentInstance == null) {
 #if DEBUG
 				if (DebugIhildaWallet.WalletManager) {
 					Logging.WriteLog (method_sig + nameof (currentInstance) + "==" + DebugRippleLibSharp.null_str);
@@ -453,30 +449,30 @@ namespace IhildaWallet
 				return;
 			}
 
-			FileChooserDialog fcd = new FileChooserDialog ("Import Wallet", 
-			                                               /*PaymentWindow.currentInstance*/ null, 
-			                                               FileChooserAction.Open,
-			                                               "Cancel", ResponseType.Cancel,
-			                                               "Open", ResponseType.Accept);
+			FileChooserDialog fcd = new FileChooserDialog ("Import Wallet",
+														   /*PaymentWindow.currentInstance*/ null,
+														   FileChooserAction.Open,
+														   "Cancel", ResponseType.Cancel,
+														   "Open", ResponseType.Accept);
 
 
 			if (fcd.Run () == (int)ResponseType.Accept) {
 #if DEBUG
 				if (DebugIhildaWallet.WalletManager) {
-					Logging.WriteLog (method_sig + "user chose file: " + DebugIhildaWallet.ToAssertString(fcd.Filename) + "\n");
+					Logging.WriteLog (method_sig + "user chose file: " + DebugIhildaWallet.ToAssertString (fcd.Filename) + "\n");
 				}
 #endif
 
-				if (fcd.Filename!=null) {
+				if (fcd.Filename != null) {
 					string nme = Path.GetFileName (fcd.Filename);
 
-					string destFile = System.IO.Path.Combine(FileHelper.WALLET_FOLDER_PATH, nme);
+					string destFile = System.IO.Path.Combine (FileHelper.WALLET_FOLDER_PATH, nme);
 
 #if DEBUG
 					if (DebugIhildaWallet.WalletManager) {
 						Logging.WriteLog (
 							method_sig + "nme=" + DebugIhildaWallet.ToAssertString (nme) + "\n" +
-							method_sig + "destFile=" + DebugIhildaWallet.ToAssertString (destFile) + "\n");			
+							method_sig + "destFile=" + DebugIhildaWallet.ToAssertString (destFile) + "\n");
 					}
 #endif
 
@@ -489,7 +485,7 @@ namespace IhildaWallet
 #pragma warning restore 0168
 
 #if DEBUG
-						Logging.WriteBoth (DebugIhildaWallet.ToAssertString(nme) + "File not found");
+						Logging.WriteBoth (DebugIhildaWallet.ToAssertString (nme) + "File not found");
 						if (DebugIhildaWallet.WalletManager) {
 							Logging.WriteLog (method_sig + fnf.Message);
 						}
@@ -501,13 +497,11 @@ namespace IhildaWallet
 
 
 
-					RippleWallet rw = ProcessJsonWallet( json, nme, false);
+					RippleWallet rw = ProcessJsonWallet (json, nme, false);
 
 					if (rw != null) {
-						WalletManager.currentInstance.AddWallet(rw);
-					}
-
-					else {
+						WalletManager.currentInstance.AddWallet (rw);
+					} else {
 						// todo you guessed it. debug 
 					}
 				}
@@ -520,7 +514,8 @@ namespace IhildaWallet
 
 
 
-		public static String LoadWallet ( String path ) {
+		public static String LoadWallet (String path)
+		{
 #if DEBUG
 			if (DebugIhildaWallet.WalletManager) {
 				Logging.WriteLog ("WalletManager : method loadWallet ( " + path + " ) : begin\n");
@@ -531,7 +526,7 @@ namespace IhildaWallet
 
 				Logging.WriteLog ("Looking for wallet at " + path + "\n");
 
-				if (File.Exists(path)) { // a wallet needs to be loaded
+				if (File.Exists (path)) { // a wallet needs to be loaded
 					Logging.WriteLog ("Wallet " + path + " Exists!\n");
 
 					// old
@@ -540,15 +535,13 @@ namespace IhildaWallet
 					//return true;
 
 					// new
-					String wah = File.ReadAllText(path, System.Text.Encoding.UTF8);
+					String wah = File.ReadAllText (path, System.Text.Encoding.UTF8);
 					return wah;
 				}
 
 
-			}
-
-			catch (Exception e) {
-				Logging.WriteLog(e.Message);
+			} catch (Exception e) {
+				Logging.WriteLog (e.Message);
 			}
 
 			return null;
@@ -559,10 +552,11 @@ namespace IhildaWallet
 
 
 
-		public static RippleWallet ProcessJsonWallet ( String plain, String name, bool prefer_filename) {
+		public static RippleWallet ProcessJsonWallet (String plain, String name, bool prefer_filename)
+		{
 
 #if DEBUG
-			String method_sig = clsstr + nameof (ProcessJsonWallet ) + DebugRippleLibSharp.left_parentheses + DebugIhildaWallet.AssertAllowInsecure(plain)  +  DebugRippleLibSharp.comma + DebugIhildaWallet.ToAssertString(name) + prefer_filename.ToString() + DebugRippleLibSharp.both_parentheses;  // wow! ?
+			String method_sig = clsstr + nameof (ProcessJsonWallet) + DebugRippleLibSharp.left_parentheses + DebugIhildaWallet.AssertAllowInsecure (plain) + DebugRippleLibSharp.comma + DebugIhildaWallet.ToAssertString (name) + prefer_filename.ToString () + DebugRippleLibSharp.both_parentheses;  // wow! ?
 
 			if (DebugIhildaWallet.WalletManager) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
@@ -574,7 +568,7 @@ namespace IhildaWallet
 			if (plain == null) {
 #if DEBUG
 				if (DebugIhildaWallet.WalletManager) {
-					Logging.WriteLog(method_sig + "plain == " + null);
+					Logging.WriteLog (method_sig + "plain == " + null);
 				}
 #endif
 				return null;
@@ -591,9 +585,9 @@ namespace IhildaWallet
 			try {
 
 				if (!(plain.Contains ("{") && plain.Contains ("}"))) { // big bad validity test   
-					//MessageDialog.showMessage ("Invalid wallet. It must be a valid json object\n");
+																	   //MessageDialog.showMessage ("Invalid wallet. It must be a valid json object\n");
 #if DEBUG
-					Logging.WriteLog(method_sig + "Invalid wallet. It must be a valid json object");
+					Logging.WriteLog (method_sig + "Invalid wallet. It must be a valid json object");
 #endif
 					return null;
 				}
@@ -605,23 +599,23 @@ namespace IhildaWallet
 				}
 #endif
 
-				JsonWallet jwallet; 
+				JsonWallet jwallet;
 
 #if DEBUG
-				String warn = method_sig + "Unable to parse wallet, invalid json = " + DebugIhildaWallet.AssertAllowInsecure( plain );
+				String warn = method_sig + "Unable to parse wallet, invalid json = " + DebugIhildaWallet.AssertAllowInsecure (plain);
 #endif
 				try {
-					
-
-					jwallet = DynamicJson.Parse(plain);
 
 
-					if (jwallet==null) {
+					jwallet = DynamicJson.Parse (plain);
+
+
+					if (jwallet == null) {
 #if DEBUG
 
-						Logging.WriteLog( warn );
+						Logging.WriteLog (warn);
 #endif
-							return null;
+						return null;
 					}
 				}
 
@@ -630,14 +624,14 @@ namespace IhildaWallet
 #pragma warning restore 0168
 
 #if DEBUG
-					Logging.WriteLog(warn + DebugRippleLibSharp.exceptionMessage + clap.Message + clap.StackTrace);
+					Logging.WriteLog (warn + DebugRippleLibSharp.exceptionMessage + clap.Message + clap.StackTrace);
 #endif
 					return null;
 					//Todo invalid wallet
 				}
 
 
-				RippleWalletTypeEnum walletTypeEnum = default(RippleWalletTypeEnum);
+				RippleWalletTypeEnum walletTypeEnum = default (RippleWalletTypeEnum);
 
 				try {
 					walletTypeEnum = (IhildaWallet.RippleWalletTypeEnum)Enum.Parse (typeof (RippleWalletTypeEnum), jwallet.AccountType);
@@ -647,10 +641,8 @@ namespace IhildaWallet
 				}
 
 
-
-				/*** *** begin secret *** ***/
-
-				if (walletTypeEnum == RippleWalletTypeEnum.Master) {
+				switch (walletTypeEnum) {
+				case RippleWalletTypeEnum.Master:
 					if (jwallet.Secret != null) {
 #if DEBUG
 						if (DebugIhildaWallet.WalletManager) {
@@ -671,7 +663,69 @@ namespace IhildaWallet
 						//return false;  // do not return. secret may be encrypted
 
 					}
-				} else if (walletTypeEnum == RippleWalletTypeEnum.Regular) {
+
+					if (jwallet.Account != null) {
+#if DEBUG
+
+						if (DebugIhildaWallet.WalletManager) {
+							Logging.WriteLog (method_sig + "Account is defined\n");
+						}
+#endif
+
+
+						acc = jwallet.Account;
+
+					} else {
+#if DEBUG
+
+						//MessageDialog.showMessage ("Account is not Defined\n");
+						if (DebugIhildaWallet.WalletManager) {
+							Logging.WriteLog (method_sig + "Account is NOT defined");
+						}
+#endif
+						//return false; // don't return. account does not need to be defined ??
+					}
+
+					if (jwallet.Encrypted_Wallet != null) {
+#if DEBUG
+
+						if (DebugIhildaWallet.WalletManager) {
+							Logging.WriteLog (method_sig + "encrypted_wallet is defined");
+						}
+#endif
+
+
+						enc = jwallet.Encrypted_Wallet;
+
+					} else {
+#if DEBUG
+
+						if (DebugIhildaWallet.WalletManager) {
+							Logging.WriteLog (method_sig + "encrypted_wallet is NOT defined");
+						}
+#endif
+					}
+
+					if (jwallet.Encryption_Type != null) {
+#if DEBUG
+
+						if (DebugIhildaWallet.WalletManager) {
+							Logging.WriteLog (method_sig + "encryption_type is defined");
+						}
+#endif
+
+
+						typ = jwallet.Encryption_Type;
+					} else {
+#if DEBUG
+
+						if (DebugIhildaWallet.WalletManager) {
+							Logging.WriteLog (method_sig + "encryption_type is NOT defined");
+						}
+#endif
+					}
+					break;
+				case RippleWalletTypeEnum.Regular:
 					if (jwallet.Regular_Key_Secret != null) {
 #if DEBUG
 						if (DebugIhildaWallet.WalletManager) {
@@ -692,36 +746,7 @@ namespace IhildaWallet
 						//return false;  // do not return. secret may be encrypted
 
 					}
-				}
-				/*** *** end secret *** ***/
 
-				/*** *** begin account *** ***/
-
-				if (walletTypeEnum == RippleWalletTypeEnum.Master) {
-					if (jwallet.Account != null) {
-#if DEBUG
-
-						if (DebugIhildaWallet.WalletManager) {
-							Logging.WriteLog (method_sig + "Account is defined\n");
-						}
-#endif
-
-
-						acc = jwallet.Account;
-
-					} else {
-#if DEBUG
-
-						//MessageDialog.showMessage ("Account is not Defined\n");
-						if (DebugIhildaWallet.WalletManager) {
-							Logging.WriteLog (method_sig + "Account is NOT defined");
-						}
-#endif
-						//return false; // don't return. account does not need to be defined
-					}
-				}
-
-			 else if (walletTypeEnum == RippleWalletTypeEnum.Regular) {
 					if (jwallet.Regular_Key_Account != null) {
 #if DEBUG
 
@@ -738,38 +763,12 @@ namespace IhildaWallet
 
 						//MessageDialog.showMessage ("Account is not Defined\n");
 						if (DebugIhildaWallet.WalletManager) {
-							Logging.WriteLog (method_sig + "Account is NOT defined");
+							Logging.WriteLog (method_sig + "Account is NOT defined\n");
 						}
 #endif
 						//return false; // don't return. account does not need to be defined
 					}
 
-			}
-				/*** *** end account *** ***/
-
-				/*** *** begin encrypted_wallet *** ***/
-
-				if (walletTypeEnum == RippleWalletTypeEnum.Master) {
-					if (jwallet.Encrypted_Wallet != null) {
-#if DEBUG
-
-						if (DebugIhildaWallet.WalletManager) {
-							Logging.WriteLog (method_sig + "encrypted_wallet is defined");
-						}
-#endif
-
-
-						enc = jwallet.Encrypted_Wallet;
-
-					} else {
-#if DEBUG
-
-						if (DebugIhildaWallet.WalletManager) {
-							Logging.WriteLog (method_sig + "encrypted_wallet is NOT defined");
-						}
-#endif
-					}
-				} else if (walletTypeEnum == RippleWalletTypeEnum.Regular) {
 					if (jwallet.Encrypted_Regular_Wallet != null) {
 #if DEBUG
 
@@ -789,13 +788,66 @@ namespace IhildaWallet
 						}
 #endif
 					}
-				}
-				/*** *** end encrypted_wallet *** ***/
+
+					if (jwallet.Regular_Key_Encryption_Type != null) {
+#if DEBUG
+
+						if (DebugIhildaWallet.WalletManager) {
+							Logging.WriteLog (method_sig + "encryption_type is defined");
+						}
+#endif
 
 
-				/*** *** begin encryption_type *** ***/
+						typ = jwallet.Regular_Key_Encryption_Type;
+					} else {
+#if DEBUG
 
-				if (walletTypeEnum == RippleWalletTypeEnum.Master) {
+						if (DebugIhildaWallet.WalletManager) {
+							Logging.WriteLog (method_sig + "encryption_type is NOT defined");
+						}
+#endif
+					}
+					break;
+				case RippleWalletTypeEnum.MasterPrivateKey:
+					if (jwallet.Private_Key_Master_Secret != null) {
+						if (DebugIhildaWallet.WalletManager) {
+							Logging.WriteLog (method_sig + "secret is defined");
+						}
+					}
+
+					sec = jwallet.Private_Key_Master_Secret;
+
+					if (jwallet.Account != null) {
+						if (DebugIhildaWallet.WalletManager) {
+							Logging.WriteLog (method_sig + "Account is defined\n");
+						}
+
+						acc = jwallet.Account;
+					} else {
+						if (DebugIhildaWallet.WalletManager) {
+							Logging.WriteLog (method_sig + "Account is not defined");
+						}
+					}
+
+					if (jwallet.Encrypted_Wallet != null) {
+#if DEBUG
+
+						if (DebugIhildaWallet.WalletManager) {
+							Logging.WriteLog (method_sig + "encrypted_wallet is defined");
+						}
+#endif
+
+
+						enc = jwallet.Encrypted_Wallet;
+
+					} else {
+#if DEBUG
+
+						if (DebugIhildaWallet.WalletManager) {
+							Logging.WriteLog (method_sig + "encrypted_wallet is NOT defined");
+						}
+#endif
+					}
 
 					if (jwallet.Encryption_Type != null) {
 #if DEBUG
@@ -816,107 +868,76 @@ namespace IhildaWallet
 #endif
 					}
 
+
+					break;
+
 				}
 
-			else if (walletTypeEnum == RippleWalletTypeEnum.Regular) {
-					if (jwallet.Regular_Key_Encryption_Type != null) {
-#if DEBUG
+				/*** *** begin walletname *** ***/
+				if (jwallet.Name != null) {
 
-						if (DebugIhildaWallet.WalletManager) {
-							Logging.WriteLog (method_sig + "encryption_type is defined");
-						}
-#endif
-
-
-						typ = jwallet.Regular_Key_Encryption_Type;
-					} else {
-#if DEBUG
-
-						if (DebugIhildaWallet.WalletManager) {
-							Logging.WriteLog (method_sig + "encryption_type is NOT defined");
-						}
-#endif
-					}
-
-			}
-					/*** *** end encryption_type *** ***/
-
-
-
-					/*** *** begin walletname *** ***/
-					if (jwallet.Name != null) {
-					
-#if DEBUG
-						
-						if (DebugIhildaWallet.WalletManager) {
-							Logging.WriteLog(method_sig + "name is defined");
-						}
-#endif
-
-					nama = jwallet.Name;
-						
-					}
-
-					else {
-#if DEBUG
-
-						if (DebugIhildaWallet.WalletManager) {
-							Logging.WriteLog(method_sig + "name is NOT defined");
-						}
-#endif
-					}
-					/*** *** end walletname *** ***/
-
-
-					/*** *** BEGIN WALLET CREATION *** ***/
-
-					RippleWallet rw = null;
-					if (sec!=null) {
-#if DEBUG
-
-						if (DebugIhildaWallet.WalletManager) {
-							Logging.WriteLog(method_sig + "sec != null");
-						}
-#endif
-
-					rw = new RippleWallet(sec, walletTypeEnum);
-
-
-						if (acc!=null) {
-							if (!acc.Equals(rw.GetStoredReceiveAddress())) {
-								// todo warn account does not match secret
-							}
-						}
-
-					}
-
-					else if (enc!=null) { // I know, I know, if else madness!!!
-					rw = new RippleWallet(enc,typ,acc, walletTypeEnum);
-
-					}
-
-
-					else  {
-						// todo, insufficient information to reconstruct wallet
-						return null;
-					}
-
-					if (rw == null) { // impossible ?
-
-					}
-
-					if (currentInstance!=null) {
-						rw.WalletName = currentInstance.DecideName(nama,name,prefer_filename);
-					}
-
-					else {
-
-					}
 #if DEBUG
 
 					if (DebugIhildaWallet.WalletManager) {
-						Logging.WriteLog(method_sig + "returning a valid wallet" );
+						Logging.WriteLog (method_sig + "name is defined");
 					}
+#endif
+
+					nama = jwallet.Name;
+
+				} else {
+#if DEBUG
+
+					if (DebugIhildaWallet.WalletManager) {
+						Logging.WriteLog (method_sig + "name is NOT defined");
+					}
+#endif
+				}
+				/*** *** end walletname *** ***/
+
+
+				/*** *** BEGIN WALLET CREATION *** ***/
+
+				RippleWallet rw = null;
+				if (sec != null) {
+#if DEBUG
+
+					if (DebugIhildaWallet.WalletManager) {
+						Logging.WriteLog (method_sig + "sec != null");
+					}
+#endif
+
+					rw = new RippleWallet (sec, walletTypeEnum);
+
+
+					if (acc != null) {
+						if (!acc.Equals (rw.GetStoredReceiveAddress ())) {
+							// todo warn account does not match secret
+						}
+					}
+
+				} else if (enc != null) { // I know, I know, if else madness!!!
+					rw = new RippleWallet (enc, typ, acc, walletTypeEnum);
+
+				} else {
+					// todo, insufficient information to reconstruct wallet
+					return null;
+				}
+
+				if (rw == null) { // impossible ?
+
+				}
+
+				if (currentInstance != null) {
+					rw.WalletName = currentInstance.DecideName (nama, name, prefer_filename);
+				} else {
+
+				}
+#if DEBUG
+
+				if (DebugIhildaWallet.WalletManager) {
+					Logging.WriteLog (method_sig + "returning a valid wallet");
+				}
 #endif
 
 
@@ -933,9 +954,9 @@ namespace IhildaWallet
 				//rw.Regular_Key_Encryption_Type = jwallet.Regular_Key_Encryption_Type;
 
 				rw.AccountType = walletTypeEnum;
-					return rw;
+				return rw;
 
-				
+
 
 #pragma warning disable 0168
 			} catch (Exception e) {
@@ -950,62 +971,57 @@ namespace IhildaWallet
 		}
 
 
-		public String DecideName (String fileName, String givenName, bool prefer_filename) {
+		public String DecideName (String fileName, String givenName, bool prefer_filename)
+		{
 
 #if DEBUG
-			String method_sig = clsstr + nameof (DecideName) + DebugRippleLibSharp.left_parentheses + nameof (fileName) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString(fileName) + DebugRippleLibSharp.comma + nameof (givenName) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString(givenName) + DebugRippleLibSharp.comma + nameof (prefer_filename) + DebugRippleLibSharp.equals + (prefer_filename.ToString()) + DebugRippleLibSharp.right_parentheses;
+			String method_sig = clsstr + nameof (DecideName) + DebugRippleLibSharp.left_parentheses + nameof (fileName) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString (fileName) + DebugRippleLibSharp.comma + nameof (givenName) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString (givenName) + DebugRippleLibSharp.comma + nameof (prefer_filename) + DebugRippleLibSharp.equals + (prefer_filename.ToString ()) + DebugRippleLibSharp.right_parentheses;
 #endif
 
 			String returnMe = null;
 
 #if DEBUG
 			if (DebugIhildaWallet.WalletManager) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
 #endif
 
-			if ( fileName == null && givenName != null ) {
-				returnMe = NameMaker.RequestName(givenName, PluginType.WALLET);
-			}
-
-			else if (givenName == null && fileName != null) {
-				returnMe = NameMaker.RequestName(fileName, PluginType.WALLET);
-			}
-
-			else if (fileName != null && givenName != null) {
-				if (fileName.Equals(givenName)) {
-					returnMe = NameMaker.RequestName(fileName, PluginType.WALLET);
-				}
-
-				else {
-					if ("".Equals(fileName)) {
-						returnMe = NameMaker.RequestName(givenName, PluginType.WALLET);
+			if (fileName == null && givenName != null) {
+				returnMe = NameMaker.RequestName (givenName, PluginType.WALLET);
+			} else if (givenName == null && fileName != null) {
+				returnMe = NameMaker.RequestName (fileName, PluginType.WALLET);
+			} else if (fileName != null && givenName != null) {
+				if (fileName.Equals (givenName)) {
+					returnMe = NameMaker.RequestName (fileName, PluginType.WALLET);
+				} else {
+					if ("".Equals (fileName)) {
+						returnMe = NameMaker.RequestName (givenName, PluginType.WALLET);
 					}
 
-					if ("".Equals(givenName)) {
-						returnMe = NameMaker.RequestName(fileName, PluginType.WALLET);
+					if ("".Equals (givenName)) {
+						returnMe = NameMaker.RequestName (fileName, PluginType.WALLET);
 					}
 
-					String ret_fileName = NameMaker.RequestName(fileName, PluginType.WALLET);
-					String ret_givenName = NameMaker.RequestName(givenName, PluginType.WALLET);
+					String ret_fileName = NameMaker.RequestName (fileName, PluginType.WALLET);
+					String ret_givenName = NameMaker.RequestName (givenName, PluginType.WALLET);
 
-					if (ret_fileName.Equals(fileName) && !ret_givenName.Equals(givenName)) {
+					if (ret_fileName.Equals (fileName) && !ret_givenName.Equals (givenName)) {
 						returnMe = ret_fileName;
 					}
 
-					if (!ret_fileName.Equals(fileName) && ret_givenName.Equals(givenName)) {
+					if (!ret_fileName.Equals (fileName) && ret_givenName.Equals (givenName)) {
 						returnMe = ret_givenName;
 					}
 
 
 
-					returnMe = prefer_filename ? NameMaker.RequestName( fileName, PluginType.WALLET) : NameMaker.RequestName( givenName, PluginType.WALLET);
+					returnMe = prefer_filename ? NameMaker.RequestName (fileName, PluginType.WALLET) : NameMaker.RequestName (givenName, PluginType.WALLET);
 				}
 			}
 
 #if DEBUG
 			if (DebugIhildaWallet.WalletManager) {
-				Logging.WriteLog(method_sig + "returning " + DebugIhildaWallet.ToAssertString(returnMe));
+				Logging.WriteLog (method_sig + "returning " + DebugIhildaWallet.ToAssertString (returnMe));
 			}
 #endif
 
@@ -1020,14 +1036,14 @@ namespace IhildaWallet
 			String method_sig = clsstr + "replace (old_wallet=" + (old_wallet ?? "null") + ", new_wallet=" + (new_wallet ?? "null");
 #endif
 
-			RippleWallet ol = LookUp(old_wallet);
-			RippleWallet ne = LookUp(new_wallet);
+			RippleWallet ol = LookUp (old_wallet);
+			RippleWallet ne = LookUp (new_wallet);
 
-			if ( ol == null) { //
-				// todo alert user
+			if (ol == null) { //
+							  // todo alert user
 #if DEBUG
 				if (DebugIhildaWallet.WalletManager) {
-					Logging.WriteLog(method_sig + "ol == null");
+					Logging.WriteLog (method_sig + "ol == null");
 				}
 #endif
 
@@ -1038,19 +1054,19 @@ namespace IhildaWallet
 				// todo alert user
 #if DEBUG
 				if (DebugIhildaWallet.WalletManager) {
-					Logging.WriteLog(method_sig + "ne == null");
+					Logging.WriteLog (method_sig + "ne == null");
 				}
 #endif
 				return false;
 			}
 
-			return Replace ( ol, ne );
+			return Replace (ol, ne);
 		}
 
 		public bool Replace (RippleWallet old_wallet, RippleWallet new_wallet)
 		{
 #if DEBUG
-			String method_sig = clsstr + nameof (Replace) + DebugRippleLibSharp.left_parentheses + nameof (old_wallet) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString(old_wallet) + DebugRippleLibSharp.comma + nameof (new_wallet) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString(new_wallet) + " ) : ";
+			String method_sig = clsstr + nameof (Replace) + DebugRippleLibSharp.left_parentheses + nameof (old_wallet) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString (old_wallet) + DebugRippleLibSharp.comma + nameof (new_wallet) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString (new_wallet) + " ) : ";
 #endif
 
 			try {
@@ -1076,7 +1092,7 @@ namespace IhildaWallet
 				if (old_wallet == null) {
 #if DEBUG
 					if (DebugIhildaWallet.WalletManager) {
-						Logging.WriteLog (method_sig + nameof(old_wallet) + isnull);
+						Logging.WriteLog (method_sig + nameof (old_wallet) + isnull);
 					}
 #endif
 					return false;
@@ -1101,7 +1117,7 @@ namespace IhildaWallet
 					}
 #endif
 				}
-	
+
 				if (new_wallet.WalletName == null) {
 					// todo debug
 #if DEBUG
@@ -1158,7 +1174,7 @@ namespace IhildaWallet
 							Logging.WriteLog (method_sig + "new_wallet.walletpath is still null, returning");
 						}
 #endif
-						UpdateUI();
+						UpdateUI ();
 						return false;
 					}
 				}
@@ -1178,7 +1194,7 @@ namespace IhildaWallet
 						Logging.WriteLog (method_sig + "failed to delete wallet");
 					}
 #endif
-					UpdateUI();
+					UpdateUI ();
 					return false;
 				}
 
@@ -1196,9 +1212,9 @@ namespace IhildaWallet
 						}
 #endif
 
-						UpdateUI();
+						UpdateUI ();
 						return true;
-					} 
+					}
 #if DEBUG
 					if (DebugIhildaWallet.WalletManager) {
 						Logging.WriteLog (method_sig + "failed to save wallet");
@@ -1215,7 +1231,7 @@ namespace IhildaWallet
 
 
 				if (AddWallet (old_wallet)) { // if function fails then readd the old wallet
-					// todo debug. Could not readd the old wallet
+											  // todo debug. Could not readd the old wallet
 #if DEBUG
 					if (DebugIhildaWallet.WalletManager) {
 						Logging.WriteLog (method_sig + "failed to READD the old wallet. yikes!!");
@@ -1223,7 +1239,7 @@ namespace IhildaWallet
 #endif
 				}
 
-				UpdateUI();
+				UpdateUI ();
 				return false;
 
 #pragma warning disable 0168
@@ -1231,24 +1247,25 @@ namespace IhildaWallet
 #pragma warning restore 0168
 
 #if DEBUG
-				Logging.WriteLog(method_sig + e.Message);
+				Logging.WriteLog (method_sig + e.Message);
 #endif
-				UpdateUI();
+				UpdateUI ();
 				return false;
 
-			} 
+			}
 		}
 
 
 		// TODO remove ui logic from class ??
-		public void UpdateUI () {
+		public void UpdateUI ()
+		{
 #if DEBUG
 			if (DebugIhildaWallet.WalletManager) {
-				Logging.WriteLog(clsstr + "updateUI");
+				Logging.WriteLog (clsstr + "updateUI");
 			}
 #endif
-			if ( WalletManagerWidget.currentInstance!=null) {
-				WalletManagerWidget.currentInstance.UpdateUI();
+			if (WalletManagerWidget.currentInstance != null) {
+				WalletManagerWidget.currentInstance.UpdateUI ();
 			}
 		}
 
@@ -1263,9 +1280,11 @@ namespace IhildaWallet
 			return SelectedWallet;
 		}
 
-		public static void SetRippleWallet ( RippleWallet rippleWallet)
+		public static void SetRippleWallet (RippleWallet rippleWallet)
 		{
 			SelectedWallet = rippleWallet;
+
+			WalletManagerWidget.currentInstance.SetQRAddress (rippleWallet.GetQrCode ());
 		}
 
 

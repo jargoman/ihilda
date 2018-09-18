@@ -66,7 +66,7 @@ namespace IhildaWallet
 
 				SignOptions opts = SignOptions.LoadSignOptions();
 
-				RippleSeedAddress seed = rw.GetDecryptedSeed();
+				RippleIdentifier seed = rw.GetDecryptedSeed();
 				if (opts == null || opts.UseLocalRippledRPC) {
 
 					tx.SignLocalRippled (seed);

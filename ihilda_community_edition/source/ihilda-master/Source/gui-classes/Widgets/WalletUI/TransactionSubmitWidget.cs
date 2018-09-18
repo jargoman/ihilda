@@ -144,7 +144,7 @@ namespace IhildaWallet
 
 
 
-			RippleSeedAddress rsa = rw.GetDecryptedSeed ();
+			RippleIdentifier rsa = rw.GetDecryptedSeed ();
 			for (int index = 0; index < this._tx_tuple.Item1.Length; index++) {
 
 
@@ -185,7 +185,7 @@ namespace IhildaWallet
 
 		}
 
-		public bool SubmitOrderAtIndex (int index, NetworkInterface ni, RippleSeedAddress rsa)
+		public bool SubmitOrderAtIndex (int index, NetworkInterface ni, RippleIdentifier rsa)
 		{
 
 #if DEBUG
@@ -262,7 +262,7 @@ namespace IhildaWallet
 
 					this.SetStatus (index.ToString (), "Signing using rpc", TextHighlighter.GREEN);
 					try {
-						tx.SignLocalRippled (rsa);
+						tx.SignLocalRippled ( rsa );
 					} catch (Exception e) {
 						this.SetResult (index.ToString (), "Error Signing using rpc", TextHighlighter.RED);
 						return false;
@@ -273,9 +273,16 @@ namespace IhildaWallet
 
 					this.SetStatus (index.ToString (), "Signing using RippleLibSharp", TextHighlighter.GREEN);
 					try {
-						tx.Sign (rsa);
+						if (rsa is RippleSeedAddress) {
+							tx.Sign ((RippleSeedAddress)rsa);
+						}
+
+						if (rsa is RipplePrivateKey) {
+							tx.Sign ((RipplePrivateKey)rsa);
+						}
+
 					} catch (Exception e) {
-						this.SetResult (index.ToString (), "Signing using RippleLibSharp", TextHighlighter.RED);
+						this.SetResult ( index.ToString (), "Signing using RippleLibSharp", TextHighlighter.RED );
 						return false;
 					}
 					this.SetStatus (index.ToString (), "Signed RippleLibSharp", TextHighlighter.GREEN);

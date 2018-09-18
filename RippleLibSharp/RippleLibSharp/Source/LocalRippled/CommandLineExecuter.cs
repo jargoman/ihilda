@@ -52,6 +52,19 @@ namespace RippleLibSharp.LocalRippled
 			return GetResult (command);
 		}
 
+		/*
+		public string SignJSONPrivateKey (string txjson, string seed)
+		{
+
+
+
+			string command = "sign " + seed + " " + txjson + " offline";
+			//string command = "--help";
+			return GetResult (command);
+		}
+*/
+
+
 		public string WalletPropose (string seed) {
 			string command = "wallet_propose " + seed;
 			return GetResult (command);

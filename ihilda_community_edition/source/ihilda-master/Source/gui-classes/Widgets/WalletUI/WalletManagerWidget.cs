@@ -10,6 +10,10 @@ using RippleLibSharp.Keys;
 using IhildaWallet.Splashes;
 using IhildaWallet.Util;
 using RippleLibSharp.Util;
+using QRCoder;
+using System.Drawing;
+using System.IO;
+using System.Drawing.Imaging;
 
 namespace IhildaWallet
 {
@@ -34,6 +38,7 @@ namespace IhildaWallet
 			}
 
 			this.SetActions ();
+
 			#if DEBUG
 
 			if (DebugIhildaWallet.WalletManagerWidget) {
@@ -205,6 +210,7 @@ namespace IhildaWallet
 			this.rclAccountButton.Clicked += (object sender, EventArgs e) => {
 
 				RippleWallet rippleWallet = WalletManager.GetRippleWallet ();
+
 				AccountRCLSettingsWindow window = new AccountRCLSettingsWindow (rippleWallet);
 				window.Show ();
 
@@ -218,14 +224,14 @@ namespace IhildaWallet
 					MessageDialog.ShowMessage ("No wallet selected", "You must select a wallet first");
 					return;
 				}
-				RippleSeedAddress seedAddress = rippleWallet.GetDecryptedSeed ();
-				if (seedAddress == null) {
+				RippleIdentifier secretIdentifier = rippleWallet.GetDecryptedSeed ();
+				if (secretIdentifier == null) {
 					// TODO 
 					//MessageDialog.ShowMessage ("invalid seed");
 					return;
 				}
 
-				string secret = seedAddress.ToString ();
+				string secret = secretIdentifier.ToString ();
 
 				PaperWalletWindow paperWalletWindow = new PaperWalletWindow {
 					Parent = this,
@@ -234,9 +240,13 @@ namespace IhildaWallet
 
 				paperWalletWindow.Show ();
 
+				if (rippleWallet.AccountType == RippleWalletTypeEnum.Master || rippleWallet.AccountType == RippleWalletTypeEnum.Regular) {
+					paperWalletWindow.SetSecret (secret);
+				}
 
-				paperWalletWindow.SetSecret (secret);
-
+				if (rippleWallet.AccountType == RippleWalletTypeEnum.MasterPrivateKey) {
+					paperWalletWindow.SetPrivateKey (secret);
+				}
 			};
 
 			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
@@ -415,6 +425,11 @@ namespace IhildaWallet
 			}
 #endif
 
+			if (rw.IsEncrypted ()) {
+				MessageDialog.ShowMessage ("Can not edit an encrypted wallet. First decrypt it ");
+				return;
+			}
+
 
 			FromSecretDialog fsd = new FromSecretDialog ("Edit Wallet", rw) {
 				Modal = true
@@ -422,43 +437,51 @@ namespace IhildaWallet
 
 			fsd.Modal = true;
 
-
-			ResponseType ret = (ResponseType) fsd.Run ();
-
-
-			if (ret == ResponseType.Ok) {
-				#if DEBUG
-				if (DebugIhildaWallet.WalletManagerWidget) {
+			RippleWallet rw_new = null;
+			while (rw_new == null) {
+				ResponseType ret = (ResponseType)fsd.Run ();
 				
-					Logging.WriteLog(method_sig + "Response is OK");
-					
-				}
-				#endif
-				// todo replace one wallet with another
 
-				RippleWallet rw_new = fsd.GetWallet();
-				if (rw_new == null) {
-					#if DEBUG
+				if (ret != ResponseType.Ok) {
+
+
+#if DEBUG
 					if (DebugIhildaWallet.WalletManagerWidget) {
-						Logging.WriteLog(method_sig + "new wallet is null");
+						Logging.WriteLog (method_sig + "Response is NOT ok");
 					}
-					#endif
-					return;
-				}
+#endif
+					// todo replace one wallet with another
 
-				walletManager.Replace(rw, rw_new);
+					break;
 
-			}
+				} 
 
-			else {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
-					Logging.WriteLog(method_sig + "Response is NOT ok");
+
+					Logging.WriteLog (method_sig + "Response is OK");
+
 				}
-				#endif
+
+
+
+#endif
+
+				 rw_new = fsd.GetWallet ();
+				if (rw_new == null) {
+#if DEBUG
+					if (DebugIhildaWallet.WalletManagerWidget) {
+						Logging.WriteLog (method_sig + "new wallet is null");
+					}
+#endif
+					continue;
+				}
 			}
 
-			fsd.Destroy();
+			if (rw_new != null) {
+				walletManager.Replace (rw, rw_new);
+			}
+			fsd?.Destroy();
 			// TODO swtitch these two around?
 			this.UpdateUI();
 		}
@@ -663,6 +686,15 @@ namespace IhildaWallet
 
 			//
 
+		}
+
+
+
+		public void SetQRAddress (Gdk.Pixbuf pixbuf)
+		{
+			
+			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (255, 255, 255));
+			this.image1.Pixbuf = pixbuf;
 		}
 
 		public void Payment (  )

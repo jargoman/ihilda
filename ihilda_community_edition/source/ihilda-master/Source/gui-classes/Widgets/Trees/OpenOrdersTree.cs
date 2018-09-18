@@ -134,7 +134,7 @@ namespace IhildaWallet
 
 						uint se = Convert.ToUInt32 (AccountInfo.GetSequence (ao.Account, networkInterface));
 
-						RippleSeedAddress rippleSeedAddress = _rippleWallet.GetDecryptedSeed ();
+						RippleIdentifier rippleSeedAddress = _rippleWallet.GetDecryptedSeed ();
 
 						//bool b = CancelOrderAtIndex ( _rippleWallet.GetStoredReceiveAddress(), se, networkInterface, rippleSeedAddress );
 						CancelOrderAtIndex (_rippleWallet.GetStoredReceiveAddress (), index, se, networkInterface, rippleSeedAddress);
@@ -248,7 +248,7 @@ namespace IhildaWallet
 		}
 
 
-		public bool CancelOrderAtIndex (string account, int index, uint sequence, NetworkInterface ni, RippleSeedAddress rsa)
+		public bool CancelOrderAtIndex (string account, int index, uint sequence, NetworkInterface ni, RippleIdentifier rsa)
 		{
 
 #if DEBUG
@@ -265,7 +265,17 @@ namespace IhildaWallet
 
 			retry:
 				AutomatedOrder off = this._offers [index];
-				String signingAccount = rsa?.GetPublicRippleAddress ()?.ToString ();
+				String signingAccount = null;
+
+				if (rsa is RippleSeedAddress se) {
+					signingAccount = se.GetPublicRippleAddress ()?.ToString ();
+				} else if (rsa is RipplePrivateKey privateKey) {
+					signingAccount = privateKey.GetPublicKey ().GetAddress ();
+				} else {
+					throw new NotSupportedException ("Signing key type not supported\n");
+				}
+				//rsa?.GetPublicRippleAddress ()?.ToString ();
+
 				if (signingAccount == null) {
 					MessageDialog.ShowMessage ("Invalid Seed", "Invalid signing address");
 					return false;

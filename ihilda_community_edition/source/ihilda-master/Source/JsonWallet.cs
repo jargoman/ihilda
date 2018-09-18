@@ -28,9 +28,20 @@ namespace IhildaWallet
 
 #endregion
 
+#region masterprivatekey
+
+		public string Private_Key_Master_Secret {
+			get;
+			set;
+		}
 
 
-#region regularkey
+
+#endregion
+
+
+
+		#region regularkey
 
 		public string Regular_Key_Secret {
 			get;

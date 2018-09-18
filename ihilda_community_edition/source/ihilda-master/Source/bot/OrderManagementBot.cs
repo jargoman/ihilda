@@ -381,7 +381,7 @@ namespace IhildaWallet
 
 				tx.LastLedgerSequence = f.Item2;
 
-				RippleSeedAddress rsa = this.Wallet.GetDecryptedSeed ();
+				RippleIdentifier rsa = this.Wallet.GetDecryptedSeed ();
 
 				tx.Sign(rsa);
 

@@ -4,6 +4,8 @@ namespace IhildaWallet
 {
 	public partial class PrismWidget
 	{
+		private global::Gtk.VBox vbox2;
+
 		private global::Gtk.Table table3;
 
 		private global::Gtk.ComboBoxEntry animalentry;
@@ -30,6 +32,8 @@ namespace IhildaWallet
 
 		private global::Gtk.ComboBoxEntry suitentry;
 
+		private global::Gtk.Label label2;
+
 		protected virtual void Build()
 		{
 			global::Stetic.Gui.Initialize(this);
@@ -37,6 +41,10 @@ namespace IhildaWallet
 			global::Stetic.BinContainer.Attach(this);
 			this.Name = "IhildaWallet.PrismWidget";
 			// Container child IhildaWallet.PrismWidget.Gtk.Container+ContainerChild
+			this.vbox2 = new global::Gtk.VBox();
+			this.vbox2.Name = "vbox2";
+			this.vbox2.Spacing = 6;
+			// Container child vbox2.Gtk.Box+BoxChild
 			this.table3 = new global::Gtk.Table(((uint)(6)), ((uint)(2)), false);
 			this.table3.Name = "table3";
 			this.table3.RowSpacing = ((uint)(6));
@@ -70,7 +78,6 @@ namespace IhildaWallet
 			global::Gtk.Table.TableChild w3 = ((global::Gtk.Table.TableChild)(this.table3[this.colorentry]));
 			w3.LeftAttach = ((uint)(1));
 			w3.RightAttach = ((uint)(2));
-			w3.XOptions = ((global::Gtk.AttachOptions)(4));
 			w3.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table3.Gtk.Table+TableChild
 			this.elemententry = global::Gtk.ComboBoxEntry.NewText();
@@ -86,7 +93,9 @@ namespace IhildaWallet
 			// Container child table3.Gtk.Table+TableChild
 			this.label1 = new global::Gtk.Label();
 			this.label1.Name = "label1";
-			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString("Card");
+			this.label1.Xalign = 0F;
+			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString("<b>Card</b>");
+			this.label1.UseMarkup = true;
 			this.table3.Add(this.label1);
 			global::Gtk.Table.TableChild w5 = ((global::Gtk.Table.TableChild)(this.table3[this.label1]));
 			w5.TopAttach = ((uint)(4));
@@ -96,7 +105,9 @@ namespace IhildaWallet
 			// Container child table3.Gtk.Table+TableChild
 			this.label10 = new global::Gtk.Label();
 			this.label10.Name = "label10";
-			this.label10.LabelProp = global::Mono.Unix.Catalog.GetString("Element");
+			this.label10.Xalign = 0F;
+			this.label10.LabelProp = global::Mono.Unix.Catalog.GetString("<b>Element</b>");
+			this.label10.UseMarkup = true;
 			this.table3.Add(this.label10);
 			global::Gtk.Table.TableChild w6 = ((global::Gtk.Table.TableChild)(this.table3[this.label10]));
 			w6.TopAttach = ((uint)(2));
@@ -106,7 +117,9 @@ namespace IhildaWallet
 			// Container child table3.Gtk.Table+TableChild
 			this.label11 = new global::Gtk.Label();
 			this.label11.Name = "label11";
-			this.label11.LabelProp = global::Mono.Unix.Catalog.GetString("Planet");
+			this.label11.Xalign = 0F;
+			this.label11.LabelProp = global::Mono.Unix.Catalog.GetString("<b>Planet</b>");
+			this.label11.UseMarkup = true;
 			this.table3.Add(this.label11);
 			global::Gtk.Table.TableChild w7 = ((global::Gtk.Table.TableChild)(this.table3[this.label11]));
 			w7.TopAttach = ((uint)(3));
@@ -116,7 +129,9 @@ namespace IhildaWallet
 			// Container child table3.Gtk.Table+TableChild
 			this.label12 = new global::Gtk.Label();
 			this.label12.Name = "label12";
-			this.label12.LabelProp = global::Mono.Unix.Catalog.GetString("Suit");
+			this.label12.Xalign = 0F;
+			this.label12.LabelProp = global::Mono.Unix.Catalog.GetString("<b>Suit</b>");
+			this.label12.UseMarkup = true;
 			this.table3.Add(this.label12);
 			global::Gtk.Table.TableChild w8 = ((global::Gtk.Table.TableChild)(this.table3[this.label12]));
 			w8.TopAttach = ((uint)(5));
@@ -126,7 +141,9 @@ namespace IhildaWallet
 			// Container child table3.Gtk.Table+TableChild
 			this.label8 = new global::Gtk.Label();
 			this.label8.Name = "label8";
-			this.label8.LabelProp = global::Mono.Unix.Catalog.GetString("Color");
+			this.label8.Xalign = 0F;
+			this.label8.LabelProp = global::Mono.Unix.Catalog.GetString("<b>Color</b>");
+			this.label8.UseMarkup = true;
 			this.table3.Add(this.label8);
 			global::Gtk.Table.TableChild w9 = ((global::Gtk.Table.TableChild)(this.table3[this.label8]));
 			w9.XOptions = ((global::Gtk.AttachOptions)(4));
@@ -134,7 +151,9 @@ namespace IhildaWallet
 			// Container child table3.Gtk.Table+TableChild
 			this.label9 = new global::Gtk.Label();
 			this.label9.Name = "label9";
-			this.label9.LabelProp = global::Mono.Unix.Catalog.GetString("Animal");
+			this.label9.Xalign = 0F;
+			this.label9.LabelProp = global::Mono.Unix.Catalog.GetString("<b>Animal</b>");
+			this.label9.UseMarkup = true;
 			this.table3.Add(this.label9);
 			global::Gtk.Table.TableChild w10 = ((global::Gtk.Table.TableChild)(this.table3[this.label9]));
 			w10.TopAttach = ((uint)(1));
@@ -163,11 +182,23 @@ namespace IhildaWallet
 			w12.RightAttach = ((uint)(2));
 			w12.XOptions = ((global::Gtk.AttachOptions)(4));
 			w12.YOptions = ((global::Gtk.AttachOptions)(4));
-			this.Add(this.table3);
+			this.vbox2.Add(this.table3);
+			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.table3]));
+			w13.Position = 0;
+			// Container child vbox2.Gtk.Box+BoxChild
+			this.label2 = new global::Gtk.Label();
+			this.label2.Name = "label2";
+			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString("<span fgcolor=\"red\">This is an info bar</span>");
+			this.label2.UseMarkup = true;
+			this.vbox2.Add(this.label2);
+			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.label2]));
+			w14.Position = 1;
+			this.Add(this.vbox2);
 			if ((this.Child != null))
 			{
 				this.Child.ShowAll();
 			}
+			this.label2.Hide();
 			this.Hide();
 		}
 	}

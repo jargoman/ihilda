@@ -114,6 +114,7 @@ namespace IhildaWallet
 
 
 
+
 		public void SetSecret ( string secret )
 		{
 
@@ -147,6 +148,7 @@ namespace IhildaWallet
 			this.addresslabel.Markup = add;
 			this.secretlabel.Markup = sec;
 
+
 			QRCode qrCodeAdd = new QRCode (addressqrCodeData);
 			QRCode qRCodeSec = new QRCode (secretqrCodeData);
 
@@ -161,6 +163,66 @@ namespace IhildaWallet
 			qrCodeImageAdd.Save (ms, ImageFormat.Png);
 			ms.Position = 0;
        			Gdk.Pixbuf pb= new Gdk.Pixbuf (ms);
+
+			this.image5.Pixbuf = pb;
+
+			MemoryStream ms2 = new MemoryStream ();
+			qrCodeImageSec.Save (ms2, ImageFormat.Png);
+			ms2.Position = 0;
+			pb = new Pixbuf (ms2);
+
+			this.image6.Pixbuf = pb;
+
+
+		}
+
+		public void SetPrivateKey (string secret)
+		{
+			RipplePrivateKey privateKey = null;
+
+			privateKey = new RipplePrivateKey (secret);
+
+
+			string add = privateKey.GetPublicKey().GetAddress().ToString ();
+			string sec = privateKey.GetHumanReadableIdentifier ();
+
+
+			QRCodeGenerator qRCodeGenerator = new QRCodeGenerator ();
+
+			QRCodeData addressqrCodeData = qRCodeGenerator.CreateQrCode (add, QRCodeGenerator.ECCLevel.Q);
+			QRCodeData secretqrCodeData = qRCodeGenerator.CreateQrCode (sec, QRCodeGenerator.ECCLevel.Q);
+
+			//string html = 
+			//	"<html><h1>" +
+			//	sec +
+			//	"</h1>"
+
+
+
+
+			TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
+			add = TextHighlighter.Highlight ("<big>" + add + "</big>");
+
+			TextHighlighter.Highlightcolor = TextHighlighter.RED;
+			sec = TextHighlighter.Highlight ("<big>" + sec + "</big>");
+			this.addresslabel.Markup = add;
+			this.secretlabel.Markup = sec;
+
+
+			QRCode qrCodeAdd = new QRCode (addressqrCodeData);
+			QRCode qRCodeSec = new QRCode (secretqrCodeData);
+
+			Bitmap qrCodeImageAdd = qrCodeAdd.GetGraphic (8, System.Drawing.Color.Black, System.Drawing.Color.White, true);
+			Bitmap qrCodeImageSec = qRCodeSec.GetGraphic (8, System.Drawing.Color.Black, System.Drawing.Color.White, true);
+
+
+			secBitmap = qrCodeImageAdd;
+			accBitmap = qrCodeImageSec;
+
+			MemoryStream ms = new MemoryStream ();
+			qrCodeImageAdd.Save (ms, ImageFormat.Png);
+			ms.Position = 0;
+			Gdk.Pixbuf pb = new Gdk.Pixbuf (ms);
 
 			this.image5.Pixbuf = pb;
 

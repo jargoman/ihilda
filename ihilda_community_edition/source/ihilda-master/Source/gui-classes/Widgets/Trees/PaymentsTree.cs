@@ -22,7 +22,7 @@ namespace IhildaWallet
 		{
 			this.Build ();
 
-			listStore = new ListStore ( typeof(bool), typeof(string), typeof(string), typeof(string), typeof(string), typeof (string) );
+			listStore = new ListStore ( typeof(bool), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof (string) );
 
 			Gtk.CellRendererToggle toggle = new CellRendererToggle {
 				Activatable = true
@@ -38,16 +38,18 @@ namespace IhildaWallet
 
 			//this.treeview1.AppendColumn ("<span fgcolor=\"green\">Buy</span>", txtr, "markup", 1);
 
-			this.treeview1.AppendColumn ("Destination", txtr, "markup", 1);
-			this.treeview1.AppendColumn ("Amount", txtr, "markup", 2);
-			this.treeview1.AppendColumn ("Sendmax", txtr, "markup", 3);
+			this.treeview1.AppendColumn ("#", txtr, "markup", 1);
 
-			this.treeview1.AppendColumn ("Status", txtr, "markup", 4);
-			this.treeview1.AppendColumn ("Result", txtr, "markup", 5);
+			this.treeview1.AppendColumn ("Destination", txtr, "markup", 2);
+			this.treeview1.AppendColumn ("Amount", txtr, "markup", 3);
+			this.treeview1.AppendColumn ("Sendmax", txtr, "markup", 4);
+
+			this.treeview1.AppendColumn ("Status", txtr, "markup", 5);
+			this.treeview1.AppendColumn ("Result", txtr, "markup", 6);
 		}
 
 
-		public bool SubmitOrderAtIndex ( int index , uint sequence, NetworkInterface ni, RippleSeedAddress rsa) {
+		public bool SubmitOrderAtIndex ( int index , uint sequence, NetworkInterface ni, RippleIdentifier rsa) {
 
 			#if DEBUG
 			string method_sig = clsstr + nameof (SubmitOrderAtIndex) + DebugRippleLibSharp.both_parentheses;
@@ -207,7 +209,7 @@ namespace IhildaWallet
 
 				if (!r.status.Equals ("success")) {
 					errorMessage += "!r.status.Equals (\"success\")";
-					this.SetResult (index.ToString (), errorMessage, TextHighlighter.RED);
+					this.SetResult (index.ToString (), r.error_message, TextHighlighter.RED);
 #if DEBUG
 					if (DebugIhildaWallet.PaymentTree) {
 						Logging.WriteLog (errorMessage);
@@ -346,7 +348,7 @@ namespace IhildaWallet
 
 			Gtk.Application.Invoke ( (object sender, EventArgs e) => {
 				if (listStore.GetIterFromString (out TreeIter iter, path)) {
-					listStore.SetValue (iter, 4, s);
+					listStore.SetValue (iter, 5, s);
 
 
 
@@ -356,7 +358,7 @@ namespace IhildaWallet
 		}
 
 		public void SetResult (string path, string message, string colorName) {
-
+			
 			TextHighlighter.Highlightcolor = colorName;
 			string s = TextHighlighter.Highlight (message ?? "");
 
@@ -364,7 +366,7 @@ namespace IhildaWallet
 			Gtk.Application.Invoke ( (object sender, EventArgs e) => {
 				
 				if (listStore.GetIterFromString (out TreeIter iter, path)) {
-					listStore.SetValue (iter, 5, s);
+					listStore.SetValue (iter, 6, s);
 
 
 
@@ -431,7 +433,7 @@ namespace IhildaWallet
 				RippleCurrency Amount = o?.Amount;
 				RippleCurrency Sendmax = o?.SendMax;
 
-				listStore.AppendValues (isSelectDefault, Destination ?? "", Amount?.ToString() ?? "", Sendmax?.ToString() ?? "");
+				listStore.AppendValues (isSelectDefault, i + 1, Destination ?? "", Amount?.ToString() ?? "", Sendmax?.ToString() ?? "");
 
 				//o.selected = true;
 

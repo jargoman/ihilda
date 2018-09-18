@@ -21,7 +21,7 @@ namespace IhildaWallet
 	{
 
 
-		public Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> SubmitOrders (IEnumerable<AutomatedOrder> orders, RippleWallet rw, RippleSeedAddress rippleSeedAddress, NetworkInterface networkInterface)
+		public Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> SubmitOrders (IEnumerable<AutomatedOrder> orders, RippleWallet rw, RippleIdentifier rippleIdentifier, NetworkInterface networkInterface)
 		{
 
 
@@ -45,7 +45,7 @@ namespace IhildaWallet
 
 
 
-				RippleSeedAddress rsa = rippleSeedAddress; //rw.GetDecryptedSeed ();
+				RippleIdentifier identifier = rippleIdentifier; //rw.GetDecryptedSeed ();
 
 
 
@@ -54,7 +54,7 @@ namespace IhildaWallet
 
 				foreach (AutomatedOrder order in orders) {
 
-					OrderSubmittedEventArgs submitEvent = _SubmitOrder (order, rw, networkInterface, rsa);
+					OrderSubmittedEventArgs submitEvent = _SubmitOrder (order, rw, networkInterface, identifier);
 
 					events.Add (submitEvent);
 
@@ -82,7 +82,7 @@ namespace IhildaWallet
 
 		}
 
-		private OrderSubmittedEventArgs _SubmitOrder (AutomatedOrder order, RippleWallet rw, NetworkInterface networkInterface, RippleSeedAddress rippleSeedAddress)
+		private OrderSubmittedEventArgs _SubmitOrder (AutomatedOrder order, RippleWallet rw, NetworkInterface networkInterface, RippleIdentifier rippleSeedAddress)
 		{
 #if DEBUG
 			string method_sig = clsstr + nameof (_SubmitOrder) + DebugRippleLibSharp.both_parentheses;

@@ -42,6 +42,8 @@ namespace IhildaWallet
 
 		private global::Gtk.Button verifybutton;
 
+		private global::Gtk.Label label6;
+
 		private global::Gtk.Button buttonCancel;
 
 		private global::Gtk.Button buttonOk;
@@ -265,17 +267,27 @@ namespace IhildaWallet
 			this.vbox5.Add(this.table4);
 			global::Gtk.Box.BoxChild w19 = ((global::Gtk.Box.BoxChild)(this.vbox5[this.table4]));
 			w19.Position = 2;
-			w1.Add(this.vbox5);
-			global::Gtk.Box.BoxChild w20 = ((global::Gtk.Box.BoxChild)(w1[this.vbox5]));
-			w20.Position = 0;
+			// Container child vbox5.Gtk.Box+BoxChild
+			this.label6 = new global::Gtk.Label();
+			this.label6.Name = "label6";
+			this.label6.LabelProp = global::Mono.Unix.Catalog.GetString("<span fgcolor=\"red\">This is an info bar</span>");
+			this.label6.UseMarkup = true;
+			this.vbox5.Add(this.label6);
+			global::Gtk.Box.BoxChild w20 = ((global::Gtk.Box.BoxChild)(this.vbox5[this.label6]));
+			w20.Position = 3;
 			w20.Expand = false;
 			w20.Fill = false;
+			w1.Add(this.vbox5);
+			global::Gtk.Box.BoxChild w21 = ((global::Gtk.Box.BoxChild)(w1[this.vbox5]));
+			w21.Position = 0;
+			w21.Expand = false;
+			w21.Fill = false;
 			// Internal child IhildaWallet.FromSecretDialog.ActionArea
-			global::Gtk.HButtonBox w21 = this.ActionArea;
-			w21.Name = "dialog1_ActionArea";
-			w21.Spacing = 10;
-			w21.BorderWidth = ((uint)(5));
-			w21.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
+			global::Gtk.HButtonBox w22 = this.ActionArea;
+			w22.Name = "dialog1_ActionArea";
+			w22.Spacing = 10;
+			w22.BorderWidth = ((uint)(5));
+			w22.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonCancel = new global::Gtk.Button();
 			this.buttonCancel.CanDefault = true;
@@ -285,9 +297,9 @@ namespace IhildaWallet
 			this.buttonCancel.UseUnderline = true;
 			this.buttonCancel.Label = "gtk-cancel";
 			this.AddActionWidget(this.buttonCancel, -6);
-			global::Gtk.ButtonBox.ButtonBoxChild w22 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w21[this.buttonCancel]));
-			w22.Expand = false;
-			w22.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w23 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w22[this.buttonCancel]));
+			w23.Expand = false;
+			w23.Fill = false;
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonOk = new global::Gtk.Button();
 			this.buttonOk.CanDefault = true;
@@ -297,18 +309,19 @@ namespace IhildaWallet
 			this.buttonOk.UseUnderline = true;
 			this.buttonOk.Label = "gtk-ok";
 			this.AddActionWidget(this.buttonOk, -5);
-			global::Gtk.ButtonBox.ButtonBoxChild w23 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w21[this.buttonOk]));
-			w23.Position = 1;
-			w23.Expand = false;
-			w23.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w24 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w22[this.buttonOk]));
+			w24.Position = 1;
+			w24.Expand = false;
+			w24.Fill = false;
 			if ((this.Child != null))
 			{
 				this.Child.ShowAll();
 			}
 			this.DefaultWidth = 810;
-			this.DefaultHeight = 327;
+			this.DefaultHeight = 336;
 			this.comboboxentry2.Hide();
 			this.label5.Hide();
+			this.label6.Hide();
 			this.Show();
 		}
 	}

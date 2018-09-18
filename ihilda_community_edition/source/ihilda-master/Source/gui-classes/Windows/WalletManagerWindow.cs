@@ -22,14 +22,16 @@ namespace IhildaWallet
 			this.Hide();
 
 			this.Build ();
+
 			if (this.walletmanagerwidget1 == null) {
 				this.walletmanagerwidget1 = new WalletManagerWidget ();
 				this.walletmanagerwidget1.Show ();
-				vbox2.Add (this.walletmanagerwidget1);
+				vbox2.Add ( this.walletmanagerwidget1 );
 			}
 
 
 			this.Hide ();
+
 			this.Visible = false;
 			#if DEBUG
 			if (DebugIhildaWallet.WalletManagerWindow) {

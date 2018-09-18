@@ -48,8 +48,8 @@ namespace IhildaWallet
 			{
 				this.Child.ShowAll();
 			}
-			this.DefaultWidth = 1126;
-			this.DefaultHeight = 440;
+			this.DefaultWidth = 1261;
+			this.DefaultHeight = 527;
 			this.Show();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler(this.OnDeleteEvent);
 		}

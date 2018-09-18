@@ -117,24 +117,43 @@ namespace IhildaWallet
 
 
 
-
+				rw.Notification = "Updating balance...";
+				WalletManager.currentInstance?.UpdateUI ();
 
 				try {
+					
+					RippleCurrency rippleCurrency = AccountInfo.GetNativeBalance (rw.GetStoredReceiveAddress (), ni);
+
+					DateTime dateTime = DateTime.Now;
+
+
+					if (rippleCurrency != null) {
+						rw.LastKnownNativeBalance = rippleCurrency;
+						rw.Notification = "balance updated as of " + dateTime.ToShortTimeString ();
+					} else {
+						rw.Notification = "<span fgcolor=\"red\">Could not update balance</span>";
+					}
+
+					WalletManager.currentInstance?.UpdateUI ();
+
 					if (rw?.LastKnownLedger == null || rw.LastKnownLedger == 0) {
 
+						rw.Notification = "<span fgcolor=\"blue\">Newly addes wallet</span>";
 						rw.LastKnownLedger = ledger;
 						rw.Save ();
+						WalletManager.currentInstance?.UpdateUI ();
 						continue;
 						//return;
 					}
 
 
-					RippleCurrency rippleCurrency = AccountInfo.GetNativeBalance (rw.GetStoredReceiveAddress (), ni);
-					rw.LastKnownNativeBalance = rippleCurrency;
+
 					Tuple<uint, IEnumerable<AutomatedOrder>> tuple = DoOfferLogic (rw, ni);
 
 					if (tuple == null) {
+						rw.Notification = "<span fgcolor=\"red\">Failed to retrieve newly filled orders.</span>";
 
+						WalletManager.currentInstance?.UpdateUI ();
 						continue;
 
 						//return;
@@ -175,6 +194,7 @@ namespace IhildaWallet
 					Logging.ReportException (method_sig, ex);
 #endif
 
+					rw.Notification = "<span>Exception thrown in notification thread</span>";
 					continue;
 				} finally {
 					
@@ -221,27 +241,50 @@ namespace IhildaWallet
 			string method_sig = clsstr + nameof (DoBasicNotification) + DebugRippleLibSharp.both_parentheses;
 #endif
 
-			List<Task<int>> tasks = new List<Task<int>> ();
-			foreach (RippleWallet rw in wallets) {
+			//List<Task<int>> tasks = new List<Task<int>> ();
+			//RippleWallet[] walls = wallets.ToArray ();
 
-				tasks.Add (Task.Run (
+			int accnts = 0;
+			int count = 0;
 
-						delegate {
+			foreach ( RippleWallet rippleWallet in wallets ) {
+
+				RippleWallet rw = rippleWallet;
+				//tasks.Add (Task.Run (
+
+				//		delegate {
+
+				rw.Notification = "Updating balance...";
+				WalletManager.currentInstance?.UpdateUI ();
 
 							try {
+
+							RippleCurrency rippleCurrency = AccountInfo.GetNativeBalance (rw.GetStoredReceiveAddress (), ni);
+
+								DateTime dateTime = DateTime.Now;
+
+
+								if (rippleCurrency != null) {
+									rw.LastKnownNativeBalance = rippleCurrency;
+									rw.Notification = "balance updated as of " + dateTime.ToShortTimeString ();
+								} else {
+								rw.Notification = "<span fgcolor=\"red\">Could not update balance " + (string)(rw?.Account ?? "null") + " </span>";
+								}
+
+								WalletManager.currentInstance?.UpdateUI ();
 
 								if (rw?.LastKnownLedger == null || rw.LastKnownLedger == 0) {
 
 									rw.LastKnownLedger = ledger;
 									rw.Save ();
-									return 0;
+						continue;
 									//return;
 								}
 
 
 								Tuple<uint, IEnumerable<AutomatedOrder>> tuple = DoOfferLogic (rw, ni);
 								if (tuple == null) {
-									return 0;
+						continue;
 									//return;
 								}
 
@@ -252,7 +295,7 @@ namespace IhildaWallet
 								int c = totalFilled.Count ();
 
 								if (c == 0) {
-									return 0;
+						continue;
 								}
 
 
@@ -266,7 +309,9 @@ namespace IhildaWallet
 								rw.LastKnownLedger = tuple.Item1;
 								rw.Save ();
 
-								return c;
+					count += c;
+					accnts += 1;
+					continue;
 								//return;
 
 							}
@@ -278,31 +323,31 @@ namespace IhildaWallet
 								Logging.ReportException (method_sig, ex);
 #endif
 
-								return 0;
+					continue;
 							} finally {
 								WalletManager.currentInstance?.UpdateUI ();
 							}
 
 
-						}
+						//}
 
 
 
-				));
+				//));
 
 			}
 
-			if (tasks != null && tasks.Count > 0) {
-				Task.WaitAll (tasks.ToArray (), 15000);
+			//if (tasks != null && tasks.Count > 0) {
+			//	Task.WaitAll (tasks.ToArray (), 15000);
 				//Task.a
-			}
+			//}
 
 
-			var va = from Task<int> t in tasks
-					 select t.Result;
+			//var va = from Task<int> t in tasks
+					 //select t.Result;
 
-			int am = va.Count ();
-			int grandTotal = va.Sum ();
+			int am = accnts; //va.Count ();
+			int grandTotal = count;
 
 			if (grandTotal == 0) {
 				return;

@@ -55,7 +55,8 @@ namespace IhildaWallet
 			// Container child vbox4.Gtk.Box+BoxChild
 			this.label13 = new global::Gtk.Label();
 			this.label13.Name = "label13";
-			this.label13.LabelProp = global::Mono.Unix.Catalog.GetString("label4");
+			this.label13.LabelProp = global::Mono.Unix.Catalog.GetString("<span fgcolor=\"Red\">This is an infobar</span>");
+			this.label13.UseMarkup = true;
 			this.vbox4.Add(this.label13);
 			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.label13]));
 			w1.Position = 0;
@@ -264,6 +265,7 @@ namespace IhildaWallet
 			{
 				this.Child.ShowAll();
 			}
+			this.label13.Hide();
 			this.Hide();
 		}
 	}

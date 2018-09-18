@@ -305,6 +305,7 @@
     <EmbeddedResource Include="..\..\..\..\ihildaplain-100-wide.png" />
     <EmbeddedResource Include="..\..\..\..\ihildabright.png" />
     <EmbeddedResource Include="..\..\..\..\coolio-medium.png" />
+    <EmbeddedResource Include="Images\xrp-symbol-black-25x25.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="gtk-gui\generated.cs" />
@@ -594,7 +595,6 @@
     <Compile Include="Source\gui-classes\Dialogs\SentementCreateDialog.cs" />
     <Compile Include="gtk-gui\IhildaWallet.SentementCreateDialog.cs" />
     <Compile Include="Source\bot\SentimentManager.cs" />
-    <Compile Include="Source\WalletClasses\RippleWallet.cs" />
     <Compile Include="Source\WalletClasses\RippleWalletTypeEnum.cs" />
     <Compile Include="Source\gui-classes\Windows\AccountRCLSettingsWindow.cs" />
     <Compile Include="gtk-gui\IhildaWallet.AccountRCLSettingsWindow.cs" />
@@ -604,6 +604,7 @@
     <Compile Include="Source\gui-classes\Windows\PaperWalletWindow.cs" />
     <Compile Include="gtk-gui\IhildaWallet.PaperWalletWindow.cs" />
     <Compile Include="Source\util\EZFontResolver.cs" />
+    <Compile Include="Source\WalletClasses\RippleWallet.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

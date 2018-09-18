@@ -271,6 +271,46 @@ namespace RippleLibSharp.Transactions.TxTypes
 			return null;
 		}
 
+		public string Sign (RippleIdentifier signingKey)
+		{
+			if (signingKey is RippleSeedAddress) {
+				return Sign ((RippleSeedAddress)signingKey);
+			}
+
+			if (signingKey is RipplePrivateKey) {
+				return Sign ((RipplePrivateKey)signingKey);
+			}
+
+			throw new NotImplementedException ("signing key type not supported");
+		}
+
+		public string Sign (RipplePrivateKey privateKey)
+		{
+			BinarySerializer bs = new BinarySerializer ();
+
+			RippleBinaryObject rbo = GetBinaryObject ();
+			rbo = rbo.GetObjectSorted ();
+
+
+
+			//RipplePrivateKey rpk = seed.GetPrivateKey (0);
+			RippleTxSigner rtxs = new RippleTxSigner (privateKey);
+
+			rbo = rtxs.Sign (rbo);
+
+			var v = bs.WriteBinaryObject (rbo);
+
+			byte [] signedTXBytes = v; // was to array
+
+			//RippleBinaryObject test = bs.readBinaryObject( new System.IO.MemoryStream (signedTXBytes));
+
+			String blob = Base58.ByteArrayToHexString (signedTXBytes);
+
+			this.SignedTransactionBlob = blob;
+
+			return blob;
+		}
+
 		public string Sign (RippleSeedAddress seed)
 		{
 
@@ -300,7 +340,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 			return blob;
 		}
 
-		public string SignLocalRippled (RippleSeedAddress seed)
+		public string SignLocalRippled (RippleIdentifier seed)
 		{
 
 			string jsn = GetJsonTx ();

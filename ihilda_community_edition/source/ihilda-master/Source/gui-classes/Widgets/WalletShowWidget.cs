@@ -102,7 +102,7 @@ namespace IhildaWallet
 				bool sure = AreYouSure.AskQuestion ("Security", "Are you sure you want to display the secret for this account?");
 
 				if (sure) {
-					RippleSeedAddress rsa = rw.GetDecryptedSeed ();
+					RippleIdentifier rsa = rw.GetDecryptedSeed ();
 					if (rsa != null) {
 						this.secretlabel.Text = rsa.ToString ();
 					}
