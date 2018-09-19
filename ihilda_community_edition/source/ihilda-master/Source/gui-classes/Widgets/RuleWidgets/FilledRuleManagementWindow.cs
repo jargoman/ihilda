@@ -554,7 +554,7 @@ namespace IhildaWallet
 
 				int num = tuple.Item2.Count ();
 
-				message = num + " suggested orders";
+				message = num + " suggested orders\n";
 				WriteToInfoBox (message);
 
 				Application.Invoke (delegate {
@@ -871,6 +871,7 @@ namespace IhildaWallet
 
 			string message = "Automation thread has stopped\n";
 			MessageDialog.ShowMessage ("Automation stopped", message);
+			WriteToInfoBox (message);
 		}
 
 

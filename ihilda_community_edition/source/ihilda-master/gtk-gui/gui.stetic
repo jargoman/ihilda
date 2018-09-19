@@ -13393,7 +13393,7 @@ example: USD/CAD</property>
                               </widget>
                             </child>
                             <child>
-                              <widget class="Gtk.Label" id="GtkLabel8">
+                              <widget class="Gtk.Label" id="GtkLabel9">
                                 <property name="MemberName" />
                                 <property name="LabelProp" translatable="yes">Ledger Contraint</property>
                                 <property name="UseUnderline">True</property>
@@ -13427,7 +13427,7 @@ example: USD/CAD</property>
                                     <property name="Xalign">0</property>
                                     <property name="Yalign">0</property>
                                     <property name="LabelProp" translatable="yes">
-	Bot output screen 
+Bot output screen
 
 </property>
                                     <property name="UseMarkup">True</property>

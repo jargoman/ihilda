@@ -161,10 +161,12 @@ namespace IhildaWallet
 				//bool b = this.orderDict.TryRemove ( node.getBotId(), out order );
 				bool b = false;
 
-				String bot_id = node.GetBotId ();
+				String bot_id = node?.GetBotId ();
 
 
-				if (bot_id != null) cachedOffers.TryGetValue(bot_id, out order);
+				if (bot_id != null && cachedOffers != null) { 
+					b = cachedOffers.TryGetValue (bot_id, out order); 
+				}
 
 
 				if ( !b || order == null ) {

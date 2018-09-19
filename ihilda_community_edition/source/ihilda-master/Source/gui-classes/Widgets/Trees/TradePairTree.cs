@@ -19,7 +19,7 @@ namespace IhildaWallet
 
 			this.treeview1.AppendColumn ("Base Currency", new CellRendererText (), "text", 0);
 			this.treeview1.AppendColumn ("Base Issuer", new CellRendererText (), "text", 1);
-			this.treeview1.AppendColumn ("Couter Currency", new CellRendererText (), "text", 2);
+			this.treeview1.AppendColumn ("Counter Currency", new CellRendererText (), "text", 2);
 			this.treeview1.AppendColumn ("Counter Issuer", new CellRendererText (), "text", 3);
 
 			this.treeview1.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {

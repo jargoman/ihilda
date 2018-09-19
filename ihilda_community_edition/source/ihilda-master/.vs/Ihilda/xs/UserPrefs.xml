@@ -1,5 +1,5 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Widgets/OrderPreviewSubmitWidget.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Widgets/Trees/TradePairTree.cs">
     <Files>
       <File FileName="Source/NotificationSystem/NotificationThread.cs" Line="258" Column="48" />
       <File FileName="Source/gui-classes/Widgets/Trees/WalletTree.cs" Line="642" Column="36" />
@@ -7,10 +7,15 @@
       <File FileName="Source/WalletClasses/RippleWallet.cs" Line="1080" Column="35" />
       <File FileName="Source/util/WalletManager.cs" Line="1" Column="1" />
       <File FileName="Source/gui-classes/Windows/WalletManagerWindow.cs" Line="1" Column="1" />
-      <File FileName="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs" Line="909" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs" Line="557" Column="41" />
       <File FileName="Source/bot/Robotics.cs" Line="29" Column="55" />
       <File FileName="Source/bot/OrderSubmitter.cs" Line="1" Column="1" />
-      <File FileName="Source/gui-classes/Widgets/OrderPreviewSubmitWidget.cs" Line="1" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/OrderPreviewSubmitWidget.cs" Line="1370" Column="4" />
+      <File FileName="Source/bot/OrderManagementBot.cs" Line="168" Column="10" />
+      <File FileName="Source/util/TradePairManager.cs" Line="1" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/TradeUI/TradePairWidget.cs" Line="1" Column="1" />
+      <File FileName="Source/gui-classes/Windows/TradePairManagerWindow.cs" Line="1" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/Trees/TradePairTree.cs" Line="22" Column="57" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />

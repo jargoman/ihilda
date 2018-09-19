@@ -60,7 +60,7 @@ namespace IhildaWallet
 
 		private global::IhildaWallet.LedgerConstraintsWidget ledgerconstraintswidget1;
 
-		private global::Gtk.Label GtkLabel8;
+		private global::Gtk.Label GtkLabel9;
 
 		private global::Gtk.ScrolledWindow scrolledwindow1;
 
@@ -290,11 +290,11 @@ namespace IhildaWallet
 			this.ledgerconstraintswidget1.Events = ((global::Gdk.EventMask)(256));
 			this.ledgerconstraintswidget1.Name = "ledgerconstraintswidget1";
 			this.expander1.Add(this.ledgerconstraintswidget1);
-			this.GtkLabel8 = new global::Gtk.Label();
-			this.GtkLabel8.Name = "GtkLabel8";
-			this.GtkLabel8.LabelProp = global::Mono.Unix.Catalog.GetString("Ledger Contraint");
-			this.GtkLabel8.UseUnderline = true;
-			this.expander1.LabelWidget = this.GtkLabel8;
+			this.GtkLabel9 = new global::Gtk.Label();
+			this.GtkLabel9.Name = "GtkLabel9";
+			this.GtkLabel9.LabelProp = global::Mono.Unix.Catalog.GetString("Ledger Contraint");
+			this.GtkLabel9.UseUnderline = true;
+			this.expander1.LabelWidget = this.GtkLabel9;
 			this.vbox4.Add(this.expander1);
 			global::Gtk.Box.BoxChild w21 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.expander1]));
 			w21.Position = 0;
@@ -315,7 +315,7 @@ namespace IhildaWallet
 			this.label6.Ypad = 5;
 			this.label6.Xalign = 0F;
 			this.label6.Yalign = 0F;
-			this.label6.LabelProp = global::Mono.Unix.Catalog.GetString("\n\tBot output screen \n\n");
+			this.label6.LabelProp = global::Mono.Unix.Catalog.GetString("\nBot output screen\n\n");
 			this.label6.UseMarkup = true;
 			this.label6.Selectable = true;
 			w22.Add(this.label6);
