@@ -398,6 +398,9 @@ namespace RippleLibSharp.Transactions
 			RippleCurrency tgets = tx.TakerGets;
 			RippleCurrency tpays = tx.TakerPays;
 
+			Decimal cost = tgets.GetNativeAdjustedCostAt (tpays);
+			Decimal price = tpays.GetNativeAdjustedPriceAt (tgets);
+
 
 			if (queried_addr == tx.Account) {
 				TextHighlighter.Highlightcolor = TextHighlighter.RED;
@@ -410,12 +413,18 @@ namespace RippleLibSharp.Transactions
 			buybuilder.Append (" for ");
 			buybuilder.Append (tgets.ToString ());
 
+			buybuilder.Append (" Price : ");
+			buybuilder.Append (price.ToString ());
+
 
 			sellbuilder.Append (account);
 			sellbuilder.Append (" created an offer to sell ");
 			sellbuilder.Append (tgets.ToString ());
 			sellbuilder.Append (" for ");
 			sellbuilder.Append (tpays.ToString ());
+
+			sellbuilder.Append (" Cost : ");
+			sellbuilder.Append (cost.ToString ());
 
 			sellbuilder.Append ("ledger #" + tx.ledger_index);
 

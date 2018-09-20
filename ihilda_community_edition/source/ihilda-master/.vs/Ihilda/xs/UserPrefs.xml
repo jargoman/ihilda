@@ -1,23 +1,22 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Widgets/LedgerConstraintsWidget.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../../RippleLibSharp/RippleLibSharp/Source/Transactions/RippleTxStructure.cs">
     <Files>
       <File FileName="Source/WalletClasses/RippleWallet.cs" Line="793" Column="4" />
       <File FileName="Source/gui-classes/Windows/WalletManagerWindow.cs" Line="1" Column="1" />
       <File FileName="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs" Line="557" Column="41" />
-      <File FileName="Source/bot/Robotics.cs" Line="72" Column="41" />
+      <File FileName="Source/bot/Robotics.cs" Line="54" Column="17" />
       <File FileName="Source/bot/OrderSubmitter.cs" Line="1" Column="1" />
       <File FileName="Source/gui-classes/Widgets/OrderPreviewSubmitWidget.cs" Line="1370" Column="4" />
-      <File FileName="Source/bot/OrderManagementBot.cs" Line="130" Column="40" />
-      <File FileName="Source/gui-classes/Widgets/Views/TxViewWidget.cs" Line="326" Column="51" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Commands/Accounts/AccountTx.cs" Line="35" Column="1" />
-      <File FileName="Source/gui-classes/Widgets/LedgerConstraintsWidget.cs" Line="70" Column="17" />
+      <File FileName="Source/bot/OrderManagementBot.cs" Line="130" Column="44" />
+      <File FileName="Source/gui-classes/Widgets/Views/TxViewWidget.cs" Line="545" Column="47" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Commands/Accounts/AccountTx.cs" Line="42" Column="7" />
+      <File FileName="Source/gui-classes/Widgets/LedgerConstraintsWidget.cs" Line="86" Column="1" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Transactions/RippleTxStructure.cs" Line="104" Column="33" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/Source/gui-classes/Widgets/Views/TxViewWidget.cs" relfile="Source/gui-classes/Widgets/Views/TxViewWidget.cs" line="358" column="1" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MultiItemStartupConfigurations />
