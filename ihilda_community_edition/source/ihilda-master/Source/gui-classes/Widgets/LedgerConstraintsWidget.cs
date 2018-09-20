@@ -10,6 +10,11 @@ namespace IhildaWallet
 		public LedgerConstraintsWidget ()
 		{
 			this.Build ();
+
+			comboboxentry4.Changed += (object sender, EventArgs e) => {
+				comboboxentry4.ModifyBase (StateType.Normal);
+				comboboxentry4.Entry.ModifyBase (StateType.Normal);
+			};
 		}
 
 		public void SetLastKnownLedger (string s) {
@@ -28,6 +33,15 @@ namespace IhildaWallet
 				this.label9.Text = s;
 				this.label9.Show ();
 				this.label10.Show ();
+			});
+		}
+
+		public void HighLightLimit ()
+		{
+			Application.Invoke ( delegate {
+				Gdk.Color orchid = new Gdk.Color (218, 112, 214);
+				comboboxentry4.ModifyBase (StateType.Normal, orchid);
+				comboboxentry4.Entry.ModifyBase (StateType.Normal, orchid);
 			});
 		}
 

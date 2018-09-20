@@ -952,7 +952,7 @@ namespace IhildaWallet
 		}
 
 
-		private object fileLock = new object ();
+		public static object fileLock = new object ();
 
 		public bool Save (String path)
 		{

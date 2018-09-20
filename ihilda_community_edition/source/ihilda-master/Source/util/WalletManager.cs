@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.IO;
 using Gtk;
 using Codeplex.Data;
@@ -53,6 +54,45 @@ namespace IhildaWallet
 
 		//public static readonly bool prefer_filename = true;
 		//public List<RippleWallet> wallets = null; 
+
+
+		public void DeleteBackups ()
+		{
+
+			lock (RippleWallet.fileLock) {
+				String [] backpaths = FileHelper.GetDirFileNames (FileHelper.WALLET_FOLDER_PATH, "*" + FileHelper.BACKUP_EXT);
+				String [] temppaths = FileHelper.GetDirFileNames (FileHelper.WALLET_FOLDER_PATH, "*" + FileHelper.TEMP_EXTENTION);
+
+				if (backpaths != null) {
+					foreach (string path in backpaths) {
+						if (path == null) {
+							// TODO
+							continue;
+						}
+
+
+						File.Delete (path);
+
+					}
+				}
+
+				if (temppaths != null) {
+					foreach (string path in temppaths) {
+						if (path == null) {
+							// TODO
+							continue;
+						}
+
+
+						File.Delete (path);
+
+					}
+				}
+			}
+
+			MessageDialog.ShowMessage ("Files deleted");
+
+		}
 
 		public void LoadWallets ()
 		{

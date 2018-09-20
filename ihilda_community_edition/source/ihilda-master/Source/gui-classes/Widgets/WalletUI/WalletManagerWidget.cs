@@ -249,6 +249,28 @@ namespace IhildaWallet
 				}
 			};
 
+			this.button134.Clicked += (object sender, EventArgs e) => {
+
+				bool sure = AreYouSure.AskQuestion 
+				                      ("Delete Backups?", 
+				                       "Delete wallets with file extention " 
+				                       + FileHelper.BACKUP_EXT 
+				                       + " and " 
+				                       + FileHelper.TEMP_EXTENTION
+				                      );
+
+				                 
+				if (!sure) {
+					return;
+				}
+				Task.Run (
+					delegate {
+						WalletManager.currentInstance?.DeleteBackups ();
+
+					}
+				);
+			};
+
 			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
 			wallettree1.GrabFocus ();
 		}

@@ -202,7 +202,12 @@ namespace IhildaWallet
 					Logging.WriteLog (event_sig + DebugRippleLibSharp.beginn);
 				}
 #endif
+
+				this.SpinWaitObj?.Show ();
+
 				string addr = this.AccountEntry.Entry.Text;
+
+
 #if DEBUG
 				if (DebugIhildaWallet.TxViewWidget) {
 					Logging.WriteLog (event_sig + nameof (addr) + DebugRippleLibSharp.equals + addr);
@@ -222,8 +227,9 @@ namespace IhildaWallet
 						Logging.ReportException (method_sig, fe);
 					}
 #endif
-
+					SpinWaitObj.Hide ();
 					MessageDialog.ShowMessage (addr + " is not a properlay formatted ripple address\n");
+
 					return;
 				}
 
@@ -236,6 +242,8 @@ namespace IhildaWallet
 						Logging.ReportException (method_sig, ex);
 					}
 #endif
+
+					SpinWaitObj.Hide ();
 					MessageDialog.ShowMessage ("Error processing ripple address\n");
 					return;
 				}
@@ -248,6 +256,7 @@ namespace IhildaWallet
 						Logging.WriteLog (event_sig + "ra == null");
 					}
 #endif
+					SpinWaitObj.Hide ();
 					return;
 				}
 
@@ -319,9 +328,31 @@ namespace IhildaWallet
 				int? limit = ledgerconstraintswidget3.GetLimit ();
 				bool? b = ledgerconstraintswidget3.GetForward ();
 
-				if (min == null && max == null && limit == null) {
+				if (string.IsNullOrWhiteSpace(  min?.ToString() ) && string.IsNullOrWhiteSpace( max?.ToString() ) && string.IsNullOrWhiteSpace(limit?.ToString())) {
+
+
+					string question = "Without a ledger constraint your request will download full transaction history. This may take a very long time for accounts that have a long transaction history. Consider setting a limit.\n  example limit 100\n Are you sure you'd like to continue without a ledger constraint?";
+					bool cont = AreYouSure.AskQuestionNonGuiThread ("Download full history?", question);
+					if (!cont) {
+						expander1.Expanded = true;
+						ledgerconstraintswidget3.HighLightLimit ();
+
+						return;
+					}
 					DoFullSync (para.address, ni);
 					return;
+				}
+
+				if (string.IsNullOrWhiteSpace(min?.ToString())) {
+					min = null;
+				}
+
+				if (string.IsNullOrWhiteSpace (max?.ToString ())) {
+					max = null;
+				}
+
+				if (string.IsNullOrWhiteSpace(limit?.ToString())) {
+					limit = null;
 				}
 
 				Task<Response<AccountTxResult>> tsk =
@@ -508,7 +539,7 @@ namespace IhildaWallet
 			LinkedList<TxSummary> reports = new LinkedList<TxSummary> ();
 
 			var list = from RippleTxStructure t in txstructureArray where t != null select t;
-
+			//list = list.a
 			foreach (RippleTxStructure txresult in list) {
 
 				Tuple<string, string> rps = txresult.GetReport (account);

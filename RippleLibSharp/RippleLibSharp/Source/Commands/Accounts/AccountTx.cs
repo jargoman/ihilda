@@ -39,8 +39,8 @@ namespace RippleLibSharp.Commands.Accounts
 				ledger_index_min,
 				ledger_index_max,
 				binary = false,
-				count = false,
-
+				//count = false,
+				limit = limit,
 				forward
 			};
 

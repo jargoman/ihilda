@@ -15,7 +15,12 @@ namespace IhildaWallet
 		{
 			this.Build ();
 
-			listStore = new ListStore (typeof (string), typeof (string), typeof (string), typeof (string));
+			listStore = new ListStore (
+				typeof (string), //  base currency
+				typeof (string),  // base issuer
+				typeof (string), // Counter currency
+				typeof (string)); // counter issuer
+
 
 			this.treeview1.AppendColumn ("Base Currency", new CellRendererText (), "text", 0);
 			this.treeview1.AppendColumn ("Base Issuer", new CellRendererText (), "text", 1);
