@@ -355,26 +355,49 @@ namespace IhildaWallet
 					limit = null;
 				}
 
-				Task<Response<AccountTxResult>> tsk =
-					AccountTx.GetResult (
+				Task< IEnumerable <Response<AccountTxResult>>> tsk = null;
+
+
+
+				if (limit != null) {
+					int lim = (int)limit;
+					tsk = AccountTx.GetFullTxResult (
+							para.address,
+							min?.ToString () ?? (-1).ToString (),
+							max?.ToString () ?? (-1).ToString (),
+							lim,
+							
+							ni);
+				} else {
+					tsk = AccountTx.GetFullTxResult (
 						para.address,
 						min?.ToString () ?? (-1).ToString (),
 						max?.ToString () ?? (-1).ToString (),
-						limit ?? 200,
-						b ?? false,
-						ni);
 
-
+						ni
+					);
+				}
 				tsk.Wait ();
 
-				Response<AccountTxResult> res = tsk.Result;
+				IEnumerable <Response<AccountTxResult>> results = tsk.Result;
 
-				AccountTxResult txr = res.result;
-				if (txr == null || txr.transactions == null) {
+				if (results == null) {
 					return;
 				}
 
-				SetTransactions (txr.transactions, para.address);
+
+				List<RippleTxStructure> transactions = new List<RippleTxStructure> ();
+				foreach (Response<AccountTxResult> res in results) {
+					AccountTxResult txr = res.result;
+					if (txr == null || txr.transactions == null) {
+						return;
+					}
+
+					transactions.AddRange (txr.transactions);
+
+				}
+
+				SetTransactions (transactions, para.address);
 			} catch (Exception e) {
 
 #if DEBUG
@@ -396,8 +419,8 @@ namespace IhildaWallet
 			try {
 
 				Task<IEnumerable<Response<AccountTxResult>>> task =
-					AccountTx.GetFullTxResult (account, ni);
-
+					//AccountTx.GetFullTxResult (account, ni);
+					AccountTx.GetFullTxResult (account, (-1).ToString (), (-1).ToString (), ni);
 				if (task == null) {
 					Gtk.Application.Invoke (
 						(object sender, EventArgs e) => {

@@ -297,6 +297,7 @@ namespace IhildaWallet
 
 				// instead of giving up we are going to try the data api instead. 
 				// response<string is correct>
+				Thread.Sleep (5000);
 				Task<Response<string>> dataTask = tx.GetRequestDataApi (PreviousTxnID);
 				dataTask.Wait ();
 

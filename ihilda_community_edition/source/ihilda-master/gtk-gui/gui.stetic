@@ -5282,6 +5282,18 @@ drops</property>
                   </packing>
                 </child>
                 <child>
+                  <widget class="Gtk.Label" id="label7">
+                    <property name="MemberName" />
+                    <property name="LabelProp" translatable="yes">Select a wallet ---&gt;</property>
+                  </widget>
+                  <packing>
+                    <property name="Position">3</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
                   <widget class="Gtk.Button" id="quitButton">
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
@@ -5291,7 +5303,7 @@ drops</property>
                     <property name="Xalign">0</property>
                   </widget>
                   <packing>
-                    <property name="Position">3</property>
+                    <property name="Position">4</property>
                     <property name="AutoSize">True</property>
                     <property name="Expand">False</property>
                     <property name="Fill">False</property>
@@ -5782,7 +5794,7 @@ drops</property>
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Window" id="IhildaWallet.WalletManagerWindow" design-size="1261 527">
+  <widget class="Gtk.Window" id="IhildaWallet.WalletManagerWindow" design-size="1261 545">
     <action-group name="Default" />
     <property name="MemberName" />
     <property name="Title" translatable="yes">Wallet Manager</property>
@@ -12105,7 +12117,25 @@ example: USD/CAD</property>
           </widget>
           <packing>
             <property name="Position">0</property>
-            <property name="AutoSize">True</property>
+            <property name="AutoSize">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.Label" id="label2">
+            <property name="MemberName" />
+            <property name="Visible">False</property>
+            <property name="Xpad">10</property>
+            <property name="Ypad">10</property>
+            <property name="Xalign">0</property>
+            <property name="Yalign">0</property>
+            <property name="LabelProp" translatable="yes">&lt;span fgcolor="red"&gt;This is an infobar&lt;/span&gt;</property>
+            <property name="UseMarkup">True</property>
+          </widget>
+          <packing>
+            <property name="Position">1</property>
+            <property name="AutoSize">False</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
           </packing>
         </child>
         <child>
@@ -12244,7 +12274,7 @@ example: USD/CAD</property>
             </child>
           </widget>
           <packing>
-            <property name="Position">1</property>
+            <property name="Position">2</property>
             <property name="AutoSize">True</property>
             <property name="Expand">False</property>
             <property name="Fill">False</property>
@@ -13487,6 +13517,21 @@ Bot output screen
                               </widget>
                               <packing>
                                 <property name="Position">2</property>
+                                <property name="AutoSize">True</property>
+                                <property name="Expand">False</property>
+                                <property name="Fill">False</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="Gtk.Button" id="button1">
+                                <property name="MemberName" />
+                                <property name="CanFocus">True</property>
+                                <property name="Type">TextOnly</property>
+                                <property name="Label" translatable="yes">Sync Orders Cache</property>
+                                <property name="UseUnderline">True</property>
+                              </widget>
+                              <packing>
+                                <property name="Position">3</property>
                                 <property name="AutoSize">True</property>
                                 <property name="Expand">False</property>
                                 <property name="Fill">False</property>

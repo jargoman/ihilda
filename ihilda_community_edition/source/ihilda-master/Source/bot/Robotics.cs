@@ -43,25 +43,41 @@ namespace IhildaWallet
 				ledgerMin = lastRuleLedger.ToString();
 
 			}
-			int lim = limit ?? 200;
+			int lim = limit ?? 0;
 
-			Task<Response<AccountTxResult>> task = null;
+			Task<IEnumerable <Response<AccountTxResult>>> task = null;
 
 			try {
-				task =
-					AccountTx.GetResult (
-						wallet.GetStoredReceiveAddress (),
-						ledgerMin,
-						ledgerMax,
-						lim,
-						false,
-						ni);
+
+				if (limit == null) {
+					task =
+
+						AccountTx.GetFullTxResult (
+							wallet.GetStoredReceiveAddress (),
+							ledgerMin,
+							ledgerMax,
+
+							/*false,*/
+							ni);
+					
+
+				} else {
+					task =
+
+						AccountTx.GetFullTxResult (
+							wallet.GetStoredReceiveAddress (),
+							ledgerMin,
+							ledgerMax,
+							lim,
+							/*false,*/
+							ni);
+					
+				}
+
 				if (task == null) {
 					//return null;
 					throw new NullReferenceException ();
 				}
-
-
 				task.Wait ();
 
 			} catch (Exception e) {
@@ -84,35 +100,44 @@ namespace IhildaWallet
 				return null;
 			}
 
-			Response<AccountTxResult> res = task.Result;
+			IEnumerable <Response<AccountTxResult>> results = task.Result;
 
-			if (res == null) {
+			if (results == null) {
 				return null;
 			}
 
+			List<RippleTxStructure> txStructures = new List<RippleTxStructure> ();
 
 
-			AccountTxResult accTxResult = res.result;
+			int lastledger = 0;
+			foreach (Response<AccountTxResult> res in results) {
 
-			if (accTxResult == null) {
-				return null;
-			}
+				AccountTxResult accTxResult = res.result;
+
+				if (accTxResult == null) {
+					return null;
+				}
 
 
 #if DEBUG
 
-			string debug =
-				"ledgermax" +
-				accTxResult.ledger_index_max.ToString () +
+				string debug =
+					"ledgermax" +
+					accTxResult.ledger_index_max.ToString () +
 
-				"ledgermin" +
-				accTxResult.ledger_index_min.ToString ();
+					"ledgermin" +
+					accTxResult.ledger_index_min.ToString ();
 
-			Logging.WriteLog (debug);
+				Logging.WriteLog (debug);
 
 #endif
 
-			RippleTxStructure [] txs = accTxResult.transactions;
+				RippleTxStructure [] txs = accTxResult.transactions;
+
+				txStructures.AddRange (txs);
+
+				lastledger = accTxResult.ledger_index_max;
+			}
 
 			OrderManagementBot omb = new OrderManagementBot (wallet, ni);
 
@@ -122,7 +147,7 @@ namespace IhildaWallet
 
 			try {
 
-				total = omb.UpdateTx (txs);
+				total = omb.UpdateTx (txStructures);
 			}
 
 #pragma warning disable 0168
@@ -174,10 +199,10 @@ namespace IhildaWallet
 
 
 
-			RuleManagerObj.LastKnownLedger = accTxResult.ledger_index_max;
+			RuleManagerObj.LastKnownLedger = lastledger;
 			RuleManagerObj.SaveRules ();
 
-			Tuple<Int32?, IEnumerable <AutomatedOrder>> tuple = new Tuple<int?, IEnumerable <AutomatedOrder>> (accTxResult.ledger_index_max, orders);
+			Tuple<Int32?, IEnumerable <AutomatedOrder>> tuple = new Tuple<int?, IEnumerable <AutomatedOrder>> (lastledger, orders);
 
 			return tuple;
 

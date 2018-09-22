@@ -271,6 +271,32 @@ namespace IhildaWallet
 				);
 			};
 
+			this.eventbox1.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
+				var pix = image1.Pixbuf;
+
+				FileChooserDialog fcd = new FileChooserDialog ("Export Wallet",
+									   /*PaymentWindow.currentInstance*/null,
+									   FileChooserAction.Save,
+									   "Cancel", ResponseType.Cancel,
+									   "Save", ResponseType.Accept);
+
+				if (fcd.Run () == (int)ResponseType.Accept) {
+#if DEBUG
+					if (DebugIhildaWallet.RippleWallet) {
+						Logging.WriteLog ("Wallet : method ExportWallet : user chose to export to file " + fcd.Filename + "\n");
+					}
+#endif
+
+					//Save (fcd.Filename);
+					pix.Save (fcd.Filename, "jpeg");
+				}
+
+				fcd.Destroy ();
+
+
+
+			};
+
 			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
 			wallettree1.GrabFocus ();
 		}
@@ -712,9 +738,10 @@ namespace IhildaWallet
 
 
 
-		public void SetQRAddress (Gdk.Pixbuf pixbuf)
+		public void SetQRAddress (string address, Gdk.Pixbuf pixbuf)
 		{
-			
+
+			this.label7.Markup = address;
 			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (255, 255, 255));
 			this.image1.Pixbuf = pixbuf;
 		}

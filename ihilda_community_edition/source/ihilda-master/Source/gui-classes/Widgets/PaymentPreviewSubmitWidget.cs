@@ -54,6 +54,7 @@ namespace IhildaWallet
 			};
 
 			this.submitButton.Clicked += delegate {
+				
 				Task.Run ((Action)SubmitAll);
 			};
 

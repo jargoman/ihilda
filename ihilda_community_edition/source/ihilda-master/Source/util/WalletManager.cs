@@ -1324,7 +1324,7 @@ namespace IhildaWallet
 		{
 			SelectedWallet = rippleWallet;
 
-			WalletManagerWidget.currentInstance.SetQRAddress (rippleWallet.GetQrCode ());
+			WalletManagerWidget.currentInstance.SetQRAddress (rippleWallet.GetStoredReceiveAddress(), rippleWallet.GetQrCode ());
 		}
 
 

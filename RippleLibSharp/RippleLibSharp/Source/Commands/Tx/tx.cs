@@ -55,7 +55,7 @@ namespace RippleLibSharp.Commands.Tx
 							last_call_time = DateTime.Now;
 						} else {
 
-							while ((((TimeSpan)(DateTime.Now - last_call_time)).TotalMilliseconds) < 1000) {
+							while ((((TimeSpan)(DateTime.Now - last_call_time)).TotalMilliseconds) < 2000) {
 								Thread.Sleep (100);
 							}
 						}

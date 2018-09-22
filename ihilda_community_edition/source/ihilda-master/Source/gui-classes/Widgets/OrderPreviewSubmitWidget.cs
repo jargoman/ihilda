@@ -404,7 +404,7 @@ namespace IhildaWallet
 			}
 
 
-
+			bool hasred = false;
 			for (int i = 0; i < _offers.Length; i++) {
 
 				for (int j = i + 1; j < _offers.Length; j++) {
@@ -437,6 +437,7 @@ namespace IhildaWallet
 						_offers [i].Red = true;
 						_offers [j].Red = true;
 
+						hasred = true;
 
 						HighLightPrice (i.ToString (), price.ToString ());
 						HighLightCost (i.ToString (), cost.ToString ());
@@ -446,6 +447,11 @@ namespace IhildaWallet
 					}
 				}
 
+			}
+
+			if (hasred) {
+				this.label2.Markup = "<span fgcolor=\"red\">Conflicting orders. Trading with self</span>";
+				this.label2.Show ();
 			}
 			//SetOffers (_offers);
 
@@ -550,8 +556,14 @@ namespace IhildaWallet
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
 #endif
+
+
 			Liststore.Clear ();
 			if (offers == null) {
+				Application.Invoke ( delegate {
+					label2.Markup = "<span fgcolor=\"red\">Error null offer list\n</span>";
+
+				}); 
 				return;
 			}
 
@@ -588,8 +600,12 @@ namespace IhildaWallet
 
 			}
 
+			Application.Invoke ( delegate {
+			
+				treeview1.Model = Liststore;
+				label2.Visible = false;
+			});
 
-			treeview1.Model = Liststore;
 
 			Analysisbutton_Clicked (null,null);
 
@@ -704,6 +720,11 @@ namespace IhildaWallet
 			}
 #endif
 
+			Application.Invoke ( delegate {
+
+				this.label2.Markup = "<span>Submitting order at index " + index.ToString() + "</span>";
+			});
+
 			try {
 				ClearIndex (index);
 
@@ -799,6 +820,11 @@ namespace IhildaWallet
 				this.SetStatus (index.ToString (), "Requesting Fee", TextHighlighter.GREEN);
 
 				Tuple<UInt32, UInt32> tupe = FeeSettings.GetFeeAndLastLedgerFromSettings (ni, lastFee);
+
+				if (tupe == null) {
+					this.SetResult (index.ToString (), "Error retrieving fee", TextHighlighter.RED);
+					return false;
+				}
 
 				if (stop) {
 
@@ -1225,6 +1251,12 @@ namespace IhildaWallet
 				string mssg = "Exception Thrown in code";
 				this.SetResult ( index.ToString (), mssg, TextHighlighter.RED);
 
+				Application.Invoke (delegate {
+					this.label2.Markup = e.Message + "\n" + e.StackTrace;
+
+				});
+
+
 				MessageDialog.ShowMessage (mssg, e.Message + e.StackTrace);
 				return false;
 				//return false;
@@ -1305,6 +1337,12 @@ namespace IhildaWallet
 				}
 #endif
 
+				Application.Invoke ( delegate {
+					this.label2.Markup = "<span fgcolor=\"red\">No wallet selected.</span>";
+
+				});
+
+
 				return;
 			}
 
@@ -1314,11 +1352,25 @@ namespace IhildaWallet
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
 			if (ni == null) {
 				// TODO network interface
+				Application.Invoke (delegate {
+					this.label2.Markup = "<span fgcolor=\"red\">No network.</span>";
+
+				});
+
 				return;
 			}
 
 			bool ShouldContinue = LeIceSense.LastDitchAttempt (rw, _licenseType);
 			if (!ShouldContinue) {
+				Application.Invoke (delegate {
+					this.label2.Markup =
+						"<span fgcolor=\"red\">Insufficient "
+						+ LeIceSense.LICENSE_CURRENCY
+						+ "Requires "
+						+ _licenseType.ToString ()
+						+ "</span>";
+
+				});
 				return;
 			}
 			//int? f = FeeSettings.getFeeFromSettings (ni);
@@ -1392,6 +1444,8 @@ namespace IhildaWallet
 			get;
 			set;
 		}
+
+
 
 		private bool stop = false;
 

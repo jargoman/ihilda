@@ -247,12 +247,24 @@ namespace IhildaWallet
 
 			//this.exitbutton.Clicked += (object sender, EventArgs e) => this.Destroy();
 
-
+			//this.button17
 
 
 
 		}
 
+		protected void OnDeleteEvent (object sender, DeleteEventArgs a)
+		{
+			if (this.tokenSource != null) {
+				bool sure = AreYouSure.AskQuestion ("Task running", "A task is currently running. Are you sure you want to close the window?");
+				if (sure) {
+					return;
+				}
+			}
+
+			//base.OnDeleteEvent (a); // should this be called?
+			this.Destroy ();
+		}
 		private void SetIsRunningUI (bool isRunning)
 		{
 			string message = "<b>Automation Status </b>: " + (String)(isRunning ? "<span fgcolor=\"green\">Running</span>" : "<span fgcolor=\"red\">Stopped</span>");
