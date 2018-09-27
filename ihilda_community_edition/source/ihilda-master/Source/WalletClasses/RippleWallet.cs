@@ -1070,7 +1070,7 @@ namespace IhildaWallet
        
 				Bitmap xmap = (Bitmap)tc.ConvertFrom(puf.SaveToBuffer("png")); 
 
-				Bitmap bitmap = qrCodeAdd.GetGraphic (6, System.Drawing.Color.Black, System.Drawing.Color.White, xmap, 16, 4, false);
+				Bitmap bitmap = qrCodeAdd.GetGraphic (6, System.Drawing.Color.DarkBlue, System.Drawing.Color.LavenderBlush, xmap, 16, 4, false);
 				Bitmap qrCodeImageAdd = bitmap; //qrCodeAdd.GetGraphic (5, System.Drawing.Color.Black, System.Drawing.Color.White, true);
 
 

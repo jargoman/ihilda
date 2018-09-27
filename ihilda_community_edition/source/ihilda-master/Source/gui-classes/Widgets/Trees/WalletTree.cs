@@ -34,14 +34,16 @@ namespace IhildaWallet
 			this.treeview2.HoverSelection = true;
 
 
+
+
 			store = new ListStore (
 				typeof (bool), // Select
 				typeof (string), // Name
 				typeof (string), // Type
-				typeof (string), // Account 
+				typeof (string) // Account 
 				//typeof (string), // Enryption
-				typeof (string), // Balance
-				typeof (string) // notifications
+				//typeof (string), // Balance
+				//typeof (string) // notifications
 			);
 
 
@@ -51,13 +53,15 @@ namespace IhildaWallet
 
 			CellRendererText renderer = new CellRendererText ();
 
-			treeview2.AppendColumn ("Select", tog, "active", 0);
+
+
+			treeview2.AppendColumn ("", tog, "active", 0);
 			treeview2.AppendColumn ("Name", renderer, "markup", 1);
 			treeview2.AppendColumn ("Type", renderer, "markup", 2);
 			treeview2.AppendColumn ("Account", renderer, "markup", 3);
 			/*treeview2.AppendColumn ("Encryption", renderer, "markup", 4);*/
-			treeview2.AppendColumn ("Balance", renderer, "markup", 4);
-			treeview2.AppendColumn ("Notifications", renderer, "markup", 5);
+			//treeview2.AppendColumn ("Balance", renderer, "markup", 4);
+			//treeview2.AppendColumn ("Notifications", renderer, "markup", 4);
 
 			currentInstance = this;
 
@@ -113,7 +117,7 @@ namespace IhildaWallet
 				}
 
 
-
+				/*
 				if (selectedRippleWallet == null) {
 					if (hoveredRippleWallet != null) {
 						return;
@@ -122,6 +126,7 @@ namespace IhildaWallet
 					goto GUI;
 					//return;
 				}
+				*/
 
 				if (!hoveredRippleWallet.WalletName.Equals (selectedRippleWallet.WalletName)) {
 					goto GUI;
@@ -173,6 +178,8 @@ namespace IhildaWallet
 			};
 			*/
 		}
+
+
 
 		public void RunWalletSelectedPopup ()
 		{
@@ -592,6 +599,8 @@ namespace IhildaWallet
 
 					sb.Clear ();
 
+					string balance = rw?.LastKnownNativeBalance?.ToString ();
+					string notification = rw?.Notification;
 					if (rw?.AccountType == RippleWalletTypeEnum.Master || rw?.AccountType == RippleWalletTypeEnum.MasterPrivateKey) {
 						sb.Append ("<span ");
 						if (b) {
@@ -603,12 +612,28 @@ namespace IhildaWallet
 							sb.Append ("<b><u>");
 						}
 						sb.Append (rw?.GetStoredReceiveAddress () ?? " ");
+
 						if (b) {
 							sb.Append ("</u></b>");
 						}
 
 
+
 						sb.Append ("</big></span>");
+
+						sb.Append ("<span fgcolor=\"darkblue\" size=\"x-large\">");
+
+						if (balance != null) {
+							sb.AppendLine ();
+							sb.Append (balance);
+						}
+
+
+						sb.Append ("</span>");
+						if (notification != null) {
+							sb.AppendLine ();
+							sb.Append (notification);
+						}
 					}
 
 					if (rw?.AccountType == RippleWalletTypeEnum.Regular) {
@@ -620,6 +645,10 @@ namespace IhildaWallet
 						sb.Append ("fgcolor=\"green\">");
 						sb.Append (rw?.GetStoredReceiveAddress () ?? " ");
 						sb.Append ("</span>");
+
+
+
+
 						sb.AppendLine ();
 						sb.Append ("<span ");
 						if (b) {
@@ -629,6 +658,19 @@ namespace IhildaWallet
 						sb.Append ("fgcolor=\"grey\">");
 						sb.Append (rw?.Regular_Key_Account ?? " ");
 						sb.Append ("</span>");
+
+						sb.Append ("<span fgcolor=\"darkblue\" size=\"x-large\">");
+						if (balance != null) {
+							sb.AppendLine ();
+							sb.Append (balance);
+						}
+
+						sb.Append ("</span>");
+
+						if (notification != null) {
+							sb.AppendLine ();
+							sb.Append (notification);
+						}
 
 					}
 					//string accType = );
@@ -646,11 +688,11 @@ namespace IhildaWallet
 
 						name,
 						stringBuilder.ToString(),
-						sb?.ToString () ?? "",
+						sb?.ToString () ?? ""
 
 
-						rw?.LastKnownNativeBalance?.ToString () ?? "",
-						rw?.Notification ?? ""
+
+
 					);
 
 
@@ -767,6 +809,19 @@ namespace IhildaWallet
 #if DEBUG
 
 #endif
+
+			int c = val.Length;
+
+			string sp1 = "<span fgcolor=\"green\" bgcolor=\"lavender\"><b><u>";
+			string sp2 = "</u></b></span>";
+
+
+			if (val.Contains(sp1)) {
+				val = val.Remove (c - sp2.Length);
+				val = val.Remove (0, sp1.Length);
+
+			}
+
 			RippleWallet rw = WalletManager.currentInstance.LookUp (val);
 #if DEBUG
 			if (DebugIhildaWallet.WalletTree) {

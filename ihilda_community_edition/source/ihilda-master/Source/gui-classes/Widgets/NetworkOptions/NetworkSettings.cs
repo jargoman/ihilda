@@ -183,6 +183,9 @@ namespace IhildaWallet
 
 				this.connecteddisplaywidget1.SetConnected ();
 
+				if (WalletManagerWidget.currentInstance != null) {
+					WalletManagerWidget.currentInstance.SetConnected (true);
+				}
 				//this.saveSettings ();  // It was a good intention but introduced a serious bug that drove me up the wall where the network settings were being saved due to multithreading environment
 
 
@@ -203,8 +206,12 @@ namespace IhildaWallet
 #endif
 
 				this.connecteddisplaywidget1.SetDisConnected ();
+
 				this.serverinfowidget1.SetServerInfo (null);
 
+				if (WalletManagerWidget.currentInstance != null) {
+					WalletManagerWidget.currentInstance.SetConnected (false);
+				}
 			};
 
 			//ni.onClose += this.onCloseEvent;

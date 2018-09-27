@@ -30,7 +30,7 @@ namespace IhildaWallet
 				}	
 				#endif
 				//this.connectStatusLabel.ma
-				this.connectStatusLabel.Markup = "<span foreground=\"green\">Connected</span>";	
+				this.connectStatusLabel.Markup = "<span foreground=\"green\"><big><b>Connected</b></big></span>";	
 
 			}
 			);

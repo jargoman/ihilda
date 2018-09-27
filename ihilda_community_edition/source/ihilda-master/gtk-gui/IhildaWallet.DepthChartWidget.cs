@@ -4,6 +4,8 @@ namespace IhildaWallet
 {
 	public partial class DepthChartWidget
 	{
+		private global::Gtk.Notebook notebook1;
+
 		private global::Gtk.VBox vbox2;
 
 		private global::Gtk.HBox hbox2;
@@ -26,6 +28,12 @@ namespace IhildaWallet
 
 		private global::Gtk.DrawingArea drawingarea1;
 
+		private global::Gtk.Label label5;
+
+		private global::IhildaWallet.OrderClusterWidget orderclusterwidget1;
+
+		private global::Gtk.Label label6;
+
 		protected virtual void Build()
 		{
 			global::Stetic.Gui.Initialize(this);
@@ -33,6 +41,11 @@ namespace IhildaWallet
 			global::Stetic.BinContainer.Attach(this);
 			this.Name = "IhildaWallet.DepthChartWidget";
 			// Container child IhildaWallet.DepthChartWidget.Gtk.Container+ContainerChild
+			this.notebook1 = new global::Gtk.Notebook();
+			this.notebook1.CanFocus = true;
+			this.notebook1.Name = "notebook1";
+			this.notebook1.CurrentPage = 0;
+			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.vbox2 = new global::Gtk.VBox();
 			this.vbox2.Name = "vbox2";
 			this.vbox2.Spacing = 6;
@@ -134,7 +147,27 @@ namespace IhildaWallet
 			this.vbox2.Add(this.drawingarea1);
 			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.drawingarea1]));
 			w10.Position = 1;
-			this.Add(this.vbox2);
+			this.notebook1.Add(this.vbox2);
+			// Notebook tab
+			this.label5 = new global::Gtk.Label();
+			this.label5.Name = "label5";
+			this.label5.LabelProp = global::Mono.Unix.Catalog.GetString("Chart");
+			this.notebook1.SetTabLabel(this.vbox2, this.label5);
+			this.label5.ShowAll();
+			// Container child notebook1.Gtk.Notebook+NotebookChild
+			this.orderclusterwidget1 = new global::IhildaWallet.OrderClusterWidget();
+			this.orderclusterwidget1.Events = ((global::Gdk.EventMask)(256));
+			this.orderclusterwidget1.Name = "orderclusterwidget1";
+			this.notebook1.Add(this.orderclusterwidget1);
+			global::Gtk.Notebook.NotebookChild w12 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.orderclusterwidget1]));
+			w12.Position = 1;
+			// Notebook tab
+			this.label6 = new global::Gtk.Label();
+			this.label6.Name = "label6";
+			this.label6.LabelProp = global::Mono.Unix.Catalog.GetString("Order Cluster");
+			this.notebook1.SetTabLabel(this.orderclusterwidget1, this.label6);
+			this.label6.ShowAll();
+			this.Add(this.notebook1);
 			if ((this.Child != null))
 			{
 				this.Child.ShowAll();

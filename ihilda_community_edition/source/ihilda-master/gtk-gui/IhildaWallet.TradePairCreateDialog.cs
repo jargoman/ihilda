@@ -17,7 +17,6 @@ namespace IhildaWallet
 			global::Stetic.Gui.Initialize(this);
 			// Widget IhildaWallet.TradePairCreateDialog
 			this.Name = "IhildaWallet.TradePairCreateDialog";
-			this.Title = global::Mono.Unix.Catalog.GetString("window1");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Internal child IhildaWallet.TradePairCreateDialog.VBox
 			global::Gtk.VBox w1 = this.VBox;

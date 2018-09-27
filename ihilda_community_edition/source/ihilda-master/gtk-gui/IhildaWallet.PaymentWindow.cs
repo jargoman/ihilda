@@ -130,7 +130,7 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 1;
+			this.notebook1.CurrentPage = 0;
 			this.notebook1.TabPos = ((global::Gtk.PositionType)(0));
 			this.notebook1.Scrollable = true;
 			this.notebook1.BorderWidth = ((uint)(16));

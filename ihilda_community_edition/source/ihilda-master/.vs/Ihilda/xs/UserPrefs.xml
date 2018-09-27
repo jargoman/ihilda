@@ -1,25 +1,14 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
   <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Widgets/WalletUI/WalletManagerWidget.cs">
     <Files>
-      <File FileName="Source/WalletClasses/RippleWallet.cs" Line="941" Column="19" />
-      <File FileName="Source/bot/Robotics.cs" Line="54" Column="1" />
-      <File FileName="Source/bot/OrderSubmitter.cs" Line="61" Column="26" />
-      <File FileName="Source/bot/OrderManagementBot.cs" Line="396" Column="4" />
-      <File FileName="Source/gui-classes/Widgets/Views/TxViewWidget.cs" Line="420" Column="5" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Commands/Accounts/AccountTx.cs" Line="169" Column="48" />
-      <File FileName="Source/gui-classes/Widgets/LedgerConstraintsWidget.cs" Line="86" Column="1" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Transactions/RippleTxStructure.cs" Line="415" Column="4" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Network/DataApi.cs" Line="18" Column="29" />
-      <File FileName="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs" Line="250" Column="6" />
-      <File FileName="Source/gui-classes/Widgets/PaymentPreviewSubmitWidget.cs" Line="158" Column="29" />
-      <File FileName="Source/gui-classes/Widgets/Trees/PaymentsTree.cs" Line="411" Column="15" />
-      <File FileName="Source/util/LeIceSense.cs" Line="258" Column="43" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Result/Marker.cs" Line="39" Column="17" />
-      <File FileName="Source/gui-classes/Widgets/OrderPreviewSubmitWidget.cs" Line="606" Column="28" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Keys/RippleAddress.cs" Line="24" Column="3" />
-      <File FileName="Source/gui-classes/Widgets/WalletUI/WalletManagerWidget.cs" Line="293" Column="5" />
-      <File FileName="Source/util/WalletManager.cs" Line="1327" Column="94" />
-      <File FileName="Source/gui-classes/Windows/WalletManagerWindow.cs" Line="132" Column="6" />
+      <File FileName="Source/gui-classes/Widgets/OrderClusterCreateWizard.cs" Line="1" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/TradeUI/CascadedBuyWidget.cs" Line="271" Column="5" />
+      <File FileName="Source/gui-classes/Widgets/Charting/DepthChartWidget.cs" Line="1072" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/OrderClusterWidget.cs" Line="254" Column="3" />
+      <File FileName="Source/gui-classes/Widgets/TradeUI/CascadedSellWidget.cs" Line="372" Column="4" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Util/TextHighlighter.cs" Line="14" Column="24" />
+      <File FileName="Source/Program.cs" Line="167" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/WalletUI/WalletManagerWidget.cs" Line="749" Column="15" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />

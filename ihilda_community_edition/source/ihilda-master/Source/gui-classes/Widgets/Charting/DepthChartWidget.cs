@@ -16,6 +16,7 @@ using Gtk;
 using Gdk;
 using Pango;
 using System.Text;
+using System.Drawing;
 
 namespace IhildaWallet
 {
@@ -33,12 +34,12 @@ namespace IhildaWallet
 				vbox2.Add (this.drawingarea1);
 			}
 
-			this.drawingarea1.AddEvents ((int) 
-				(EventMask.ButtonPressMask    
-					|EventMask.ButtonReleaseMask    
-					|EventMask.KeyPressMask    
-					|EventMask.PointerMotionMask
-					|EventMask.LeaveNotifyMask
+			this.drawingarea1.AddEvents ((int)
+				(EventMask.ButtonPressMask
+					| EventMask.ButtonReleaseMask
+					| EventMask.KeyPressMask
+					| EventMask.PointerMotionMask
+					| EventMask.LeaveNotifyMask
 
 				));
 
@@ -61,15 +62,19 @@ namespace IhildaWallet
 
 			this.hscale1.ValueChanged += (object sender, EventArgs e) => {
 				max_bids = (int)hscale1.Value;
-				this.Drawingarea1_ExposeEvent (null, null);
-
+				scaleChanged = true;
+				DrawChart (_pointFrame);
 			};
 
 			this.hscale2.ValueChanged += (object sender, EventArgs e) => {
 				max_asks = (int)hscale2.Value;
-				this.Drawingarea1_ExposeEvent (null, null);
+				scaleChanged = true;
+				DrawChart (_pointFrame);
 			};
 
+			this.drawingarea1.EnterNotifyEvent += (object o, EnterNotifyEventArgs args) => {
+				scaleChanged = true;
+			};
 			Task.Factory.StartNew (async () => {
 
 				while (_cont) {
@@ -88,7 +93,8 @@ namespace IhildaWallet
 
 		private bool _cont = true;
 
-		private TradeWindow ShowTradeWindow () {
+		private TradeWindow ShowTradeWindow ()
+		{
 			TradeWindow tradeWindow = new TradeWindow (_rippleWallet, _tradePair);
 			//tradeWindow.
 
@@ -136,7 +142,7 @@ namespace IhildaWallet
 			decimal amount = (pointFrame.height - (int)args.Event.Y) * pointFrame.highestypoint / pointFrame.height;
 
 			Offer buyOffer = new Offer {
-				taker_gets = tradePair.Currency_Counter.DeepCopy(),
+				taker_gets = tradePair.Currency_Counter.DeepCopy (),
 				taker_pays = tradePair.Currency_Base.DeepCopy ()
 			};
 
@@ -171,18 +177,18 @@ namespace IhildaWallet
 				sellOffer.taker_pays.amount *= 1000000m;
 			}
 
-			Menu menu = new Menu();
+			Menu menu = new Menu ();
 
 
-#region buy_menus
+			#region buy_menus
 			MenuItem buy = new MenuItem (
-				"Prepare a <span fgcolor=\"green\">buy</span>  order at " 
-				+ price.ToString() 
+				"Prepare a <span fgcolor=\"green\">buy</span>  order at "
+				+ price.ToString ()
 				+ " "
-				+ tradePair.Currency_Counter.currency 
-				+ " per " 
+				+ tradePair.Currency_Counter.currency
+				+ " per "
 				+ tradePair.Currency_Base.currency
-			
+
 			);
 
 
@@ -195,13 +201,13 @@ namespace IhildaWallet
 			buy.Activated += (object sender, EventArgs e) => {
 
 
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.DepthChartWidget) {
 					Logging.WriteLog ("buy selected");
 				}
-				#endif
+#endif
 
-				TradeWindow tradeWindow = ShowTradeWindow();
+				TradeWindow tradeWindow = ShowTradeWindow ();
 
 				/*
 				Offer offer = new Offer();
@@ -213,30 +219,30 @@ namespace IhildaWallet
 
 				offer.taker_pays.amount = amount;
 				*/
-				tradeWindow.SetBuyOffer(buyOffer);
+				tradeWindow.SetBuyOffer (buyOffer);
 
 
 
 			};
 
 			Gtk.MenuItem cassbuy = new MenuItem (
-				                       "Cascade <span fgcolor=\"green\">buy</span> orders from "
-				                       + price.ToString ()
-				                       + " "
-				                       + tradePair.Currency_Counter.currency
-				                       + " per "
-				                       + tradePair.Currency_Base.currency
-			                       );
-			cassbuy.Show();
-			menu.Add(cassbuy);
+									   "Cascade <span fgcolor=\"green\">buy</span> orders from "
+									   + price.ToString ()
+									   + " "
+									   + tradePair.Currency_Counter.currency
+									   + " per "
+									   + tradePair.Currency_Base.currency
+								   );
+			cassbuy.Show ();
+			menu.Add (cassbuy);
 
 			l = (Label)cassbuy.Child;
 			l.UseMarkup = true;
 
 			cassbuy.Activated += (object sender, EventArgs e) => {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.DepthChartWidget) {
-					Logging.WriteLog("cassbuy selected");
+					Logging.WriteLog ("cassbuy selected");
 				}
 #endif
 
@@ -256,35 +262,35 @@ namespace IhildaWallet
 
 
 
-				tradeWindow.InitiateCascade(buyOffer, OrderEnum.BID);
+				tradeWindow.InitiateCascade (buyOffer, OrderEnum.BID);
 			};
 
-			Gtk.MenuItem autobuy = new MenuItem ("Prepare an automated <span fgcolor=\"green\">buy</span> at " 
-				+ price.ToString() 
+			Gtk.MenuItem autobuy = new MenuItem ("Prepare an automated <span fgcolor=\"green\">buy</span> at "
+				+ price.ToString ()
 				+ " "
 				+ tradePair.Currency_Counter.currency
 				+ " per "
 				+ tradePair.Currency_Base.currency
 				+ " ");
-			autobuy.Show();
+			autobuy.Show ();
 			menu.Add (autobuy);
 
 			l = (Gtk.Label)autobuy.Child;
 			l.UseMarkup = true;
 
 			autobuy.Activated += (object sender, EventArgs e) => {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.DepthChartWidget) {
-					Logging.WriteLog("autobuy selected");
-				}			
-				#endif
+					Logging.WriteLog ("autobuy selected");
+				}
+#endif
 
 				TradeWindow tradeWindow = ShowTradeWindow ();
 
-				tradeWindow.SetAutomatedBuyOffer(buyOffer);
+				tradeWindow.SetAutomatedBuyOffer (buyOffer);
 
 			};
-#endregion
+			#endregion
 
 			#region sell_menus
 
@@ -295,14 +301,14 @@ namespace IhildaWallet
 			l = (Gtk.Label)sell.Child;
 			l.UseMarkup = true;
 
-			sell.Activated += (object sender, EventArgs e) => {	
-				#if DEBUG
+			sell.Activated += (object sender, EventArgs e) => {
+#if DEBUG
 				if (DebugIhildaWallet.DepthChartWidget) {
-					Logging.WriteLog("sell selected");
-				}			
-				#endif
+					Logging.WriteLog ("sell selected");
+				}
+#endif
 
-				TradeWindow tradeWindow = ShowTradeWindow();
+				TradeWindow tradeWindow = ShowTradeWindow ();
 
 				tradeWindow.SetSellOffer (sellOffer);
 
@@ -315,28 +321,28 @@ namespace IhildaWallet
 				+ tradePair.Currency_Counter.currency
 				+ " per "
 				+ tradePair.Currency_Base.currency);
-			
+
 			casssell.Show ();
 			menu.Add (casssell);
 			l = (Gtk.Label)casssell.Child;
 			l.UseMarkup = true;
-			casssell.Activated += (object sender, EventArgs e) => {	
-				
-				#if DEBUG
-				if (DebugIhildaWallet.DepthChartWidget) {
-					Logging.WriteLog("casssell selected");
-				}			
-				#endif
+			casssell.Activated += (object sender, EventArgs e) => {
 
-				TradeWindow tradeWindow = ShowTradeWindow();
-				tradeWindow.InitCascadedSellOffer(sellOffer);
+#if DEBUG
+				if (DebugIhildaWallet.DepthChartWidget) {
+					Logging.WriteLog ("casssell selected");
+				}
+#endif
+
+				TradeWindow tradeWindow = ShowTradeWindow ();
+				tradeWindow.InitCascadedSellOffer (sellOffer);
 
 			};
 
 			Gtk.MenuItem autosell = new MenuItem (
-				
-				"Prepare an automated <span fgcolor=\"red\">sell</span> order at " 
-				+ price.ToString() 
+
+				"Prepare an automated <span fgcolor=\"red\">sell</span> order at "
+				+ price.ToString ()
 				+ " "
 				+ tradePair.Currency_Counter.currency
 				+ " per "
@@ -347,24 +353,53 @@ namespace IhildaWallet
 			menu.Add (autosell);
 			l = (Gtk.Label)autosell.Child;
 			l.UseMarkup = true;
-			autosell.Activated += (object sender, EventArgs e) => {	
-				
-				#if DEBUG
+			autosell.Activated += (object sender, EventArgs e) => {
+
+#if DEBUG
 				if (DebugIhildaWallet.DepthChartWidget) {
-					Logging.WriteLog("autosell selected");
-				}			
-				#endif
+					Logging.WriteLog ("autosell selected");
+				}
+#endif
 				TradeWindow tradeWindow = ShowTradeWindow ();
 
 
-				tradeWindow.SetAutomatedOffer(sellOffer, OrderEnum.ASK);
+				tradeWindow.SetAutomatedOffer (sellOffer, OrderEnum.ASK);
 
 
 
 
 
 			};
-#endregion
+			#endregion
+
+			Gtk.MenuItem orderCluster = new MenuItem ("Prepare order cluster");
+
+			orderCluster.Show ();
+			menu.Add (orderCluster);
+
+			l = (Gtk.Label)orderCluster.Child;
+			l.UseMarkup = true;
+			orderCluster.Activated += (object sender, EventArgs e) => { 
+
+#if DEBUG
+				if (DebugIhildaWallet.DepthChartWidget) {
+					Logging.WriteLog ("autosell selected");
+				}
+#endif
+
+
+				var orders = this.orderclusterwidget1.cluster.GetOrders ((double)price, tradePair);
+
+				OrderSubmitWindow orderSubmitWindow = new OrderSubmitWindow (_rippleWallet, Util.LicenseType.SEMIAUTOMATED);
+
+				var buys = orders.Item1;
+				var list = buys.Concat (orders.Item2);
+
+				orderSubmitWindow.SetOrders (list);
+
+			};
+
+
 
 
 			menu.Popup ();
@@ -379,9 +414,10 @@ namespace IhildaWallet
 		}
 		*/
 
-		public void CalculatePoints (PointFrame pointFrame) {
+		public void CalculatePoints (PointFrame pointFrame)
+		{
 
-			 
+
 
 			pointFrame.bidPoints = new List<Gdk.Point> ();
 			pointFrame.askPoints = new List<Gdk.Point> ();
@@ -393,6 +429,7 @@ namespace IhildaWallet
 			pointFrame.localBidPointsBlue = new List<Gdk.Point> ();
 			pointFrame.localAskPointsBlue = new List<Gdk.Point> ();
 
+			pointFrame.clusterPoints = new List<Gdk.Point> (); // cluster
 
 			decimal rawx = Decimal.Zero;
 			decimal rawy = pointFrame.highestypoint;
@@ -404,15 +441,15 @@ namespace IhildaWallet
 
 
 
-			for ( int i = 0; i < pointFrame.numBids; i++) {
+			for (int i = 0; i < pointFrame.numBids; i++) {
 
-				rawx = pointFrame.bids[i].TakerPays.GetNativeAdjustedPriceAt ( pointFrame.bids[i].taker_gets );
+				rawx = pointFrame.bids [i].TakerPays.GetNativeAdjustedPriceAt (pointFrame.bids [i].taker_gets);
 
 				// TODO deal with divide by zero exception that can occur. Why? How to prevent? handle the exception ect
-				double resx = (double) ((rawx - pointFrame.lowestxpoint ) * (pointFrame.width / pointFrame.rawxWidth)); 
-				double resy = (double) (rawy *  (pointFrame.height / pointFrame.highestypoint));
+				double resx = (double)((rawx - pointFrame.lowestxpoint) * (pointFrame.width / pointFrame.rawxWidth));
+				double resy = (double)(rawy * (pointFrame.height / pointFrame.highestypoint));
 
-				rawy -= pointFrame.bids[i].TakerPays.amount;
+				rawy -= pointFrame.bids [i].TakerPays.amount;
 
 
 
@@ -421,13 +458,13 @@ namespace IhildaWallet
 				pointFrame.bidPoints.Add (point);
 
 				RippleWallet rw = _rippleWallet;
-				if (rw?.GetStoredReceiveAddress() == null) {
+				if (rw?.GetStoredReceiveAddress () == null) {
 					continue;
 				}
 
-				if (rw.GetStoredReceiveAddress().Equals(pointFrame.bids[i].Account)) {
+				if (rw.GetStoredReceiveAddress ().Equals (pointFrame.bids [i].Account)) {
 
-					resy = (double) (localy *  (pointFrame.height / pointFrame.highestypoint));
+					resy = (double)(localy * (pointFrame.height / pointFrame.highestypoint));
 					localy -= pointFrame.bids [i].TakerPays.amount;
 					bidsGetsSpent += pointFrame.bids [i].TakerGets.amount;
 
@@ -463,7 +500,7 @@ namespace IhildaWallet
 
 
 			rawy = pointFrame.highestypoint;
-			rawx = pointFrame.asks[0].TakerGets.GetNativeAdjustedPriceAt (pointFrame.asks[0].TakerPays);
+			rawx = pointFrame.asks [0].TakerGets.GetNativeAdjustedPriceAt (pointFrame.asks [0].TakerPays);
 
 
 			//double resultx = (double)((rawx - lowestxpoint) * (width / rawxWidth));
@@ -480,26 +517,26 @@ namespace IhildaWallet
 			Decimal asksGetsSpent = Decimal.Zero;
 			for (int i = 0; i < pointFrame.numAsks; i++) {
 
-				rawx = pointFrame.asks[i].TakerGets.GetNativeAdjustedPriceAt (pointFrame.asks[i].TakerPays);
-				rawy -= pointFrame.asks[i].TakerGets.amount;
+				rawx = pointFrame.asks [i].TakerGets.GetNativeAdjustedPriceAt (pointFrame.asks [i].TakerPays);
+				rawy -= pointFrame.asks [i].TakerGets.amount;
 
 
-				double resx = (double) ((rawx - pointFrame.lowestxpoint) * (pointFrame.width / pointFrame.rawxWidth));
-				double resy = (double) (rawy * pointFrame.height / pointFrame.highestypoint);
+				double resx = (double)((rawx - pointFrame.lowestxpoint) * (pointFrame.width / pointFrame.rawxWidth));
+				double resy = (double)(rawy * pointFrame.height / pointFrame.highestypoint);
 
 				Gdk.Point point = new Gdk.Point ((int)resx, (int)resy /*- RULER_WIDTH*/);
 
 				pointFrame.askPoints.Add (point);
 
 				RippleWallet rw = _rippleWallet;
-				if (rw?.GetStoredReceiveAddress() == null) {
+				if (rw?.GetStoredReceiveAddress () == null) {
 					continue;
 				}
 
-				if (rw.GetStoredReceiveAddress().Equals(pointFrame.asks[i].Account)) {
-					localy -= pointFrame.asks[i].TakerGets.amount;
+				if (rw.GetStoredReceiveAddress ().Equals (pointFrame.asks [i].Account)) {
+					localy -= pointFrame.asks [i].TakerGets.amount;
 					asksGetsSpent += pointFrame.asks [i].TakerGets.amount;
-					resy = (double) (localy * pointFrame.height / pointFrame.highestypoint);
+					resy = (double)(localy * pointFrame.height / pointFrame.highestypoint);
 
 					if (_tradePair.Currency_Base.amount > asksGetsSpent) {
 						pointFrame.localAskPointsBlue.Add (
@@ -526,8 +563,8 @@ namespace IhildaWallet
 			int askc = pointFrame.numAsks;
 
 			Decimal lowestPrice = pointFrame.bids [bidc - 1].TakerGets.GetNativeAdjustedCostAt (pointFrame.bids [bidc - 1].TakerPays);
-			Decimal highestPrice = pointFrame.asks [askc - 1].TakerGets.GetNativeAdjustedPriceAt (pointFrame.asks [askc -1].TakerPays);
-			Decimal priceRange =  highestPrice - lowestPrice;
+			Decimal highestPrice = pointFrame.asks [askc - 1].TakerGets.GetNativeAdjustedPriceAt (pointFrame.asks [askc - 1].TakerPays);
+			Decimal priceRange = highestPrice - lowestPrice;
 
 
 			Decimal targetIncrement = priceRange / 5;
@@ -535,7 +572,7 @@ namespace IhildaWallet
 			Decimal scaleGuess = 1000000000;
 
 			int incr = 0;
-			while ( scaleGuess > targetIncrement ) {
+			while (scaleGuess > targetIncrement) {
 
 				if (incr == 0) {
 					scaleGuess /= 2;
@@ -558,12 +595,12 @@ namespace IhildaWallet
 
 
 
-			while ( ex < pointFrame.highestxpoint ) {
+			while (ex < pointFrame.highestxpoint) {
 				double esRes = (double)((ex - pointFrame.lowestxpoint) * (pointFrame.width / pointFrame.rawxWidth));
 
 				Tuple<Gdk.Point, Decimal> tuple = new Tuple<Gdk.Point, decimal> (new Gdk.Point ((int)esRes, pointFrame.height + 2), ex);
 
-				pointFrame.scalePoints.Add ( tuple );
+				pointFrame.scalePoints.Add (tuple);
 				ex += scaleGuess;
 			}
 
@@ -599,7 +636,7 @@ namespace IhildaWallet
 			//gwin.GetSize(out int width, out int height);
 			//gwin.Clear ();
 
-			this.Drawingarea1_ExposeEvent (null,null);
+			DrawChart (_pointFrame);
 
 		}
 
@@ -620,9 +657,9 @@ namespace IhildaWallet
 			Gdk.Window gwin = this.drawingarea1.GdkWindow;
 			//gwin.GetSize(out int width, out int height);
 
-			gwin.Clear ();
 
-			this.Drawingarea1_ExposeEvent (null,null);
+			DrawChart (pointFrame);
+			//this.Drawingarea1_ExposeEvent (null,null);
 
 			int x = (int)args.Event.X;
 			int y = (int)args.Event.Y;
@@ -664,7 +701,7 @@ namespace IhildaWallet
 
 			stringBuilder.Append ("</span>");
 
-			layout.SetMarkup ( stringBuilder.ToString () );
+			layout.SetMarkup (stringBuilder.ToString ());
 
 			int xoffset = 0;
 
@@ -684,14 +721,61 @@ namespace IhildaWallet
 			gwin.DrawLayout (gc, x + xoffset, y + yoffset, layout);
 
 
-			gwin.DrawLine (gc, x, y, x, pointFrame.height);
 
 
+			var cluster = this.orderclusterwidget1.cluster;
+			if (cluster == null) {
 
+				gwin.DrawLine (gc, x, y, x, pointFrame.height);
+				return;
+			} else {
+
+				var orderTuple = cluster.GetOrders ((double)price, _tradePair);
+
+				gc.Foreground = new Gdk.Color (0, 255, 0);
+				gc.RgbFgColor = new Gdk.Color (0, 255, 0);
+				foreach (AutomatedOrder order in orderTuple.Item1) {
+					//decimal am = order.taker_pays.amount;
+
+
+					//decimal yyy = pointFrame.height - (am * pointFrame.height) / pointFrame.highestypoint;
+
+
+					decimal pric = order.taker_pays.GetNativeAdjustedPriceAt (order.taker_gets);
+
+
+					decimal xxx = ((pric - pointFrame.lowestxpoint) * pointFrame.width) / pointFrame.rawxWidth;
+
+					//gwin.DrawArc (gc, true, (int)xxx, (int)yyy, 5, 5, 0, 360 * 64);
+
+					gwin.DrawLine (gc, (int)xxx, 0, (int)xxx, pointFrame.height + RULER_WIDTH);
+				}
+
+				gc.Foreground = new Gdk.Color (255, 0, 0);
+				gc.RgbFgColor = new Gdk.Color (255, 0, 0);
+				foreach (AutomatedOrder order in orderTuple.Item2) {
+
+					//decimal am = order.taker_gets.amount;
+
+
+					//decimal yyy = pointFrame.height - (am * pointFrame.height) / pointFrame.highestypoint;
+
+					decimal pric = order.taker_pays.GetNativeAdjustedCostAt (order.taker_gets);
+
+
+					decimal xxx = ((pric - pointFrame.lowestxpoint) * pointFrame.width) / pointFrame.rawxWidth;
+
+					//gwin.DrawArc (gc, true, (int)xxx, (int)yyy, 5, 5, 0, 360 * 64);
+
+					gwin.DrawLine (gc, (int)xxx, (int)0, (int)xxx, pointFrame.height + RULER_WIDTH);
+				}
+			}
 
 		}
 
-		public void SetTradePair ( TradePair tp )
+
+
+		public void SetTradePair (TradePair tp)
 		{
 			this._tradePair = tp;
 
@@ -700,19 +784,20 @@ namespace IhildaWallet
 
 
 
-		public void UpdateBooks (  ) {
-			#if DEBUG
+		public void UpdateBooks ()
+		{
+#if DEBUG
 			String method_sig = clsstr + nameof (UpdateBooks) + DebugRippleLibSharp.both_parentheses;
 #endif
 
 			TradePair tradePair = _tradePair;
 
 			if (tradePair == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.DepthChartWidget) {
-					Logging.WriteLog(method_sig + "tp == null");
+					Logging.WriteLog (method_sig + "tp == null");
 				}
-				#endif
+#endif
 				// todo the lines below
 				//if (this.buyorderbooktablewidget != null) {
 				//	this.buyorderbooktablewidget.clearTable();
@@ -729,7 +814,7 @@ namespace IhildaWallet
 
 
 
-				
+
 
 
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
@@ -739,15 +824,15 @@ namespace IhildaWallet
 
 			this._tradePair.UpdateBalances (_rippleWallet.GetStoredReceiveAddress (), ni);
 
-			Task<IEnumerable<AutomatedOrder>> bidsTask = Task.Run( delegate { return UpdateBids (ni, tradePair); } );
-			Task<IEnumerable<AutomatedOrder>> askTask = Task.Run( delegate { return UpdateAsks (ni, tradePair);  }  );
+			Task<IEnumerable<AutomatedOrder>> bidsTask = Task.Run (delegate { return UpdateBids (ni, tradePair); });
+			Task<IEnumerable<AutomatedOrder>> askTask = Task.Run (delegate { return UpdateAsks (ni, tradePair); });
 
-			Task[] tasks = { bidsTask, askTask};
+			Task [] tasks = { bidsTask, askTask };
 			Task.WaitAll (tasks);
 
-			#if DEBUG
+#if DEBUG
 			if (DebugIhildaWallet.DepthChartWidget) {
-				Logging.WriteLog(method_sig + "stopped Waiting");
+				Logging.WriteLog (method_sig + "stopped Waiting");
 				//Logging.writeLog("id type =" + id.GetType().ToString());
 				//Logging.writeLog("id = " + id.ToString());
 			}
@@ -760,7 +845,7 @@ namespace IhildaWallet
 
 
 
-
+			this.scaleChanged = true;
 
 
 		}
@@ -769,15 +854,13 @@ namespace IhildaWallet
 		{
 
 			// TODO is linq faster? is this too much copying?
-			PointFrame pointFrame = new PointFrame ();
+			PointFrame pointFrame = new PointFrame {
+				numAsks = asks.Length < max_asks ? asks.Length : max_asks,
+				numBids = bids.Length < max_bids ? bids.Length : max_bids,
 
-
-
-			pointFrame.numAsks = asks.Length < max_asks ? asks.Length : max_asks;
-			pointFrame.numBids = bids.Length < max_bids ? bids.Length : max_bids;
-
-			pointFrame.asks = asks;
-			pointFrame.bids = bids;
+				asks = asks,
+				bids = bids
+			};
 
 			CalculateBidSums (pointFrame);
 			CalculatePoints (pointFrame);
@@ -785,95 +868,97 @@ namespace IhildaWallet
 			return pointFrame;
 		}
 
-		public IEnumerable <AutomatedOrder> UpdateBids (NetworkInterface ni, TradePair tp) {
-			
+		public IEnumerable<AutomatedOrder> UpdateBids (NetworkInterface ni, TradePair tp)
+		{
 
-			#if DEBUG
-			string method_sig = nameof(UpdateBids) + DebugRippleLibSharp.colon;
+
+#if DEBUG
+			string method_sig = nameof (UpdateBids) + DebugRippleLibSharp.colon;
 			if (DebugIhildaWallet.DepthChartWidget) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.beginn);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 
 			}
-			#endif
+#endif
 
 			RippleCurrency cur_base = tp.Currency_Base;
 			if (cur_base == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.DepthChartWidget) {
-					Logging.WriteLog(method_sig + "cur_base == null, returning");
+					Logging.WriteLog (method_sig + "cur_base == null, returning");
 				}
-				#endif
+#endif
 				return null;
 			}
 
 			RippleCurrency counter_currency = tp.Currency_Counter;
 			if (counter_currency == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.DepthChartWidget) {
-					Logging.WriteLog(method_sig + "counter_currency == null, returning");
+					Logging.WriteLog (method_sig + "counter_currency == null, returning");
 				}
-				#endif
+#endif
 				return null;
 			}
 
-			Task< Response<BookOfferResult>> buyTask = BookOffers.GetResult (counter_currency, cur_base, ni);
+			Task<Response<BookOfferResult>> buyTask = BookOffers.GetResult (counter_currency, cur_base, ni);
 			buyTask.Wait ();
-			#if DEBUG
+#if DEBUG
 
 			if (DebugIhildaWallet.DepthChartWidget) {
-				Logging.WriteLog(method_sig + "done waiting");
+				Logging.WriteLog (method_sig + "done waiting");
 				//Logging.writeLog(method_sig + "e.Message = " + Debug.toAssertString(e.Message));
 			}
-			#endif
+#endif
 
-			Offer[] buys = buyTask?.Result?.result?.offers;
+			Offer [] buys = buyTask?.Result?.result?.offers;
 
 			IEnumerable<AutomatedOrder> buyoffers = AutomatedOrder.ConvertFromIEnumerableOrder ( /*account,*/ buys);
 
 			return buyoffers;
 		}
 
-		public IEnumerable <AutomatedOrder> UpdateAsks (NetworkInterface ni, TradePair tp) {
-			
+		public IEnumerable<AutomatedOrder> UpdateAsks (NetworkInterface ni, TradePair tp)
+		{
 
-			#if DEBUG
-			string method_sig = nameof(UpdateAsks) + DebugRippleLibSharp.colon;
+
+#if DEBUG
+			string method_sig = nameof (UpdateAsks) + DebugRippleLibSharp.colon;
 			if (DebugIhildaWallet.DepthChartWidget) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.beginn);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 
 			}
-			#endif
+#endif
 
 			RippleCurrency cur_base = tp.Currency_Base;
 			if (cur_base == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.DepthChartWidget) {
-					Logging.WriteLog(method_sig + "cur_base == null, returning");
+					Logging.WriteLog (method_sig + "cur_base == null, returning");
 				}
-				#endif
+#endif
 				return null;
 			}
 
 			RippleCurrency counter_currency = tp.Currency_Counter;
 			if (counter_currency == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.DepthChartWidget) {
-					Logging.WriteLog(method_sig + "counter_currency == null, returning");
+					Logging.WriteLog (method_sig + "counter_currency == null, returning");
 				}
-				#endif
+#endif
 				return null;
 			}
 
-			Task< Response<BookOfferResult>> sellTask = BookOffers.GetResult (cur_base, counter_currency, ni);
+			Task<Response<BookOfferResult>> sellTask = BookOffers.GetResult (cur_base, counter_currency, ni);
 			sellTask.Wait ();
-			#if DEBUG
+#if DEBUG
 
 			if (DebugIhildaWallet.DepthChartWidget) {
-				Logging.WriteLog(method_sig + "done waiting");
+				Logging.WriteLog (method_sig + "done waiting");
 				//Logging.writeLog(method_sig + "e.Message = " + Debug.toAssertString(e.Message));
 			}
-			#endif
-			Offer[] sells = sellTask?.Result?.result?.offers;
+#endif
+			Offer [] sells = sellTask?.Result?.result?.offers;
 
 			IEnumerable<AutomatedOrder> selloffers = AutomatedOrder.ConvertFromIEnumerableOrder (/*account,*/ sells);
 
@@ -891,12 +976,13 @@ namespace IhildaWallet
 
 
 
-	
+
 		TradePair _tradePair = null;
 
 		// TODO adjust later
 		int RULER_WIDTH = 35;
-		public void CalculateBidSums (PointFrame pointFrame) {
+		public void CalculateBidSums (PointFrame pointFrame)
+		{
 
 
 
@@ -908,79 +994,79 @@ namespace IhildaWallet
 				return;
 			}
 
-			this.drawingarea1.GetSizeRequest (out pointFrame.width, out pointFrame.height);
+			//this.drawingarea1.GetSizeRequest (out pointFrame.width, out pointFrame.height);
 
 			Gdk.Window gwin = this.drawingarea1.GdkWindow;
 			//	return;
 
 
-			gwin.GetSize( out pointFrame.width, out pointFrame.height);
+			gwin.GetSize (out pointFrame.width, out pointFrame.height);
 
 
 			pointFrame.height -= RULER_WIDTH;
 
 			if (pointFrame.bids != null) {
 				for (int i = 0; i < pointFrame.numBids; i++) {
-				//foreach ( AutomatedOrder ao in pointFrame.bids ) {
+					//foreach ( AutomatedOrder ao in pointFrame.bids ) {
 
 					//bidsum += ao.TakerPays.amount;
-					pointFrame.bidsum += pointFrame.bids[i].TakerPays.amount;
+					pointFrame.bidsum += pointFrame.bids [i].TakerPays.amount;
 
 					RippleWallet rw = _rippleWallet;
-					if (rw?.GetStoredReceiveAddress() == null) {
+					if (rw?.GetStoredReceiveAddress () == null) {
 						continue;
 					}
 
-					if (rw.GetStoredReceiveAddress().Equals(pointFrame.bids[i].Account)) {
+					if (rw.GetStoredReceiveAddress ().Equals (pointFrame.bids [i].Account)) {
 
 
-						pointFrame.localbidsum += pointFrame.bids[i].TakerPays.amount;
+						pointFrame.localbidsum += pointFrame.bids [i].TakerPays.amount;
 					}
 				}
 			}
 
 			if (pointFrame.asks != null) {
 				for (int i = 0; i < pointFrame.numAsks; i++) {
-				//foreach ( AutomatedOrder ao in pointFrame.asks ) {
+					//foreach ( AutomatedOrder ao in pointFrame.asks ) {
 					//asksum += ao.TakerPays.amount;
-					pointFrame.asksum += pointFrame.asks[i].TakerGets.amount;
+					pointFrame.asksum += pointFrame.asks [i].TakerGets.amount;
 
 					RippleWallet rw = _rippleWallet;
-					if (rw?.GetStoredReceiveAddress() == null) {
+					if (rw?.GetStoredReceiveAddress () == null) {
 						continue;
 					}
 
-					if (rw.GetStoredReceiveAddress().Equals(pointFrame.asks[i].Account)) {
+					if (rw.GetStoredReceiveAddress ().Equals (pointFrame.asks [i].Account)) {
 
 
-						pointFrame.localasksum += pointFrame.asks[i].TakerGets.amount;
+						pointFrame.localasksum += pointFrame.asks [i].TakerGets.amount;
 					}
 				}
 
 			}
 
 			AutomatedOrder lowestBid = pointFrame.bids [pointFrame.numBids - 1];
-			AutomatedOrder highestAsk = pointFrame.asks[pointFrame.numAsks - 1];
+			AutomatedOrder highestAsk = pointFrame.asks [pointFrame.numAsks - 1];
 
 
 
 			pointFrame.highestypoint = (pointFrame.bidsum > pointFrame.asksum) ? pointFrame.bidsum : pointFrame.asksum; // summ
 			pointFrame.lowestypoint = 0;
 
-			if ( highestAsk != null ) {
-				pointFrame.highestxpoint = highestAsk.taker_gets.GetNativeAdjustedPriceAt ( highestAsk.taker_pays );
+			if (highestAsk != null) {
+				pointFrame.highestxpoint = highestAsk.taker_gets.GetNativeAdjustedPriceAt (highestAsk.taker_pays);
 				if (lowestBid == null) {
 					AutomatedOrder lowestAsk = pointFrame.bids.First ();
 
-					pointFrame.lowestxpoint = lowestAsk.taker_gets.GetNativeAdjustedPriceAt ( lowestAsk.taker_pays );
+					pointFrame.lowestxpoint = lowestAsk.taker_gets.GetNativeAdjustedPriceAt (lowestAsk.taker_pays);
 				}
 			}
 
-			if ( lowestBid != null ) {
-				pointFrame.lowestxpoint = lowestBid.taker_pays.GetNativeAdjustedPriceAt( lowestBid.taker_gets );
+			if (lowestBid != null) {
+				pointFrame.lowestxpoint = lowestBid.taker_pays.GetNativeAdjustedPriceAt (lowestBid.taker_gets);
 				if (highestAsk == null) {
 					AutomatedOrder highestBid = pointFrame.asks.First ();
-					pointFrame.highestxpoint = highestBid.taker_gets.GetNativeAdjustedPriceAt ( highestBid.taker_pays );
+					pointFrame.highestxpoint = highestBid.taker_gets.GetNativeAdjustedPriceAt (highestBid.taker_pays);
 				}
 			}
 
@@ -991,16 +1077,21 @@ namespace IhildaWallet
 
 		public void Drawingarea1_ExposeEvent (object sender, ExposeEventArgs args)
 		{
-
-			//DrawingArea da = (DrawingArea)sender;
-
 			PointFrame pointFrame = _pointFrame;
+			DrawChart (pointFrame);
+		}
 
-			#if DEBUG
+		public void DrawChart (PointFrame pointFrame)
+		{
+
+			int cirsize = 5;
+			//
+
+#if DEBUG
 			if (DebugIhildaWallet.DepthChartWidget) {
 				//Logging.writeLog ();
 			}
-			#endif
+#endif
 
 
 
@@ -1010,53 +1101,43 @@ namespace IhildaWallet
 
 
 
-
-
-			//decimal lowest_price = low
-
-			//Context cr = Gdk.CairoHelper.Create ( da.GdkWindow );
-
-			//Gtk.Requisition r = this.drawingarea1.SizeRequest ();
-
-			//Gtk.Requisition r = this.SizeRequest ();
-
-
-
 			Gdk.Window gwin = this.drawingarea1.GdkWindow;
+
 			gwin.Clear ();
-			gwin.GetSize(out pointFrame.width, out pointFrame.height);
-			Gdk.GC gc = new Gdk.GC(gwin);
+			gwin.GetSize (out pointFrame.width, out pointFrame.height);
+
+			Gdk.GC gc = new Gdk.GC (gwin);
+
+
+
+
+
+
 
 			gc.SetLineAttributes (3, LineStyle.Solid, CapStyle.Butt, JoinStyle.Miter);
-			//CalculatePoints (pointFrame);
-
-			//gwin.DrawRectangle (gc, true, new Gdk.Rectangle(1,1,100,10));
-
-	
 
 			gc.RgbFgColor = new Gdk.Color (0, 250, 0);
-			gwin.DrawLines(gc, pointFrame.bidPoints.ToArray());
+			gwin.DrawLines (gc, pointFrame.bidPoints.ToArray ());
 
 			gc.RgbFgColor = new Gdk.Color (250, 0, 0);
-			gwin.DrawLines (gc,pointFrame.askPoints.ToArray());
+			gwin.DrawLines (gc, pointFrame.askPoints.ToArray ());
 
-
-			gc.RgbFgColor = new Gdk.Color (0,0,250);
+			gc.RgbFgColor = new Gdk.Color (0, 0, 250);
 
 			gc.SetLineAttributes (1, LineStyle.Solid, CapStyle.Round, JoinStyle.Round);
 			foreach (Gdk.Point p in pointFrame.localBidPointsBlue) {
 				//gwin.DrawLine(gc, p.X, p.Y, p.X, 0);
 
-				int cirsize = 5;
-				gwin.DrawArc(gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
+				//int cirsize = 5;
+				gwin.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
 
 			}
 
 			foreach (Gdk.Point p in pointFrame.localAskPointsBlue) {
 				//gwin.DrawLine (gc, p.X, p.Y, p.X, 0);
 
-				int cirsize = 5;
-				gwin.DrawArc(gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
+				//int cirsize = 5;
+				gwin.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
 
 			}
 
@@ -1065,7 +1146,7 @@ namespace IhildaWallet
 			foreach (Gdk.Point p in pointFrame.localBidPointsRed) {
 				//gwin.DrawLine(gc, p.X, p.Y, p.X, 0);
 
-				int cirsize = 5;
+				//int cirsize = 5;
 				gwin.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
 
 			}
@@ -1073,7 +1154,7 @@ namespace IhildaWallet
 			foreach (Gdk.Point p in pointFrame.localAskPointsRed) {
 				//gwin.DrawLine (gc, p.X, p.Y, p.X, 0);
 
-				int cirsize = 5;
+				//int cirsize = 5;
 				gwin.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
 
 			}
@@ -1082,17 +1163,20 @@ namespace IhildaWallet
 			gc.RgbFgColor = new Gdk.Color (0, 0, 0);
 			gc.SetLineAttributes (2, LineStyle.Solid, CapStyle.Butt, JoinStyle.Miter);
 			gwin.DrawLine (gc, 0, pointFrame.height - RULER_WIDTH, pointFrame.width, pointFrame.height - RULER_WIDTH);
-			gc.SetLineAttributes (1, LineStyle.Solid,CapStyle.Butt,JoinStyle.Miter);
-			foreach ( var tuple in pointFrame.scalePoints) {
+			gc.SetLineAttributes (1, LineStyle.Solid, CapStyle.Butt, JoinStyle.Miter);
+
+
+
+			foreach (var tuple in pointFrame.scalePoints) {
 				//gwin.DrawLine(gc, p.X, p.Y, p.X, 0);
 				Gdk.Point p = tuple.Item1;
 				Decimal inc = tuple.Item2;
-				int cirsize = 5;
+
 				gwin.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
 
-				Gdk.PangoRenderer renderer = Gdk.PangoRenderer.GetDefault (gwin.Screen);
-				renderer.Drawable = this.drawingarea1.GdkWindow;
-				renderer.Gc = this.drawingarea1.Style.BlackGC;
+				//Gdk.PangoRenderer renderer = Gdk.PangoRenderer.GetDefault (gwin.Screen);
+				//renderer.Drawable = this.drawingarea1.GdkWindow;
+				//renderer.Gc = this.drawingarea1.Style.BlackGC;
 
 				Pango.Context context = this.CreatePangoContext ();
 
@@ -1105,19 +1189,32 @@ namespace IhildaWallet
 
 				layout.FontDescription = desc;
 
-				renderer.SetOverrideColor (RenderPart.Foreground, new Gdk.Color (0, 0, 0));
+				//renderer.SetOverrideColor (RenderPart.Foreground, new Gdk.Color (0, 0, 0));
 				layout.Alignment = Pango.Alignment.Left;
 
 				gwin.DrawLayout (gc, p.X + 1, p.Y + 5, layout);
 				//renderer.DrawLayout (layout, p.X, p.Y);
 
-				renderer.SetOverrideColor (RenderPart.Foreground, Gdk.Color.Zero);
-				renderer.Drawable = null;
-				renderer.Gc = null;
+				//renderer.SetOverrideColor (RenderPart.Foreground, Gdk.Color.Zero);
+				//renderer.Drawable = null;
+				//renderer.Gc = null;
 
 			}
 
+
+
+
+
 		}
+
+		Gdk.Image image = null;
+		private int lastWidth = 0;
+		private int lastHeight = 0;
+		private bool scaleChanged = false;
+
+
+
+
 
 		private int max_bids = 100;
 		private int max_asks = 100;
@@ -1142,14 +1239,15 @@ namespace IhildaWallet
 		public AutomatedOrder [] asks = null;
 
 
-		#pragma warning restore RECS0122 // Initializing field with default value is redundant
-		#if DEBUG
+#pragma warning restore RECS0122 // Initializing field with default value is redundant
+#if DEBUG
 		private const string clsstr = nameof (DepthChartWidget) + DebugRippleLibSharp.colon;
-		#endif
+#endif
 	}
 
 
-	public class PointFrame {
+	public class PointFrame
+	{
 		// This is a frame of points that the draw func can use to draw a graph. 
 
 		public int numAsks = 0;
@@ -1180,7 +1278,9 @@ namespace IhildaWallet
 		public List<Gdk.Point> localBidPointsRed = new List<Gdk.Point> ();
 		public List<Gdk.Point> localAskPointsRed = new List<Gdk.Point> ();
 
-		public List< Tuple <Gdk.Point, Decimal>> scalePoints = new List< Tuple <Gdk.Point, Decimal>> ();
+		public List<Gdk.Point> clusterPoints = new List<Gdk.Point> ();
+
+		public List<Tuple<Gdk.Point, Decimal>> scalePoints = new List<Tuple<Gdk.Point, Decimal>> ();
 
 		public AutomatedOrder [] bids = null;
 

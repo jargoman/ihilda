@@ -605,6 +605,10 @@
     <Compile Include="gtk-gui\IhildaWallet.PaperWalletWindow.cs" />
     <Compile Include="Source\util\EZFontResolver.cs" />
     <Compile Include="Source\WalletClasses\RippleWallet.cs" />
+    <Compile Include="Source\gui-classes\Widgets\OrderClusterCreateWizard.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OrderClusterCreateWizard.cs" />
+    <Compile Include="Source\gui-classes\Widgets\OrderClusterWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OrderClusterWidget.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

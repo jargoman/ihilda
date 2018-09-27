@@ -6,8 +6,6 @@ namespace IhildaWallet
 	{
 		private global::Gtk.VBox vbox1;
 
-		private global::Gtk.Label label1;
-
 		private global::Gtk.HSeparator hseparator1;
 
 		private global::Gtk.ScrolledWindow GtkScrolledWindow;
@@ -25,24 +23,13 @@ namespace IhildaWallet
 			this.vbox1.Name = "vbox1";
 			this.vbox1.Spacing = 6;
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.label1 = new global::Gtk.Label();
-			this.label1.Name = "label1";
-			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString("<span size=\"x-large\"><b><u>Balances</u></b></span>");
-			this.label1.UseMarkup = true;
-			this.vbox1.Add(this.label1);
-			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.label1]));
-			w1.Position = 0;
-			w1.Expand = false;
-			w1.Fill = false;
-			w1.Padding = ((uint)(5));
-			// Container child vbox1.Gtk.Box+BoxChild
 			this.hseparator1 = new global::Gtk.HSeparator();
 			this.hseparator1.Name = "hseparator1";
 			this.vbox1.Add(this.hseparator1);
-			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hseparator1]));
-			w2.Position = 1;
-			w2.Expand = false;
-			w2.Fill = false;
+			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hseparator1]));
+			w1.Position = 0;
+			w1.Expand = false;
+			w1.Fill = false;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.GtkScrolledWindow = new global::Gtk.ScrolledWindow();
 			this.GtkScrolledWindow.Name = "GtkScrolledWindow";
@@ -53,8 +40,8 @@ namespace IhildaWallet
 			this.treeview1.Name = "treeview1";
 			this.GtkScrolledWindow.Add(this.treeview1);
 			this.vbox1.Add(this.GtkScrolledWindow);
-			global::Gtk.Box.BoxChild w4 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.GtkScrolledWindow]));
-			w4.Position = 2;
+			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.GtkScrolledWindow]));
+			w3.Position = 1;
 			this.Add(this.vbox1);
 			if ((this.Child != null))
 			{

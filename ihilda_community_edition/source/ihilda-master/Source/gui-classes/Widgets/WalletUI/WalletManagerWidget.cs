@@ -297,8 +297,16 @@ namespace IhildaWallet
 
 			};
 
+			this.eventbox2.ModifyBase (StateType.Normal, new Gdk.Color(218, 112, 214));
+
+			this.eventbox2.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
+				NetworkSettingsDialog.ShowDialog ();
+			};
+
 			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
 			wallettree1.GrabFocus ();
+
+			//this.TestConnectivity ();
 		}
 
 		public void SetActions () {
@@ -741,9 +749,11 @@ namespace IhildaWallet
 		public void SetQRAddress (string address, Gdk.Pixbuf pixbuf)
 		{
 
-			this.label7.Markup = address;
+			this.label7.Markup = "<span fgcolor=\"darkgreen\"><big><b>" + address + "</b></big></span>";
 			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (255, 255, 255));
 			this.image1.Pixbuf = pixbuf;
+
+			this.balancetab1.SetAddress (address);
 		}
 
 		public void Payment (  )
@@ -1512,6 +1522,32 @@ namespace IhildaWallet
 				}
 
 			);
+		}
+
+		public bool TestConnectivity ()
+		{
+			NetworkInterface networkInterface = Networking.NetworkController.CurrentInterface;
+
+			if ( networkInterface == null) {
+				return SetConnected (false);
+			}
+
+			return SetConnected (networkInterface.IsConnected ());
+		}
+
+		public bool SetConnected (bool connected)
+		{
+			if (connected) {
+				this.connecteddisplaywidget1.SetConnected ();
+
+			} else {
+				this.connecteddisplaywidget1.SetDisConnected ();
+
+			}
+
+			this.connecteddisplaywidget1.Show ();
+
+			return connected;
 		}
 
 		public static void ThreadedWalletAdd (object obj)

@@ -204,9 +204,17 @@ namespace IhildaWallet
 
 			this.removesentimentbutton.Clicked += (object sender, EventArgs e) => {
 
+				var sentiment = GetSelectedSentiment ();
+				if (sentiment == null) {
+
+				}
+				this.SentimentManagerObject.RemoveSentiment (sentiment);
+
+				SetSentiments (this.SentimentManagerObject.SentimentList);
 			};
 
 			this.addsentimentbutton.Clicked += (object sender, EventArgs e) => {
+				
 				Sentiment sentiment = SentementCreateDialog.DoDialog ();
 
 				if (sentiment == null) {
@@ -215,6 +223,7 @@ namespace IhildaWallet
 
 				this.SentimentManagerObject.AddSentiment (sentiment);
 				this.SentimentManagerObject.SaveSentiments ();
+
 				SetSentiments (this.SentimentManagerObject.SentimentList);
 			};
 
@@ -599,6 +608,10 @@ namespace IhildaWallet
 					progressbar1.Fraction = 0;
 
 				});
+
+				string message = "Automation thread has stopped\n";
+				//MessageDialog.ShowMessage ("Automation stopped", message);
+				WriteToInfoBox (message);
 			}
 
 		}
@@ -879,11 +892,13 @@ namespace IhildaWallet
 					progressbar1.Fraction = 0;
 
 				});
+
+				string message = "Automation thread has stopped\n";
+				MessageDialog.ShowMessage ("Automation stopped", message);
+				WriteToInfoBox (message);
 			}
 
-			string message = "Automation thread has stopped\n";
-			MessageDialog.ShowMessage ("Automation stopped", message);
-			WriteToInfoBox (message);
+
 		}
 
 

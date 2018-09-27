@@ -51,6 +51,9 @@ namespace IhildaWallet
 				return;
 			}
 
+
+			WalletManagerWidget.currentInstance?.TestConnectivity ();
+
 			try {
 				NetworkInterface ni = NetworkController.CurrentInterface;
 				if (ni == null) {
