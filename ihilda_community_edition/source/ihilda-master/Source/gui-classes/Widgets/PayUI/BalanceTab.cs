@@ -44,12 +44,15 @@ namespace IhildaWallet
 
 			Gtk.CellRendererText cell = new Gtk.CellRendererText {
 				Editable = true
+
 			};
+
+
 			//cell.Mode = CellRendererMode.
 
-			this.treeview1.AppendColumn ("Currency", cell, "text", 0);
-			this.treeview1.AppendColumn ("Issuer", cell, "text", 1);
-			this.treeview1.AppendColumn ("Balance", cell, "text", 2);
+			this.treeview1.AppendColumn ("Currency", cell, "markup", 0);
+			this.treeview1.AppendColumn ("Issuer", cell, "markup", 1);
+			this.treeview1.AppendColumn ("Balance", cell, "markup", 2);
 
 
 
@@ -113,6 +116,10 @@ namespace IhildaWallet
 						return;
 					}
 
+
+
+
+
 					RippleAddress ra = _rippleAddress;
 
 					if (ra == null) {
@@ -174,14 +181,31 @@ namespace IhildaWallet
 				ListStoreObj?.Clear ();
 
 				for (int i = 0; i < currencyArray.Length; i++) {
-
+					
 					RippleCurrency c = currencyArray [i];
-
+					if (c == null) {
+						continue;
+					}
 					string cu = c.currency;
 					string iss = c.IsNative ? "native currency" : c.issuer;
 					string ba = c.amount.ToString();
 
+					if (c.amount == decimal.Zero) {
+						TextHighlighter.Highlightcolor = "\"grey\"";
+						cu = TextHighlighter.Highlight (cu);
+						iss = TextHighlighter.Highlight (iss);
+						ba = TextHighlighter.Highlight (ba);
+					}
+
+					if (c.amount < decimal.Zero) {
+						TextHighlighter.Highlightcolor = "\"red\"";
+						cu = TextHighlighter.Highlight (cu);
+						iss = TextHighlighter.Highlight (iss);
+						ba = TextHighlighter.Highlight (ba);
+					}
+
 					ListStoreObj.AppendValues (cu, iss, ba);
+
 
 				}
 

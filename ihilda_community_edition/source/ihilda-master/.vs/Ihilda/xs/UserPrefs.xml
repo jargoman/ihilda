@@ -1,14 +1,7 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Widgets/WalletUI/WalletManagerWidget.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Widgets/Charting/DepthChartWidget.cs">
     <Files>
-      <File FileName="Source/gui-classes/Widgets/OrderClusterCreateWizard.cs" Line="1" Column="1" />
-      <File FileName="Source/gui-classes/Widgets/TradeUI/CascadedBuyWidget.cs" Line="271" Column="5" />
-      <File FileName="Source/gui-classes/Widgets/Charting/DepthChartWidget.cs" Line="1072" Column="1" />
-      <File FileName="Source/gui-classes/Widgets/OrderClusterWidget.cs" Line="254" Column="3" />
-      <File FileName="Source/gui-classes/Widgets/TradeUI/CascadedSellWidget.cs" Line="372" Column="4" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Util/TextHighlighter.cs" Line="14" Column="24" />
-      <File FileName="Source/Program.cs" Line="167" Column="1" />
-      <File FileName="Source/gui-classes/Widgets/WalletUI/WalletManagerWidget.cs" Line="749" Column="15" />
+      <File FileName="Source/gui-classes/Widgets/Charting/DepthChartWidget.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />

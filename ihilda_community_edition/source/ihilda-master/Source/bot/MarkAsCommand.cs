@@ -17,6 +17,11 @@ namespace IhildaWallet
 			if (markAs == "*") {
 				return mark;
 			}
+
+			if (string.IsNullOrWhiteSpace(markAs)) {
+				return "";
+			}
+
 			string inv = "Invalid ";
 			string expctd = ". Expected format ";
 			StringBuilder stringBuilder = new StringBuilder ();

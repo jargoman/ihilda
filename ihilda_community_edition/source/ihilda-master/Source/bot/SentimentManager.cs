@@ -55,7 +55,13 @@ namespace IhildaWallet
 
 		public bool RemoveSentiment (Sentiment val)
 		{
-			return SentimentList.Remove (val);
+			bool success = SentimentList.Remove (val);
+
+			if (success) {
+				SaveSentiments ();
+			}
+
+			return success;
 		}
 
 		public void LoadSentiments ()

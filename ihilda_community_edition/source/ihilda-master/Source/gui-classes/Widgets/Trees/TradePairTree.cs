@@ -21,11 +21,15 @@ namespace IhildaWallet
 				typeof (string), // Counter currency
 				typeof (string)); // counter issuer
 
+			CellRendererText cellRenderer = new CellRendererText {
+				Sensitive = true,
+				Editable = true
+			};
 
-			this.treeview1.AppendColumn ("Base Currency", new CellRendererText (), "text", 0);
-			this.treeview1.AppendColumn ("Base Issuer", new CellRendererText (), "text", 1);
-			this.treeview1.AppendColumn ("Counter Currency", new CellRendererText (), "text", 2);
-			this.treeview1.AppendColumn ("Counter Issuer", new CellRendererText (), "text", 3);
+			this.treeview1.AppendColumn ("Base", cellRenderer, "text", 0);
+			this.treeview1.AppendColumn ("Issuer", cellRenderer, "text", 1);
+			this.treeview1.AppendColumn ("Counter", cellRenderer, "text", 2);
+			this.treeview1.AppendColumn ("Issuer", cellRenderer, "text", 3);
 
 			this.treeview1.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
 

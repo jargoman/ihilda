@@ -81,18 +81,20 @@ namespace IhildaWallet
 				task.Wait ();
 
 			} catch (Exception e) {
-
+				
 				StringBuilder errorMessage = new StringBuilder ();
 
-				errorMessage.AppendLine ("Network exception");
-				errorMessage.AppendLine (e.Message);
-				errorMessage.AppendLine (e.StackTrace);
-				while (e.InnerException != null) {
-					errorMessage.AppendLine ("Inner Exception");
-					errorMessage.AppendLine (e.InnerException.Message);
-					errorMessage.AppendLine (e.InnerException.StackTrace);
+				errorMessage.AppendLine ("Network exception : ");
+				if (e != null) {
+					errorMessage.AppendLine (e.Message);
+					errorMessage.AppendLine (e.StackTrace);
+					while (e.InnerException != null) {
+						errorMessage.AppendLine ("Inner Exception");
+						errorMessage.AppendLine (e.InnerException.Message);
+						errorMessage.AppendLine (e.InnerException.StackTrace);
 
-					e = e.InnerException;
+						e = e.InnerException;
+					}
 				}
 				Logging.WriteBoth (errorMessage.ToString());
 				MessageDialog.ShowMessage (errorMessage.ToString());
@@ -123,7 +125,7 @@ namespace IhildaWallet
 
 				string debug =
 					"ledgermax" +
-					accTxResult.ledger_index_max.ToString () +
+					accTxResult.ledger_index_max.ToString ()  +
 
 					"ledgermin" +
 					accTxResult.ledger_index_min.ToString ();

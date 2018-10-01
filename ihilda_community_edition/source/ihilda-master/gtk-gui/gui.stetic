@@ -11732,7 +11732,7 @@ example: USD/CAD</property>
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Window" id="IhildaWallet.TradePairManagerWindow" design-size="1286 451">
+  <widget class="Gtk.Window" id="IhildaWallet.TradePairManagerWindow" design-size="789 451">
     <property name="MemberName" />
     <property name="Title" translatable="yes">TradePair Manager</property>
     <property name="WindowPosition">CenterOnParent</property>

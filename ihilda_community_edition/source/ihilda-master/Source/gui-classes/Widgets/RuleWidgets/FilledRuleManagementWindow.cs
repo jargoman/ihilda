@@ -625,6 +625,58 @@ namespace IhildaWallet
 				return;
 			}
 
+			RippleWallet rw = walletswitchwidget2.GetRippleWallet ();
+			if (rw == null) {
+				MessageDialog.ShowMessage ("No wallet Selected");
+				//shouldContinue = false;
+
+				return;
+			}
+
+			NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
+			if (ni == null) {
+
+				MessageDialog.ShowMessage ("Network Warning", "Could not connect to network");
+				//shouldContinue = false;
+				return;
+			}
+
+			LicenseType licenseT = Util.LicenseType.AUTOMATIC;
+
+			bool should = LeIceSense.LastDitchAttempt (rw, licenseT);
+			if (!should) {
+				//shouldContinue = false;
+				return;
+			}
+
+			bool cont = false;
+			ManualResetEvent manualResetEvent = new ManualResetEvent (false);
+			manualResetEvent.Reset ();
+
+			Gtk.Application.Invoke (
+				delegate {
+						// TODO more explicit warning
+
+						progressbar1.Pulse ();
+					cont = AreYouSure.AskQuestion ("Warning !!!", "<markup><span foreground=\"red\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>" + rw.GetStoredReceiveAddress () + "</b></markup>");
+					progressbar1.Pulse ();
+					manualResetEvent.Set ();
+
+
+				}
+			);
+
+			manualResetEvent.WaitOne ();
+			if (!cont) {
+				//shouldContinue = false;
+				return;
+			}
+
+			if (this.tokenSource != null) {
+				WriteToInfoBox ("A rule script is already running\n");
+				return;
+			}
+
 			this.tokenSource = new CancellationTokenSource ();
 
 			CancellationToken token = tokenSource.Token;
@@ -633,52 +685,6 @@ namespace IhildaWallet
 
 				this.SetIsRunningUI (true);
 
-				RippleWallet rw = walletswitchwidget2.GetRippleWallet ();
-				if (rw == null) {
-					MessageDialog.ShowMessage ("No wallet Selected");
-					//shouldContinue = false;
-
-					return;
-				}
-
-				NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
-				if (ni == null) {
-
-					MessageDialog.ShowMessage ("Network Warning", "Could not connect to network");
-					//shouldContinue = false;
-					return;
-				}
-
-				LicenseType licenseT = Util.LicenseType.AUTOMATIC;
-
-				bool should = LeIceSense.LastDitchAttempt (rw, licenseT);
-				if (!should) {
-					//shouldContinue = false;
-					return;
-				}
-
-				bool cont = false;
-				ManualResetEvent manualResetEvent = new ManualResetEvent (false);
-				manualResetEvent.Reset ();
-
-				Gtk.Application.Invoke (
-					delegate {
-						// TODO more explicit warning
-
-						progressbar1.Pulse ();
-						cont = AreYouSure.AskQuestion ("Warning !!!", "<markup><span foreground=\"red\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>" + rw.GetStoredReceiveAddress () + "</b></markup>");
-						progressbar1.Pulse ();
-						manualResetEvent.Set ();
-
-
-					}
-				);
-
-				manualResetEvent.WaitOne ();
-				if (!cont) {
-					//shouldContinue = false;
-					return;
-				}
 
 				OrderSubmitter orderSubmitter = new OrderSubmitter ();
 				orderSubmitter.OnOrderSubmitted += (object sender, OrderSubmittedEventArgs e) => {
@@ -715,6 +721,7 @@ namespace IhildaWallet
 
 					stringBuilder.Append ("Verifying transaction ");
 					stringBuilder.Append ((string)(e.RippleOfferTransaction.hash ?? ""));
+					stringBuilder.AppendLine ();
 
 					Application.Invoke (
 						delegate {
@@ -748,6 +755,8 @@ namespace IhildaWallet
 						TextHighlighter.Highlightcolor = TextHighlighter.RED;
 
 					}
+
+					stringBuilder.AppendLine ();
 
 					messg = TextHighlighter.Highlight (stringBuilder);
 
@@ -865,7 +874,7 @@ namespace IhildaWallet
 					}
 					success = tupleResp.Item1;
 					if (!success) {
-						string errMess = "Error submitting orders";
+						string errMess = "Error submitting orders\n";
 						this.WriteToInfoBox (errMess);
 						//shouldContinue = false;
 						break;
