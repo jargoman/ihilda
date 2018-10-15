@@ -12,7 +12,7 @@ namespace IhildaWallet
 		{
 			this.Build ();
 
-			_listStore = new ListStore ( typeof (bool), typeof (string) );
+			_listStore = new ListStore (typeof (bool), typeof (string));
 
 			Gtk.CellRendererToggle toggle = new CellRendererToggle {
 				Activatable = true
@@ -26,7 +26,10 @@ namespace IhildaWallet
 					bool val = (bool)_listStore.GetValue (iter, 0);
 					string name = (string)_listStore.GetValue (iter, 1);
 					_listStore.SetValue (iter, 0, !val);
+
+#if DEBUG
 					DebugIhildaWallet.SetDebug (name, !val);
+#endif
 
 					//this._payments_tuple.Item2 [index] = !val;
 				}
@@ -44,6 +47,8 @@ namespace IhildaWallet
 
 		public void InitDebugOptions ()
 		{
+#if DEBUG
+
 			FieldInfo[] fields = typeof (DebugIhildaWallet).GetFields ();
 			_listStore.Clear ();
 			foreach (FieldInfo f in fields) {
@@ -58,6 +63,8 @@ namespace IhildaWallet
 			}
 
 			this.treeview1.Model = _listStore;
+
+#endif
 		}
 
 		ListStore _listStore = null;

@@ -48,6 +48,12 @@ namespace IhildaWallet
 		}
 
 		private void SetFromOffer (Offer o) {
+
+			if (o == null) {
+				// TODO
+
+				return;
+			}
 			this.Account = o.Account;
 
 			this.taker_gets = o.taker_gets.DeepCopy();
@@ -65,7 +71,7 @@ namespace IhildaWallet
 			this.PreviousTxnID = o.PreviousTxnID;
 			this.PreviousTxnLgrSeq = o.PreviousTxnLgrSeq;
 			this.Sequence = o.Sequence;
-			//this.Memos = o.Memos; // TODO 
+			this.Memos = o.Memos; // TODO 
 
 		}
 

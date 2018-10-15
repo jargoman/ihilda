@@ -104,7 +104,7 @@ namespace IhildaWallet
 			this.unitsSelectBox = global::Gtk.ComboBoxEntry.NewText();
 			this.unitsSelectBox.AppendText(global::Mono.Unix.Catalog.GetString("XRP"));
 			this.unitsSelectBox.AppendText(global::Mono.Unix.Catalog.GetString("drops"));
-			this.unitsSelectBox.WidthRequest = 70;
+			this.unitsSelectBox.WidthRequest = 100;
 			this.unitsSelectBox.Name = "unitsSelectBox";
 			this.unitsSelectBox.Active = 1;
 			this.hbox1.Add(this.unitsSelectBox);

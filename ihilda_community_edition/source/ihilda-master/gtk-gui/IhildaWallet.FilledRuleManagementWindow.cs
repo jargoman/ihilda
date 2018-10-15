@@ -403,7 +403,7 @@ namespace IhildaWallet
 			{
 				this.Child.ShowAll();
 			}
-			this.DefaultWidth = 1090;
+			this.DefaultWidth = 691;
 			this.DefaultHeight = 444;
 			this.Show();
 		}

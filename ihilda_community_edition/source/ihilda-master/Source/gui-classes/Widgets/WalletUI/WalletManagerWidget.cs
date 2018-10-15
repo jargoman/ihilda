@@ -297,17 +297,51 @@ namespace IhildaWallet
 
 			};
 
-			this.eventbox2.ModifyBase (StateType.Normal, new Gdk.Color(218, 112, 214));
+			this.eventbox5.ModifyBase (StateType.Normal, new Gdk.Color(218, 112, 214));
 
-			this.eventbox2.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
+			this.eventbox5.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
 				NetworkSettingsDialog.ShowDialog ();
 			};
 
 			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
+
+			this.walletswitchwidget1.WalletChangedEvent += (object source, WalletChangedEventArgs eventArgs) => {
+				RippleWallet rippleWallet = eventArgs?.GetRippleWallet ();
+				if (rippleWallet == null) {
+					return;
+				}
+				WalletManager.SetRippleWallet (rippleWallet);
+				Gtk.Application.Invoke ( delegate {
+					this.UpdateWalletUI (rippleWallet);
+
+				});
+
+			};
+
+			eventbox3.ModifyBase (StateType.Normal, new Gdk.Color (55,55,55));
+			eventbox3.ModifyBg (StateType.Normal, new Gdk.Color (55, 55, 55));
+
+			eventbox4.ModifyBase (StateType.Normal, new Gdk.Color (211, 211, 211));
+			eventbox4.ModifyBg (StateType.Normal, new Gdk.Color (211, 211, 211));
+
+			eventbox6.ModifyBg (StateType.Normal, new Gdk.Color(0, 0, 0));
+			eventbox6.ModifyBase (StateType.Normal, new Gdk.Color (0, 0, 0));
+
+			//vbox1.ModifyBg (StateType.Normal, new Gdk.Color (75,75,75));
+			//vbox1.ModifyBase (StateType.Normal, new Gdk.Color (75, 75, 75));
+			//this.notebook1.ModifyBg (StateType.Normal, new Gdk.Color (0,0,0));
+			// didn't work :(
+			//label4.ModifyBase (StateType.Normal, new Gdk.Color(0,0,0));
+			//label4.ModifyBase (StateType.Normal, new Gdk.Color (0, 0, 0));
+			//label4.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
+			//label4.ModifyBg (StateType.Active, new Gdk.Color (0, 0, 0));
+
 			wallettree1.GrabFocus ();
 
 			//this.TestConnectivity ();
 		}
+
+
 
 		public void SetActions () {
 			this.NewAction.Activated += (sender, e) => New_Wallet_Wizard ();
@@ -746,14 +780,37 @@ namespace IhildaWallet
 
 
 
-		public void SetQRAddress (string address, Gdk.Pixbuf pixbuf)
+		public void SetQRandWalletAddress (RippleWallet rippleWallet /*, Gdk.Pixbuf pixbuf */)
 		{
 
-			this.label7.Markup = "<span fgcolor=\"darkgreen\"><big><b>" + address + "</b></big></span>";
-			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (255, 255, 255));
-			this.image1.Pixbuf = pixbuf;
+			//this.label7.Markup = "<span fgcolor=\"darkgreen\"><big><b>" + address + "</b></big></span>";
 
-			this.balancetab1.SetAddress (address);
+			Gtk.Application.Invoke ( delegate {
+				this.walletswitchwidget1.SetRippleWallet (rippleWallet);
+
+			});
+
+
+
+
+
+		}
+
+		public void UpdateWalletUI (RippleWallet rippleWallet)
+		{
+			//Gtk.Application.Invoke (
+			//	delegate {
+					this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (255, 255, 255));
+					this.image1.Pixbuf = rippleWallet.GetQrCode ();
+					this.balancetab1.SetAddress (rippleWallet.GetStoredReceiveAddress ());
+
+			//	}
+			//);
+
+			this.scrolledwindow1.Visible = false;
+			this.balancetab1.Visible = true;
+			this.UpdateUI ();
+
 		}
 
 		public void Payment (  )
@@ -1486,6 +1543,7 @@ namespace IhildaWallet
 			this.walletManager = wm;
 
 			//this.walletviewport1.setWallets(walletManager.wallets.Values);
+			this.balancetab1.Visible = false;
 			this.UpdateUI();
 		}
 

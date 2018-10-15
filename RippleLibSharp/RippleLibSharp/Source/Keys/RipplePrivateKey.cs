@@ -4,6 +4,7 @@ using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math.EC.Abc;
 using Org.BouncyCastle.Math.EC;
+using Org.BouncyCastle.Crypto.Generators;
 
 // done
 
@@ -94,10 +95,37 @@ namespace RippleLibSharp.Keys
 				return publickey;
 			}
 
-			BigInteger privateBI = new BigInteger( 1, this.PayloadBytes); //new BigInteger(BinarySerializer.prepareBigIntegerBytes(this.payloadBytes));
+			var domain = RippleDeterministicKeyGenerator.SECP256k1_PARAMS;
+			//BigInteger privateBI = new BigInteger( 1, this.PayloadBytes); 
+			//new BigInteger(BinarySerializer.prepareBigIntegerBytes(this.payloadBytes));
+				/*														  
 			ECPoint uncompressed = RippleDeterministicKeyGenerator.SECP256k1_PARAMS.G.Multiply(privateBI);
-			FpPoint publicPoint = new FpPoint(RippleDeterministicKeyGenerator.SECP256k1_PARAMS.Curve, uncompressed.X, uncompressed.Y, true);
-			publickey = new RipplePublicKey (publicPoint.GetEncoded());
+
+
+			//ECKeyGenerationParameters keyParams = new ECKeyGenerationParameters(RippleDeterministicKeyGenerator.SECP256k1_PARAMS, privateBI);
+
+			Org.BouncyCastle.Crypto.Parameters.ECPrivateKeyParameters keyParams =
+				new ECPrivateKeyParameters (privateBI, RippleDeterministicKeyGenerator.SECP256k1_PARAMS);
+
+			ECKeyPairGenerator generator = new ECKeyPairGenerator ();
+
+
+			var publicPoint = RippleDeterministicKeyGenerator.SECP256k1_PARAMS.Curve.CreatePoint (
+				uncompressed.XCoord.ToBigInteger(),
+				uncompressed.YCoord.ToBigInteger (),
+				false
+			);
+
+			publickey = new RipplePublicKey ( publicPoint.GetEncoded(false) );
+*/
+			BigInteger d = new BigInteger (PayloadBytes);
+			ECPoint q = domain.G.Multiply (d);
+
+			var publicParams = new ECPublicKeyParameters (q, domain);
+			var encoded = publicParams.Q.GetEncoded (true);
+
+			this.publickey = new RipplePublicKey (encoded);
+			//return encoded;
 
 			return publickey;
 		}

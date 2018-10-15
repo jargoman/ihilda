@@ -189,9 +189,9 @@ namespace IhildaWallet
 		{
 #if DEBUG
 			string method_sig = clsstr + nameof (Entry_Changed) + DebugRippleLibSharp.both_parentheses;
-			string str = combobox1.ActiveText;
-#endif
 
+#endif
+			string str = combobox1.ActiveText;
 			combobox1.ModifyBase (StateType.Normal);
 
 			RippleWalletTypeEnum walletTypeEnum = default (RippleWalletTypeEnum);
@@ -600,11 +600,16 @@ namespace IhildaWallet
 				try {
 					walletTypeEnum = (IhildaWallet.RippleWalletTypeEnum)Enum.Parse (typeof (RippleWalletTypeEnum), walletType);
 				} catch (Exception e) {
+
+
+#if DEBUG
 					if (DebugIhildaWallet.FromScriptDialog) {
 						Logging.WriteLog (e.Message);
 						Logging.ReportException (method_sig, e);
 
 					}
+
+#endif
 
 					this.label6.Markup = "<span fgcolor=\"red\">Invalid Wallet type " + (string)(walletType ?? null) + "</span>";
 					combobox1.ModifyBase (StateType.Normal, orchid);

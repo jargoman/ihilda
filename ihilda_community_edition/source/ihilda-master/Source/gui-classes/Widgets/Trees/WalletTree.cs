@@ -86,9 +86,11 @@ namespace IhildaWallet
 
 					}
 
-					WalletManager.SetRippleWallet (selectedRippleWallet);
+					WalletManagerWidget.currentInstance.SetQRandWalletAddress (selectedRippleWallet);
 
-					WalletManager.currentInstance?.UpdateUI ();
+					//WalletManager.SetRippleWallet (selectedRippleWallet);
+
+					//WalletManager.currentInstance?.UpdateUI ();
 				}
 
 
@@ -128,7 +130,7 @@ namespace IhildaWallet
 				}
 				*/
 
-				if (!hoveredRippleWallet.WalletName.Equals (selectedRippleWallet.WalletName)) {
+				if (!hoveredRippleWallet.WalletName.Equals (selectedRippleWallet?.WalletName)) {
 					goto GUI;
 					//return;
 				}
@@ -138,8 +140,8 @@ namespace IhildaWallet
 
 				}
 
-				WalletManager.SetRippleWallet(selectedRippleWallet);
-
+				//WalletManager.SetRippleWallet( selectedRippleWallet );
+				WalletManagerWidget.currentInstance.SetQRandWalletAddress ( selectedRippleWallet );
 
 
 				Logging.WriteConsole ("Selected Wallet " + (selectedRippleWallet?.GetStoredReceiveAddress () ?? "null") + " \n\n");
@@ -800,15 +802,15 @@ namespace IhildaWallet
 
 			if (!(o is String val)) {
 
-				if (DebugIhildaWallet.WalletTree) {
+				#if DEBUG
+			if (DebugIhildaWallet.WalletTree) {
 					Logging.WriteLog (method_sig + "val is not string, " + DebugRippleLibSharp.returning + DebugRippleLibSharp.null_str);
 				}
+#endif
+
 
 				return null;
 			}
-#if DEBUG
-
-#endif
 
 			int c = val.Length;
 

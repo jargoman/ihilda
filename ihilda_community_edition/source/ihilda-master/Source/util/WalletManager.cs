@@ -676,7 +676,11 @@ namespace IhildaWallet
 				try {
 					walletTypeEnum = (IhildaWallet.RippleWalletTypeEnum)Enum.Parse (typeof (RippleWalletTypeEnum), jwallet.AccountType);
 				} catch (Exception e) {
+
+#if DEBUG
 					Logging.WriteLog (warn + DebugRippleLibSharp.exceptionMessage + e.Message + e.StackTrace);
+#endif
+
 					return null;
 				}
 
@@ -850,23 +854,34 @@ namespace IhildaWallet
 					break;
 				case RippleWalletTypeEnum.MasterPrivateKey:
 					if (jwallet.Private_Key_Master_Secret != null) {
+
+#if DEBUG
 						if (DebugIhildaWallet.WalletManager) {
 							Logging.WriteLog (method_sig + "secret is defined");
 						}
+#endif
+
 					}
 
 					sec = jwallet.Private_Key_Master_Secret;
 
 					if (jwallet.Account != null) {
+
+#if DEBUG
 						if (DebugIhildaWallet.WalletManager) {
 							Logging.WriteLog (method_sig + "Account is defined\n");
 						}
+#endif
 
 						acc = jwallet.Account;
 					} else {
+
+#if DEBUG
 						if (DebugIhildaWallet.WalletManager) {
 							Logging.WriteLog (method_sig + "Account is not defined");
 						}
+#endif
+
 					}
 
 					if (jwallet.Encrypted_Wallet != null) {
@@ -1324,7 +1339,7 @@ namespace IhildaWallet
 		{
 			SelectedWallet = rippleWallet;
 
-			WalletManagerWidget.currentInstance.SetQRAddress (rippleWallet.GetStoredReceiveAddress(), rippleWallet.GetQrCode ());
+			//WalletManagerWidget.currentInstance.SetQRandWalletAddress (rippleWallet);  //SetQRAddress (rippleWallet.GetStoredReceiveAddress(), rippleWallet.GetQrCode ());
 		}
 
 

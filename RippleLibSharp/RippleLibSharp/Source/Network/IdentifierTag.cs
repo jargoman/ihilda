@@ -40,10 +40,10 @@ namespace RippleLibSharp.Network
 		{
 			StringBuilder stringBuilder = new StringBuilder (nameof (IdentificationNumber));
 
-			stringBuilder.Append (DebugRippleLibSharp.colon);
+			stringBuilder.Append (" : ");
 			stringBuilder.AppendLine (IdentificationNumber.ToString ());
 			stringBuilder.Append (nameof (IdentificationMessage));
-			stringBuilder.Append (DebugRippleLibSharp.colon);
+			stringBuilder.Append (" : ");
 			stringBuilder.Append (IdentificationMessage?.ToString () ?? "null");
 
 			return stringBuilder.ToString (); 

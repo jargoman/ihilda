@@ -35,6 +35,7 @@ namespace RippleLibSharp.Keys
 			string curveName = "secp256k1";
 
 			X9ECParameters paramater = SecNamedCurves.GetByName (curveName);
+			//paramater.c
 			SECP256k1_PARAMS = new ECDomainParameters (paramater.Curve, paramater.G, paramater.N, paramater.H);
 
 			/*

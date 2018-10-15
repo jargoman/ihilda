@@ -406,6 +406,7 @@ namespace IhildaWallet
 
 			} finally {
 				HideSpinner ();
+
 			}
 
 
@@ -629,7 +630,7 @@ namespace IhildaWallet
 			cache.Set (reports.ToArray ());
 			int x = cache.GetNumPages;
 			this.pagerwidget1.SetNumberOfPages (x);
-
+			Task.Run ((System.Action)FirstClicked);
 
 
 		}

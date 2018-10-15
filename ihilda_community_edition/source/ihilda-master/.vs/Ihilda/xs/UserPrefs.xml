@@ -1,14 +1,23 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Widgets/Charting/DepthChartWidget.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Windows/TradeWindow.cs">
     <Files>
-      <File FileName="Source/gui-classes/Widgets/Charting/DepthChartWidget.cs" Line="1" Column="1" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Network/NetworkRequestTask.cs" Line="22" Column="1" />
+      <File FileName="Source/util/WalletManager.cs" Line="1338" Column="22" />
+      <File FileName="Source/gui-classes/Widgets/Trees/WalletTree.cs" Line="81" Column="6" />
+      <File FileName="Source/gui-classes/Widgets/WalletSwitchWidget.cs" Line="38" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/PayUI/BalanceTab.cs" Line="81" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/OrderPreviewSubmitWidget.cs" Line="623" Column="1" />
+      <File FileName="Source/gui-classes/Windows/OrderSubmitWindow.cs" Line="1" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/WalletUI/WalletManagerWidget.cs" Line="331" Column="6" />
+      <File FileName="Source/gui-classes/Windows/WalletManagerWindow.cs" Line="1" Column="1" />
+      <File FileName="Source/gui-classes/Windows/TradeWindow.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MultiItemStartupConfigurations />
   <MonoDevelop.Ide.ItemProperties.IhildaWallet PreferredExecutionTarget="MonoDevelop.Default" />
 </Properties>

@@ -21,7 +21,17 @@ namespace IhildaWallet
 
 
 			};
+
+			this.eventbox2.ButtonReleaseEvent += (object o, Gtk.ButtonReleaseEventArgs args) => { 
+				RippleWallet rippleWallet = WalletSelectDialog.DoDialog ();
+
+				if (rippleWallet != null) {
+					SetRippleWallet (rippleWallet);
+				}
+			};
 		}
+
+
 
 		public void SetRippleWallet ( RippleWallet rippleWallet )
 		{

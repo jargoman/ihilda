@@ -19,6 +19,30 @@ namespace IhildaWallet
 			set;
 		}
 
+		public SentimentRatingEnum GetEnum ()
+		{
+			Enum.TryParse<SentimentRatingEnum> (Rating, out SentimentRatingEnum sentiment);//.Parse (typeof (SentimentRatingEnum), args.NewText);
+			return sentiment;
+		}
+
+		public string GetMarkupString ()
+		{
+			SentimentRatingEnum sentiment = GetEnum ();
+
+			switch (sentiment) {
+			case SentimentRatingEnum.Bearish:
+			case SentimentRatingEnum.Very_Bearish:
+			case SentimentRatingEnum.Trash:
+				return "<span fgcolor=\"red\">" + Rating + "</span>";
+
+			case SentimentRatingEnum.Bullish:
+			case SentimentRatingEnum.Very_Bullish:
+			case SentimentRatingEnum.Mooning:
+				return "<span fgcolor=\"green\">" + Rating + "</span>";
+			}
+
+			return Rating;
+		}
 	}
 
 

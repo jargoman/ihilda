@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using RippleLibSharp.Network;
 using IhildaWallet.Networking;
-using Gtk; 
+using Gtk;
 
 using IhildaWallet.Splashes;
 
@@ -109,7 +109,7 @@ namespace IhildaWallet
 		public void ViewOrderBook ()
 		{
 
-			RippleWallet rippleWallet = WalletManager.GetRippleWallet();
+			RippleWallet rippleWallet = WalletManager.GetRippleWallet ();
 			if (rippleWallet == null) {
 				return;
 			}
@@ -138,7 +138,8 @@ namespace IhildaWallet
 
 
 
-		public void NewTradePair ( object sender, EventArgs args ) {
+		public void NewTradePair (object sender, EventArgs args)
+		{
 
 			TradePair tp = TradePairCreateDialog.DoDialog ();
 
@@ -152,10 +153,12 @@ namespace IhildaWallet
 
 		}
 
-		public void EditTradePair ( object sender, EventArgs args ) {
+		public void EditTradePair (object sender, EventArgs args)
+		{
 
-
+#if DEBUG
 			string method_sig = clsstr + nameof (EditTradePair) + DebugRippleLibSharp.both_parentheses;
+#endif
 
 
 			TradePair oldtp = TradePairManager.SelectedTradePair;
@@ -238,27 +241,27 @@ namespace IhildaWallet
 
 		public void Trade ()
 		{
-			#if DEBUG
+#if DEBUG
 			String method_sig = clsstr + nameof (Trade) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.WalletManagerWidget) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
-			#endif
+#endif
 			LoadingWindow loadingwin = null;
 
 			RippleWallet rw = WalletManager.GetRippleWallet();
 			if (rw ==null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.TradePairManagerWindow) {
 					Logging.WriteLog (method_sig + "rw == null, returning");
 				}
-				#endif
+#endif
 				return;
 			}
 
 
 
-			#if DEBUG
+#if DEBUG
 			if (DebugIhildaWallet.TradePairManagerWindow) {
 				Logging.WriteLog ( method_sig + DebugIhildaWallet.ToAssertString(rw) );
 			}
@@ -278,12 +281,12 @@ namespace IhildaWallet
 
 
 			Gtk.Application.Invoke (delegate {
-				#if DEBUG
+#if DEBUG
 				string event_sig = method_sig + DebugIhildaWallet.gtkInvoke;
 				if (DebugIhildaWallet.TradePairManagerWindow) {
 					Logging.WriteLog( event_sig + DebugRippleLibSharp.begin );
 				}
-				#endif
+#endif
 				loadingwin = new LoadingWindow();
 				loadingwin.Show();
 			});
@@ -364,14 +367,14 @@ namespace IhildaWallet
 
 			/*
 			if (PaymentWindow.currentInstance != null  ) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.NoHideWindows) {
-				#endif
+#endif
 					Application.Invoke ((sender, e) => PaymentWindow.currentInstance.Hide ());
 
-					#if DEBUG
+#if DEBUG
 				}
-					#endif
+#endif
 			}
 			*/
 		}
@@ -401,9 +404,9 @@ namespace IhildaWallet
 
 		public TradePairManager tpm = null;
 
-		#if DEBUG
+#if DEBUG
 		private string clsstr = nameof (TradePairManagerWindow) + DebugRippleLibSharp.colon;
-		#endif
+#endif
 	}
 }
 

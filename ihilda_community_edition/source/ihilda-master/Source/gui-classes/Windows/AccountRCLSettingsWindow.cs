@@ -14,22 +14,21 @@ namespace IhildaWallet
 		{
 			this.Build ();
 
-			Gtk.TreeStore treeStore = new TreeStore ( typeof(string) );
+			Gtk.TreeStore treeStore = new TreeStore (typeof (string));
 
 			this.SetRippleWallet (rippleWallet);
 
 			foreach (var wallet in WalletManager.currentInstance.wallets) {
-				
+
 				var actType = wallet.Value.AccountType;
 				if (actType == RippleWalletTypeEnum.Regular) {
 					string regAcct = wallet.Value?.Regular_Key_Account;
 					string name = wallet.Key;
 					string masAcct = wallet.Value.Account;
-					if ( 
-					    !string.IsNullOrWhiteSpace(name) && 
-					    !string.IsNullOrWhiteSpace (regAcct)  && 
-					    !string.IsNullOrWhiteSpace (masAcct )) 
-					{
+					if (
+						!string.IsNullOrWhiteSpace (name) &&
+						!string.IsNullOrWhiteSpace (regAcct) &&
+						!string.IsNullOrWhiteSpace (masAcct)) {
 
 						RippleWallet selectedWallet = this.walletswitchwidget1.GetRippleWallet ();
 
@@ -50,7 +49,12 @@ namespace IhildaWallet
 
 			button405.Clicked += (object sender, EventArgs exceptio) => {
 
+
+#if DEBUG
 				string event_sig = nameof (DebugRippleLibSharp.AccountRCLSettingsWindow);
+
+#endif
+
 				string str = comboboxentry2.ActiveText;
 
 				if (string.IsNullOrEmpty(str)) {

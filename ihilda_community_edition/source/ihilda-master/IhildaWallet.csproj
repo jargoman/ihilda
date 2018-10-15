@@ -89,160 +89,6 @@
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="SuperSocket.ClientEngine">
-      <HintPath>packages\SuperSocket.ClientEngine.Core.0.10.0\lib\net45\SuperSocket.ClientEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="WebSocket4Net">
-      <HintPath>packages\WebSocket4Net.0.15.2\lib\net45\WebSocket4Net.dll</HintPath>
-    </Reference>
-    <Reference Include="BouncyCastle.Crypto">
-      <HintPath>packages\BouncyCastle.1.8.2\lib\BouncyCastle.Crypto.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CSharp">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\Microsoft.CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mono.Cairo">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\Mono.Cairo.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mono.CSharp">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\Mono.CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Posix">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\Mono.Posix.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="mscorlib">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\mscorlib.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Core">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data.Linq">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Data.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="System">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Dynamic">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Dynamic.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Management">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Management.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Numerics">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Numerics.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Runtime.Serialization.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Xml.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Xml.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CSharp">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\Microsoft.CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cairo">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\Mono.Cairo.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.CSharp">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\Mono.CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Posix">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\Mono.Posix.dll</HintPath>
-    </Reference>
-    <Reference Include="mscorlib">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\mscorlib.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5.1-api\System.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data.Linq">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Data.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="System">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Dynamic">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Dynamic.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Management">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Management.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Numerics">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Numerics.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Runtime.Serialization.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Xml.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Xml.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CSharp">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\Microsoft.CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cairo">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\Mono.Cairo.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.CSharp">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\Mono.CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Posix">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\Mono.Posix.dll</HintPath>
-    </Reference>
-    <Reference Include="mscorlib">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\mscorlib.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5.1-api\System.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data.Linq">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Data.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="System">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Dynamic">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Dynamic.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Management">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Management.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Numerics">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Numerics.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Runtime.Serialization.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Xml.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq">
-      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\System.Xml.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="BouncyCastle.Crypto">
-      <HintPath>packages\BouncyCastle.1.8.2\lib\BouncyCastle.Crypto.dll</HintPath>
-    </Reference>
-    <Reference Include="SuperSocket.ClientEngine">
-      <HintPath>packages\SuperSocket.ClientEngine.Core.0.10.0\lib\net45\SuperSocket.ClientEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="WebSocket4Net">
-      <HintPath>packages\WebSocket4Net.0.15.2\lib\net45\WebSocket4Net.dll</HintPath>
-    </Reference>
     <Reference Include="QRCoder">
       <HintPath>packages\QRCoder.1.3.3\lib\net40\QRCoder.dll</HintPath>
     </Reference>
@@ -255,6 +101,15 @@
     </Reference>
     <Reference Include="PdfSharp">
       <HintPath>packages\PDFsharp.1.32.3057.0\lib\net20\PdfSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib">
+      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>packages\BouncyCastle.1.8.3.1\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="WebSocket4Net">
+      <HintPath>packages\WebSocket4Net.0.14.1\lib\net45\WebSocket4Net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -306,6 +161,7 @@
     <EmbeddedResource Include="..\..\..\..\ihildabright.png" />
     <EmbeddedResource Include="..\..\..\..\coolio-medium.png" />
     <EmbeddedResource Include="Images\xrp-symbol-black-25x25.png" />
+    <EmbeddedResource Include="..\..\..\..\earthfrommoonsided.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="gtk-gui\generated.cs" />

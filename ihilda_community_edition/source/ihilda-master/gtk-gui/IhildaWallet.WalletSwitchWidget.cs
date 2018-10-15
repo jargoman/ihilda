@@ -8,6 +8,8 @@ namespace IhildaWallet
 
 		private global::Gtk.Button button91;
 
+		private global::Gtk.EventBox eventbox2;
+
 		private global::Gtk.Label label1;
 
 		protected virtual void Build()
@@ -32,15 +34,19 @@ namespace IhildaWallet
 			w1.Expand = false;
 			w1.Fill = false;
 			// Container child hbox1.Gtk.Box+BoxChild
+			this.eventbox2 = new global::Gtk.EventBox();
+			this.eventbox2.Name = "eventbox2";
+			// Container child eventbox2.Gtk.Container+ContainerChild
 			this.label1 = new global::Gtk.Label();
 			this.label1.Name = "label1";
 			this.label1.Xpad = 7;
 			this.label1.Xalign = 0F;
-			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString("label1");
+			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString("Select a wallet");
 			this.label1.Selectable = true;
-			this.hbox1.Add(this.label1);
-			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.label1]));
-			w2.Position = 1;
+			this.eventbox2.Add(this.label1);
+			this.hbox1.Add(this.eventbox2);
+			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.eventbox2]));
+			w3.Position = 1;
 			this.Add(this.hbox1);
 			if ((this.Child != null))
 			{

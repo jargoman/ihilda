@@ -1954,7 +1954,7 @@ GWC</property>
                 <child>
                   <widget class="Gtk.ComboBoxEntry" id="unitsSelectBox">
                     <property name="MemberName" />
-                    <property name="WidthRequest">70</property>
+                    <property name="WidthRequest">100</property>
                     <property name="IsTextCombo">True</property>
                     <property name="Items">XRP
 drops</property>
@@ -4629,7 +4629,7 @@ drops</property>
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Bin" id="IhildaWallet.WalletManagerWidget" design-size="1055 536">
+  <widget class="Gtk.Bin" id="IhildaWallet.WalletManagerWidget" design-size="1122 490">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -4724,41 +4724,10 @@ drops</property>
         <property name="MemberName" />
         <property name="Spacing">6</property>
         <child>
-          <widget class="Gtk.MenuBar" id="menubar1">
-            <property name="MemberName" />
-            <node name="menubar1" type="Menubar">
-              <node type="Menu" action="FileAction">
-                <node type="Menu" action="WalletAction">
-                  <node type="Menuitem" action="NewAction" />
-                  <node type="Menuitem" action="EditWalletAction" />
-                  <node type="Menuitem" action="UpgradeAction" />
-                  <node type="Menuitem" action="EncryptAction" />
-                  <node type="Menuitem" action="DecryptAction" />
-                  <node type="Menuitem" action="ImportAction" />
-                  <node type="Menuitem" action="ExportAction" />
-                </node>
-              </node>
-              <node type="Menu" action="EditAction" />
-              <node type="Menu" action="CommerceAction">
-                <node type="Menuitem" action="TradingMarketAction" />
-                <node type="Menuitem" action="MakeAPaymentAction" />
-                <node type="Menuitem" action="MarketBotAction" />
-                <node type="Menuitem" action="ManageTrustAction" />
-              </node>
-            </node>
-          </widget>
-          <packing>
-            <property name="Position">0</property>
-            <property name="AutoSize">True</property>
-            <property name="Expand">False</property>
-            <property name="Fill">False</property>
-          </packing>
-        </child>
-        <child>
           <widget class="Gtk.HPaned" id="hpaned1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="Position">471</property>
+            <property name="Position">451</property>
             <child>
               <widget class="Gtk.VBox" id="vbox1">
                 <property name="MemberName" />
@@ -4799,489 +4768,531 @@ drops</property>
                   </packing>
                 </child>
                 <child>
+                  <widget class="Gtk.MenuBar" id="menubar1">
+                    <property name="MemberName" />
+                    <node name="menubar1" type="Menubar">
+                      <node type="Menu" action="FileAction">
+                        <node type="Menu" action="WalletAction">
+                          <node type="Menuitem" action="NewAction" />
+                          <node type="Menuitem" action="EditWalletAction" />
+                          <node type="Menuitem" action="UpgradeAction" />
+                          <node type="Menuitem" action="EncryptAction" />
+                          <node type="Menuitem" action="DecryptAction" />
+                          <node type="Menuitem" action="ImportAction" />
+                          <node type="Menuitem" action="ExportAction" />
+                        </node>
+                      </node>
+                      <node type="Menu" action="EditAction" />
+                      <node type="Menu" action="CommerceAction">
+                        <node type="Menuitem" action="TradingMarketAction" />
+                        <node type="Menuitem" action="MakeAPaymentAction" />
+                        <node type="Menuitem" action="MarketBotAction" />
+                        <node type="Menuitem" action="ManageTrustAction" />
+                      </node>
+                    </node>
+                  </widget>
+                  <packing>
+                    <property name="Position">1</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
                   <widget class="Gtk.HBox" id="hbox5">
                     <property name="MemberName" />
                     <property name="HeightRequest">214</property>
                     <property name="Spacing">6</property>
                     <child>
-                      <widget class="Gtk.Notebook" id="notebook1">
+                      <widget class="Gtk.EventBox" id="eventbox3">
                         <property name="MemberName" />
-                        <property name="CanFocus">True</property>
-                        <property name="CurrentPage">0</property>
-                        <property name="TabPos">Left</property>
                         <child>
-                          <widget class="Gtk.VBox" id="vbox6">
+                          <widget class="Gtk.Notebook" id="notebook1">
                             <property name="MemberName" />
-                            <property name="Spacing">3</property>
+                            <property name="CanFocus">True</property>
+                            <property name="CurrentPage">0</property>
+                            <property name="TabPos">Left</property>
                             <child>
-                              <widget class="Gtk.Button" id="botbutton">
+                              <widget class="Gtk.EventBox" id="eventbox4">
                                 <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">Market Bot</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
+                                <child>
+                                  <widget class="Gtk.VBox" id="vbox6">
+                                    <property name="MemberName" />
+                                    <property name="Spacing">3</property>
+                                    <child>
+                                      <widget class="Gtk.Button" id="botbutton">
+                                        <property name="MemberName" />
+                                        <property name="CanFocus">True</property>
+                                        <property name="Type">TextOnly</property>
+                                        <property name="Label" translatable="yes">Market Bot</property>
+                                        <property name="UseUnderline">True</property>
+                                        <property name="Xalign">0</property>
+                                      </widget>
+                                      <packing>
+                                        <property name="Position">0</property>
+                                        <property name="AutoSize">True</property>
+                                        <property name="Expand">False</property>
+                                        <property name="Fill">False</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <widget class="Gtk.Button" id="tradepairButton">
+                                        <property name="MemberName" />
+                                        <property name="CanFocus">True</property>
+                                        <property name="Type">TextOnly</property>
+                                        <property name="Label" translatable="yes">Trading Market</property>
+                                        <property name="UseUnderline">True</property>
+                                        <property name="Xalign">0</property>
+                                      </widget>
+                                      <packing>
+                                        <property name="Position">1</property>
+                                        <property name="AutoSize">True</property>
+                                        <property name="Expand">False</property>
+                                        <property name="Fill">False</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <widget class="Gtk.Button" id="useButton">
+                                        <property name="MemberName" />
+                                        <property name="CanFocus">True</property>
+                                        <property name="Type">TextOnly</property>
+                                        <property name="Label" translatable="yes">Make A _Payment</property>
+                                        <property name="UseUnderline">True</property>
+                                        <property name="Xalign">0</property>
+                                      </widget>
+                                      <packing>
+                                        <property name="Position">2</property>
+                                        <property name="AutoSize">True</property>
+                                        <property name="Expand">False</property>
+                                        <property name="Fill">False</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <widget class="Gtk.Button" id="trustbutton">
+                                        <property name="MemberName" />
+                                        <property name="CanFocus">True</property>
+                                        <property name="Type">TextOnly</property>
+                                        <property name="Label" translatable="yes">Manage _Trust</property>
+                                        <property name="UseUnderline">True</property>
+                                        <property name="Xalign">0</property>
+                                      </widget>
+                                      <packing>
+                                        <property name="Position">3</property>
+                                        <property name="AutoSize">True</property>
+                                        <property name="Expand">False</property>
+                                        <property name="Fill">False</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <widget class="Gtk.Button" id="txbutton">
+                                        <property name="MemberName" />
+                                        <property name="CanFocus">True</property>
+                                        <property name="Type">TextOnly</property>
+                                        <property name="Label" translatable="yes">View Transactions</property>
+                                        <property name="UseUnderline">True</property>
+                                        <property name="Xalign">0</property>
+                                      </widget>
+                                      <packing>
+                                        <property name="Position">4</property>
+                                        <property name="AutoSize">True</property>
+                                        <property name="Expand">False</property>
+                                        <property name="Fill">False</property>
+                                      </packing>
+                                    </child>
+                                  </widget>
+                                </child>
                               </widget>
                               <packing>
-                                <property name="Position">0</property>
-                                <property name="AutoSize">True</property>
-                                <property name="Expand">False</property>
-                                <property name="Fill">False</property>
+                                <property name="TabFill">False</property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="Gtk.Button" id="tradepairButton">
+                              <widget class="Gtk.Label" id="label4">
                                 <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">Trading Market</property>
-                                <property name="UseUnderline">True</property>
+                                <property name="Xpad">1</property>
                                 <property name="Xalign">0</property>
+                                <property name="LabelProp" translatable="yes">&lt;span fgcolor="orchid" bgcolor="black" size="x-large"&gt;&lt;b&gt; Transact   &lt;/b&gt;&lt;/span&gt;</property>
+                                <property name="UseMarkup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="type">tab</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="Gtk.Table" id="table1">
+                                <property name="MemberName" />
+                                <property name="NRows">5</property>
+                                <property name="Homogeneous">True</property>
+                                <property name="RowSpacing">3</property>
+                                <child>
+                                  <widget class="Gtk.Button" id="button66">
+                                    <property name="MemberName" />
+                                    <property name="CanFocus">True</property>
+                                    <property name="Type">TextOnly</property>
+                                    <property name="Label" translatable="yes">Dec_rypt Wallet</property>
+                                    <property name="UseUnderline">True</property>
+                                    <property name="Xalign">0</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="TopAttach">3</property>
+                                    <property name="BottomAttach">4</property>
+                                    <property name="AutoSize">True</property>
+                                    <property name="XOptions">Fill</property>
+                                    <property name="YOptions">Fill</property>
+                                    <property name="XExpand">False</property>
+                                    <property name="XFill">True</property>
+                                    <property name="XShrink">False</property>
+                                    <property name="YExpand">False</property>
+                                    <property name="YFill">True</property>
+                                    <property name="YShrink">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="Gtk.Button" id="button67">
+                                    <property name="MemberName" />
+                                    <property name="CanFocus">True</property>
+                                    <property name="Type">TextOnly</property>
+                                    <property name="Label" translatable="yes">Encr_ypt Wallet</property>
+                                    <property name="UseUnderline">True</property>
+                                    <property name="Xalign">0</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="TopAttach">2</property>
+                                    <property name="BottomAttach">3</property>
+                                    <property name="AutoSize">True</property>
+                                    <property name="XOptions">Fill</property>
+                                    <property name="YOptions">Fill</property>
+                                    <property name="XExpand">False</property>
+                                    <property name="XFill">True</property>
+                                    <property name="XShrink">False</property>
+                                    <property name="YExpand">False</property>
+                                    <property name="YFill">True</property>
+                                    <property name="YShrink">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="Gtk.Button" id="deleteButton">
+                                    <property name="MemberName" />
+                                    <property name="CanFocus">True</property>
+                                    <property name="Type">TextOnly</property>
+                                    <property name="Label" translatable="yes">_Delete Wallet</property>
+                                    <property name="UseUnderline">True</property>
+                                    <property name="Xalign">0</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="TopAttach">4</property>
+                                    <property name="BottomAttach">5</property>
+                                    <property name="AutoSize">True</property>
+                                    <property name="XOptions">Fill</property>
+                                    <property name="YOptions">Fill</property>
+                                    <property name="XExpand">False</property>
+                                    <property name="XFill">True</property>
+                                    <property name="XShrink">False</property>
+                                    <property name="YExpand">False</property>
+                                    <property name="YFill">True</property>
+                                    <property name="YShrink">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="Gtk.Button" id="editButton">
+                                    <property name="MemberName" />
+                                    <property name="CanFocus">True</property>
+                                    <property name="Type">TextOnly</property>
+                                    <property name="Label" translatable="yes">_Edit Wallet</property>
+                                    <property name="UseUnderline">True</property>
+                                    <property name="Xalign">0</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="TopAttach">1</property>
+                                    <property name="BottomAttach">2</property>
+                                    <property name="AutoSize">True</property>
+                                    <property name="XOptions">Fill</property>
+                                    <property name="YOptions">Fill</property>
+                                    <property name="XExpand">False</property>
+                                    <property name="XFill">True</property>
+                                    <property name="XShrink">False</property>
+                                    <property name="YExpand">False</property>
+                                    <property name="YFill">True</property>
+                                    <property name="YShrink">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="Gtk.Button" id="newbutton">
+                                    <property name="MemberName" />
+                                    <property name="CanFocus">True</property>
+                                    <property name="Type">TextOnly</property>
+                                    <property name="Label" translatable="yes">_New Wallet</property>
+                                    <property name="UseUnderline">True</property>
+                                    <property name="Xalign">0</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="AutoSize">False</property>
+                                    <property name="YOptions">Fill</property>
+                                    <property name="XExpand">True</property>
+                                    <property name="XFill">True</property>
+                                    <property name="XShrink">False</property>
+                                    <property name="YExpand">False</property>
+                                    <property name="YFill">True</property>
+                                    <property name="YShrink">False</property>
+                                  </packing>
+                                </child>
                               </widget>
                               <packing>
                                 <property name="Position">1</property>
-                                <property name="AutoSize">True</property>
-                                <property name="Expand">False</property>
-                                <property name="Fill">False</property>
+                                <property name="TabFill">False</property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="Gtk.Button" id="useButton">
+                              <widget class="Gtk.Label" id="label5">
                                 <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">Make A _Payment</property>
-                                <property name="UseUnderline">True</property>
                                 <property name="Xalign">0</property>
+                                <property name="LabelProp" translatable="yes">&lt;span fgcolor="orchid" bgcolor="black" size="x-large"&gt;&lt;b&gt; Keys            &lt;/b&gt;&lt;/span&gt;</property>
+                                <property name="UseMarkup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="type">tab</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="Gtk.Table" id="table2">
+                                <property name="MemberName" />
+                                <property name="NRows">5</property>
+                                <property name="Homogeneous">True</property>
+                                <property name="RowSpacing">3</property>
+                                <child>
+                                  <widget class="Gtk.Button" id="button134">
+                                    <property name="MemberName" />
+                                    <property name="CanFocus">True</property>
+                                    <property name="Type">TextOnly</property>
+                                    <property name="Label" translatable="yes">Remove .bkp wallet files</property>
+                                    <property name="UseUnderline">True</property>
+                                    <property name="Xalign">0</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="TopAttach">4</property>
+                                    <property name="BottomAttach">5</property>
+                                    <property name="AutoSize">True</property>
+                                    <property name="XOptions">Fill</property>
+                                    <property name="YOptions">Fill</property>
+                                    <property name="XExpand">False</property>
+                                    <property name="XFill">True</property>
+                                    <property name="XShrink">False</property>
+                                    <property name="YExpand">False</property>
+                                    <property name="YFill">True</property>
+                                    <property name="YShrink">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="Gtk.Button" id="button135">
+                                    <property name="MemberName" />
+                                    <property name="CanFocus">True</property>
+                                    <property name="Type">TextOnly</property>
+                                    <property name="Label" translatable="yes">Paper Wallet Wizard</property>
+                                    <property name="UseUnderline">True</property>
+                                    <property name="Xalign">0</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="TopAttach">3</property>
+                                    <property name="BottomAttach">4</property>
+                                    <property name="AutoSize">True</property>
+                                    <property name="XOptions">Fill</property>
+                                    <property name="YOptions">Fill</property>
+                                    <property name="XExpand">False</property>
+                                    <property name="XFill">True</property>
+                                    <property name="XShrink">False</property>
+                                    <property name="YExpand">False</property>
+                                    <property name="YFill">True</property>
+                                    <property name="YShrink">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="Gtk.Button" id="exportButton">
+                                    <property name="MemberName" />
+                                    <property name="CanFocus">True</property>
+                                    <property name="Type">TextOnly</property>
+                                    <property name="Label" translatable="yes">E_xport Wallet</property>
+                                    <property name="UseUnderline">True</property>
+                                    <property name="Xalign">0</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="TopAttach">2</property>
+                                    <property name="BottomAttach">3</property>
+                                    <property name="AutoSize">True</property>
+                                    <property name="XOptions">Fill</property>
+                                    <property name="YOptions">Fill</property>
+                                    <property name="XExpand">False</property>
+                                    <property name="XFill">True</property>
+                                    <property name="XShrink">False</property>
+                                    <property name="YExpand">False</property>
+                                    <property name="YFill">True</property>
+                                    <property name="YShrink">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="Gtk.Button" id="importButton">
+                                    <property name="MemberName" />
+                                    <property name="CanFocus">True</property>
+                                    <property name="Type">TextOnly</property>
+                                    <property name="Label" translatable="yes">_Import Wallet</property>
+                                    <property name="UseUnderline">True</property>
+                                    <property name="Xalign">0</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="TopAttach">1</property>
+                                    <property name="BottomAttach">2</property>
+                                    <property name="AutoSize">True</property>
+                                    <property name="XOptions">Fill</property>
+                                    <property name="YOptions">Fill</property>
+                                    <property name="XExpand">False</property>
+                                    <property name="XFill">True</property>
+                                    <property name="XShrink">False</property>
+                                    <property name="YExpand">False</property>
+                                    <property name="YFill">True</property>
+                                    <property name="YShrink">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="Gtk.Button" id="upgradebutton">
+                                    <property name="MemberName" />
+                                    <property name="CanFocus">True</property>
+                                    <property name="Type">TextOnly</property>
+                                    <property name="Label" translatable="yes">_Upgrade Wallet</property>
+                                    <property name="UseUnderline">True</property>
+                                    <property name="Xalign">0</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="AutoSize">False</property>
+                                    <property name="YOptions">Fill</property>
+                                    <property name="XExpand">True</property>
+                                    <property name="XFill">True</property>
+                                    <property name="XShrink">False</property>
+                                    <property name="YExpand">False</property>
+                                    <property name="YFill">True</property>
+                                    <property name="YShrink">False</property>
+                                  </packing>
+                                </child>
                               </widget>
                               <packing>
                                 <property name="Position">2</property>
-                                <property name="AutoSize">True</property>
-                                <property name="Expand">False</property>
-                                <property name="Fill">False</property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="Gtk.Button" id="trustbutton">
+                              <widget class="Gtk.Label" id="label6">
                                 <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">Manage _Trust</property>
-                                <property name="UseUnderline">True</property>
                                 <property name="Xalign">0</property>
+                                <property name="LabelProp" translatable="yes">&lt;span fgcolor="orchid" bgcolor="black" size="x-large"&gt;&lt;b&gt; Restore     &lt;/b&gt;&lt;/span&gt;</property>
+                                <property name="UseMarkup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="type">tab</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="Gtk.VBox" id="vbox7">
+                                <property name="MemberName" />
+                                <property name="Spacing">3</property>
+                                <child>
+                                  <widget class="Gtk.Button" id="networkbutton1">
+                                    <property name="MemberName" />
+                                    <property name="CanFocus">True</property>
+                                    <property name="Type">TextOnly</property>
+                                    <property name="Label" translatable="yes">Network _Settings</property>
+                                    <property name="UseUnderline">True</property>
+                                    <property name="Xalign">0</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="Position">0</property>
+                                    <property name="AutoSize">True</property>
+                                    <property name="Expand">False</property>
+                                    <property name="Fill">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="Gtk.Button" id="rclAccountButton">
+                                    <property name="MemberName" />
+                                    <property name="CanFocus">True</property>
+                                    <property name="Type">TextOnly</property>
+                                    <property name="Label" translatable="yes">RCL Account Settings</property>
+                                    <property name="UseUnderline">True</property>
+                                    <property name="Xalign">0</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="Position">1</property>
+                                    <property name="AutoSize">True</property>
+                                    <property name="Expand">False</property>
+                                    <property name="Fill">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="Gtk.Button" id="optionsbutton1">
+                                    <property name="MemberName" />
+                                    <property name="CanFocus">True</property>
+                                    <property name="Type">TextOnly</property>
+                                    <property name="Label" translatable="yes">_Options</property>
+                                    <property name="UseUnderline">True</property>
+                                    <property name="Xalign">0</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="Position">2</property>
+                                    <property name="AutoSize">True</property>
+                                    <property name="Expand">False</property>
+                                    <property name="Fill">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="Gtk.Button" id="consolebutton1">
+                                    <property name="MemberName" />
+                                    <property name="CanFocus">True</property>
+                                    <property name="Type">TextOnly</property>
+                                    <property name="Label" translatable="yes">_Console</property>
+                                    <property name="UseUnderline">True</property>
+                                    <property name="Xalign">0</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="Position">3</property>
+                                    <property name="AutoSize">True</property>
+                                    <property name="Expand">False</property>
+                                    <property name="Fill">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="Gtk.Button" id="button91">
+                                    <property name="MemberName" />
+                                    <property name="CanFocus">True</property>
+                                    <property name="Type">TextOnly</property>
+                                    <property name="Label" translatable="yes">Debugging</property>
+                                    <property name="UseUnderline">True</property>
+                                    <property name="Xalign">0</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="Position">4</property>
+                                    <property name="AutoSize">True</property>
+                                    <property name="Expand">False</property>
+                                    <property name="Fill">False</property>
+                                  </packing>
+                                </child>
                               </widget>
                               <packing>
                                 <property name="Position">3</property>
-                                <property name="AutoSize">True</property>
-                                <property name="Expand">False</property>
-                                <property name="Fill">False</property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="Gtk.Button" id="txbutton">
+                              <widget class="Gtk.Label" id="label9">
                                 <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">View Transactions</property>
-                                <property name="UseUnderline">True</property>
                                 <property name="Xalign">0</property>
+                                <property name="LabelProp" translatable="yes">&lt;span size="x-large" fgcolor="orchid" bgcolor="black"&gt;&lt;b&gt; Options      &lt;/b&gt;&lt;/span&gt;</property>
+                                <property name="UseMarkup">True</property>
                               </widget>
                               <packing>
-                                <property name="Position">4</property>
-                                <property name="AutoSize">True</property>
-                                <property name="Expand">False</property>
-                                <property name="Fill">False</property>
+                                <property name="type">tab</property>
                               </packing>
                             </child>
                           </widget>
-                          <packing>
-                            <property name="TabFill">False</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="Gtk.Label" id="label4">
-                            <property name="MemberName" />
-                            <property name="Xalign">0</property>
-                            <property name="LabelProp" translatable="yes">&lt;big&gt;&lt;b&gt;Transact&lt;/b&gt;&lt;/big&gt;</property>
-                            <property name="UseMarkup">True</property>
-                          </widget>
-                          <packing>
-                            <property name="type">tab</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="Gtk.Table" id="table1">
-                            <property name="MemberName" />
-                            <property name="NRows">5</property>
-                            <property name="Homogeneous">True</property>
-                            <property name="RowSpacing">3</property>
-                            <child>
-                              <widget class="Gtk.Button" id="button66">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">Dec_rypt Wallet</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
-                              </widget>
-                              <packing>
-                                <property name="TopAttach">3</property>
-                                <property name="BottomAttach">4</property>
-                                <property name="AutoSize">True</property>
-                                <property name="XOptions">Fill</property>
-                                <property name="YOptions">Fill</property>
-                                <property name="XExpand">False</property>
-                                <property name="XFill">True</property>
-                                <property name="XShrink">False</property>
-                                <property name="YExpand">False</property>
-                                <property name="YFill">True</property>
-                                <property name="YShrink">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="Gtk.Button" id="button67">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">Encr_ypt Wallet</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
-                              </widget>
-                              <packing>
-                                <property name="TopAttach">2</property>
-                                <property name="BottomAttach">3</property>
-                                <property name="AutoSize">True</property>
-                                <property name="XOptions">Fill</property>
-                                <property name="YOptions">Fill</property>
-                                <property name="XExpand">False</property>
-                                <property name="XFill">True</property>
-                                <property name="XShrink">False</property>
-                                <property name="YExpand">False</property>
-                                <property name="YFill">True</property>
-                                <property name="YShrink">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="Gtk.Button" id="deleteButton">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">_Delete Wallet</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
-                              </widget>
-                              <packing>
-                                <property name="TopAttach">4</property>
-                                <property name="BottomAttach">5</property>
-                                <property name="AutoSize">True</property>
-                                <property name="XOptions">Fill</property>
-                                <property name="YOptions">Fill</property>
-                                <property name="XExpand">False</property>
-                                <property name="XFill">True</property>
-                                <property name="XShrink">False</property>
-                                <property name="YExpand">False</property>
-                                <property name="YFill">True</property>
-                                <property name="YShrink">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="Gtk.Button" id="editButton">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">_Edit Wallet</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
-                              </widget>
-                              <packing>
-                                <property name="TopAttach">1</property>
-                                <property name="BottomAttach">2</property>
-                                <property name="AutoSize">True</property>
-                                <property name="XOptions">Fill</property>
-                                <property name="YOptions">Fill</property>
-                                <property name="XExpand">False</property>
-                                <property name="XFill">True</property>
-                                <property name="XShrink">False</property>
-                                <property name="YExpand">False</property>
-                                <property name="YFill">True</property>
-                                <property name="YShrink">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="Gtk.Button" id="newbutton">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">_New Wallet</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
-                              </widget>
-                              <packing>
-                                <property name="AutoSize">False</property>
-                                <property name="YOptions">Fill</property>
-                                <property name="XExpand">True</property>
-                                <property name="XFill">True</property>
-                                <property name="XShrink">False</property>
-                                <property name="YExpand">False</property>
-                                <property name="YFill">True</property>
-                                <property name="YShrink">False</property>
-                              </packing>
-                            </child>
-                          </widget>
-                          <packing>
-                            <property name="Position">1</property>
-                            <property name="TabFill">False</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="Gtk.Label" id="label5">
-                            <property name="MemberName" />
-                            <property name="Xalign">0</property>
-                            <property name="LabelProp" translatable="yes">&lt;big&gt;&lt;b&gt;Keys&lt;/b&gt;&lt;/big&gt;</property>
-                            <property name="UseMarkup">True</property>
-                          </widget>
-                          <packing>
-                            <property name="type">tab</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="Gtk.Table" id="table2">
-                            <property name="MemberName" />
-                            <property name="NRows">5</property>
-                            <property name="Homogeneous">True</property>
-                            <property name="RowSpacing">3</property>
-                            <child>
-                              <widget class="Gtk.Button" id="button134">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">Remove .bkp wallet files</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
-                              </widget>
-                              <packing>
-                                <property name="TopAttach">4</property>
-                                <property name="BottomAttach">5</property>
-                                <property name="AutoSize">True</property>
-                                <property name="XOptions">Fill</property>
-                                <property name="YOptions">Fill</property>
-                                <property name="XExpand">False</property>
-                                <property name="XFill">True</property>
-                                <property name="XShrink">False</property>
-                                <property name="YExpand">False</property>
-                                <property name="YFill">True</property>
-                                <property name="YShrink">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="Gtk.Button" id="button135">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">Paper Wallet Wizard</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
-                              </widget>
-                              <packing>
-                                <property name="TopAttach">3</property>
-                                <property name="BottomAttach">4</property>
-                                <property name="AutoSize">True</property>
-                                <property name="XOptions">Fill</property>
-                                <property name="YOptions">Fill</property>
-                                <property name="XExpand">False</property>
-                                <property name="XFill">True</property>
-                                <property name="XShrink">False</property>
-                                <property name="YExpand">False</property>
-                                <property name="YFill">True</property>
-                                <property name="YShrink">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="Gtk.Button" id="exportButton">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">E_xport Wallet</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
-                              </widget>
-                              <packing>
-                                <property name="TopAttach">2</property>
-                                <property name="BottomAttach">3</property>
-                                <property name="AutoSize">True</property>
-                                <property name="XOptions">Fill</property>
-                                <property name="YOptions">Fill</property>
-                                <property name="XExpand">False</property>
-                                <property name="XFill">True</property>
-                                <property name="XShrink">False</property>
-                                <property name="YExpand">False</property>
-                                <property name="YFill">True</property>
-                                <property name="YShrink">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="Gtk.Button" id="importButton">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">_Import Wallet</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
-                              </widget>
-                              <packing>
-                                <property name="TopAttach">1</property>
-                                <property name="BottomAttach">2</property>
-                                <property name="AutoSize">True</property>
-                                <property name="XOptions">Fill</property>
-                                <property name="YOptions">Fill</property>
-                                <property name="XExpand">False</property>
-                                <property name="XFill">True</property>
-                                <property name="XShrink">False</property>
-                                <property name="YExpand">False</property>
-                                <property name="YFill">True</property>
-                                <property name="YShrink">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="Gtk.Button" id="upgradebutton">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">_Upgrade Wallet</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
-                              </widget>
-                              <packing>
-                                <property name="AutoSize">False</property>
-                                <property name="YOptions">Fill</property>
-                                <property name="XExpand">True</property>
-                                <property name="XFill">True</property>
-                                <property name="XShrink">False</property>
-                                <property name="YExpand">False</property>
-                                <property name="YFill">True</property>
-                                <property name="YShrink">False</property>
-                              </packing>
-                            </child>
-                          </widget>
-                          <packing>
-                            <property name="Position">2</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="Gtk.Label" id="label6">
-                            <property name="MemberName" />
-                            <property name="Xalign">0</property>
-                            <property name="LabelProp" translatable="yes">&lt;big&gt;&lt;b&gt;Restore&lt;/b&gt;&lt;/big&gt;</property>
-                            <property name="UseMarkup">True</property>
-                          </widget>
-                          <packing>
-                            <property name="type">tab</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="Gtk.VBox" id="vbox7">
-                            <property name="MemberName" />
-                            <property name="Spacing">3</property>
-                            <child>
-                              <widget class="Gtk.Button" id="networkbutton1">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">Network _Settings</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
-                              </widget>
-                              <packing>
-                                <property name="Position">0</property>
-                                <property name="AutoSize">True</property>
-                                <property name="Expand">False</property>
-                                <property name="Fill">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="Gtk.Button" id="rclAccountButton">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">RCL Account Settings</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
-                              </widget>
-                              <packing>
-                                <property name="Position">1</property>
-                                <property name="AutoSize">True</property>
-                                <property name="Expand">False</property>
-                                <property name="Fill">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="Gtk.Button" id="optionsbutton1">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">_Options</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
-                              </widget>
-                              <packing>
-                                <property name="Position">2</property>
-                                <property name="AutoSize">True</property>
-                                <property name="Expand">False</property>
-                                <property name="Fill">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="Gtk.Button" id="consolebutton1">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">_Console</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
-                              </widget>
-                              <packing>
-                                <property name="Position">3</property>
-                                <property name="AutoSize">True</property>
-                                <property name="Expand">False</property>
-                                <property name="Fill">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="Gtk.Button" id="button91">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Type">TextOnly</property>
-                                <property name="Label" translatable="yes">Debugging</property>
-                                <property name="UseUnderline">True</property>
-                                <property name="Xalign">0</property>
-                              </widget>
-                              <packing>
-                                <property name="Position">4</property>
-                                <property name="AutoSize">True</property>
-                                <property name="Expand">False</property>
-                                <property name="Fill">False</property>
-                              </packing>
-                            </child>
-                          </widget>
-                          <packing>
-                            <property name="Position">3</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="Gtk.Label" id="label9">
-                            <property name="MemberName" />
-                            <property name="Xalign">0</property>
-                            <property name="LabelProp" translatable="yes">&lt;big&gt;&lt;b&gt;Options&lt;/b&gt;&lt;/big&gt;</property>
-                            <property name="UseMarkup">True</property>
-                          </widget>
-                          <packing>
-                            <property name="type">tab</property>
-                          </packing>
                         </child>
                       </widget>
                       <packing>
                         <property name="Position">0</property>
-                        <property name="AutoSize">False</property>
+                        <property name="AutoSize">True</property>
                         <property name="Expand">False</property>
                         <property name="Fill">False</property>
                       </packing>
@@ -5304,7 +5315,7 @@ drops</property>
                     </child>
                   </widget>
                   <packing>
-                    <property name="Position">1</property>
+                    <property name="Position">2</property>
                     <property name="AutoSize">False</property>
                     <property name="Expand">False</property>
                     <property name="Fill">False</property>
@@ -5313,10 +5324,11 @@ drops</property>
                 <child>
                   <widget class="IhildaWallet.BalanceTab" id="balancetab1">
                     <property name="MemberName" />
+                    <property name="Visible">False</property>
                     <property name="Events">ButtonPressMask</property>
                   </widget>
                   <packing>
-                    <property name="Position">2</property>
+                    <property name="Position">3</property>
                     <property name="AutoSize">True</property>
                   </packing>
                 </child>
@@ -5340,40 +5352,57 @@ drops</property>
                       </packing>
                     </child>
                     <child>
-                      <widget class="Gtk.Label" id="label7">
+                      <widget class="IhildaWallet.WalletSwitchWidget" id="walletswitchwidget1">
                         <property name="MemberName" />
-                        <property name="UseMarkup">True</property>
-                      </widget>
-                      <packing>
-                        <property name="Position">1</property>
-                        <property name="AutoSize">False</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="Gtk.EventBox" id="eventbox2">
-                        <property name="MemberName" />
-                        <child>
-                          <widget class="IhildaWallet.ConnectedDisplayWidget" id="connecteddisplaywidget1">
-                            <property name="MemberName" />
-                            <property name="Visible">False</property>
-                            <property name="Events">ButtonPressMask</property>
-                          </widget>
-                        </child>
+                        <property name="Events">ButtonPressMask</property>
                       </widget>
                       <packing>
                         <property name="PackType">End</property>
-                        <property name="Position">2</property>
-                        <property name="AutoSize">True</property>
-                        <property name="Expand">False</property>
-                        <property name="Fill">False</property>
+                        <property name="Position">1</property>
+                        <property name="AutoSize">False</property>
+                        <property name="Padding">3</property>
                       </packing>
                     </child>
                   </widget>
                   <packing>
-                    <property name="Position">3</property>
+                    <property name="PackType">End</property>
+                    <property name="Position">4</property>
                     <property name="AutoSize">False</property>
                     <property name="Expand">False</property>
                     <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.ScrolledWindow" id="scrolledwindow1">
+                    <property name="MemberName" />
+                    <property name="CanFocus">True</property>
+                    <property name="VscrollbarPolicy">Never</property>
+                    <property name="HscrollbarPolicy">Never</property>
+                    <property name="ShadowType">In</property>
+                    <child>
+                      <widget class="Gtk.Viewport" id="GtkViewport">
+                        <property name="MemberName" />
+                        <property name="ShadowType">None</property>
+                        <child>
+                          <widget class="Gtk.EventBox" id="eventbox6">
+                            <property name="MemberName" />
+                            <child>
+                              <widget class="Gtk.Image" id="image2">
+                                <property name="MemberName" />
+                                <property name="Xalign">0</property>
+                                <property name="Yalign">1</property>
+                                <property name="Pixbuf">resource:IhildaWallet.earthfrommoonsided.png</property>
+                              </widget>
+                            </child>
+                          </widget>
+                        </child>
+                      </widget>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="PackType">End</property>
+                    <property name="Position">5</property>
+                    <property name="AutoSize">False</property>
                   </packing>
                 </child>
               </widget>
@@ -5401,6 +5430,26 @@ drops</property>
                         <property name="AutoSize">False</property>
                       </packing>
                     </child>
+                    <child>
+                      <widget class="Gtk.EventBox" id="eventbox5">
+                        <property name="MemberName" />
+                        <child>
+                          <widget class="IhildaWallet.ConnectedDisplayWidget" id="connecteddisplaywidget1">
+                            <property name="MemberName" />
+                            <property name="Visible">False</property>
+                            <property name="Events">ButtonPressMask</property>
+                          </widget>
+                        </child>
+                      </widget>
+                      <packing>
+                        <property name="PackType">End</property>
+                        <property name="Position">1</property>
+                        <property name="AutoSize">True</property>
+                        <property name="Expand">False</property>
+                        <property name="Fill">False</property>
+                        <property name="Padding">8</property>
+                      </packing>
+                    </child>
                   </widget>
                   <packing>
                     <property name="Position">0</property>
@@ -5410,7 +5459,7 @@ drops</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="Gtk.HBox" id="hbox4">
+                  <widget class="Gtk.HBox" id="hbox7">
                     <property name="MemberName" />
                     <property name="Spacing">6</property>
                     <child>
@@ -5433,7 +5482,7 @@ drops</property>
             </child>
           </widget>
           <packing>
-            <property name="Position">1</property>
+            <property name="Position">0</property>
             <property name="AutoSize">True</property>
           </packing>
         </child>
@@ -5881,7 +5930,7 @@ drops</property>
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Window" id="IhildaWallet.WalletManagerWindow" design-size="1108 545">
+  <widget class="Gtk.Window" id="IhildaWallet.WalletManagerWindow" design-size="1065 493">
     <action-group name="Default" />
     <property name="MemberName" />
     <property name="Title" translatable="yes">Wallet Manager</property>
@@ -6918,7 +6967,7 @@ drops</property>
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Window" id="IhildaWallet.TradeWindow" design-size="716 520">
+  <widget class="Gtk.Window" id="IhildaWallet.TradeWindow" design-size="554 611">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -7027,113 +7076,149 @@ drops</property>
           </packing>
         </child>
         <child>
-          <widget class="Gtk.Notebook" id="notebook">
+          <widget class="Gtk.Notebook" id="notebook1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="CurrentPage">0</property>
+            <property name="CurrentPage">1</property>
+            <property name="TabPos">Left</property>
             <child>
-              <widget class="IhildaWallet.BuyWidget" id="buywidget1">
+              <widget class="Gtk.Notebook" id="notebook">
                 <property name="MemberName" />
-                <property name="Events">ButtonPressMask</property>
+                <property name="CanFocus">True</property>
+                <property name="CurrentPage">2</property>
+                <child>
+                  <widget class="IhildaWallet.BuyWidget" id="buywidget1">
+                    <property name="MemberName" />
+                    <property name="Events">ButtonPressMask</property>
+                  </widget>
+                </child>
+                <child>
+                  <widget class="Gtk.Label" id="label29">
+                    <property name="MemberName" />
+                    <property name="Xalign">0</property>
+                    <property name="LabelProp" translatable="yes">Buy</property>
+                  </widget>
+                  <packing>
+                    <property name="type">tab</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="IhildaWallet.CascadedBuyWidget" id="cascadedbuywidget1">
+                    <property name="MemberName" />
+                    <property name="Events">ButtonPressMask</property>
+                  </widget>
+                  <packing>
+                    <property name="Position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Label" id="label36">
+                    <property name="MemberName" />
+                    <property name="Xalign">0</property>
+                    <property name="LabelProp" translatable="yes">Cascaded Buy</property>
+                  </widget>
+                  <packing>
+                    <property name="type">tab</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="IhildaWallet.AutomatedBuyWidget" id="automatedbuywidget1">
+                    <property name="MemberName" />
+                    <property name="Events">ButtonPressMask</property>
+                  </widget>
+                  <packing>
+                    <property name="Position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Label" id="label41">
+                    <property name="MemberName" />
+                    <property name="LabelProp" translatable="yes">Automated Buy</property>
+                  </widget>
+                  <packing>
+                    <property name="type">tab</property>
+                  </packing>
+                </child>
               </widget>
             </child>
             <child>
-              <widget class="Gtk.Label" id="label29">
+              <widget class="Gtk.Label" id="label73">
                 <property name="MemberName" />
-                <property name="Xalign">0</property>
-                <property name="LabelProp" translatable="yes">Buy</property>
+                <property name="LabelProp" translatable="yes">&lt;span fgcolor="green" size="x-large"&gt;&lt;b&gt;Buy&lt;/b&gt;&lt;/span&gt;</property>
+                <property name="UseMarkup">True</property>
               </widget>
               <packing>
                 <property name="type">tab</property>
               </packing>
             </child>
             <child>
-              <widget class="IhildaWallet.CascadedBuyWidget" id="cascadedbuywidget1">
+              <widget class="Gtk.Notebook" id="notebook4">
                 <property name="MemberName" />
-                <property name="Events">ButtonPressMask</property>
+                <property name="CanFocus">True</property>
+                <property name="CurrentPage">2</property>
+                <child>
+                  <widget class="IhildaWallet.SellWidget" id="sellwidget1">
+                    <property name="MemberName" />
+                    <property name="Events">ButtonPressMask</property>
+                  </widget>
+                </child>
+                <child>
+                  <widget class="Gtk.Label" id="label74">
+                    <property name="MemberName" />
+                    <property name="LabelProp" translatable="yes">Sell</property>
+                  </widget>
+                  <packing>
+                    <property name="type">tab</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="IhildaWallet.CascadedSellWidget" id="cascadedsellwidget2">
+                    <property name="MemberName" />
+                    <property name="Events">ButtonPressMask</property>
+                  </widget>
+                  <packing>
+                    <property name="Position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Label" id="label75">
+                    <property name="MemberName" />
+                    <property name="LabelProp" translatable="yes">Cascaded Sell</property>
+                    <property name="UseMarkup">True</property>
+                  </widget>
+                  <packing>
+                    <property name="type">tab</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="IhildaWallet.AutomatedSellWidget" id="automatedsellwidget1">
+                    <property name="MemberName" />
+                    <property name="Events">ButtonPressMask</property>
+                  </widget>
+                  <packing>
+                    <property name="Position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Label" id="label76">
+                    <property name="MemberName" />
+                    <property name="LabelProp" translatable="yes">Automated Sell</property>
+                    <property name="UseMarkup">True</property>
+                  </widget>
+                  <packing>
+                    <property name="type">tab</property>
+                  </packing>
+                </child>
               </widget>
               <packing>
                 <property name="Position">1</property>
               </packing>
             </child>
             <child>
-              <widget class="Gtk.Label" id="label36">
+              <widget class="Gtk.Label" id="label77">
                 <property name="MemberName" />
-                <property name="Xalign">0</property>
-                <property name="LabelProp" translatable="yes">Cascaded Buy</property>
-              </widget>
-              <packing>
-                <property name="type">tab</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="IhildaWallet.AutomatedBuyWidget" id="automatedbuywidget1">
-                <property name="MemberName" />
-                <property name="Events">ButtonPressMask</property>
-              </widget>
-              <packing>
-                <property name="Position">2</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.Label" id="label39">
-                <property name="MemberName" />
-                <property name="LabelProp" translatable="yes">Automated Buy</property>
-              </widget>
-              <packing>
-                <property name="type">tab</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="IhildaWallet.SellWidget" id="sellwidget1">
-                <property name="MemberName" />
-                <property name="Events">ButtonPressMask</property>
-              </widget>
-              <packing>
-                <property name="Position">3</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.Label" id="selllabel">
-                <property name="MemberName" />
-                <property name="Xalign">0</property>
-                <property name="LabelProp" translatable="yes">Sell</property>
-              </widget>
-              <packing>
-                <property name="type">tab</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="IhildaWallet.CascadedSellWidget" id="cascadedsellwidget2">
-                <property name="MemberName" />
-                <property name="Events">ButtonPressMask</property>
-              </widget>
-              <packing>
-                <property name="Position">4</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.Label" id="label57">
-                <property name="MemberName" />
-                <property name="LabelProp" translatable="yes">Cascaded Sell</property>
-              </widget>
-              <packing>
-                <property name="type">tab</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="IhildaWallet.AutomatedSellWidget" id="automatedsellwidget1">
-                <property name="MemberName" />
-                <property name="Events">ButtonPressMask</property>
-              </widget>
-              <packing>
-                <property name="Position">5</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.Label" id="autoselltablabel">
-                <property name="MemberName" />
-                <property name="LabelProp" translatable="yes">Automated Sell</property>
+                <property name="LabelProp" translatable="yes">&lt;span fgcolor="red" size="x-large"&gt;&lt;b&gt;Sell&lt;/b&gt;&lt;/span&gt;</property>
+                <property name="UseMarkup">True</property>
               </widget>
               <packing>
                 <property name="type">tab</property>
@@ -7142,9 +7227,7 @@ drops</property>
           </widget>
           <packing>
             <property name="Position">2</property>
-            <property name="AutoSize">True</property>
-            <property name="Expand">False</property>
-            <property name="Fill">False</property>
+            <property name="AutoSize">False</property>
           </packing>
         </child>
       </widget>
@@ -13232,7 +13315,7 @@ example: USD/CAD</property>
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Window" id="IhildaWallet.FilledRuleManagementWindow" design-size="1090 444">
+  <widget class="Gtk.Window" id="IhildaWallet.FilledRuleManagementWindow" design-size="691 444">
     <property name="MemberName" />
     <property name="Title" translatable="yes">Filled Rule Management </property>
     <property name="WindowPosition">CenterOnParent</property>
@@ -14462,7 +14545,7 @@ Bot output screen
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Window" id="IhildaWallet.OrderSubmitWindow" design-size="1227 370">
+  <widget class="Gtk.Window" id="IhildaWallet.OrderSubmitWindow" design-size="1051 386">
     <property name="MemberName" />
     <property name="Title" translatable="yes">OrderSubmitWindow</property>
     <property name="WindowPosition">CenterOnParent</property>
@@ -16444,6 +16527,23 @@ Bot output screen
                   <packing>
                     <property name="Position">1</property>
                     <property name="AutoSize">True</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.CheckButton" id="darkmodecheckbox">
+                    <property name="MemberName" />
+                    <property name="CanFocus">True</property>
+                    <property name="Label" translatable="yes">Dark Mode</property>
+                    <property name="DrawIndicator">True</property>
+                    <property name="HasLabel">True</property>
+                    <property name="UseUnderline">True</property>
+                  </widget>
+                  <packing>
+                    <property name="PackType">End</property>
+                    <property name="Position">2</property>
+                    <property name="AutoSize">False</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
                   </packing>
                 </child>
               </widget>
@@ -19268,12 +19368,17 @@ OR</property>
           </packing>
         </child>
         <child>
-          <widget class="Gtk.Label" id="label1">
+          <widget class="Gtk.EventBox" id="eventbox2">
             <property name="MemberName" />
-            <property name="Xpad">7</property>
-            <property name="Xalign">0</property>
-            <property name="LabelProp" translatable="yes">label1</property>
-            <property name="Selectable">True</property>
+            <child>
+              <widget class="Gtk.Label" id="label1">
+                <property name="MemberName" />
+                <property name="Xpad">7</property>
+                <property name="Xalign">0</property>
+                <property name="LabelProp" translatable="yes">Select a wallet</property>
+                <property name="Selectable">True</property>
+              </widget>
+            </child>
           </widget>
           <packing>
             <property name="Position">1</property>

@@ -189,8 +189,11 @@ namespace IhildaWallet
 		}
 
 		public void SyncClicked ( object address ) {
-			#if DEBUG
-			string method_sig = clsstr + "syncClicked (address) : ";
+
+
+#if DEBUG
+
+			string method_sig = clsstr + nameof (SyncClicked) + DebugRippleLibSharp.left_parentheses + nameof (address) + DebugRippleLibSharp.right_parentheses;
 			if (DebugIhildaWallet.OrdersTreeWidget) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}

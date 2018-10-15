@@ -150,11 +150,36 @@ namespace IhildaWallet
 				Amountmod = amountModNum,
 				Mark = mark
 			};
+
+			SetDetails ( cluster );
+
+			if (OnClusterChanged != null) {
+				OnClusterChanged.Invoke (this, new ClusterChangedEventArgs () { Cluster = cluster });
+			}
+		}
+
+		public void SetDetails (OrderCluster cluster)
+		{
+			//cluster.GetOrders (
 		}
 
 		public OrderCluster cluster = null;
+		public event EventHandler<ClusterChangedEventArgs> OnClusterChanged;
+	}
+
+
+
+	public class ClusterChangedEventArgs : EventArgs
+	{
+
+		public OrderCluster Cluster {
+			get;
+			set;
+		}
+
 
 	}
+
 
 	public class OrderCluster
 	{
@@ -170,14 +195,14 @@ namespace IhildaWallet
 
 		public string Mark { get; set; }
 
-		public Tuple <IEnumerable<AutomatedOrder>, IEnumerable<AutomatedOrder>> GetOrders (double midPrice, TradePair tradePair)
+		public Tuple < IEnumerable<AutomatedOrder>, IEnumerable<AutomatedOrder> > GetOrders (double midPrice, TradePair tradePair)
 		{
 			
 
 			int number = Orders;
 
-			double buyPrice = midPrice / Spread;
-			double sellPrice = midPrice * Spread;
+			double buyPrice = midPrice / ((Spread + 1) / 2);
+			double sellPrice = midPrice * ((Spread + 1) / 2 );
 
 
 			double amount = Amount;
@@ -247,7 +272,7 @@ namespace IhildaWallet
 
 
 
-			return new Tuple<IEnumerable<AutomatedOrder>, IEnumerable<AutomatedOrder>>(buylist, selllist);
+			return new Tuple< IEnumerable<AutomatedOrder>, IEnumerable<AutomatedOrder> > ( buylist, selllist );
 
 		}
 

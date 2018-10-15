@@ -71,43 +71,43 @@ namespace IhildaWallet
 				automatedbuywidget1 = new AutomatedBuyWidget ();
 				automatedbuywidget1.Show ();
 
-				if (label39 == null) {
-					label39 = new Label ("<b>Automated Buy</b>");
+				if (label41 == null) {
+					label41 = new Label ("<b>Automated Buy</b>");
 				}
 
-				notebook.AppendPage (automatedbuywidget1, label39);
+				notebook.AppendPage (automatedbuywidget1, label41);
 			}
 
 			if (sellwidget1 == null) {
 				sellwidget1 = new SellWidget ();
 				sellwidget1.Show ();
 
-				if (selllabel == null) {
-					selllabel = new Label ("<b>Sell</b>");
+				if (label74 == null) {
+					label74 = new Label ("<b>Sell</b>");
 				}
-				notebook.AppendPage (sellwidget1, selllabel);
+				notebook4.AppendPage (sellwidget1, label74);
 			}
 
 			if (cascadedsellwidget2 == null) {
 				cascadedsellwidget2 = new CascadedSellWidget ();
 				cascadedsellwidget2.Show ();
 
-				if (label57 == null) {
-					label57 = new Label ("<b>Cascaded Sell</b>");
+				if (label75 == null) {
+					label75 = new Label ("<b>Cascaded Sell</b>");
 				}
 
-				notebook.AppendPage (cascadedbuywidget1, label57);
+				notebook4.AppendPage (cascadedbuywidget1, label75);
 			}
 
 			if (automatedsellwidget1 == null) {
 				automatedsellwidget1 = new AutomatedSellWidget ();
 				automatedsellwidget1.Show ();
 
-				if (autoselltablabel == null) {
-					autoselltablabel = new Label ("<b>Automated Sell</b>");
+				if (label76 == null) {
+					label76 = new Label ("<b>Automated Sell</b>");
 				}
 
-				notebook.AppendPage (automatedsellwidget1, autoselltablabel);
+				notebook4.AppendPage (automatedsellwidget1, label76);
 			}
 
 			this.SetTradePair (tradePair);

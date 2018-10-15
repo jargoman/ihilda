@@ -24,6 +24,8 @@ namespace IhildaWallet
 
 		private global::IhildaWallet.SpreadWidget spreadwidget1;
 
+		private global::Gtk.Notebook notebook1;
+
 		private global::Gtk.Notebook notebook;
 
 		private global::IhildaWallet.BuyWidget buywidget1;
@@ -36,19 +38,25 @@ namespace IhildaWallet
 
 		private global::IhildaWallet.AutomatedBuyWidget automatedbuywidget1;
 
-		private global::Gtk.Label label39;
+		private global::Gtk.Label label41;
+
+		private global::Gtk.Label label73;
+
+		private global::Gtk.Notebook notebook4;
 
 		private global::IhildaWallet.SellWidget sellwidget1;
 
-		private global::Gtk.Label selllabel;
+		private global::Gtk.Label label74;
 
 		private global::IhildaWallet.CascadedSellWidget cascadedsellwidget2;
 
-		private global::Gtk.Label label57;
+		private global::Gtk.Label label75;
 
 		private global::IhildaWallet.AutomatedSellWidget automatedsellwidget1;
 
-		private global::Gtk.Label autoselltablabel;
+		private global::Gtk.Label label76;
+
+		private global::Gtk.Label label77;
 
 		protected virtual void Build()
 		{
@@ -128,10 +136,16 @@ namespace IhildaWallet
 			w7.Position = 1;
 			w7.Expand = false;
 			// Container child vbox2.Gtk.Box+BoxChild
+			this.notebook1 = new global::Gtk.Notebook();
+			this.notebook1.CanFocus = true;
+			this.notebook1.Name = "notebook1";
+			this.notebook1.CurrentPage = 1;
+			this.notebook1.TabPos = ((global::Gtk.PositionType)(0));
+			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.notebook = new global::Gtk.Notebook();
 			this.notebook.CanFocus = true;
 			this.notebook.Name = "notebook";
-			this.notebook.CurrentPage = 0;
+			this.notebook.CurrentPage = 2;
 			// Container child notebook.Gtk.Notebook+NotebookChild
 			this.buywidget1 = new global::IhildaWallet.BuyWidget();
 			this.buywidget1.Events = ((global::Gdk.EventMask)(256));
@@ -166,63 +180,83 @@ namespace IhildaWallet
 			global::Gtk.Notebook.NotebookChild w10 = ((global::Gtk.Notebook.NotebookChild)(this.notebook[this.automatedbuywidget1]));
 			w10.Position = 2;
 			// Notebook tab
-			this.label39 = new global::Gtk.Label();
-			this.label39.Name = "label39";
-			this.label39.LabelProp = global::Mono.Unix.Catalog.GetString("Automated Buy");
-			this.notebook.SetTabLabel(this.automatedbuywidget1, this.label39);
-			this.label39.ShowAll();
-			// Container child notebook.Gtk.Notebook+NotebookChild
+			this.label41 = new global::Gtk.Label();
+			this.label41.Name = "label41";
+			this.label41.LabelProp = global::Mono.Unix.Catalog.GetString("Automated Buy");
+			this.notebook.SetTabLabel(this.automatedbuywidget1, this.label41);
+			this.label41.ShowAll();
+			this.notebook1.Add(this.notebook);
+			// Notebook tab
+			this.label73 = new global::Gtk.Label();
+			this.label73.Name = "label73";
+			this.label73.LabelProp = global::Mono.Unix.Catalog.GetString("<span fgcolor=\"green\" size=\"x-large\"><b>Buy</b></span>");
+			this.label73.UseMarkup = true;
+			this.notebook1.SetTabLabel(this.notebook, this.label73);
+			this.label73.ShowAll();
+			// Container child notebook1.Gtk.Notebook+NotebookChild
+			this.notebook4 = new global::Gtk.Notebook();
+			this.notebook4.CanFocus = true;
+			this.notebook4.Name = "notebook4";
+			this.notebook4.CurrentPage = 2;
+			// Container child notebook4.Gtk.Notebook+NotebookChild
 			this.sellwidget1 = new global::IhildaWallet.SellWidget();
 			this.sellwidget1.Events = ((global::Gdk.EventMask)(256));
 			this.sellwidget1.Name = "sellwidget1";
-			this.notebook.Add(this.sellwidget1);
-			global::Gtk.Notebook.NotebookChild w11 = ((global::Gtk.Notebook.NotebookChild)(this.notebook[this.sellwidget1]));
-			w11.Position = 3;
+			this.notebook4.Add(this.sellwidget1);
 			// Notebook tab
-			this.selllabel = new global::Gtk.Label();
-			this.selllabel.Name = "selllabel";
-			this.selllabel.Xalign = 0F;
-			this.selllabel.LabelProp = global::Mono.Unix.Catalog.GetString("Sell");
-			this.notebook.SetTabLabel(this.sellwidget1, this.selllabel);
-			this.selllabel.ShowAll();
-			// Container child notebook.Gtk.Notebook+NotebookChild
+			this.label74 = new global::Gtk.Label();
+			this.label74.Name = "label74";
+			this.label74.LabelProp = global::Mono.Unix.Catalog.GetString("Sell");
+			this.notebook4.SetTabLabel(this.sellwidget1, this.label74);
+			this.label74.ShowAll();
+			// Container child notebook4.Gtk.Notebook+NotebookChild
 			this.cascadedsellwidget2 = new global::IhildaWallet.CascadedSellWidget();
 			this.cascadedsellwidget2.Events = ((global::Gdk.EventMask)(256));
 			this.cascadedsellwidget2.Name = "cascadedsellwidget2";
-			this.notebook.Add(this.cascadedsellwidget2);
-			global::Gtk.Notebook.NotebookChild w12 = ((global::Gtk.Notebook.NotebookChild)(this.notebook[this.cascadedsellwidget2]));
-			w12.Position = 4;
+			this.notebook4.Add(this.cascadedsellwidget2);
+			global::Gtk.Notebook.NotebookChild w13 = ((global::Gtk.Notebook.NotebookChild)(this.notebook4[this.cascadedsellwidget2]));
+			w13.Position = 1;
 			// Notebook tab
-			this.label57 = new global::Gtk.Label();
-			this.label57.Name = "label57";
-			this.label57.LabelProp = global::Mono.Unix.Catalog.GetString("Cascaded Sell");
-			this.notebook.SetTabLabel(this.cascadedsellwidget2, this.label57);
-			this.label57.ShowAll();
-			// Container child notebook.Gtk.Notebook+NotebookChild
+			this.label75 = new global::Gtk.Label();
+			this.label75.Name = "label75";
+			this.label75.LabelProp = global::Mono.Unix.Catalog.GetString("Cascaded Sell");
+			this.label75.UseMarkup = true;
+			this.notebook4.SetTabLabel(this.cascadedsellwidget2, this.label75);
+			this.label75.ShowAll();
+			// Container child notebook4.Gtk.Notebook+NotebookChild
 			this.automatedsellwidget1 = new global::IhildaWallet.AutomatedSellWidget();
 			this.automatedsellwidget1.Events = ((global::Gdk.EventMask)(256));
 			this.automatedsellwidget1.Name = "automatedsellwidget1";
-			this.notebook.Add(this.automatedsellwidget1);
-			global::Gtk.Notebook.NotebookChild w13 = ((global::Gtk.Notebook.NotebookChild)(this.notebook[this.automatedsellwidget1]));
-			w13.Position = 5;
-			// Notebook tab
-			this.autoselltablabel = new global::Gtk.Label();
-			this.autoselltablabel.Name = "autoselltablabel";
-			this.autoselltablabel.LabelProp = global::Mono.Unix.Catalog.GetString("Automated Sell");
-			this.notebook.SetTabLabel(this.automatedsellwidget1, this.autoselltablabel);
-			this.autoselltablabel.ShowAll();
-			this.vbox2.Add(this.notebook);
-			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.notebook]));
+			this.notebook4.Add(this.automatedsellwidget1);
+			global::Gtk.Notebook.NotebookChild w14 = ((global::Gtk.Notebook.NotebookChild)(this.notebook4[this.automatedsellwidget1]));
 			w14.Position = 2;
-			w14.Expand = false;
-			w14.Fill = false;
+			// Notebook tab
+			this.label76 = new global::Gtk.Label();
+			this.label76.Name = "label76";
+			this.label76.LabelProp = global::Mono.Unix.Catalog.GetString("Automated Sell");
+			this.label76.UseMarkup = true;
+			this.notebook4.SetTabLabel(this.automatedsellwidget1, this.label76);
+			this.label76.ShowAll();
+			this.notebook1.Add(this.notebook4);
+			global::Gtk.Notebook.NotebookChild w15 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.notebook4]));
+			w15.Position = 1;
+			// Notebook tab
+			this.label77 = new global::Gtk.Label();
+			this.label77.Name = "label77";
+			this.label77.LabelProp = global::Mono.Unix.Catalog.GetString("<span fgcolor=\"red\" size=\"x-large\"><b>Sell</b></span>");
+			this.label77.UseMarkup = true;
+			this.notebook1.SetTabLabel(this.notebook4, this.label77);
+			this.label77.ShowAll();
+			this.vbox2.Add(this.notebook1);
+			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.notebook1]));
+			w16.Position = 2;
 			this.Add(this.vbox2);
 			if ((this.Child != null))
 			{
 				this.Child.ShowAll();
 			}
-			this.DefaultWidth = 716;
-			this.DefaultHeight = 520;
+			this.DefaultWidth = 554;
+			this.DefaultHeight = 611;
 			this.Show();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler(this.OnDeleteEvent);
 		}

@@ -17,6 +17,7 @@ using Gdk;
 using Pango;
 using System.Text;
 using System.Drawing;
+using System.ComponentModel;
 
 namespace IhildaWallet
 {
@@ -27,12 +28,20 @@ namespace IhildaWallet
 		{
 			this.Build ();
 
+
+
 			if (this.drawingarea1 == null) {
 				this.drawingarea1 = new DrawingArea ();
 				this.drawingarea1.Show ();
 
 				vbox2.Add (this.drawingarea1);
 			}
+
+			//this.DoubleBuffered = false;
+			//this.drawingarea1.DoubleBuffered = false;
+
+			this.DoubleBuffered = true;
+			this.drawingarea1.DoubleBuffered = true;
 
 			this.drawingarea1.AddEvents ((int)
 				(EventMask.ButtonPressMask
@@ -51,25 +60,73 @@ namespace IhildaWallet
 			this.drawingarea1.MotionNotifyEvent += Drawingarea1_MotionNotifyEvent;
 
 			this.drawingarea1.LeaveNotifyEvent += Drawingarea1_LeaveNotifyEvent;
-
+			//this.drawingarea1.
 			//this.drawingarea1.ConfigureEvent += Drawingarea1_ConfigureEvent;
 
 			//this.drawingarea1.Realized += Drawingarea1_Realized;
 
+			this.drawingarea1.SizeAllocated += Drawingarea1_SizeAllocated;
+
 			this.drawingarea1.ButtonPressEvent += Drawingarea1_ButtonPressEvent;
+
+			this.drawingarea1.DragMotion += (o, args) => {
+				CopyBuffer ();
+				//drawingarea1.
+			};
+
+			orderclusterwidget1.OnClusterChanged += (object sender, ClusterChangedEventArgs e) => {
+				var pointframe = this.GetPointFrame ();
+
+				decimal price = pointframe.midprice;
+
+				var cluster = e.Cluster;
+
+				var orders = cluster.GetOrders ((double)price, _tradePair);
+
+				this.ordersTuple = orders;
+				this.DrawChartToPixMap (pointframe);
+				this.CopyBuffer ();
+			};
+
+			darkmodecheckbox.Clicked += (object sender, EventArgs e) => {
+				var pointframe = this.GetPointFrame ();
+				this.DrawChartToPixMap (pointframe);
+				this.CopyBuffer ();
+			};
+
+
+			/*
+var pointframe = this.GetPointFrame ();
+this.DrawChartToPixMap (pointframe);
+this.CopyBuffer ();
+};*/
+
 			this.hscale1.Digits = 0;
 			this.hscale2.Digits = 0;
 
 			this.hscale1.ValueChanged += (object sender, EventArgs e) => {
 				max_bids = (int)hscale1.Value;
 				scaleChanged = true;
-				DrawChart (_pointFrame);
+				PointFrame pointFrame = _pointFrame;
+				if (pointFrame == null) {
+					return;
+				}
+				this.chartBufferImage = DrawChartToPixMap (pointFrame);
+				CopyBuffer ( /*pointFrame*/ );
 			};
 
 			this.hscale2.ValueChanged += (object sender, EventArgs e) => {
 				max_asks = (int)hscale2.Value;
 				scaleChanged = true;
-				DrawChart (_pointFrame);
+				//DrawChart (_pointFrame);
+				PointFrame pointFrame = _pointFrame;
+				if (pointFrame == null) {
+					return;
+				}
+
+				this.chartBufferImage = DrawChartToPixMap (pointFrame);
+
+				CopyBuffer ( /*pointFrame*/ );
 			};
 
 			this.drawingarea1.EnterNotifyEvent += (object o, EnterNotifyEventArgs args) => {
@@ -80,6 +137,8 @@ namespace IhildaWallet
 				while (_cont) {
 					await Task.Delay (30000);
 					UpdateBooks ();
+					System.GC.Collect ();
+					System.GC.WaitForPendingFinalizers ();
 				}
 			}
 			);
@@ -89,6 +148,7 @@ namespace IhildaWallet
 		~DepthChartWidget ()
 		{
 			_cont = false;
+			this.Dispose ();
 		}
 
 		private bool _cont = true;
@@ -372,33 +432,56 @@ namespace IhildaWallet
 			};
 			#endregion
 
-			Gtk.MenuItem orderCluster = new MenuItem ("Prepare order cluster");
+			var orders = this.ordersTuple;
+			if (orders != null) {
 
-			orderCluster.Show ();
-			menu.Add (orderCluster);
 
-			l = (Gtk.Label)orderCluster.Child;
-			l.UseMarkup = true;
-			orderCluster.Activated += (object sender, EventArgs e) => { 
+				Gtk.MenuItem orderCluster = new MenuItem ("Prepare order cluster as shown");
+				orderCluster.Show ();
+				menu.Add (orderCluster);
+				l = (Gtk.Label)orderCluster.Child;
+				l.UseMarkup = true;
+				orderCluster.Activated += (object sender, EventArgs e) => {
 
 #if DEBUG
-				if (DebugIhildaWallet.DepthChartWidget) {
-					Logging.WriteLog ("autosell selected");
-				}
+					if (DebugIhildaWallet.DepthChartWidget) {
+						Logging.WriteLog ("autosell selected \n");
+					}
 #endif
 
+					//
 
-				var orders = this.orderclusterwidget1.cluster.GetOrders ((double)price, tradePair);
+					OrderSubmitWindow orderSubmitWindow = new OrderSubmitWindow (_rippleWallet, Util.LicenseType.SEMIAUTOMATED);
 
-				OrderSubmitWindow orderSubmitWindow = new OrderSubmitWindow (_rippleWallet, Util.LicenseType.SEMIAUTOMATED);
+					var buys = orders.Item1;
+					var list = buys.Concat (orders.Item2);
 
-				var buys = orders.Item1;
-				var list = buys.Concat (orders.Item2);
+					orderSubmitWindow.SetOrders (list);
 
-				orderSubmitWindow.SetOrders (list);
+				};
 
-			};
 
+				Gtk.MenuItem moveCluster = new MenuItem ("Move OrderCluster to " + (price.ToString () ?? ""));
+				moveCluster.Show ();
+				menu.Add (moveCluster);
+				l = (Gtk.Label)moveCluster.Child;
+				l.UseMarkup = true;
+				moveCluster.Activated += (object sender, EventArgs e) => {
+
+#if DEBUG
+
+					if (DebugIhildaWallet.DepthChartWidget) {
+						Logging.WriteLog ("move cluster selected \n");
+					}
+#endif
+
+					this.ordersTuple = this.orderclusterwidget1.cluster.GetOrders ((double)price, tradePair);
+
+					DrawChartToPixMap (pointFrame);
+					CopyBuffer ();
+
+				};
+			}
 
 
 
@@ -417,7 +500,10 @@ namespace IhildaWallet
 		public void CalculatePoints (PointFrame pointFrame)
 		{
 
-
+			if (pointFrame == null) {
+				return;
+			}
+				
 
 			pointFrame.bidPoints = new List<Gdk.Point> ();
 			pointFrame.askPoints = new List<Gdk.Point> ();
@@ -439,11 +525,14 @@ namespace IhildaWallet
 			// We're calulating this backwards. Starting with totals bids
 			decimal bidsGetsSpent = 0;
 
-
+			decimal midcalc = 0;
 
 			for (int i = 0; i < pointFrame.numBids; i++) {
 
 				rawx = pointFrame.bids [i].TakerPays.GetNativeAdjustedPriceAt (pointFrame.bids [i].taker_gets);
+				if (i == 0) {
+					midcalc += rawx;
+				}
 
 				// TODO deal with divide by zero exception that can occur. Why? How to prevent? handle the exception ect
 				double resx = (double)((rawx - pointFrame.lowestxpoint) * (pointFrame.width / pointFrame.rawxWidth));
@@ -518,6 +607,11 @@ namespace IhildaWallet
 			for (int i = 0; i < pointFrame.numAsks; i++) {
 
 				rawx = pointFrame.asks [i].TakerGets.GetNativeAdjustedPriceAt (pointFrame.asks [i].TakerPays);
+
+				if (i == 0) {
+					midcalc += rawx;
+				}
+
 				rawy -= pointFrame.asks [i].TakerGets.amount;
 
 
@@ -558,6 +652,14 @@ namespace IhildaWallet
 				}
 
 			}
+
+			pointFrame.midprice = midcalc / 2;
+
+			double px = (double)((pointFrame.midprice - pointFrame.lowestxpoint) * (pointFrame.width / pointFrame.rawxWidth));
+			double py = (double)(0 * (pointFrame.height / pointFrame.highestypoint));
+
+
+			pointFrame.midpoint = new Gdk.Point ((int)px, (int)py);
 
 			int bidc = pointFrame.numBids;
 			int askc = pointFrame.numAsks;
@@ -635,16 +737,43 @@ namespace IhildaWallet
 			//Gdk.Window gwin = this.drawingarea1.GdkWindow;
 			//gwin.GetSize(out int width, out int height);
 			//gwin.Clear ();
+			PointFrame pointFrame = _pointFrame;
+			//DrawChart (_pointFrame);
+			this.chartBufferImage = DrawChartToPixMap (pointFrame);
+			CopyBuffer ( /*pointFrame*/ );
+		}
 
-			DrawChart (_pointFrame);
+		void Drawingarea1_SizeAllocated (object o, SizeAllocatedArgs args)
+		{
+			PointFrame pointFrame = _pointFrame;
+			//DrawChart (_pointFrame);
+			this.chartBufferImage = DrawChartToPixMap (pointFrame);
+			CopyBuffer ( /*pointFrame*/ );
+		}
 
+
+		Gdk.Color color_orchid = new Gdk.Color (218, 112, 214);
+		Gdk.Color color_black = new Gdk.Color (0, 0, 0);
+		Gdk.Color color_red = new Gdk.Color (255, 0, 0);
+		Gdk.Color color_green = new Gdk.Color (0, 255, 0);
+		Gdk.Color Color_white = new Gdk.Color (255,255,255);
+		Tuple<IEnumerable<AutomatedOrder>, IEnumerable<AutomatedOrder>> ordersTuple = null;
+
+		private void SetOrdersTuple (decimal price)
+		{
+			var cluster = this.orderclusterwidget1.cluster;
+			var orderTuple = cluster.GetOrders ((double)price, _tradePair);
+			ordersTuple = orderTuple;
 		}
 
 		void Drawingarea1_MotionNotifyEvent (object o, MotionNotifyEventArgs args)
 		{
 
-
+			bool darkmode = darkmodecheckbox.Active;
 			PointFrame pointFrame = _pointFrame;
+			if (pointFrame == null) {
+				return;
+			}
 
 			if (!this.drawingarea1.IsDrawable) {
 				return;
@@ -655,10 +784,10 @@ namespace IhildaWallet
 
 
 			Gdk.Window gwin = this.drawingarea1.GdkWindow;
-			//gwin.GetSize(out int width, out int height);
+			gwin.GetSize(out int gwinwidth, out int gwinheight);
 
 
-			DrawChart (pointFrame);
+
 			//this.Drawingarea1_ExposeEvent (null,null);
 
 			int x = (int)args.Event.X;
@@ -666,18 +795,44 @@ namespace IhildaWallet
 
 			decimal amount = (pointFrame.height - y) * pointFrame.highestypoint / pointFrame.height;
 
+			Gdk.Image buff = chartBufferImage;
+
+			if (buff == null) {
+				DrawChartToPixMap (pointFrame);
+			}
+
+
+
+			//Gdk.Image img = buff.GetImage (0, 0, pointFrame.width, pointFrame.height);
+			//gwin.DrawImage (gc, img, 0, 0, 0, 0, pointFrame.width, pointFrame.height);
+
+			CopyBuffer ( /* pointFrame */);
+
 			if (amount <= Decimal.Zero) {
 				return;
 			}
-			Gdk.GC gc = new Gdk.GC (gwin) {
-				RgbFgColor = new Gdk.Color (0, 0, 0),
-				RgbBgColor = new Gdk.Color (218, 112, 214)
-			};
-			Pango.Layout layout = new Pango.Layout (this.PangoContext);
+			//return;
 
+			Gdk.GC gc = new Gdk.GC (gwin);
 
 
 			decimal price = pointFrame.lowestxpoint + (x * pointFrame.rawxWidth / pointFrame.width);
+
+			if (!darkmode) {
+				gc.RgbFgColor = color_black;
+			} else {
+				gc.RgbFgColor = Color_white;
+
+			}
+			gwin.DrawLine (gc, x, y, x, pointFrame.height);
+
+
+			gc.RgbFgColor = color_black;
+			gc.RgbBgColor = color_orchid;
+
+			Pango.Layout layout = new Pango.Layout (this.PangoContext);
+
+
 
 			//decimal amount = (pointFrame.height - y) * pointFrame.highestypoint / pointFrame.height;
 
@@ -721,55 +876,10 @@ namespace IhildaWallet
 			gwin.DrawLayout (gc, x + xoffset, y + yoffset, layout);
 
 
+			//gwin.DrawLine (gc, x
 
 
-			var cluster = this.orderclusterwidget1.cluster;
-			if (cluster == null) {
-
-				gwin.DrawLine (gc, x, y, x, pointFrame.height);
-				return;
-			} else {
-
-				var orderTuple = cluster.GetOrders ((double)price, _tradePair);
-
-				gc.Foreground = new Gdk.Color (0, 255, 0);
-				gc.RgbFgColor = new Gdk.Color (0, 255, 0);
-				foreach (AutomatedOrder order in orderTuple.Item1) {
-					//decimal am = order.taker_pays.amount;
-
-
-					//decimal yyy = pointFrame.height - (am * pointFrame.height) / pointFrame.highestypoint;
-
-
-					decimal pric = order.taker_pays.GetNativeAdjustedPriceAt (order.taker_gets);
-
-
-					decimal xxx = ((pric - pointFrame.lowestxpoint) * pointFrame.width) / pointFrame.rawxWidth;
-
-					//gwin.DrawArc (gc, true, (int)xxx, (int)yyy, 5, 5, 0, 360 * 64);
-
-					gwin.DrawLine (gc, (int)xxx, 0, (int)xxx, pointFrame.height + RULER_WIDTH);
-				}
-
-				gc.Foreground = new Gdk.Color (255, 0, 0);
-				gc.RgbFgColor = new Gdk.Color (255, 0, 0);
-				foreach (AutomatedOrder order in orderTuple.Item2) {
-
-					//decimal am = order.taker_gets.amount;
-
-
-					//decimal yyy = pointFrame.height - (am * pointFrame.height) / pointFrame.highestypoint;
-
-					decimal pric = order.taker_pays.GetNativeAdjustedCostAt (order.taker_gets);
-
-
-					decimal xxx = ((pric - pointFrame.lowestxpoint) * pointFrame.width) / pointFrame.rawxWidth;
-
-					//gwin.DrawArc (gc, true, (int)xxx, (int)yyy, 5, 5, 0, 360 * 64);
-
-					gwin.DrawLine (gc, (int)xxx, (int)0, (int)xxx, pointFrame.height + RULER_WIDTH);
-				}
-			}
+			gc?.Dispose ();
 
 		}
 
@@ -853,14 +963,34 @@ namespace IhildaWallet
 		public PointFrame GetPointFrame ()
 		{
 
+
+			int numAsk = 0;
+			int numBid = 0;
+
+			if (asks != null) {
+				
+				numAsk = asks.Length < max_asks ? asks.Length : max_asks;
+			}
+
+			if (bids != null) {
+				numBid = bids.Length < max_bids ? bids.Length : max_bids;
+			}
+
+			if (numAsk == 0 && numBid == 0) {
+				return null;
+			}
+
+
 			// TODO is linq faster? is this too much copying?
 			PointFrame pointFrame = new PointFrame {
-				numAsks = asks.Length < max_asks ? asks.Length : max_asks,
-				numBids = bids.Length < max_bids ? bids.Length : max_bids,
+				numAsks = numAsk,
+				numBids = numBid,
 
 				asks = asks,
 				bids = bids
 			};
+
+
 
 			CalculateBidSums (pointFrame);
 			CalculatePoints (pointFrame);
@@ -984,7 +1114,9 @@ namespace IhildaWallet
 		public void CalculateBidSums (PointFrame pointFrame)
 		{
 
-
+			if (pointFrame == null) {
+				return;
+			}
 
 			if (pointFrame.bids == null && pointFrame.asks == null) {
 				return;
@@ -997,8 +1129,10 @@ namespace IhildaWallet
 			//this.drawingarea1.GetSizeRequest (out pointFrame.width, out pointFrame.height);
 
 			Gdk.Window gwin = this.drawingarea1.GdkWindow;
-			//	return;
 
+			if (gwin == null) {
+				return;
+			}
 
 			gwin.GetSize (out pointFrame.width, out pointFrame.height);
 
@@ -1077,12 +1211,68 @@ namespace IhildaWallet
 
 		public void Drawingarea1_ExposeEvent (object sender, ExposeEventArgs args)
 		{
+			if (drawingarea1 == null) {
+				return;
+			}
+
+			if (!this.drawingarea1.IsDrawable) {
+				return;
+			}
+
+
+
 			PointFrame pointFrame = _pointFrame;
-			DrawChart (pointFrame);
+
+
+
+			if (chartBufferImage == null) {
+				DrawChartToPixMap (pointFrame);
+			}
+
+			CopyBuffer (/*pointFrame*/);
+
 		}
 
-		public void DrawChart (PointFrame pointFrame)
+		public void CopyBuffer (/*PointFrame pointFrame*/)
 		{
+
+
+
+			Gdk.Window gwin = this.drawingarea1?.GdkWindow;
+			if (gwin == null) {
+				return;
+			}
+
+			if (chartBufferImage == null) {
+				return;
+			}
+
+			Gdk.GC gc = new Gdk.GC (gwin);
+			//chartBufferImage.GetSize (out int wid, out int hei);
+
+			//Gdk.Image img = chartBufferImage.GetImage (0, 0, wid, hei);
+			gwin.DrawImage (gc, chartBufferImage, 0, 0, 0, 0, chartBufferImage.Width, chartBufferImage.Height);
+
+			//gc.Dispose ();
+
+			//img.Dispose ();
+			gc.Dispose ();
+
+			//System.GC.Collect ();
+			//System.GC.WaitForPendingFinalizers ();
+		}
+
+
+
+		private Gdk.Image chartBufferImage = null;
+		private Pixmap lastpixmap = null;
+		public Gdk.Image DrawChartToPixMap (PointFrame pointFrame)
+		{
+			if (pointFrame == null) {
+				return null;
+			}
+
+
 
 			int cirsize = 5;
 			//
@@ -1095,104 +1285,139 @@ namespace IhildaWallet
 
 
 
-			if (!this.drawingarea1.IsDrawable) {
-				return;
+			Gdk.Window gwin = this.drawingarea1?.GdkWindow;
+
+			if (gwin == null) {
+				return null;
+			}
+
+			//gwin.Clear ();
+			gwin.GetSize (out int gwinwidth, out int gwinheight);
+
+
+			if (lastpixmap == null) {
+				lastpixmap = new Pixmap (drawingarea1.GdkWindow, gwinwidth, gwinheight);
+
+
+			}
+			this.lastpixmap.GetSize (out int pixwidth, out int pixheight);
+
+			if (gwinwidth != pixwidth || gwinheight != pixheight ) {
+				
+				this.lastpixmap?.Dispose ();
+				lastpixmap = new Pixmap (drawingarea1.GdkWindow, gwinwidth, gwinheight);
+
+				//this.chartBufferImage = new Pixmap (drawingarea1.GdkWindow, gwinwidth, gwinheight);
+				//System.GC.Collect ();
+				//System.GC.WaitForPendingFinalizers ();
+			} else {
+				
+			}
+
+			/*
+			var gra = System.Drawing.Graphics.FromImage ((System.Drawing.Image)gdkImage.g);
+
+
+
+
+			System.Drawing.FontFamily fontFamily = new System.Drawing.FontFamily ("Arial");
+			System.Drawing.Font font = new System.Drawing.Font (
+			   fontFamily,
+			   10,
+			   FontStyle.Regular,
+			   GraphicsUnit.Point);
+
+			RectangleF rectF = new RectangleF (0, 0, 300, 20);
+			SolidBrush solidBrush = new SolidBrush (System.Drawing.Color.Black);
+
+			*/
+
+
+
+
+
+			//gra.DrawString ("test", new System.Drawing.Font());
+
+			//gra.DrawString ("Ihilda", font, solidBrush, rectF);
+
+			//Gdk.GC gc = new Gdk.GC (gwin);
+
+			var pixmap = this.lastpixmap;
+			Gdk.GC gc = new Gdk.GC (pixmap);
+
+			bool darkmode = darkmodecheckbox.Active;
+
+			Pango.Context context = this.CreatePangoContext ();
+
+			Pango.Layout layout = new Pango.Layout (context);
+
+			layout.Width = Pango.Units.FromPixels (pointFrame.width);
+
+
+			FontDescription desc = FontDescription.FromString ("Serif Bold 100");
+
+			layout.FontDescription = desc;
+
+			//renderer.SetOverrideColor (RenderPart.Foreground, new Gdk.Color (0, 0, 0));
+			layout.Alignment = Pango.Alignment.Center;
+
+			//gwin.DrawImage (gc, gdkImage, 0, 0, 0, 0, pointFrame.width, pointFrame.height);
+			layout.SetText ("Ihilda");
+
+			if (!darkmode) {
+				gc.RgbFgColor = new Gdk.Color (255, 255, 255);
+			} else {
+				gc.RgbFgColor = new Gdk.Color (39, 40, 33);
+			}
+
+			pixmap.DrawRectangle (gc, true, 0, 0, gwinwidth, gwinheight);
+
+			if (!darkmode) {
+				gc.RgbFgColor = new Gdk.Color (250, 235, 249);
+			} else {
+				gc.RgbFgColor = new Gdk.Color (81, 21, 78);
 			}
 
 
-
-			Gdk.Window gwin = this.drawingarea1.GdkWindow;
-
-			gwin.Clear ();
-			gwin.GetSize (out pointFrame.width, out pointFrame.height);
-
-			Gdk.GC gc = new Gdk.GC (gwin);
+			pixmap.DrawLayout (gc, 25, 25, layout);
 
 
 
-
-
-
-
-			gc.SetLineAttributes (3, LineStyle.Solid, CapStyle.Butt, JoinStyle.Miter);
-
-			gc.RgbFgColor = new Gdk.Color (0, 250, 0);
-			gwin.DrawLines (gc, pointFrame.bidPoints.ToArray ());
-
-			gc.RgbFgColor = new Gdk.Color (250, 0, 0);
-			gwin.DrawLines (gc, pointFrame.askPoints.ToArray ());
-
-			gc.RgbFgColor = new Gdk.Color (0, 0, 250);
-
-			gc.SetLineAttributes (1, LineStyle.Solid, CapStyle.Round, JoinStyle.Round);
-			foreach (Gdk.Point p in pointFrame.localBidPointsBlue) {
-				//gwin.DrawLine(gc, p.X, p.Y, p.X, 0);
-
-				//int cirsize = 5;
-				gwin.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
-
+			if (!darkmode) {
+				gc.RgbFgColor = color_black;
+			} else {
+				gc.RgbFgColor = Color_white;
 			}
-
-			foreach (Gdk.Point p in pointFrame.localAskPointsBlue) {
-				//gwin.DrawLine (gc, p.X, p.Y, p.X, 0);
-
-				//int cirsize = 5;
-				gwin.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
-
-			}
-
-			gc.RgbFgColor = new Gdk.Color (250, 0, 0);
-
-			foreach (Gdk.Point p in pointFrame.localBidPointsRed) {
-				//gwin.DrawLine(gc, p.X, p.Y, p.X, 0);
-
-				//int cirsize = 5;
-				gwin.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
-
-			}
-
-			foreach (Gdk.Point p in pointFrame.localAskPointsRed) {
-				//gwin.DrawLine (gc, p.X, p.Y, p.X, 0);
-
-				//int cirsize = 5;
-				gwin.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
-
-			}
-
-
-			gc.RgbFgColor = new Gdk.Color (0, 0, 0);
+			//gc.RgbFgColor = new Gdk.Color (255,255,255);
 			gc.SetLineAttributes (2, LineStyle.Solid, CapStyle.Butt, JoinStyle.Miter);
-			gwin.DrawLine (gc, 0, pointFrame.height - RULER_WIDTH, pointFrame.width, pointFrame.height - RULER_WIDTH);
+
+			//gwin.DrawLine (gc, 0, pointFrame.height - RULER_WIDTH, pointFrame.width, pointFrame.height - RULER_WIDTH);
+
+			// either windowwidth - Ruler_width OR pointframeheight
+			pixmap.DrawLine (gc, 0, pointFrame.height, pointFrame.width, pointFrame.height);
+
 			gc.SetLineAttributes (1, LineStyle.Solid, CapStyle.Butt, JoinStyle.Miter);
 
-
+			layout.Alignment = Pango.Alignment.Left;
+			layout.FontDescription = FontDescription.FromString ("Serif Bold 9");
 
 			foreach (var tuple in pointFrame.scalePoints) {
 				//gwin.DrawLine(gc, p.X, p.Y, p.X, 0);
 				Gdk.Point p = tuple.Item1;
 				Decimal inc = tuple.Item2;
 
-				gwin.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
-
+				//gwin.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
+				pixmap.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
 				//Gdk.PangoRenderer renderer = Gdk.PangoRenderer.GetDefault (gwin.Screen);
 				//renderer.Drawable = this.drawingarea1.GdkWindow;
 				//renderer.Gc = this.drawingarea1.Style.BlackGC;
 
-				Pango.Context context = this.CreatePangoContext ();
 
-				Pango.Layout layout = new Pango.Layout (context);
 
-				layout.Width = Pango.Units.FromPixels (pointFrame.width);
+
 				layout.SetText (inc.ToString ());
-
-				FontDescription desc = FontDescription.FromString ("Serif Bold 9");
-
-				layout.FontDescription = desc;
-
-				//renderer.SetOverrideColor (RenderPart.Foreground, new Gdk.Color (0, 0, 0));
-				layout.Alignment = Pango.Alignment.Left;
-
-				gwin.DrawLayout (gc, p.X + 1, p.Y + 5, layout);
+				//gwin.DrawLayout (gc, p.X + 1, p.Y + 5, layout);
+				pixmap.DrawLayout (gc, p.X + 1, p.Y + 5, layout);
 				//renderer.DrawLayout (layout, p.X, p.Y);
 
 				//renderer.SetOverrideColor (RenderPart.Foreground, Gdk.Color.Zero);
@@ -1202,7 +1427,121 @@ namespace IhildaWallet
 			}
 
 
+			gc.SetLineAttributes (3, LineStyle.Solid, CapStyle.Butt, JoinStyle.Miter);
 
+			gc.RgbFgColor = new Gdk.Color (0, 250, 0);
+
+			pixmap.DrawLines (gc, pointFrame.bidPoints.ToArray ());
+			//gwin.DrawLines (gc, pointFrame.bidPoints.ToArray ());
+
+			gc.RgbFgColor = new Gdk.Color (250, 0, 0);
+			pixmap.DrawLines (gc, pointFrame.askPoints.ToArray ());
+			//gwin.DrawLines (gc, pointFrame.askPoints.ToArray ());
+
+			if (!darkmode) {
+				gc.RgbFgColor = new Gdk.Color (0, 0, 250);
+			} else {
+				gc.RgbFgColor = new Gdk.Color (0,90,255);
+			}
+
+			gc.SetLineAttributes (1, LineStyle.Solid, CapStyle.Round, JoinStyle.Round);
+			foreach (Gdk.Point p in pointFrame.localBidPointsBlue) {
+				//gwin.DrawLine(gc, p.X, p.Y, p.X, 0);
+
+				//int cirsize = 5;
+				//gwin.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
+				pixmap.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
+			}
+
+			foreach (Gdk.Point p in pointFrame.localAskPointsBlue) {
+				//gwin.DrawLine (gc, p.X, p.Y, p.X, 0);
+
+				//int cirsize = 5;
+				//gwin.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
+				pixmap.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
+			}
+
+			gc.RgbFgColor = new Gdk.Color (250, 0, 0);
+
+			foreach (Gdk.Point p in pointFrame.localBidPointsRed) {
+				//gwin.DrawLine(gc, p.X, p.Y, p.X, 0);
+
+
+				//gwin.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
+				pixmap.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
+
+			}
+
+			foreach (Gdk.Point p in pointFrame.localAskPointsRed) {
+				//gwin.DrawLine (gc, p.X, p.Y, p.X, 0);
+
+
+				//gwin.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
+				pixmap.DrawArc (gc, true, p.X - (cirsize / 2), p.Y - (cirsize / 2), cirsize, cirsize, 0, 23040);
+			}
+
+
+
+
+			//Gdk.GC
+
+
+			if (this.ordersTuple == null) {
+
+				//gwin.DrawLine (gc, x, y, x, pointFrame.height);
+				//return;
+			} else {
+
+
+				var orderTuple = this.ordersTuple;
+				gc.Foreground = color_green;
+				gc.RgbFgColor = color_green;
+				foreach (AutomatedOrder order in orderTuple.Item1) {
+					//decimal am = order.taker_pays.amount;
+
+
+					//decimal yyy = pointFrame.height - (am * pointFrame.height) / pointFrame.highestypoint;
+
+
+					decimal pric = order.taker_pays.GetNativeAdjustedPriceAt (order.taker_gets);
+
+
+					decimal xxx = ((pric - pointFrame.lowestxpoint) * pointFrame.width) / pointFrame.rawxWidth;
+
+					//gwin.DrawArc (gc, true, (int)xxx, (int)yyy, 5, 5, 0, 360 * 64);
+
+					pixmap.DrawLine (gc, (int)xxx, 0, (int)xxx, pointFrame.height /*+ RULER_WIDTH */);
+				}
+
+				gc.Foreground = color_red;
+				gc.RgbFgColor = color_red;
+				foreach (AutomatedOrder order in orderTuple.Item2) {
+
+					//decimal am = order.taker_gets.amount;
+
+
+					//decimal yyy = pointFrame.height - (am * pointFrame.height) / pointFrame.highestypoint;
+
+					decimal pric = order.taker_pays.GetNativeAdjustedCostAt (order.taker_gets);
+
+
+					decimal xxx = ((pric - pointFrame.lowestxpoint) * pointFrame.width) / pointFrame.rawxWidth;
+
+					//gwin.DrawArc (gc, true, (int)xxx, (int)yyy, 5, 5, 0, 360 * 64);
+
+					pixmap.DrawLine (gc, (int)xxx, (int)0, (int)xxx, pointFrame.height /*+ RULER_WIDTH*/);
+				}
+			}
+
+			this.chartBufferImage?.Dispose ();
+			this.chartBufferImage = null;
+			this.chartBufferImage = pixmap.GetImage (0, 0, gwinwidth, gwinheight);
+
+
+
+			gc.Dispose ();
+
+			return chartBufferImage;
 
 
 		}
@@ -1266,6 +1605,9 @@ namespace IhildaWallet
 
 		public decimal rawxWidth = 0; // full spread
 
+		public decimal midprice = 0;
+		public Gdk.Point midpoint = default(Gdk.Point);
+
 		public int width = 0; //r.Width;
 		public int height = 0; //r.Height;
 
@@ -1286,6 +1628,18 @@ namespace IhildaWallet
 
 		public AutomatedOrder [] asks = null;
 
+	}
+
+
+	public static class MyExtensions
+	{
+		public static System.Drawing.Bitmap ToBitmap (this Pixbuf pix)
+		{
+			TypeConverter tc = TypeDescriptor.GetConverter (typeof (Bitmap));
+
+			//// Possible file formats are: "jpeg", "png", "ico" and "bmp"
+			return (Bitmap)tc.ConvertFrom (pix.SaveToBuffer ("jpeg"));
+		}
 	}
 
 }

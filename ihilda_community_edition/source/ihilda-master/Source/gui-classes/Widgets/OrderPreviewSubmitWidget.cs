@@ -69,7 +69,7 @@ namespace IhildaWallet
 				typeof (string), // Buy 
 				typeof (string), // Sell
 				typeof (string), // Price
-				typeof (string), // Cost
+				//typeof (string), // Cost
 				typeof (string), // Color
 				typeof (string),  // Status
 				typeof (string)); // Result
@@ -94,10 +94,10 @@ namespace IhildaWallet
 			this.treeview1.AppendColumn ("Buy", txtr, "markup", 2);
 			this.treeview1.AppendColumn ("Sell", txtr, "markup", 3);
 			this.treeview1.AppendColumn ("Price", txtr, "markup", 4);
-			this.treeview1.AppendColumn ("Cost", txtr, "markup", 5);
-			this.treeview1.AppendColumn ("Mark", txtr, "markup", 6);
-			this.treeview1.AppendColumn ("Status", txtr, "markup", 7);
-			this.treeview1.AppendColumn ("Result", txtr, "markup", 8);
+			//this.treeview1.AppendColumn ("Cost", txtr, "markup", 5);
+			this.treeview1.AppendColumn ("Mark", txtr, "markup", 5);
+			this.treeview1.AppendColumn ("Status", txtr, "markup", 6);
+			this.treeview1.AppendColumn ("Result", txtr, "markup", 7);
 
 			this.SubmitButton.Clicked += delegate {
 				//ThreadStart ts = new ThreadStart(  );
@@ -429,9 +429,21 @@ namespace IhildaWallet
 					decimal spread = 1.01m;
 
 					decimal resaleEstimate = price * spread;
-					//diff = Math.Abs (dif);
 
-					// 
+					StringBuilder priceString = new StringBuilder ();
+					priceString.Append (price);
+					priceString.AppendLine ();
+					priceString.Append ("<span fgcolor=\"grey\">");
+					priceString.Append (cost);
+					priceString.Append ("</span>");
+
+					StringBuilder priceStringj = new StringBuilder ();
+					priceStringj.Append (pricej);
+					priceStringj.AppendLine ();
+					priceStringj.Append ("<span fgcolor=\"grey\">");
+					priceStringj.Append (costj);
+					priceStringj.Append ("</span>");
+
 					bool spreadTooSmall = resaleEstimate > costj;
 					if (spreadTooSmall) {
 						_offers [i].Red = true;
@@ -439,11 +451,11 @@ namespace IhildaWallet
 
 						hasred = true;
 
-						HighLightPrice (i.ToString (), price.ToString ());
-						HighLightCost (i.ToString (), cost.ToString ());
+						HighLightPrice (i.ToString (), priceString.ToString ());
+						//HighLightCost (i.ToString (), cost.ToString ());
 
-						HighLightPrice (j.ToString (), pricej.ToString ());
-						HighLightCost (j.ToString (), costj.ToString ());
+						HighLightPrice (j.ToString (), priceStringj.ToString ());
+						//HighLightCost (j.ToString (), costj.ToString ());
 					}
 				}
 
@@ -460,7 +472,7 @@ namespace IhildaWallet
 
 		}
 
-
+		/*
 		private void HighLightCost (string path, string message)
 		{
 			if (message == null)
@@ -474,8 +486,9 @@ namespace IhildaWallet
 
 
 
-		}
+		} */
 
+		/*
 		private void SetCost (string path, string message)
 		{
 			Gtk.Application.Invoke ((object sender, EventArgs e) => {
@@ -487,6 +500,7 @@ namespace IhildaWallet
 				}
 			});
 		}
+		*/
 
 		private void SetPrice (string path, string message)
 		{
@@ -579,17 +593,55 @@ namespace IhildaWallet
 					// TODO 
 				}
 
+				if (string.IsNullOrWhiteSpace(o.Account)) {
+					o.Account = this.walletswitchwidget1?.GetRippleWallet ()?.Account;
+				}
+
 				Decimal price = o.TakerPays.GetNativeAdjustedPriceAt (o.TakerGets);
 				Decimal cost = o.TakerGets.GetNativeAdjustedPriceAt (o.TakerPays);
+
+				StringBuilder priceString = new StringBuilder ();
+				priceString.Append (price);
+				priceString.AppendLine ();
+				priceString.Append ("<span fgcolor=\"grey\">");
+				priceString.Append (cost);
+				priceString.Append ("</span>");
+
+
+				StringBuilder getsString = new StringBuilder ();
+				if (!o.TakerGets.IsNative) {
+					getsString.Append (o.TakerGets.amount.ToString ());
+				} else {
+					getsString.Append ((o.TakerGets.amount / 1000000).ToString ());
+				}
+				getsString.Append (" ");
+				getsString.Append (o.TakerGets.currency);
+				if (!o.TakerGets.IsNative) {
+					getsString.AppendLine ();
+					getsString.Append (o.TakerGets.issuer);
+				}
+
+				StringBuilder paysString = new StringBuilder ();
+				if (!o.TakerPays.IsNative) {
+					paysString.Append (o.TakerPays.amount.ToString ());
+				} else {
+					paysString.Append ( (o.TakerPays.amount / 1000000).ToString ());
+				}
+				paysString.Append (" ");
+				paysString.Append (o.TakerPays.currency);
+				if (!o.TakerPays.IsNative) {
+					paysString.AppendLine ();
+					paysString.Append (o.TakerPays.issuer);
+				}
 
 				Liststore.AppendValues (
 					o.Selected,
 					(i + 1).ToString(),
-					o.TakerPays.ToString (),
-					o.TakerGets.ToString (),
 
-					price.ToString (),
-					cost.ToString (),
+					paysString.ToString (),
+					getsString.ToString (),
+					priceString.ToString(),
+					//cost.ToString (),
 					o.BotMarking?.ToString ()
 
 				);
@@ -656,7 +708,7 @@ namespace IhildaWallet
 
 			Gtk.Application.Invoke ((object sender, EventArgs e) => {
 				if (Liststore.GetIterFromString (out TreeIter iter, path)) {
-					Liststore.SetValue (iter, 7, s);
+					Liststore.SetValue (iter, 6, s);
 
 
 
@@ -676,7 +728,7 @@ namespace IhildaWallet
 
 			Application.Invoke ((object sender, EventArgs e) => {
 				if (Liststore.GetIterFromString (out TreeIter iter, path)) {
-					Liststore.SetValue (iter, 8, s);
+					Liststore.SetValue (iter, 7, s);
 				}
 			});
 
@@ -702,8 +754,8 @@ namespace IhildaWallet
 
 			Application.Invoke ((object sender, EventArgs e) => {
 				if (Liststore.GetIterFromString (out TreeIter iter, index.ToString ())) {
+					Liststore.SetValue (iter, 6, "");
 					Liststore.SetValue (iter, 7, "");
-					Liststore.SetValue (iter, 8, "");
 
 
 				}

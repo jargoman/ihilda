@@ -59,19 +59,19 @@ namespace IhildaWallet
 
 			walletswitchwidget2.SetRippleWallet (rw);
 
-			this.RuleListStore = 
-				new Gtk.ListStore ( 
-				                   typeof (bool), // active
-				                   typeof (string), // bought
-				                   typeof (string), // sold
-				                   typeof (string), // mark
-				                   typeof (string), // mark as
-				                   typeof (string), // pay less
-				                   typeof (string), // get more
-				                   typeof (string), // exponential pay less 
-				                   typeof (string), // exponential get more
-				                   typeof (string)); // speculate
-			
+			this.RuleListStore =
+				new Gtk.ListStore (
+								   typeof (bool), // active
+								   typeof (string), // bought
+								   typeof (string), // sold
+								   typeof (string), // mark
+								   typeof (string), // mark as
+								   typeof (string), // pay less
+								   typeof (string), // get more
+								   typeof (string), // exponential pay less 
+								   typeof (string), // exponential get more
+								   typeof (string)); // speculate
+
 			this.SentimentStore = new Gtk.ListStore (typeof (string), typeof (string));
 
 			//TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
@@ -133,7 +133,7 @@ namespace IhildaWallet
 				Sentiment sentiment = GetSelectedSentiment ();
 
 
-				sentiment.Rating = ((SentimentRatingEnum)Enum.Parse (typeof (SentimentRatingEnum), args.NewText)).ToString();
+				sentiment.Rating = ((SentimentRatingEnum)Enum.Parse (typeof (SentimentRatingEnum), args.NewText)).ToString ();
 				//SentimentManagerObject.RemoveSentiment(sentiment)
 
 
@@ -161,7 +161,7 @@ namespace IhildaWallet
 			this.treeview1.AppendColumn ("Speculate", cellRendererText, "text", 9);
 
 			this.sentimenttreeview.AppendColumn ("Asset", cellRendererText, "text", 0);
-			this.sentimenttreeview.AppendColumn ("Sentiment", cellRendererCombo, "text", 1);
+			this.sentimenttreeview.AppendColumn ("Sentiment", cellRendererCombo, "markup", 1);
 			//this.sentimenttreeview.
 
 
@@ -179,7 +179,7 @@ namespace IhildaWallet
 			};
 
 			this.removebutton.Clicked += (object sender, EventArgs e) => {
-				
+
 				var v = this.GetSelectedRule ();
 				this.RuleManagerObj.RemoveRule (v);
 				this.RuleManagerObj.SaveRules ();
@@ -214,7 +214,7 @@ namespace IhildaWallet
 			};
 
 			this.addsentimentbutton.Clicked += (object sender, EventArgs e) => {
-				
+
 				Sentiment sentiment = SentementCreateDialog.DoDialog ();
 
 				if (sentiment == null) {
@@ -385,7 +385,7 @@ namespace IhildaWallet
 
 
 						string m = sent?.Match?.ToString () ?? "";
-						string s = sent?.Rating.ToString () ?? "";
+						string s = sent?.GetMarkupString () ?? "";
 
 						SentimentStore.AppendValues (m, s);
 
@@ -454,11 +454,11 @@ namespace IhildaWallet
 				object speculate = tm.GetValue (ti, 9);
 
 				return RuleManagerObj.RetreiveFromValues (
-					(string)bought, 
-					(string)sold, 
-					(string)mark, 
-					(string)markas, 
-					(string)payless, 
+					(string)bought,
+					(string)sold,
+					(string)mark,
+					(string)markas,
+					(string)payless,
 					(string)getmore,
 					(string)exppayless,
 					(string)exgetmore,
@@ -470,16 +470,18 @@ namespace IhildaWallet
 
 		}
 
-					                  
-				                  
-			
+
+
+
 
 
 
 		public void DoLogicClicked ()
 		{
 
+#if DEBUG
 			string method_sig = clsstr + nameof (DoLogicClicked) + DebugRippleLibSharp.both_parentheses;
+#endif
 
 			if (this.tokenSource != null) {
 				WriteToInfoBox ("A rule script is already running\n");

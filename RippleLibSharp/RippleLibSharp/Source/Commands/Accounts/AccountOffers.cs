@@ -54,16 +54,17 @@ namespace RippleLibSharp.Commands.Accounts
 
 				Offer[] offers = response?.result?.offers;
 
-				if (offers != null && account != null) {	foreach (Offer o in offers) {
-
+				if (offers != null && account != null) {	
+					foreach (Offer o in offers) {
 						o.Account = account;
-				}}
+					}
+				}
 
 				//IEnumerable<Offer> offers = response?.result?.offers;
 
-				if (response != null) {
+				if ( response != null ) {
 					//return list;
-					list.Add (response);
+					list.Add ( response );
 				}
 
 

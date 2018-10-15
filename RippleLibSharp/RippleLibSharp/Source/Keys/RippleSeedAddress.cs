@@ -57,8 +57,11 @@ namespace RippleLibSharp.Keys
 
 				RippleDeterministicKeyGenerator generator = new RippleDeterministicKeyGenerator (this.PayloadBytes);
 				RipplePrivateKey signingPrivateKey = generator.GetAccountPrivateKey (accountNumber);
+
 				privateKeyCache = signingPrivateKey;
 			}
+
+			privateKeyCache.GetPublicKey ();
 			return privateKeyCache;
 		}
 

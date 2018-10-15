@@ -13,6 +13,7 @@ using RippleLibSharp.Util;
 
 using RippleLibSharp.Trust;
 using Gtk;
+using System.Collections.Generic;
 
 namespace IhildaWallet
 {
@@ -110,10 +111,15 @@ namespace IhildaWallet
 		{
 			Task.Run (
 				delegate {
+					this.Clear ();
 					NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
 					if (ni == null) {
-						NetworkController.DoNetworkingDialogNonGUIThread ();
-						return;
+						bool test = NetworkController.DoNetworkingDialogNonGUIThread ();
+						if (!test) {
+
+							return;
+						}
+
 					}
 
 
@@ -180,34 +186,54 @@ namespace IhildaWallet
 
 				ListStoreObj?.Clear ();
 
+				List<Tuple<string, string, string>> values = new List<Tuple<string, string, string>> ();
+				List<Tuple<string, string, string>> zerovalues = new List<Tuple<string, string, string>> ();
+
 				for (int i = 0; i < currencyArray.Length; i++) {
-					
+
 					RippleCurrency c = currencyArray [i];
 					if (c == null) {
 						continue;
 					}
 					string cu = c.currency;
 					string iss = c.IsNative ? "native currency" : c.issuer;
-					string ba = c.amount.ToString();
+					string ba = c.amount.ToString ();
 
 					if (c.amount == decimal.Zero) {
 						TextHighlighter.Highlightcolor = "\"grey\"";
 						cu = TextHighlighter.Highlight (cu);
 						iss = TextHighlighter.Highlight (iss);
 						ba = TextHighlighter.Highlight (ba);
-					}
 
-					if (c.amount < decimal.Zero) {
+						zerovalues.Add (new Tuple<string, string, string> (cu, iss, ba));
+					} else if (c.amount < decimal.Zero) {
 						TextHighlighter.Highlightcolor = "\"red\"";
-						cu = TextHighlighter.Highlight (cu);
-						iss = TextHighlighter.Highlight (iss);
+						//cu = TextHighlighter.Highlight (cu);
+						//iss = TextHighlighter.Highlight (iss);
 						ba = TextHighlighter.Highlight (ba);
+
+						values.Add (new Tuple<string, string, string> (cu, iss, ba));
+					} else {
+						TextHighlighter.Highlightcolor = "\"green\"";
+						//cu = TextHighlighter.Highlight (cu);
+						//iss = TextHighlighter.Highlight (iss);
+						ba = TextHighlighter.Highlight (ba);
+
+						values.Add (new Tuple<string, string, string> (cu, iss, ba));
 					}
 
-					ListStoreObj.AppendValues (cu, iss, ba);
+						
+
 
 
 				}
+
+				values.AddRange (zerovalues);
+
+				foreach (var v in values) {
+					ListStoreObj.AppendValues (v.Item1, v.Item2, v.Item3);
+				}
+
 
 
 				treeview1.Model = ListStoreObj;

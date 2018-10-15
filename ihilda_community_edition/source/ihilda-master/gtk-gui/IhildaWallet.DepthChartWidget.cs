@@ -26,6 +26,8 @@ namespace IhildaWallet
 
 		private global::Gtk.HScale hscale2;
 
+		private global::Gtk.CheckButton darkmodecheckbox;
+
 		private global::Gtk.DrawingArea drawingarea1;
 
 		private global::Gtk.Label label5;
@@ -136,17 +138,30 @@ namespace IhildaWallet
 			this.hbox2.Add(this.hbox1);
 			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.hbox1]));
 			w8.Position = 1;
-			this.vbox2.Add(this.hbox2);
-			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hbox2]));
-			w9.Position = 0;
+			// Container child hbox2.Gtk.Box+BoxChild
+			this.darkmodecheckbox = new global::Gtk.CheckButton();
+			this.darkmodecheckbox.CanFocus = true;
+			this.darkmodecheckbox.Name = "darkmodecheckbox";
+			this.darkmodecheckbox.Label = global::Mono.Unix.Catalog.GetString("Dark Mode");
+			this.darkmodecheckbox.DrawIndicator = true;
+			this.darkmodecheckbox.UseUnderline = true;
+			this.hbox2.Add(this.darkmodecheckbox);
+			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.darkmodecheckbox]));
+			w9.PackType = ((global::Gtk.PackType)(1));
+			w9.Position = 2;
 			w9.Expand = false;
 			w9.Fill = false;
+			this.vbox2.Add(this.hbox2);
+			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hbox2]));
+			w10.Position = 0;
+			w10.Expand = false;
+			w10.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.drawingarea1 = new global::Gtk.DrawingArea();
 			this.drawingarea1.Name = "drawingarea1";
 			this.vbox2.Add(this.drawingarea1);
-			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.drawingarea1]));
-			w10.Position = 1;
+			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.drawingarea1]));
+			w11.Position = 1;
 			this.notebook1.Add(this.vbox2);
 			// Notebook tab
 			this.label5 = new global::Gtk.Label();
@@ -159,8 +174,8 @@ namespace IhildaWallet
 			this.orderclusterwidget1.Events = ((global::Gdk.EventMask)(256));
 			this.orderclusterwidget1.Name = "orderclusterwidget1";
 			this.notebook1.Add(this.orderclusterwidget1);
-			global::Gtk.Notebook.NotebookChild w12 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.orderclusterwidget1]));
-			w12.Position = 1;
+			global::Gtk.Notebook.NotebookChild w13 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.orderclusterwidget1]));
+			w13.Position = 1;
 			// Notebook tab
 			this.label6 = new global::Gtk.Label();
 			this.label6.Name = "label6";
