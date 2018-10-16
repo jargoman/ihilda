@@ -735,6 +735,7 @@ namespace IhildaWallet
 				this.Child.ShowAll();
 			}
 			w1.SetUiManager(UIManager);
+			this.label3.Hide();
 			this.balancetab1.Hide();
 			this.connecteddisplaywidget1.Hide();
 			this.Hide();

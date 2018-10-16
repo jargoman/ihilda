@@ -50,7 +50,13 @@ namespace IhildaWallet
 				if (se == 0) {
 					return;
 				}
-				Tuple< UInt32,UInt32 > tupe = FeeSettings.GetFeeAndLastLedgerFromSettings ( ni );
+
+				FeeSettings feeSettings = FeeSettings.LoadSettings ();
+				if (feeSettings == null) {
+					// TODO
+					return;
+				}
+				Tuple< UInt32,UInt32 > tupe = feeSettings.GetFeeAndLastLedgerFromSettings ( ni );
 				if (tupe == null) {
 					return;
 				}

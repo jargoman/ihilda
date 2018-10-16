@@ -31,12 +31,14 @@ namespace IhildaWallet
 
 			this.Build ();
 
-			if (walletswitchwidget2 == null) {
-				walletswitchwidget2 = new WalletSwitchWidget ();
-				walletswitchwidget2.Show ();
 
-				hbox4.Add (walletswitchwidget2);
+			if (walletswitchwidget1 == null) {
+				walletswitchwidget1 = new WalletSwitchWidget ();
+				walletswitchwidget1.Show ();
+
+				hbox4.Add (walletswitchwidget1);
 			}
+
 
 			if (ledgerconstraintswidget1 == null) {
 
@@ -51,13 +53,15 @@ namespace IhildaWallet
 
 			this.label6.UseMarkup = true;
 
-			walletswitchwidget2.WalletChangedEvent += (object source, WalletChangedEventArgs eventArgs) => {
+
+			walletswitchwidget1.WalletChangedEvent += (object source, WalletChangedEventArgs eventArgs) => {
 
 				RippleWallet rippleWallet = eventArgs.GetRippleWallet ();
 				this.SetRippleWallet (rippleWallet);
 			};
 
-			walletswitchwidget2.SetRippleWallet (rw);
+
+			walletswitchwidget1.SetRippleWallet (rw);
 
 			this.RuleListStore =
 				new Gtk.ListStore (
@@ -142,6 +146,7 @@ namespace IhildaWallet
 				SetSentiments (this.SentimentManagerObject.SentimentList);
 
 			};
+
 			cellRendererCombo.Model = comboModel;
 			cellRendererCombo.TextColumn = 0;
 			//cellRendererCombo.
@@ -254,6 +259,41 @@ namespace IhildaWallet
 				tokenSource = null;
 			};
 
+			this.button1.Clicked += (object sender, EventArgs e) => {
+
+				WalletSwitchWidget walletSwitchWidget = this.walletswitchwidget1;
+				RippleWallet wallet = walletSwitchWidget?.GetRippleWallet ();
+				if (wallet == null) {
+					return;
+				}
+
+
+				dologicbutton.Visible = false;
+				automatebutton.Visible = false;
+				button171.Visible = false;
+				button1.Visible = false;
+
+				Task.Run ( delegate {
+					WriteToInfoBox ("Syncing Orders Cache.... \n");
+					OrderManagementBot.SyncOrdersCache (wallet.GetStoredReceiveAddress ());
+					WriteToInfoBox ("Finished Syncing orders cache \n");
+
+					Gtk.Application.Invoke (
+						delegate {
+							dologicbutton.Visible = true;
+							automatebutton.Visible = true;
+							button171.Visible = false;
+							button1.Visible = true;
+
+						}
+					);
+
+				} );
+
+
+
+			};
+
 			//this.exitbutton.Clicked += (object sender, EventArgs e) => this.Destroy();
 
 			//this.button17
@@ -278,8 +318,13 @@ namespace IhildaWallet
 		{
 			string message = "<b>Automation Status </b>: " + (String)(isRunning ? "<span fgcolor=\"green\">Running</span>" : "<span fgcolor=\"red\">Stopped</span>");
 			Application.Invoke (delegate {
-				walletswitchwidget2.Sensitive = !isRunning;
+				walletswitchwidget1.Sensitive = !isRunning;
 				label4.Markup = message;
+
+				button171.Visible = isRunning;
+				automatebutton.Visible = !isRunning;
+				dologicbutton.Visible = !isRunning;
+				button1.Visible = !isRunning;
 			});
 
 		}
@@ -511,7 +556,7 @@ namespace IhildaWallet
 					WriteToInfoBox ("");
 				}
 				*/
-				RippleWallet rw = walletswitchwidget2.GetRippleWallet ();
+				RippleWallet rw = walletswitchwidget1.GetRippleWallet ();
 				if (rw == null) {
 					string messg = "No wallet Selected";
 					MessageDialog.ShowMessage (messg);
@@ -538,9 +583,28 @@ namespace IhildaWallet
 
 
 				this.WriteToInfoBox ("Polling data for " + (string)(rw?.GetStoredReceiveAddress () ?? "null") + "\n");
-				this.WriteToInfoBox ("Starting from ledger " + (string)(strt?.ToString () ?? "null") + "\n");
-				//this.WriteToInfoBox ("");
+				int last = RuleManagerObj.LastKnownLedger;
+				if (strt != null) {
+					this.WriteToInfoBox ("Starting from ledger " + (string)(strt?.ToString () ?? "null") + "\n");
+				} else {
 
+
+					this.WriteToInfoBox ("Starting ledger is null\n Using last known ledger " + last + "\n");
+				}
+
+				if (last == 0) {
+					bool b = AreYouSure.AskQuestion (
+						"Process entire transaction history?",
+						"You haven't specified a starting ledger and no previous lastledger value has been saved. " +
+						"This will cause the automation to process all transaction history and may not be what you intended" +
+						"Should the script continue?"
+					
+					);
+
+					if (!b) {
+						return;
+					}
+				}
 
 
 				Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = robot.DoLogic (rw, ni, strt, endStr, lim);
@@ -627,7 +691,7 @@ namespace IhildaWallet
 				return;
 			}
 
-			RippleWallet rw = walletswitchwidget2.GetRippleWallet ();
+			RippleWallet rw = walletswitchwidget1.GetRippleWallet ();
 			if (rw == null) {
 				MessageDialog.ShowMessage ("No wallet Selected");
 				//shouldContinue = false;
@@ -689,6 +753,10 @@ namespace IhildaWallet
 
 
 				OrderSubmitter orderSubmitter = new OrderSubmitter ();
+
+				orderSubmitter.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
+					this.WriteToInfoBox ("Fee " + e.FeeAndLastLedger.Item1.ToString() + " is too high, waiting on lower fee/n");
+				};
 				orderSubmitter.OnOrderSubmitted += (object sender, OrderSubmittedEventArgs e) => {
 					StringBuilder stringBuilder = new StringBuilder ();
 
@@ -783,6 +851,12 @@ namespace IhildaWallet
 				Robotics robot = new Robotics (this.RuleManagerObj);
 
 				Int32? strt = this.ledgerconstraintswidget1.GetStartFromLedger ();
+
+
+
+
+
+
 				Int32? endStr = this.ledgerconstraintswidget1.GetEndLedger ();
 
 				int? lim = this.ledgerconstraintswidget1.GetLimit ();
@@ -799,7 +873,37 @@ namespace IhildaWallet
 					});
 
 					this.WriteToInfoBox ("Polling data for " + (string)(rw?.GetStoredReceiveAddress () ?? "null") + "\n");
-					this.WriteToInfoBox ("Starting from ledger " + (string)(strt?.ToString () ?? "null") + "\n");
+					//this.WriteToInfoBox ("Starting from ledger " + (string)(strt?.ToString () ?? "null") + "\n");
+
+
+					int last = RuleManagerObj.LastKnownLedger;
+					if (strt != null) {
+						this.WriteToInfoBox ("Starting from ledger " + (string)(strt?.ToString () ?? "null") + "\n");
+					} else {
+
+
+						this.WriteToInfoBox ("Starting ledger is null\n Using last known ledger " + last + "\n");
+					}
+
+					if (last == 0) {
+						bool b = AreYouSure.AskQuestion (
+							"Process entire transaction history?",
+							"You haven't specified a starting ledger and no previous lastledger value has been saved. " +
+							"This will cause the automation to process all transaction history and may not be what you intended" +
+							"Should the script continue?"
+
+						);
+
+						if (!b) {
+							return;
+						}
+					}
+
+
+
+
+
+
 					Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = robot.DoLogic (rw, ni, strt, endStr, lim);
 					if (tuple == null) {
 						MessageDialog.ShowMessage ("Automate : DoLogic tuple == null");

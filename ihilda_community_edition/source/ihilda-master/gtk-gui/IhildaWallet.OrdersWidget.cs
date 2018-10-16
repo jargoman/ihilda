@@ -164,98 +164,68 @@ namespace IhildaWallet
 			this.vbox2.Homogeneous = true;
 			this.vbox2.Spacing = 6;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.orderwidget1 = new global::IhildaWallet.OrderWidget();
-			this.orderwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.orderwidget1.Name = "orderwidget1";
-			this.orderwidget1.Selected = false;
+			this.orderwidget1 = null;
 			this.vbox2.Add(this.orderwidget1);
 			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.orderwidget1]));
 			w11.Position = 0;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.orderwidget2 = new global::IhildaWallet.OrderWidget();
-			this.orderwidget2.Events = ((global::Gdk.EventMask)(256));
-			this.orderwidget2.Name = "orderwidget2";
-			this.orderwidget2.Selected = false;
+			this.orderwidget2 = null;
 			this.vbox2.Add(this.orderwidget2);
 			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.orderwidget2]));
 			w12.Position = 1;
 			w12.Expand = false;
 			w12.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.orderwidget3 = new global::IhildaWallet.OrderWidget();
-			this.orderwidget3.Events = ((global::Gdk.EventMask)(256));
-			this.orderwidget3.Name = "orderwidget3";
-			this.orderwidget3.Selected = false;
+			this.orderwidget3 = null;
 			this.vbox2.Add(this.orderwidget3);
 			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.orderwidget3]));
 			w13.Position = 2;
 			w13.Expand = false;
 			w13.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.orderwidget4 = new global::IhildaWallet.OrderWidget();
-			this.orderwidget4.Events = ((global::Gdk.EventMask)(256));
-			this.orderwidget4.Name = "orderwidget4";
-			this.orderwidget4.Selected = false;
+			this.orderwidget4 = null;
 			this.vbox2.Add(this.orderwidget4);
 			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.orderwidget4]));
 			w14.Position = 3;
 			w14.Expand = false;
 			w14.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.orderwidget5 = new global::IhildaWallet.OrderWidget();
-			this.orderwidget5.Events = ((global::Gdk.EventMask)(256));
-			this.orderwidget5.Name = "orderwidget5";
-			this.orderwidget5.Selected = false;
+			this.orderwidget5 = null;
 			this.vbox2.Add(this.orderwidget5);
 			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.orderwidget5]));
 			w15.Position = 4;
 			w15.Expand = false;
 			w15.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.orderwidget6 = new global::IhildaWallet.OrderWidget();
-			this.orderwidget6.Events = ((global::Gdk.EventMask)(256));
-			this.orderwidget6.Name = "orderwidget6";
-			this.orderwidget6.Selected = false;
+			this.orderwidget6 = null;
 			this.vbox2.Add(this.orderwidget6);
 			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.orderwidget6]));
 			w16.Position = 5;
 			w16.Expand = false;
 			w16.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.orderwidget7 = new global::IhildaWallet.OrderWidget();
-			this.orderwidget7.Events = ((global::Gdk.EventMask)(256));
-			this.orderwidget7.Name = "orderwidget7";
-			this.orderwidget7.Selected = false;
+			this.orderwidget7 = null;
 			this.vbox2.Add(this.orderwidget7);
 			global::Gtk.Box.BoxChild w17 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.orderwidget7]));
 			w17.Position = 6;
 			w17.Expand = false;
 			w17.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.orderwidget8 = new global::IhildaWallet.OrderWidget();
-			this.orderwidget8.Events = ((global::Gdk.EventMask)(256));
-			this.orderwidget8.Name = "orderwidget8";
-			this.orderwidget8.Selected = false;
+			this.orderwidget8 = null;
 			this.vbox2.Add(this.orderwidget8);
 			global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.orderwidget8]));
 			w18.Position = 7;
 			w18.Expand = false;
 			w18.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.orderwidget9 = new global::IhildaWallet.OrderWidget();
-			this.orderwidget9.Events = ((global::Gdk.EventMask)(256));
-			this.orderwidget9.Name = "orderwidget9";
-			this.orderwidget9.Selected = false;
+			this.orderwidget9 = null;
 			this.vbox2.Add(this.orderwidget9);
 			global::Gtk.Box.BoxChild w19 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.orderwidget9]));
 			w19.Position = 8;
 			w19.Expand = false;
 			w19.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.orderwidget10 = new global::IhildaWallet.OrderWidget();
-			this.orderwidget10.Events = ((global::Gdk.EventMask)(256));
-			this.orderwidget10.Name = "orderwidget10";
-			this.orderwidget10.Selected = false;
+			this.orderwidget10 = null;
 			this.vbox2.Add(this.orderwidget10);
 			global::Gtk.Box.BoxChild w20 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.orderwidget10]));
 			w20.Position = 9;
@@ -267,9 +237,7 @@ namespace IhildaWallet
 			global::Gtk.Box.BoxChild w23 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.scrolledwindow1]));
 			w23.Position = 4;
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.pagerwidget1 = new global::IhildaWallet.PagerWidget();
-			this.pagerwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.pagerwidget1.Name = "pagerwidget1";
+			this.pagerwidget1 = null;
 			this.vbox1.Add(this.pagerwidget1);
 			global::Gtk.Box.BoxChild w24 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.pagerwidget1]));
 			w24.Position = 5;

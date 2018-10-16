@@ -98,7 +98,9 @@ namespace IhildaWallet
 				0);
 
 			SignOptions opts = SignOptions.LoadSignOptions ();
-			Tuple<UInt32, UInt32> tupe = FeeSettings.GetFeeAndLastLedgerFromSettings (ni);
+			FeeSettings feeSettings = FeeSettings.LoadSettings ();
+
+			Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni);
 
 			uint se = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence (rw.GetStoredReceiveAddress (), ni));
 

@@ -12,7 +12,7 @@ namespace IhildaWallet
 
 		private global::Gtk.HBox hbox4;
 
-		private global::IhildaWallet.WalletSwitchWidget walletswitchwidget2;
+		private global::IhildaWallet.WalletSwitchWidget walletswitchwidget1;
 
 		private global::Gtk.Label label4;
 
@@ -104,12 +104,15 @@ namespace IhildaWallet
 			this.hbox4.Name = "hbox4";
 			this.hbox4.Spacing = 6;
 			// Container child hbox4.Gtk.Box+BoxChild
-			this.walletswitchwidget2 = new global::IhildaWallet.WalletSwitchWidget();
-			this.walletswitchwidget2.Events = ((global::Gdk.EventMask)(256));
-			this.walletswitchwidget2.Name = "walletswitchwidget2";
-			this.hbox4.Add(this.walletswitchwidget2);
-			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.walletswitchwidget2]));
+			this.walletswitchwidget1 = new global::IhildaWallet.WalletSwitchWidget();
+			this.walletswitchwidget1.WidthRequest = 321;
+			this.walletswitchwidget1.Events = ((global::Gdk.EventMask)(256));
+			this.walletswitchwidget1.Name = "walletswitchwidget1";
+			this.hbox4.Add(this.walletswitchwidget1);
+			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.walletswitchwidget1]));
 			w1.Position = 0;
+			w1.Expand = false;
+			w1.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.label4 = new global::Gtk.Label();
 			this.label4.Name = "label4";
@@ -405,6 +408,7 @@ namespace IhildaWallet
 			}
 			this.DefaultWidth = 691;
 			this.DefaultHeight = 444;
+			this.button171.Hide();
 			this.Show();
 		}
 	}

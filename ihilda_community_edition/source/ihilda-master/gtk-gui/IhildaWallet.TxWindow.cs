@@ -42,9 +42,7 @@ namespace IhildaWallet
 			this.notebook1.Name = "notebook1";
 			this.notebook1.CurrentPage = 0;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.txviewwidget1 = new global::IhildaWallet.TxViewWidget();
-			this.txviewwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.txviewwidget1.Name = "txviewwidget1";
+			this.txviewwidget1 = null;
 			this.notebook1.Add(this.txviewwidget1);
 			// Notebook tab
 			this.txtablabel = new global::Gtk.Label();
@@ -53,9 +51,7 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.txviewwidget1, this.txtablabel);
 			this.txtablabel.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.orderswidget1 = new global::IhildaWallet.OrdersWidget();
-			this.orderswidget1.Events = ((global::Gdk.EventMask)(256));
-			this.orderswidget1.Name = "orderswidget1";
+			this.orderswidget1 = null;
 			this.notebook1.Add(this.orderswidget1);
 			global::Gtk.Notebook.NotebookChild w2 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.orderswidget1]));
 			w2.Position = 1;
@@ -66,9 +62,7 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.orderswidget1, this.label39);
 			this.label39.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.orderstreewidget1 = new global::IhildaWallet.OrdersTreeWidget();
-			this.orderstreewidget1.Events = ((global::Gdk.EventMask)(256));
-			this.orderstreewidget1.Name = "orderstreewidget1";
+			this.orderstreewidget1 = null;
 			this.notebook1.Add(this.orderstreewidget1);
 			global::Gtk.Notebook.NotebookChild w3 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.orderstreewidget1]));
 			w3.Position = 2;
@@ -79,9 +73,7 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.orderstreewidget1, this.label40);
 			this.label40.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.canseltxwidget1 = new global::IhildaWallet.CanselTxWidget();
-			this.canseltxwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.canseltxwidget1.Name = "canseltxwidget1";
+			this.canseltxwidget1 = null;
 			this.notebook1.Add(this.canseltxwidget1);
 			global::Gtk.Notebook.NotebookChild w4 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.canseltxwidget1]));
 			w4.Position = 3;

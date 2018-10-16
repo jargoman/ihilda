@@ -111,8 +111,12 @@ namespace IhildaWallet
 
 
 			opts = SignOptions.LoadSignOptions ();
+			FeeSettings feeSettings = FeeSettings.LoadSettings ();
+			feeSettings.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
+				this.OnFeeSleep.Invoke (sender,e);
+			};
 
-			Tuple<UInt32, UInt32> tupe = FeeSettings.GetFeeAndLastLedgerFromSettings (networkInterface, lastFee);
+			Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (networkInterface, lastFee);
 
 			UInt32 f = tupe.Item1;
 			orderSubmittedEventArgs.RippleOfferTransaction.fee = f.ToString ();
@@ -843,6 +847,8 @@ namespace IhildaWallet
 
 		public static int MAX_SUBMIT_ATTEMPTS = 3;
 		public static int FAILED_ATTEMPT_RETRY_DELAY = 6000;
+
+		public event EventHandler<FeeSleepEventArgs> OnFeeSleep;
 
 		public event EventHandler<OrderSubmittedEventArgs> OnOrderSubmitted;
 

@@ -39,7 +39,6 @@ namespace IhildaWallet
 
 			this.Wallet = rw;
 
-			this.settingsPath = FileHelper.GetSettingsPath ( rw.ToString () + settingsFileName );
 
 			//this.orderDict = new ConcurrentDictionary< string, AutomatedOrder > ();
 		}
@@ -154,7 +153,7 @@ namespace IhildaWallet
 		private IEnumerable <AutomatedOrder> TraceNodesToSource (IEnumerable <RippleNode> nodes) {
 			List< AutomatedOrder > list = new List<AutomatedOrder> ();
 
-			Dictionary<String, AutomatedOrder> cachedOffers = Load ();
+			Dictionary<String, AutomatedOrder> cachedOffers = Load (Wallet.GetStoredReceiveAddress());
 
 			foreach ( RippleNode node in nodes ) {
 				AutomatedOrder order = null;
@@ -365,7 +364,7 @@ namespace IhildaWallet
 
 		}
 
-
+		/*
 		public void SubmmitOrders ( IEnumerable<AutomatedOrder> orders ) {
 
 			foreach (AutomatedOrder ao in orders) {
@@ -393,18 +392,20 @@ namespace IhildaWallet
 
 
 			}
-		}
+		}*/
 
-		public void SyncOrdersCache (string account) {
+		public static void SyncOrdersCache (string account) {
 			if (account == null) {
 				return;
 			}
 
-			if (this.NetInterface == null) {
+			NetworkInterface networkInterface = NetworkController.CurrentInterface;
+
+			if (networkInterface == null) {
 				return;
 			}
 
-			Task<IEnumerable <Response<AccountOffersResult>>> task = AccountOffers.GetFullOfferList (account, this.NetInterface);
+			Task<IEnumerable <Response<AccountOffersResult>>> task = AccountOffers.GetFullOfferList (account, networkInterface);
 			task.Wait ();
 
 			//List<Offer> orders = new List<Offer> ();
@@ -428,7 +429,7 @@ namespace IhildaWallet
 				return;
 			}
 
-			UpdateOrdersCache (offs_list);
+			UpdateOrdersCache (offs_list, account);
 			/*  linq obsoleted code delete after testing linq
 			foreach (var offls in offs_list) {
 				orders.AddRange (offls);
@@ -450,7 +451,7 @@ namespace IhildaWallet
 
 		}
 
-		public void UpdateOrdersCache (IEnumerable<AutomatedOrder> orders) {
+		public static void UpdateOrdersCache (IEnumerable<AutomatedOrder> orders, string account) {
 			 
 			if (orders == null) {
 				return;
@@ -462,7 +463,7 @@ namespace IhildaWallet
 
 
 
-			Dictionary<string, AutomatedOrder> dict = Load ();
+			Dictionary<string, AutomatedOrder> dict = Load (account);
 			if (dict == null) {
 				dict = new Dictionary<string, AutomatedOrder> (orders.Count ());
 			}
@@ -485,24 +486,25 @@ namespace IhildaWallet
 			}
 
 
-
-			this.Save ( dict.Values );
+			var settingsPath = FileHelper.GetSettingsPath (account + settingsFileName);
+			OrderManagementBot.Save ( dict.Values, settingsPath );
 
 		}
 
-		public void Save (IEnumerable<AutomatedOrder> offers) {
+		public static void Save (IEnumerable<AutomatedOrder> offers, string path) {
 			//ConfStruct confstruct = new ConfStruct( orderDict.Values );
 			ConfStruct confstruct = new ConfStruct( offers );
 
 			string conf = DynamicJson.Serialize (confstruct);
 
-			FileHelper.SaveConfig (settingsPath, conf);
+
+			FileHelper.SaveConfig (path, conf);
 		}
 
-		public Dictionary<String, AutomatedOrder> Load () {
+		public static Dictionary<String, AutomatedOrder> Load (string account) {
 
 
-
+			var settingsPath = FileHelper.GetSettingsPath (account + settingsFileName);
 			string str = FileHelper.GetJsonConf (settingsPath);
 
 			if (str == null) {
@@ -549,7 +551,7 @@ namespace IhildaWallet
 
 		//private string 
 #pragma warning disable RECS0122 // Initializing field with default value is redundant
-		private string settingsPath = null;
+		//private static string settingsPath = null;
 #pragma warning restore RECS0122 // Initializing field with default value is redundant
 
 #if DEBUG

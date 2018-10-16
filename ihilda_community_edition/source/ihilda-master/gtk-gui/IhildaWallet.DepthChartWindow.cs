@@ -20,9 +20,7 @@ namespace IhildaWallet
 			this.vbox2.Name = "vbox2";
 			this.vbox2.Spacing = 6;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.depthchartwidget1 = new global::IhildaWallet.DepthChartWidget();
-			this.depthchartwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.depthchartwidget1.Name = "depthchartwidget1";
+			this.depthchartwidget1 = null;
 			this.vbox2.Add(this.depthchartwidget1);
 			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.depthchartwidget1]));
 			w1.Position = 0;

@@ -28,9 +28,7 @@ namespace IhildaWallet
 			this.vbox2.Name = "vbox2";
 			this.vbox2.Spacing = 6;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.networksettings1 = new global::IhildaWallet.NetworkSettings();
-			this.networksettings1.Events = ((global::Gdk.EventMask)(256));
-			this.networksettings1.Name = "networksettings1";
+			this.networksettings1 = null;
 			this.vbox2.Add(this.networksettings1);
 			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.networksettings1]));
 			w2.Position = 0;

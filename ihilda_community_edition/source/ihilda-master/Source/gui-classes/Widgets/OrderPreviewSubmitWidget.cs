@@ -870,8 +870,16 @@ namespace IhildaWallet
 
 
 				this.SetStatus (index.ToString (), "Requesting Fee", TextHighlighter.GREEN);
+				FeeSettings feeSettings = FeeSettings.LoadSettings ();
+				if (feeSettings == null) {
+					// TODO
+					return false;
+				}
 
-				Tuple<UInt32, UInt32> tupe = FeeSettings.GetFeeAndLastLedgerFromSettings (ni, lastFee);
+				feeSettings.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
+					this.SetResult (index.ToString (), "Fee " + e.FeeAndLastLedger.Item1.ToString () + " is too high, waiting on lower fee", TextHighlighter.BLACK);
+				};
+				Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, lastFee);
 
 				if (tupe == null) {
 					this.SetResult (index.ToString (), "Error retrieving fee", TextHighlighter.RED);

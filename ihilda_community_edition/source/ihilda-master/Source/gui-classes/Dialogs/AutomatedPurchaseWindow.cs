@@ -55,6 +55,11 @@ namespace IhildaWallet
 				WriteToInfoBox (targetMessage);
 
 				OrderSubmitter orderSubmitter = new OrderSubmitter ();
+
+				orderSubmitter.OnFeeSleep += (object send, FeeSleepEventArgs ee) => {
+					this.WriteToInfoBox ("Fee " + ee.FeeAndLastLedger.Item1.ToString () + " is too high, waiting on lower fee/n");
+				};
+
 				orderSubmitter.OnOrderSubmitted += ( object senderObj, OrderSubmittedEventArgs eventObj ) => {
 					string submitMessage = "Successfully Submitted order : " + eventObj.RippleOfferTransaction.hash ;
 					WriteToInfoBox (submitMessage);

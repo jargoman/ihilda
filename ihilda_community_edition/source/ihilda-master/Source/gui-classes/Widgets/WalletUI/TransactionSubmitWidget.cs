@@ -216,10 +216,11 @@ namespace IhildaWallet
 
 
 				SignOptions opts = SignOptions.LoadSignOptions ();
+				FeeSettings feeSettings = FeeSettings.LoadSettings ();
 
 				this.SetStatus (index.ToString (), "Requesting Fee", TextHighlighter.GREEN);
 
-				Tuple<UInt32, UInt32> tupe = FeeSettings.GetFeeAndLastLedgerFromSettings (ni);
+				Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni);
 
 
 				if (stop) {

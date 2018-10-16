@@ -65,7 +65,7 @@ namespace RippleLibSharp.Util
 			set;
 		}
 
-
+		public static string BLACK = "\"black\"";
 		public static string RED = "\"red\"";
 		public static string BLUE = "\"blue\"";
 		public static string GREEN = "\"green\"";

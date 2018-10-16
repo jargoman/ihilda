@@ -296,7 +296,12 @@ namespace IhildaWallet
 
 				this.SetIsSubmitted (index.ToString (), "Requesting Fee");
 
-				Tuple<UInt32, UInt32> tupe = FeeSettings.GetFeeAndLastLedgerFromSettings (ni);
+				FeeSettings feeSettings = FeeSettings.LoadSettings ();
+				feeSettings.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
+					this.SetIsSubmitted (index.ToString(), "Fee " + e.FeeAndLastLedger.Item1.ToString() + " is too high, waiting on lower fee");
+				};
+
+				Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni);
 
 				if (stop) {
 

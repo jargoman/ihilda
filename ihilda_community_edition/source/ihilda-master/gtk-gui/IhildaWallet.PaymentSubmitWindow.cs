@@ -14,9 +14,7 @@ namespace IhildaWallet
 			this.Title = global::Mono.Unix.Catalog.GetString("PaymentSubmitWindow");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Container child IhildaWallet.PaymentSubmitWindow.Gtk.Container+ContainerChild
-			this.paymentpreviewsubmitwidget1 = new global::IhildaWallet.PaymentPreviewSubmitWidget();
-			this.paymentpreviewsubmitwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.paymentpreviewsubmitwidget1.Name = "paymentpreviewsubmitwidget1";
+			this.paymentpreviewsubmitwidget1 = null;
 			this.Add(this.paymentpreviewsubmitwidget1);
 			if ((this.Child != null))
 			{

@@ -19,7 +19,7 @@ namespace IhildaWallet
 		}
 
 		public void InitGUI () {
-			FeeSettings settings = FeeSettings.Settings;
+			FeeSettings settings = FeeSettings.LoadSettings ();
 
 			if (settings == null) {
 				return;
@@ -144,7 +144,7 @@ namespace IhildaWallet
 				}
 			}
 
-			FeeSettings.Settings = fs;
+			//FeeSettings.Settings = fs;
 
 			FeeSettings.SaveSettings (fs);
 		}
@@ -155,7 +155,7 @@ namespace IhildaWallet
 
 		static FeeSettings () {
 			settingsPath = FileHelper.GetSettingsPath ( settingsFileName );
-			Settings = LoadSettings ();
+			//Settings = LoadSettings ();
 		}
 
 		public UInt32? Specify {
@@ -206,7 +206,7 @@ namespace IhildaWallet
 		}
 
 		public static void SaveSettings ( FeeSettings settings ) {
-			FeeSettings.Settings = settings;
+			//FeeSettings.Settings = settings;
 
 			string conf = DynamicJson.Serialize (settings);
 
@@ -232,13 +232,14 @@ namespace IhildaWallet
 			return new Tuple<UInt32, UInt32>(f, tupe.Item2);
 		}
 
-		public static Tuple<UInt32,UInt32> GetFeeAndLastLedgerFromSettings (NetworkInterface ni, UInt32? lastFee = null) {
+		public Tuple<UInt32,UInt32> GetFeeAndLastLedgerFromSettings (NetworkInterface ni, UInt32? lastFee = null) {
 
-
+			/*
 			if (Settings == null) {
 
 				return ParseFee (ni);
 			}
+			*/
 
 
 			int feeRetry = 0; 
@@ -249,18 +250,18 @@ namespace IhildaWallet
 
 
 
-			if (Settings.Specify != null) {
+			if (this.Specify != null) {
 				//var tupe = parseFee (ni);
 				// you have to get the last ledger anyway
 
 				// we already know the last fee was explicitly specified so we blindly increase it by the retry factor
-				if (Settings.RetryFactor != null && lastFee != null) {
+				if (this.RetryFactor != null && lastFee != null) {
 
-					fs = new Tuple<uint, uint> ((uint)(Settings.Specify * Settings.RetryFactor), fs.Item2);
+					fs = new Tuple<uint, uint> ((uint)(this.Specify * this.RetryFactor), fs.Item2);
 
 
 				} else {
-					fs = new Tuple<uint, uint> ((uint)Settings.Specify, fs.Item2);
+					fs = new Tuple<uint, uint> ((uint)this.Specify, fs.Item2);
 				}
 
 				// we are going to wait for the lowest fee specified 
@@ -272,38 +273,38 @@ namespace IhildaWallet
 
 			fs = ParseFee (ni);
 
-			if (Settings.Multiplier != null) {
+			if (this.Multiplier != null) {
 
 				//f *= (int)settings.multiplier;
 
-				fs = new Tuple<uint, uint> (fs.Item1 * (UInt32)Settings.Multiplier, fs.Item2);
+				fs = new Tuple<uint, uint> (fs.Item1 * (UInt32)this.Multiplier, fs.Item2);
 
 
 			}
 
-			if (Settings.RetryFactor != null) {
+			if (this.RetryFactor != null) {
 				if (lastFee != null) {
 
-					UInt32 lastAmountFactored = (UInt32)lastFee * (UInt32)Settings.RetryFactor;
+					UInt32 lastAmountFactored = (UInt32)lastFee * (UInt32)this.RetryFactor;
 					 
 
-					UInt32 newSuggestedAmount = fs.Item1 * (UInt32)Settings.RetryFactor;
+					UInt32 newSuggestedAmount = fs.Item1 * (UInt32)this.RetryFactor;
 
 					bool newSuggestionIshigher = lastAmountFactored > newSuggestedAmount ;
 
 					UInt32 highestSuggestion = newSuggestionIshigher ? lastAmountFactored : newSuggestedAmount;
 					UInt32 lowestSuggestion = newSuggestionIshigher ? newSuggestedAmount : lastAmountFactored;
 					// if waiting for lower fee is specified
-					if ( Settings.Wait != null ) {
+					if ( this.Wait != null ) {
 
 						// if the suggestion is less than wait limit
-						if (highestSuggestion < Settings.Wait) {
+						if (highestSuggestion < this.Wait) {
 							// I think we should fasttrack it
 							fs = new Tuple<uint, uint> (highestSuggestion, fs.Item2);
 							goto Fasttrack;
 						}
 
-						if (lowestSuggestion < Settings.Wait) {
+						if (lowestSuggestion < this.Wait) {
 
 							if (lowestSuggestion > lastFee) {
 								fs = new Tuple<uint, uint> (lowestSuggestion, fs.Item2);
@@ -313,7 +314,7 @@ namespace IhildaWallet
 						}
 
 						if (feeRetry > 20) {
-							fs = new Tuple<uint, uint> ((UInt32)Settings.Wait, fs.Item2);
+							fs = new Tuple<uint, uint> ((UInt32)this.Wait, fs.Item2);
 							goto Fasttrack;
 						}
 						goto START;
@@ -327,12 +328,17 @@ namespace IhildaWallet
 
 
 			Wait:
-			if (Settings.Wait != null) {
+			if (this.Wait != null) {
 				
-				if ( fs.Item1 > Settings.Wait ) {
+				if ( fs.Item1 > this.Wait ) {
 					if (feeRetry++ == MAX_FEE_RETRY_ATTEMPTS) {
 						return null;
 					}
+
+
+					FeeSleepEventArgs feeSleepEventArgs = new FeeSleepEventArgs ();
+					feeSleepEventArgs.FeeAndLastLedger = fs;
+					OnFeeSleep?.Invoke (this, feeSleepEventArgs);
 					Thread.Sleep (3000);
 					goto START;
 				}
@@ -340,11 +346,11 @@ namespace IhildaWallet
 
 			Fasttrack:
 
-			if (Settings.Warn != null) {
+			if (this.Warn != null) {
 
 
 
-				if (fs.Item1 > Settings.Warn ) {
+				if (fs.Item1 > this.Warn ) {
 					var v = AreYouSure.AskQuestionNonGuiThread("Approve High Fee", "The current fee is " + fs.Item1.ToString() + " drops. Do you wish to submit the transaction anyway?");
 					if (!v) {
 						return null;
@@ -356,10 +362,14 @@ namespace IhildaWallet
 			return fs;
 		}
 
+
+		public event EventHandler<FeeSleepEventArgs> OnFeeSleep;
+		/*
 		public static FeeSettings Settings {
 			get;
 			set;
 		}
+		*/
 
 		public const string settingsFileName = "FeeSettings.jsn";
 
@@ -372,6 +382,17 @@ namespace IhildaWallet
 			#if DEBUG
 		private const string clsstr = nameof (FeeSettings) + DebugRippleLibSharp.colon;
 		#endif 
+	}
+
+	public class FeeSleepEventArgs : EventArgs
+	{
+
+		public Tuple< uint,uint >  FeeAndLastLedger {
+			get;
+			set;
+		}
+
+
 	}
 
 

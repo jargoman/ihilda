@@ -798,6 +798,8 @@ namespace IhildaWallet
 
 		public void UpdateWalletUI (RippleWallet rippleWallet)
 		{
+
+			label3.Visible = true;
 			//Gtk.Application.Invoke (
 			//	delegate {
 					this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (255, 255, 255));
@@ -1543,7 +1545,9 @@ namespace IhildaWallet
 			this.walletManager = wm;
 
 			//this.walletviewport1.setWallets(walletManager.wallets.Values);
-			this.balancetab1.Visible = false;
+			if (this.balancetab1 != null) {
+				this.balancetab1.Visible = false;
+			}
 			this.UpdateUI();
 		}
 

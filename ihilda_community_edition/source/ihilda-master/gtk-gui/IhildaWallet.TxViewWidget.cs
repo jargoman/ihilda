@@ -111,9 +111,7 @@ namespace IhildaWallet
 			this.expander1.CanFocus = true;
 			this.expander1.Name = "expander1";
 			// Container child expander1.Gtk.Container+ContainerChild
-			this.ledgerconstraintswidget3 = new global::IhildaWallet.LedgerConstraintsWidget();
-			this.ledgerconstraintswidget3.Events = ((global::Gdk.EventMask)(256));
-			this.ledgerconstraintswidget3.Name = "ledgerconstraintswidget3";
+			this.ledgerconstraintswidget3 = null;
 			this.expander1.Add(this.ledgerconstraintswidget3);
 			this.GtkLabel35 = new global::Gtk.Label();
 			this.GtkLabel35.Name = "GtkLabel35";
@@ -151,84 +149,54 @@ namespace IhildaWallet
 			this.vbox2.Spacing = 3;
 			this.vbox2.BorderWidth = ((uint)(5));
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.txwidget1 = new global::IhildaWallet.TxWidget();
-			this.txwidget1.HeightRequest = 300;
-			this.txwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.txwidget1.Name = "txwidget1";
+			this.txwidget1 = null;
 			this.vbox2.Add(this.txwidget1);
 			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.txwidget1]));
 			w10.Position = 0;
 			w10.Expand = false;
 			w10.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.txwidget2 = new global::IhildaWallet.TxWidget();
-			this.txwidget2.HeightRequest = 300;
-			this.txwidget2.Events = ((global::Gdk.EventMask)(256));
-			this.txwidget2.Name = "txwidget2";
+			this.txwidget2 = null;
 			this.vbox2.Add(this.txwidget2);
 			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.txwidget2]));
 			w11.Position = 1;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.txwidget3 = new global::IhildaWallet.TxWidget();
-			this.txwidget3.HeightRequest = 300;
-			this.txwidget3.Events = ((global::Gdk.EventMask)(256));
-			this.txwidget3.Name = "txwidget3";
+			this.txwidget3 = null;
 			this.vbox2.Add(this.txwidget3);
 			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.txwidget3]));
 			w12.Position = 2;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.txwidget4 = new global::IhildaWallet.TxWidget();
-			this.txwidget4.HeightRequest = 300;
-			this.txwidget4.Events = ((global::Gdk.EventMask)(256));
-			this.txwidget4.Name = "txwidget4";
+			this.txwidget4 = null;
 			this.vbox2.Add(this.txwidget4);
 			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.txwidget4]));
 			w13.Position = 3;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.txwidget5 = new global::IhildaWallet.TxWidget();
-			this.txwidget5.HeightRequest = 300;
-			this.txwidget5.Events = ((global::Gdk.EventMask)(256));
-			this.txwidget5.Name = "txwidget5";
+			this.txwidget5 = null;
 			this.vbox2.Add(this.txwidget5);
 			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.txwidget5]));
 			w14.Position = 4;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.txwidget6 = new global::IhildaWallet.TxWidget();
-			this.txwidget6.HeightRequest = 300;
-			this.txwidget6.Events = ((global::Gdk.EventMask)(256));
-			this.txwidget6.Name = "txwidget6";
+			this.txwidget6 = null;
 			this.vbox2.Add(this.txwidget6);
 			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.txwidget6]));
 			w15.Position = 5;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.txwidget7 = new global::IhildaWallet.TxWidget();
-			this.txwidget7.HeightRequest = 300;
-			this.txwidget7.Events = ((global::Gdk.EventMask)(256));
-			this.txwidget7.Name = "txwidget7";
+			this.txwidget7 = null;
 			this.vbox2.Add(this.txwidget7);
 			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.txwidget7]));
 			w16.Position = 6;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.txwidget8 = new global::IhildaWallet.TxWidget();
-			this.txwidget8.HeightRequest = 300;
-			this.txwidget8.Events = ((global::Gdk.EventMask)(256));
-			this.txwidget8.Name = "txwidget8";
+			this.txwidget8 = null;
 			this.vbox2.Add(this.txwidget8);
 			global::Gtk.Box.BoxChild w17 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.txwidget8]));
 			w17.Position = 7;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.txwidget9 = new global::IhildaWallet.TxWidget();
-			this.txwidget9.HeightRequest = 300;
-			this.txwidget9.Events = ((global::Gdk.EventMask)(256));
-			this.txwidget9.Name = "txwidget9";
+			this.txwidget9 = null;
 			this.vbox2.Add(this.txwidget9);
 			global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.txwidget9]));
 			w18.Position = 8;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.txwidget10 = new global::IhildaWallet.TxWidget();
-			this.txwidget10.HeightRequest = 300;
-			this.txwidget10.Events = ((global::Gdk.EventMask)(256));
-			this.txwidget10.Name = "txwidget10";
+			this.txwidget10 = null;
 			this.vbox2.Add(this.txwidget10);
 			global::Gtk.Box.BoxChild w19 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.txwidget10]));
 			w19.Position = 9;
@@ -238,9 +206,7 @@ namespace IhildaWallet
 			global::Gtk.Box.BoxChild w22 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.scrolledwindow1]));
 			w22.Position = 4;
 			// Container child vbox3.Gtk.Box+BoxChild
-			this.pagerwidget1 = new global::IhildaWallet.PagerWidget();
-			this.pagerwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.pagerwidget1.Name = "pagerwidget1";
+			this.pagerwidget1 = null;
 			this.vbox3.Add(this.pagerwidget1);
 			global::Gtk.Box.BoxChild w23 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.pagerwidget1]));
 			w23.Position = 5;

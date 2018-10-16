@@ -17,6 +17,8 @@ namespace IhildaWallet
 			};
 		}
 
+
+
 		public void SetLastKnownLedger (string s) {
 
 			Gtk.Application.Invoke (delegate {

@@ -13,6 +13,24 @@ namespace IhildaWallet
 		{
 			this.Build ();
 
+			if (label3 == null) {
+				label3 = new Label ("2Factor Auth");
+			}
+
+			if (pincodewidget2 == null) {
+				pincodewidget2 = new PinCodeWidget ();
+				vbox3.Add ( pincodewidget2 );
+			}
+
+			if (label7 == null) {
+				label7 = new Label ("Prism");
+			}
+
+			if (prismwidget1 == null) {
+				prismwidget1 = new PrismWidget ();
+				vbox7.Add (prismwidget1);
+			}
+
 		}
 
 

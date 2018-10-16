@@ -4750,6 +4750,7 @@ drops</property>
                     <child>
                       <widget class="Gtk.Label" id="label3">
                         <property name="MemberName" />
+                        <property name="Visible">False</property>
                         <property name="LabelProp" translatable="yes">&lt;big&gt;&lt;b&gt;QrCode&lt;/b&gt;&lt;/big&gt;</property>
                         <property name="UseMarkup">True</property>
                       </widget>
@@ -13338,13 +13339,16 @@ example: USD/CAD</property>
                     <property name="MemberName" />
                     <property name="Spacing">6</property>
                     <child>
-                      <widget class="IhildaWallet.WalletSwitchWidget" id="walletswitchwidget2">
+                      <widget class="IhildaWallet.WalletSwitchWidget" id="walletswitchwidget1">
                         <property name="MemberName" />
+                        <property name="WidthRequest">321</property>
                         <property name="Events">ButtonPressMask</property>
                       </widget>
                       <packing>
                         <property name="Position">0</property>
-                        <property name="AutoSize">False</property>
+                        <property name="AutoSize">True</property>
+                        <property name="Expand">False</property>
+                        <property name="Fill">False</property>
                       </packing>
                     </child>
                     <child>
@@ -13680,6 +13684,7 @@ Bot output screen
                             <child>
                               <widget class="Gtk.Button" id="button171">
                                 <property name="MemberName" />
+                                <property name="Visible">False</property>
                                 <property name="CanFocus">True</property>
                                 <property name="Type">TextOnly</property>
                                 <property name="Label" translatable="yes">Stop Automation</property>
@@ -14586,7 +14591,7 @@ Bot output screen
               <widget class="Gtk.Notebook" id="notebook2">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">2</property>
+                <property name="CurrentPage">0</property>
                 <child>
                   <widget class="Gtk.VBox" id="vbox5">
                     <property name="MemberName" />
@@ -17639,7 +17644,7 @@ Bot output screen
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Bin" id="IhildaWallet.LedgerConstraintsWidget" design-size="477 171">
+  <widget class="Gtk.Bin" id="IhildaWallet.LedgerConstraintsWidget" design-size="477 172">
     <property name="MemberName" />
     <property name="Visible">False</property>
     <child>
