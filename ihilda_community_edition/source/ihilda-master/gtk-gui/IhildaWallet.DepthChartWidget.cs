@@ -46,7 +46,7 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 0;
+			this.notebook1.CurrentPage = 1;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.vbox2 = new global::Gtk.VBox();
 			this.vbox2.Name = "vbox2";
@@ -170,7 +170,9 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.vbox2, this.label5);
 			this.label5.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.orderclusterwidget1 = null;
+			this.orderclusterwidget1 = new global::IhildaWallet.OrderClusterWidget();
+			this.orderclusterwidget1.Events = ((global::Gdk.EventMask)(256));
+			this.orderclusterwidget1.Name = "orderclusterwidget1";
 			this.notebook1.Add(this.orderclusterwidget1);
 			global::Gtk.Notebook.NotebookChild w13 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.orderclusterwidget1]));
 			w13.Position = 1;

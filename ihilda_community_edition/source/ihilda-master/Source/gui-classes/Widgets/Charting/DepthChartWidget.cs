@@ -37,6 +37,17 @@ namespace IhildaWallet
 				vbox2.Add (this.drawingarea1);
 			}
 
+			if (label6 == null) {
+				label6 = new Label ("Order Cluster");
+			}
+
+			if (orderclusterwidget1 == null) {
+
+				orderclusterwidget1 = new OrderClusterWidget ();
+				//orderclusterwidget1
+				notebook1.AppendPage (orderclusterwidget1, label6);
+			}
+
 			//this.DoubleBuffered = false;
 			//this.drawingarea1.DoubleBuffered = false;
 
