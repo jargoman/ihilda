@@ -42,6 +42,26 @@ namespace RippleLibSharp.Commands.Tx
 		}
 
 
+		public static Task<Response<string>> GetTxFromAccountAndSequenceDataAPI (string account, uint sequence)
+		{
+			return Task.Run (
+				delegate {
+
+					//DoThrottlingWait ();
+
+					string req = baseapi + accountscommand + account + "/" + txcommand + sequence + options;
+					Response<string> resp = DataApi.GetResponseObject<Response<string>> (req);
+
+					//if () {
+
+					//}
+					//}
+					return resp;
+				}
+			);
+		}
+
+
 		// HAS to be string. Not RippleTxStructure. Or rather lets hope string is the only potential result
 		// result returns a string and if successful transction is populated with a txstructure. 
 		public static Task<Response<string>> GetRequestDataApi (string tx_id) {
@@ -50,23 +70,11 @@ namespace RippleLibSharp.Commands.Tx
 
 					//int attempt = 0;
 					//while (attempt++ < 3) {
-						// limit data api calls to avoid getting 
-						if (last_call_time == default (DateTime)) {
-							last_call_time = DateTime.Now;
-						} else {
+					// limit data api calls to avoid getting 
 
-							while ((((TimeSpan)(DateTime.Now - last_call_time)).TotalMilliseconds) < 2000) {
-								Thread.Sleep (100);
-							}
-						}
+					//DoThrottlingWait ();
 
-
-
-						last_call_time = DateTime.Now;
-
-
-
-						string req = api + tx_id + options;
+					string req = baseapi + txcommand + tx_id + options;
 						Response<string> resp = DataApi.GetResponseObject<Response<string>> (req);
 
 						//if () {
@@ -79,10 +87,16 @@ namespace RippleLibSharp.Commands.Tx
 
 		}
 
-		private static DateTime last_call_time = default (DateTime);
 
 
-		static string api = "https://data.ripple.com/v2/transactions/";
+
+
+		static string baseapi = "https://data.ripple.com/v2/";
+
+		static string txcommand = "transactions/";
+
+		static string accountscommand = "accounts/";
+
 		static string options = "?binary=false";
 
 	}

@@ -298,7 +298,19 @@ namespace IhildaWallet
 
 			//this.button17
 
+			this.deleteordersbutton.Clicked += (sender, e) => {
 
+				string account = this.walletswitchwidget1?.GetRippleWallet ()?.GetStoredReceiveAddress ();
+				if (account == null) {
+					MessageDialog.ShowMessage ("Select an account", "No account has been selected for cache deletion");
+					return;
+				}
+				bool sure = AreYouSure.AskQuestion ("Delete cache", "Are you sure you want to delete the orders cache for account " + account + "?");
+				if (!sure) {
+					return;
+				}
+				OrderManagementBot.DeleteSettingsFile (account);
+			};
 
 		}
 

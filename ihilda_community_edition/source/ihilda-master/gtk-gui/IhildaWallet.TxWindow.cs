@@ -14,15 +14,15 @@ namespace IhildaWallet
 
 		private global::IhildaWallet.OrdersWidget orderswidget1;
 
-		private global::Gtk.Label label39;
+		private global::Gtk.Label label50;
 
 		private global::IhildaWallet.OrdersTreeWidget orderstreewidget1;
 
-		private global::Gtk.Label label40;
+		private global::Gtk.Label label52;
 
 		private global::IhildaWallet.CanselTxWidget canseltxwidget1;
 
-		private global::Gtk.Label label43;
+		private global::Gtk.Label label55;
 
 		protected virtual void Build()
 		{
@@ -40,9 +40,11 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 0;
+			this.notebook1.CurrentPage = 3;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.txviewwidget1 = null;
+			this.txviewwidget1 = new global::IhildaWallet.TxViewWidget();
+			this.txviewwidget1.Events = ((global::Gdk.EventMask)(256));
+			this.txviewwidget1.Name = "txviewwidget1";
 			this.notebook1.Add(this.txviewwidget1);
 			// Notebook tab
 			this.txtablabel = new global::Gtk.Label();
@@ -51,38 +53,44 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.txviewwidget1, this.txtablabel);
 			this.txtablabel.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.orderswidget1 = null;
+			this.orderswidget1 = new global::IhildaWallet.OrdersWidget();
+			this.orderswidget1.Events = ((global::Gdk.EventMask)(256));
+			this.orderswidget1.Name = "orderswidget1";
 			this.notebook1.Add(this.orderswidget1);
 			global::Gtk.Notebook.NotebookChild w2 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.orderswidget1]));
 			w2.Position = 1;
 			// Notebook tab
-			this.label39 = new global::Gtk.Label();
-			this.label39.Name = "label39";
-			this.label39.LabelProp = global::Mono.Unix.Catalog.GetString("Order Pager");
-			this.notebook1.SetTabLabel(this.orderswidget1, this.label39);
-			this.label39.ShowAll();
+			this.label50 = new global::Gtk.Label();
+			this.label50.Name = "label50";
+			this.label50.LabelProp = global::Mono.Unix.Catalog.GetString("Order Pager");
+			this.notebook1.SetTabLabel(this.orderswidget1, this.label50);
+			this.label50.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.orderstreewidget1 = null;
+			this.orderstreewidget1 = new global::IhildaWallet.OrdersTreeWidget();
+			this.orderstreewidget1.Events = ((global::Gdk.EventMask)(256));
+			this.orderstreewidget1.Name = "orderstreewidget1";
 			this.notebook1.Add(this.orderstreewidget1);
 			global::Gtk.Notebook.NotebookChild w3 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.orderstreewidget1]));
 			w3.Position = 2;
 			// Notebook tab
-			this.label40 = new global::Gtk.Label();
-			this.label40.Name = "label40";
-			this.label40.LabelProp = global::Mono.Unix.Catalog.GetString("Order Tree");
-			this.notebook1.SetTabLabel(this.orderstreewidget1, this.label40);
-			this.label40.ShowAll();
+			this.label52 = new global::Gtk.Label();
+			this.label52.Name = "label52";
+			this.label52.LabelProp = global::Mono.Unix.Catalog.GetString("Order Tree");
+			this.notebook1.SetTabLabel(this.orderstreewidget1, this.label52);
+			this.label52.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.canseltxwidget1 = null;
+			this.canseltxwidget1 = new global::IhildaWallet.CanselTxWidget();
+			this.canseltxwidget1.Events = ((global::Gdk.EventMask)(256));
+			this.canseltxwidget1.Name = "canseltxwidget1";
 			this.notebook1.Add(this.canseltxwidget1);
 			global::Gtk.Notebook.NotebookChild w4 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.canseltxwidget1]));
 			w4.Position = 3;
 			// Notebook tab
-			this.label43 = new global::Gtk.Label();
-			this.label43.Name = "label43";
-			this.label43.LabelProp = global::Mono.Unix.Catalog.GetString("Cancel");
-			this.notebook1.SetTabLabel(this.canseltxwidget1, this.label43);
-			this.label43.ShowAll();
+			this.label55 = new global::Gtk.Label();
+			this.label55.Name = "label55";
+			this.label55.LabelProp = global::Mono.Unix.Catalog.GetString("Cancel");
+			this.notebook1.SetTabLabel(this.canseltxwidget1, this.label55);
+			this.label55.ShowAll();
 			this.vbox3.Add(this.notebook1);
 			global::Gtk.Box.BoxChild w5 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.notebook1]));
 			w5.Position = 0;

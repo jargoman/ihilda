@@ -851,13 +851,15 @@ namespace IhildaWallet
 				bool ShouldContinue = LeIceSense.DoTrialDialog (rw, LicenseType.PAYMENT);
 
 				if (!ShouldContinue) {
+
+					/*
 					Gtk.Application.Invoke (delegate {
 						loadingwin.Hide ();
 						loadingwin.Destroy ();
 						loadingwin = null;
 
 
-					});
+					});*/
 					return;
 				}
 				/*
@@ -918,6 +920,8 @@ namespace IhildaWallet
 			}
 
 			finally {
+
+
 				Application.Invoke ((sender, e) => {
 					if (loadingwin != null) {
 						loadingwin?.Hide ();
@@ -926,6 +930,7 @@ namespace IhildaWallet
 					}
 
 				});
+
 			}
 
 

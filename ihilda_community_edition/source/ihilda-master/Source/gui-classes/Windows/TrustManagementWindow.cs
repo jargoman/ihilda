@@ -32,10 +32,10 @@ namespace IhildaWallet
 				hbox4.Add (walletswitchwidget3);
 			}
 
-			if (trustsetter1 == null) {
-				trustsetter1 = new TrustSetter ();
-				trustsetter1.Show ();
-				notebook1.PrependPage (trustsetter1, new Label ("<b>Trust Set</b>") { UseMarkup = true });
+			if (trustsetter2 == null) {
+				trustsetter2 = new TrustSetter ();
+				trustsetter2.Show ();
+				notebook1.PrependPage (trustsetter2, new Label ("<b>Trust Set</b>") { UseMarkup = true });
 			}
 
 			if (accountlineswidget1 == null) {
@@ -43,7 +43,7 @@ namespace IhildaWallet
 				accountlineswidget1.Show ();
 				notebook1.PrependPage (accountlineswidget1, new Label ("<b>Account Lines</b>") { UseMarkup = true });
 			}
-			this.Visible = false;
+			//this.Visible = false;
 
 
 
@@ -57,8 +57,8 @@ namespace IhildaWallet
 				this.SetChildrensWallets (eventArgs.GetRippleWallet ());
 			};
 
-			if (this.trustsetter1 != null) {
-				this.trustsetter1.HideRipplingWidgets ();
+			if (this.trustsetter2 != null) {
+				this.trustsetter2.HideRipplingWidgets ();
 			}
 
 			this.DeleteEvent += OnDeleteEvent;
@@ -118,8 +118,8 @@ namespace IhildaWallet
 				this.accountlineswidget1.SetRippleWallet (rippleWallet);
 			}
 
-			if (this.trustsetter1 != null) {
-				this.trustsetter1.SetRippleWallet (rippleWallet);
+			if (this.trustsetter2 != null) {
+				this.trustsetter2.SetRippleWallet (rippleWallet);
 			}
 
 		}

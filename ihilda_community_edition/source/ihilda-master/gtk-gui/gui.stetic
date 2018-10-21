@@ -6611,7 +6611,7 @@ drops</property>
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Bin" id="IhildaWallet.PagerWidget" design-size="390 43">
+  <widget class="Gtk.Bin" id="IhildaWallet.PagerWidget" design-size="337 29">
     <property name="MemberName" />
     <property name="Visible">False</property>
     <child>
@@ -7077,16 +7077,16 @@ drops</property>
           </packing>
         </child>
         <child>
-          <widget class="Gtk.Notebook" id="notebook1">
+          <widget class="Gtk.Notebook" id="masternotebook">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="CurrentPage">1</property>
+            <property name="CurrentPage">0</property>
             <property name="TabPos">Left</property>
             <child>
-              <widget class="Gtk.Notebook" id="notebook">
+              <widget class="Gtk.Notebook" id="buynotebook">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">2</property>
+                <property name="CurrentPage">0</property>
                 <child>
                   <widget class="IhildaWallet.BuyWidget" id="buywidget1">
                     <property name="MemberName" />
@@ -7153,10 +7153,10 @@ drops</property>
               </packing>
             </child>
             <child>
-              <widget class="Gtk.Notebook" id="notebook4">
+              <widget class="Gtk.Notebook" id="sellnotebook">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">2</property>
+                <property name="CurrentPage">0</property>
                 <child>
                   <widget class="IhildaWallet.SellWidget" id="sellwidget1">
                     <property name="MemberName" />
@@ -7173,7 +7173,7 @@ drops</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="IhildaWallet.CascadedSellWidget" id="cascadedsellwidget2">
+                  <widget class="IhildaWallet.CascadedSellWidget" id="cascadedsellwidget1">
                     <property name="MemberName" />
                     <property name="Events">ButtonPressMask</property>
                   </widget>
@@ -8640,13 +8640,13 @@ what ever widget controls chat functions</property>
             <property name="CanFocus">True</property>
             <property name="CurrentPage">0</property>
             <child>
-              <widget class="IhildaWallet.TrustSetter" id="trustsetter1">
+              <widget class="IhildaWallet.TrustSetter" id="trustsetter2">
                 <property name="MemberName" />
                 <property name="Events">ButtonPressMask</property>
               </widget>
             </child>
             <child>
-              <widget class="Gtk.Label" id="label12">
+              <widget class="Gtk.Label" id="trustlabel">
                 <property name="MemberName" />
                 <property name="LabelProp" translatable="yes">Trust Set</property>
               </widget>
@@ -8664,7 +8664,7 @@ what ever widget controls chat functions</property>
               </packing>
             </child>
             <child>
-              <widget class="Gtk.Label" id="label13">
+              <widget class="Gtk.Label" id="linelabel">
                 <property name="MemberName" />
                 <property name="LabelProp" translatable="yes">Lines</property>
               </widget>
@@ -9291,7 +9291,7 @@ example: USD/CAD</property>
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Window" id="IhildaWallet.Splashes.LoadingWindow" design-size="373 159">
+  <widget class="Gtk.Window" id="IhildaWallet.Splashes.LoadingWindow" design-size="214 110">
     <property name="MemberName" />
     <property name="Title" translatable="yes">LoadingWindow</property>
     <property name="TypeHint">Splashscreen</property>
@@ -9310,7 +9310,7 @@ example: USD/CAD</property>
                 <child>
                   <widget class="Gtk.Image" id="image11">
                     <property name="MemberName" />
-                    <property name="Pixbuf">resource:IhildaWallet.Images.ihilda_logo_black_sans.png</property>
+                    <property name="Pixbuf">resource:IhildaWallet.ihildaplain-100-wide.png</property>
                   </widget>
                   <packing>
                     <property name="Position">0</property>
@@ -9653,7 +9653,7 @@ example: USD/CAD</property>
           <widget class="Gtk.Notebook" id="notebook1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="CurrentPage">0</property>
+            <property name="CurrentPage">3</property>
             <child>
               <widget class="IhildaWallet.TxViewWidget" id="txviewwidget1">
                 <property name="MemberName" />
@@ -9679,7 +9679,7 @@ example: USD/CAD</property>
               </packing>
             </child>
             <child>
-              <widget class="Gtk.Label" id="label39">
+              <widget class="Gtk.Label" id="label50">
                 <property name="MemberName" />
                 <property name="LabelProp" translatable="yes">Order Pager</property>
               </widget>
@@ -9697,7 +9697,7 @@ example: USD/CAD</property>
               </packing>
             </child>
             <child>
-              <widget class="Gtk.Label" id="label40">
+              <widget class="Gtk.Label" id="label52">
                 <property name="MemberName" />
                 <property name="LabelProp" translatable="yes">Order Tree</property>
               </widget>
@@ -9715,7 +9715,7 @@ example: USD/CAD</property>
               </packing>
             </child>
             <child>
-              <widget class="Gtk.Label" id="label43">
+              <widget class="Gtk.Label" id="label55">
                 <property name="MemberName" />
                 <property name="LabelProp" translatable="yes">Cancel</property>
               </widget>
@@ -10320,7 +10320,7 @@ example: USD/CAD</property>
           </widget>
           <packing>
             <property name="Position">4</property>
-            <property name="AutoSize">True</property>
+            <property name="AutoSize">False</property>
           </packing>
         </child>
         <child>
@@ -10329,6 +10329,7 @@ example: USD/CAD</property>
             <property name="Events">ButtonPressMask</property>
           </widget>
           <packing>
+            <property name="PackType">End</property>
             <property name="Position">5</property>
             <property name="AutoSize">False</property>
             <property name="Expand">False</property>
@@ -13707,6 +13708,21 @@ Bot output screen
                               </widget>
                               <packing>
                                 <property name="Position">3</property>
+                                <property name="AutoSize">True</property>
+                                <property name="Expand">False</property>
+                                <property name="Fill">False</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="Gtk.Button" id="deleteordersbutton">
+                                <property name="MemberName" />
+                                <property name="CanFocus">True</property>
+                                <property name="Type">TextOnly</property>
+                                <property name="Label" translatable="yes">Delete Orders Cache</property>
+                                <property name="UseUnderline">True</property>
+                              </widget>
+                              <packing>
+                                <property name="Position">4</property>
                                 <property name="AutoSize">True</property>
                                 <property name="Expand">False</property>
                                 <property name="Fill">False</property>

@@ -7,6 +7,7 @@ using RippleLibSharp.Util;
 
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
+using System.Threading;
 
 namespace RippleLibSharp.Network
 {
@@ -83,6 +84,8 @@ namespace RippleLibSharp.Network
 		public static string Get(string uri)
 		{
 
+			DoThrottlingWait ();
+
 			//System.Security.Cryptography.AesCryptoServiceProvider b = new System.Security.Cryptography.AesCryptoServiceProvider(); 
 			try {
 				HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
@@ -113,6 +116,25 @@ namespace RippleLibSharp.Network
 
 			//return null;
 		}
+
+		private static DateTime last_call_time = default (DateTime);
+		private static void DoThrottlingWait ()
+		{
+			if (last_call_time == default (DateTime)) {
+				last_call_time = DateTime.Now;
+			} else {
+
+				while ((((TimeSpan)(DateTime.Now - last_call_time)).TotalMilliseconds) < 2500) {
+					Thread.Sleep (125);
+				}
+			}
+
+
+
+			last_call_time = DateTime.Now;
+
+		}
+
 
 		/*
 		public static bool AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)

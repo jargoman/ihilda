@@ -53,7 +53,7 @@ namespace IhildaWallet
 					label29 = new Label ("<b>Buy</b>");
 				}
 
-				notebook.AppendPage (buywidget1, label29);
+				buynotebook.AppendPage (buywidget1, label29);
 			}
 
 			if (this.cascadedbuywidget1 == null) {
@@ -64,7 +64,7 @@ namespace IhildaWallet
 					label36 = new Label ("<b>Cascaded Buy</b>");
 				}
 
-				notebook.AppendPage (cascadedbuywidget1, label36);
+				buynotebook.AppendPage (cascadedbuywidget1, label36);
 			}
 
 			if (automatedbuywidget1 == null) {
@@ -75,7 +75,7 @@ namespace IhildaWallet
 					label41 = new Label ("<b>Automated Buy</b>");
 				}
 
-				notebook.AppendPage (automatedbuywidget1, label41);
+				buynotebook.AppendPage (automatedbuywidget1, label41);
 			}
 
 			if (sellwidget1 == null) {
@@ -85,18 +85,18 @@ namespace IhildaWallet
 				if (label74 == null) {
 					label74 = new Label ("<b>Sell</b>");
 				}
-				notebook4.AppendPage (sellwidget1, label74);
+				sellnotebook.AppendPage (sellwidget1, label74);
 			}
 
-			if (cascadedsellwidget2 == null) {
-				cascadedsellwidget2 = new CascadedSellWidget ();
-				cascadedsellwidget2.Show ();
+			if (cascadedsellwidget1 == null) {
+				cascadedsellwidget1 = new CascadedSellWidget ();
+				cascadedsellwidget1.Show ();
 
 				if (label75 == null) {
 					label75 = new Label ("<b>Cascaded Sell</b>");
 				}
 
-				notebook4.AppendPage (cascadedbuywidget1, label75);
+				sellnotebook.AppendPage (cascadedbuywidget1, label75);
 			}
 
 			if (automatedsellwidget1 == null) {
@@ -107,7 +107,7 @@ namespace IhildaWallet
 					label76 = new Label ("<b>Automated Sell</b>");
 				}
 
-				notebook4.AppendPage (automatedsellwidget1, label76);
+				sellnotebook.AppendPage (automatedsellwidget1, label76);
 			}
 
 			this.SetTradePair (tradePair);
@@ -137,8 +137,9 @@ namespace IhildaWallet
 			//	Gtk.Application.RunIteration();
 
 
-			this.notebook.CurrentPage = 0;
-
+			this.masternotebook.CurrentPage = 0;
+			this.sellnotebook.CurrentPage = 0;
+			this.sellnotebook.CurrentPage = 0;
 
 			this.WindowPosition = Gtk.WindowPosition.Center;
 			//Gdk.Color col = new Gdk.Color(3, 3, 56);
@@ -233,7 +234,7 @@ namespace IhildaWallet
 			this.buywidget1.TradePairInstance = tradepair; // auto sets UI
 			this.sellwidget1.TradePairInstance = tradepair;
 			this.cascadedbuywidget1.TradePairInstance = tradepair;
-			this.cascadedsellwidget2.TradePairInstance = tradepair;
+			this.cascadedsellwidget1.TradePairInstance = tradepair;
 
 			this.automatedbuywidget1.TradePairInstance = tradepair;
 			this.automatedsellwidget1.TradePairInstance = tradepair;
@@ -263,8 +264,8 @@ namespace IhildaWallet
 #endif
 
 
-				this.notebook.Page = 0;
-				this.notebook.CurrentPage = 0;
+				this.masternotebook.Page = 0;
+				this.masternotebook.CurrentPage = 0;
 			});
 			#endregion
 
@@ -285,8 +286,8 @@ namespace IhildaWallet
 				this.sellwidget1.SetRippleWallet (rw);
 			}
 
-			if (this.cascadedsellwidget2 != null) {
-				this.cascadedsellwidget2.SetRippleWallet (rw);
+			if (this.cascadedsellwidget1 != null) {
+				this.cascadedsellwidget1.SetRippleWallet (rw);
 			}
 
 			if (this.automatedsellwidget1 != null) {
@@ -381,17 +382,23 @@ namespace IhildaWallet
 
 		public void InitCascadedSellOffer (Offer off) {
 			Gtk.Application.Invoke ( delegate {
-				this.notebook.Page = (int) NoteBookPages.cascadedSell;
-				this.notebook.CurrentPage = (int) NoteBookPages.cascadedSell;
+				this.masternotebook.Page = 1;
+				this.masternotebook.CurrentPage = 1;
+
+				this.sellnotebook.Page = (int) NoteBookPages.cascadedSell;
+				this.sellnotebook.CurrentPage = (int) NoteBookPages.cascadedSell;
 			});
 
-			this.cascadedsellwidget2.SetOffer (off);
+			this.cascadedsellwidget1.SetOffer (off);
 		}
 
 		public void InitCascadedBuyOffer (Offer off) {
 			Gtk.Application.Invoke ( delegate {
-				this.notebook.Page = (int) NoteBookPages.cascadedBuy;
-				this.notebook.CurrentPage = (int) NoteBookPages.cascadedBuy;
+				this.masternotebook.Page = 0;
+				this.masternotebook.CurrentPage = 0;
+
+				this.buynotebook.Page = (int) NoteBookPages.cascadedBuy;
+				this.buynotebook.CurrentPage = (int) NoteBookPages.cascadedBuy;
 			});
 			this.cascadedbuywidget1.SetOffer (off);
 			//this.CascadedbuyWidget1.SetOffer (off);
@@ -401,8 +408,11 @@ namespace IhildaWallet
 		public void SetBuyOffer (Offer off) {
 			this.buywidget1.SetOffer(off);
 			Gtk.Application.Invoke ( delegate {
-				this.notebook.Page = (int) NoteBookPages.buy;
-				this.notebook.CurrentPage = (int) NoteBookPages.buy;
+				this.masternotebook.Page = 0;
+				this.masternotebook.CurrentPage = 0;
+
+				this.buynotebook.Page = (int) NoteBookPages.buy;
+				this.buynotebook.CurrentPage = (int) NoteBookPages.buy;
 			});
 
 
@@ -413,8 +423,11 @@ namespace IhildaWallet
 			this.sellwidget1.SetOffer(off);
 
 			Gtk.Application.Invoke ( delegate {
-				this.notebook.Page = (int) NoteBookPages.sell;
-				this.notebook.CurrentPage = (int) NoteBookPages.sell;
+				this.masternotebook.Page = 1;
+				this.masternotebook.CurrentPage = 1;
+
+				this.sellnotebook.Page = (int) NoteBookPages.sell;
+				this.sellnotebook.CurrentPage = (int) NoteBookPages.sell;
 			});
 
 		}
@@ -422,8 +435,12 @@ namespace IhildaWallet
 		public void SetAutomatedSellOffer ( Offer off ) {
 
 			Gtk.Application.Invoke ( delegate {
-				this.notebook.Page = (int) NoteBookPages.automatedSell;
-				this.notebook.CurrentPage = (int) NoteBookPages.automatedSell;
+				this.masternotebook.Page = 1;
+				this.masternotebook.CurrentPage = 1;
+
+
+				this.sellnotebook.Page = (int) NoteBookPages.automatedSell;
+				this.sellnotebook.CurrentPage = (int) NoteBookPages.automatedSell;
 			});
 
 			this.automatedsellwidget1.SetOffer (off);
@@ -431,8 +448,12 @@ namespace IhildaWallet
 
 		public void SetAutomatedBuyOffer ( Offer off ) {
 			Gtk.Application.Invoke ( delegate {
-				this.notebook.Page = (int) NoteBookPages.automatedBuy;
-				this.notebook.CurrentPage = (int) NoteBookPages.automatedBuy;
+				this.masternotebook.Page = 0;
+				this.masternotebook.CurrentPage = 0;
+
+
+				this.buynotebook.Page = (int) NoteBookPages.automatedBuy;
+				this.buynotebook.CurrentPage = (int) NoteBookPages.automatedBuy;
 			});
 
 			this.automatedbuywidget1.SetOffer (off);
@@ -546,9 +567,9 @@ namespace IhildaWallet
 			buy = 0,
 			cascadedBuy = 1,
 			automatedBuy = 2,
-			sell = 3,
-			cascadedSell = 4,
-			automatedSell = 5
+			sell = 0,
+			cascadedSell = 1,
+			automatedSell = 2
 
 		}
 	}

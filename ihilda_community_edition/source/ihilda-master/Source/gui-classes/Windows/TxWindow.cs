@@ -26,32 +26,32 @@ namespace IhildaWallet
 			if (orderswidget1 == null) {
 				orderswidget1 = new OrdersWidget ();
 				orderswidget1.Show ();
-				if (this.label39 == null) {
-					this.label39 = new Gtk.Label ("<b>Orders Pager</b>") {
+				if (this.label50 == null) {
+					this.label50 = new Gtk.Label ("<b>Orders Pager</b>") {
 						UseMarkup = true
 					};
 				}
-				notebook1.AppendPage ( orderswidget1, this.label39);
+				notebook1.AppendPage ( orderswidget1, this.label50);
 			}
 
 			if (orderstreewidget1 == null) {
 				orderstreewidget1 = new OrdersTreeWidget ();
 				orderstreewidget1.Show ();
-				if (label40 == null) {
-					label40 = new Gtk.Label ("<b>Orders Tree</b>") {
+				if (label52 == null) {
+					label52 = new Gtk.Label ("<b>Orders Tree</b>") {
 						UseMarkup = true
 					};
 				}
-				notebook1.AppendPage (orderstreewidget1, this.label40 );
+				notebook1.AppendPage (orderstreewidget1, this.label52 );
 			}
 
 			if (canseltxwidget1 == null) {
 				canseltxwidget1 = new CanselTxWidget ();
 				canseltxwidget1.Show ();
-				if (label43 == null) {
-					label43 = new Gtk.Label ("<b>Cancel</b>");
+				if (label55 == null) {
+					label55 = new Gtk.Label ("<b>Cancel</b>");
 				}
-				notebook1.AppendPage (canseltxwidget1, this.label43);
+				notebook1.AppendPage (canseltxwidget1, this.label55);
 			}
 
 

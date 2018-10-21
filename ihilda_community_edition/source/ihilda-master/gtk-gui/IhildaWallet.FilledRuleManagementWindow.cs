@@ -76,6 +76,8 @@ namespace IhildaWallet
 
 		private global::Gtk.Button button1;
 
+		private global::Gtk.Button deleteordersbutton;
+
 		private global::Gtk.Label label5;
 
 		protected virtual void Build()
@@ -377,14 +379,25 @@ namespace IhildaWallet
 			w29.Position = 3;
 			w29.Expand = false;
 			w29.Fill = false;
-			this.vbox4.Add(this.hbox3);
-			global::Gtk.Box.BoxChild w30 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hbox3]));
-			w30.Position = 2;
+			// Container child hbox3.Gtk.Box+BoxChild
+			this.deleteordersbutton = new global::Gtk.Button();
+			this.deleteordersbutton.CanFocus = true;
+			this.deleteordersbutton.Name = "deleteordersbutton";
+			this.deleteordersbutton.UseUnderline = true;
+			this.deleteordersbutton.Label = global::Mono.Unix.Catalog.GetString("Delete Orders Cache");
+			this.hbox3.Add(this.deleteordersbutton);
+			global::Gtk.Box.BoxChild w30 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.deleteordersbutton]));
+			w30.Position = 4;
 			w30.Expand = false;
 			w30.Fill = false;
-			this.notebook1.Add(this.vbox4);
-			global::Gtk.Notebook.NotebookChild w31 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.vbox4]));
+			this.vbox4.Add(this.hbox3);
+			global::Gtk.Box.BoxChild w31 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hbox3]));
 			w31.Position = 2;
+			w31.Expand = false;
+			w31.Fill = false;
+			this.notebook1.Add(this.vbox4);
+			global::Gtk.Notebook.NotebookChild w32 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.vbox4]));
+			w32.Position = 2;
 			// Notebook tab
 			this.label5 = new global::Gtk.Label();
 			this.label5.Name = "label5";
@@ -392,15 +405,15 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.vbox4, this.label5);
 			this.label5.ShowAll();
 			this.vbox3.Add(this.notebook1);
-			global::Gtk.Box.BoxChild w32 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.notebook1]));
-			w32.Position = 1;
-			w32.Padding = ((uint)(6));
+			global::Gtk.Box.BoxChild w33 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.notebook1]));
+			w33.Position = 1;
+			w33.Padding = ((uint)(6));
 			this.hbox5.Add(this.vbox3);
-			global::Gtk.Box.BoxChild w33 = ((global::Gtk.Box.BoxChild)(this.hbox5[this.vbox3]));
-			w33.Position = 0;
-			this.vbox2.Add(this.hbox5);
-			global::Gtk.Box.BoxChild w34 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hbox5]));
+			global::Gtk.Box.BoxChild w34 = ((global::Gtk.Box.BoxChild)(this.hbox5[this.vbox3]));
 			w34.Position = 0;
+			this.vbox2.Add(this.hbox5);
+			global::Gtk.Box.BoxChild w35 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hbox5]));
+			w35.Position = 0;
 			this.Add(this.vbox2);
 			if ((this.Child != null))
 			{

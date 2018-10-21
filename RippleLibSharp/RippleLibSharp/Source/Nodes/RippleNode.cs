@@ -488,7 +488,7 @@ namespace RippleLibSharp.Nodes
 
 		public string GetBotId ()
 		{
-			return this.FinalFields.Account + this.FinalFields.Sequence;
+			return this.FinalFields.Account + this.FinalFields.Sequence.ToString();
 		}
 
 #if DEBUG

@@ -40,7 +40,7 @@ namespace IhildaWallet.Splashes
 			// Container child hbox2.Gtk.Box+BoxChild
 			this.image11 = new global::Gtk.Image();
 			this.image11.Name = "image11";
-			this.image11.Pixbuf = global::Gdk.Pixbuf.LoadFromResource("IhildaWallet.Images.ihilda_logo_black_sans.png");
+			this.image11.Pixbuf = global::Gdk.Pixbuf.LoadFromResource("IhildaWallet.ihildaplain-100-wide.png");
 			this.hbox2.Add(this.image11);
 			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.image11]));
 			w1.Position = 0;
@@ -84,8 +84,8 @@ namespace IhildaWallet.Splashes
 			{
 				this.Child.ShowAll();
 			}
-			this.DefaultWidth = 373;
-			this.DefaultHeight = 159;
+			this.DefaultWidth = 214;
+			this.DefaultHeight = 110;
 			this.Show();
 		}
 	}
