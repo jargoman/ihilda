@@ -58,8 +58,8 @@ namespace IhildaWallet
 			string acct = this.Wallet.GetStoredReceiveAddress ();
 			foreach (RippleNodeGroup [] arng in aff) {
 
-				IEnumerable<RippleNode> ar = from RippleNodeGroup rng in arng
-											 where
+				IEnumerable<RippleNode> ar =
+					from RippleNodeGroup rng in arng where
 										 "Offer".Equals (rng?.DeletedNode?.LedgerEntryType)
 
 
@@ -70,7 +70,7 @@ namespace IhildaWallet
 										 && rng.DeletedNode.PreviousFields.TakerGets != null
 										 && rng.DeletedNode.FinalFields.TakerGets.amount < rng.DeletedNode.PreviousFields.TakerGets.amount
 
-											 select rng.GetNode ();
+					select rng.GetNode ();
 
 				foreach (RippleNode nd in ar) {
 					if (nd != null) {
@@ -158,7 +158,9 @@ namespace IhildaWallet
 		{
 			List<AutomatedOrder> list = new List<AutomatedOrder> ();
 
-			Dictionary<String, AutomatedOrder> cachedOffers = Load (Wallet.GetStoredReceiveAddress ());
+			AccountSequenceCache accountSequnceCache = new AccountSequenceCache ();
+
+			Dictionary<String, AutomatedOrder> cachedOffers = AccountSequenceCache.Load (Wallet.GetStoredReceiveAddress ());
 
 			foreach (RippleNode node in nodes) {
 				AutomatedOrder order = null;
@@ -186,6 +188,12 @@ namespace IhildaWallet
 
 				}
 
+				if (order == null) {
+					throw new NullReferenceException ("Could not retrieve order");
+				}
+
+
+				accountSequnceCache.UpdateOrdersCache (order, order.Account);
 				list.Add (order);
 
 			}
@@ -237,8 +245,19 @@ namespace IhildaWallet
 
 		private AutomatedOrder TraceFilledOrderToCreationRobustly (RippleNode node)
 		{
-			//LinkedList < RippleNode > failedNodes = new LinkedList < RippleNode > ();
+
+
+			string account = node.FinalFields.Account;
+			uint seq = node.FinalFields.Sequence;
+
+			// we try one method first half the time and the other method is tried first the other half
+			// to avoid hogging an info soure and getting banned or disconnected by anti spam anti ddos. 
+
 			AutomatedOrder order = null;
+
+
+				//LinkedList < RippleNode > failedNodes = new LinkedList < RippleNode > ();
+
 			int attempts = 3;
 			for (int i = 0; i < attempts; i++) {
 
@@ -247,14 +266,46 @@ namespace IhildaWallet
 				if (order != null) {
 					break;
 				}
+
+				order = LookUpSequenceDataApi (account, seq);
+				if (order != null) {
+					break;
+				}
+
 				Logging.WriteBoth ("sleeping for 1");
 				Thread.Sleep (1000);
+
 			}
+	
+
+			
+
+
+
 
 			return order;
+		}
 
-			//failedNodes.AddLast(node);
+		public AutomatedOrder LookUpSequenceDataApi (string account, uint seq)
+		{
+			Task<Response<string>> seqTask = tx.GetTxFromAccountAndSequenceDataAPI (account, seq);
+			if (seqTask == null) {
+				// don't sweat it, we can try other ways to look up the order. 
+				return null;
+			}
 
+			seqTask.Wait ();
+
+			Response<string> response = seqTask.Result;
+			if (response == null) {
+				return null;
+			}
+
+			var txstruct = response?.transaction;
+			//txstruct.tx.
+			AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (txstruct?.tx);
+
+			return ao;
 		}
 
 		public AutomatedOrder TraceFilledOfferToCreation (RippleNode node)
@@ -306,6 +357,9 @@ namespace IhildaWallet
 				// response<string is correct>
 				Thread.Sleep (5000);
 				Task<Response<string>> dataTask = tx.GetRequestDataApi (PreviousTxnID);
+				if (dataTask == null) {
+					return null;
+				}
 				dataTask.Wait ();
 
 				Response<string> dataResp = dataTask?.Result;
@@ -373,240 +427,16 @@ namespace IhildaWallet
 
 		}
 
-		/*
-		public void SubmmitOrders ( IEnumerable<AutomatedOrder> orders ) {
 
-			foreach (AutomatedOrder ao in orders) {
 
 
-				RippleOfferTransaction tx = new RippleOfferTransaction(ao.Account, ao);
 
 
-				tx.AutoRequestSequence (ao.Account, this.NetInterface);
-
-				Tuple<UInt32,UInt32> f = FeeSettings.GetFeeAndLastLedgerFromSettings (this.NetInterface);
-				if (f == null) {
-					return;
-				}
-				tx.fee = f.Item1.ToString ();
-
-				tx.LastLedgerSequence = f.Item2;
-
-				RippleIdentifier rsa = this.Wallet.GetDecryptedSeed ();
-
-				tx.Sign(rsa);
-
-				Task< Response <RippleSubmitTxResult>> task = NetworkController.UiTxNetworkSubmit (tx, this.NetInterface);
-				task.Wait ();
-
-
-			}
-		}*/
-
-		public static void SyncOrdersCache (string account)
-		{
-			if (account == null) {
-				return;
-			}
-
-			NetworkInterface networkInterface = NetworkController.CurrentInterface;
-
-			if (networkInterface == null) {
-				return;
-			}
-
-			Task<IEnumerable<Response<AccountOffersResult>>> task = AccountOffers.GetFullOfferList (account, networkInterface);
-			task.Wait ();
-
-
-			IEnumerable<Response<AccountOffersResult>> responses = task.Result;
-
-			Dictionary<string, AutomatedOrder> cached = Load (account);
-
-
-
-
-
-			foreach (Response<AccountOffersResult> resp in responses) {
-
-				var offs = resp?.result?.offers;
-				if (offs == null) {
-					continue;
-				}
-
-				List<AutomatedOrder> auts_list = new List<AutomatedOrder> ();
-
-				foreach (Offer o in offs) {
-					string id = o.Account + o.Sequence.ToString();
-
-					if ( cached != null && cached.ContainsKey (id)) {
-
-						continue;
-					} else {
-
-						Task<Response<string>> seqTask = tx.GetTxFromAccountAndSequenceDataAPI (o.Account, o.Sequence);
-						seqTask.Wait ();
-
-						Response<string> response = seqTask.Result;
-						string s = response.result;
-						var txstruct = response.transaction;
-						//txstruct.tx.
-						AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (txstruct.tx);
-						auts_list.Add (ao);
-					}
-				}
-
-				if (!auts_list.Any ()) {
-					continue;
-				}
-
-				UpdateOrdersCache (auts_list, account);
-
-			}
-
-
-
-			/*
-			foreach (Offer o in offs_list) {
-
-
-				Task<Response<string>> seqTask = tx.GetTxFromAccountAndSequenceDataAPI (o.Account, o.Sequence);
-				seqTask.Wait ();
-
-				Response<string> response = seqTask.Result;
-				string s = response.result;
-				var txstruct = response.transaction;
-				//txstruct.tx.
-				AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (txstruct.tx);
-				auts_list.Add (ao);
-			}
-			*/
-
-
-		
-
-
-			//IEnumerable<AutomatedOrder> aorders = AutomatedOrder.convertFromIEnumerableOrder (/*account,*/ orders);
-			//foreach (AutomatedOrder offer in orders) {
-			//	aorders.Add ( new AutomatedOrder (account, offer));
-			//}
-			//updateOrdersCache (aorders.AsEnumerable());
-
-
-
-		}
-
-		public static void UpdateOrdersCache (IEnumerable<AutomatedOrder> orders, string account)
-		{
-
-			if (orders == null) {
-				return;
-			}
-
-			if (!orders.Any ()) {
-				return;
-			}
-
-
-
-			Dictionary<string, AutomatedOrder> dict = Load (account);
-			if (dict == null) {
-				//dict = new Dictionary<string, AutomatedOrder> (orders.Count ());
-				dict = new Dictionary<string, AutomatedOrder> ();
-			}
-
-			/*
-			if ( dict.Count > 0) {
-				return;
-			}
-			*/
-
-
-			foreach (AutomatedOrder order in orders) {
-
-				string id = order.Bot_ID;
-				Logging.WriteLog ("synccache : " + id);
-				if (dict.ContainsKey (id)) {
-					continue;
-				}
-
-				dict.Add (id, order);
-			}
-
-
-			var settingsPath = FileHelper.GetSettingsPath (account + settingsFileName);
-			OrderManagementBot.Save (dict.Values, settingsPath);
-
-		
-		}
-
-		public static void DeleteSettingsFile (string account)
-		{
-			var settingsPath = FileHelper.GetSettingsPath (account + settingsFileName);
-			if (File.Exists(settingsPath)) {
-				File.Delete (settingsPath);
-			}
-
-		}
-
-		public static void Save (IEnumerable<AutomatedOrder> offers, string path)
-		{
-			//ConfStruct confstruct = new ConfStruct( orderDict.Values );
-			ConfStruct confstruct = new ConfStruct (offers);
-
-			string conf = DynamicJson.Serialize (confstruct);
-
-
-			FileHelper.SaveConfig (path, conf);
-		}
-
-
-
-		public static Dictionary<String, AutomatedOrder> Load (string account)
-		{
-
-
-			var settingsPath = FileHelper.GetSettingsPath (account + settingsFileName);
-			string str = FileHelper.GetJsonConf (settingsPath);
-
-			if (str == null) {
-				return null;
-			}
-			ConfStruct jsconf = null;
-			try {
-				jsconf = DynamicJson.Parse (str);
-
-			} catch (Exception e) {
-				Logging.WriteLog (e.Message + e.StackTrace);
-				return null;
-			}
-
-			if (jsconf == null) {
-				return null;
-			}
-
-			Offer [] ords = jsconf.Orders;
-
-			Dictionary<String, AutomatedOrder> orderDict = new Dictionary<string, AutomatedOrder> (ords.Length);
-
-			//orderDict.Clear ();
-			foreach (AutomatedOrder order in ords) {
-				string key = order.Bot_ID;
-
-				if (key != null) {
-					//orderDict.TryAdd (key, order);
-					orderDict.Add (key, order);
-				}
-			}
-
-			return orderDict;
-
-		}
 
 		/*public static int latestLedger = 0;*/
 		//public ConcurrentDictionary < string, AutomatedOrder > orderDict = null;
 
-		public const string settingsFileName = "OrderManagementBot.jsn";
+
 
 
 		//private string 
@@ -622,46 +452,6 @@ namespace IhildaWallet
 
 
 
-		private class ConfStruct
-		{
-			public ConfStruct (IEnumerable<AutomatedOrder> ords)
-			{
-
-				int count = ords.Count ();
-
-				var it = ords.GetEnumerator ();
-
-
-
-				this.Orders = new AutomatedOrder [count];
-
-				for (int i = 0; i < count; i++) {
-					it.MoveNext ();
-					Orders [i] = it.Current;
-
-				}
-
-			}
-
-			public ConfStruct ()
-			{
-
-			}
-
-
-			public AutomatedOrder [] Orders {
-				get;
-				set;
-			}
-
-			/*
-			public int latestLedger {
-				get;
-				set;
-			}
-			*/
-
-		}
 
 		NetworkInterface NetInterface {
 			get;

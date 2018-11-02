@@ -1360,6 +1360,12 @@ namespace IhildaWallet
 					if (transaction.validated != null && (bool)transaction.validated) {
 
 						this.SetResult (index.ToString (), "validated", TextHighlighter.GREEN);
+
+
+						AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (offerTransaction);
+						AccountSequenceCache sequenceCache = new AccountSequenceCache ();
+						sequenceCache.UpdateOrdersCache (ao, ao.Account);
+
 						return;
 					}
 

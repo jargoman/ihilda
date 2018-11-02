@@ -274,8 +274,18 @@ namespace IhildaWallet
 				button1.Visible = false;
 
 				Task.Run ( delegate {
+
+					AccountSequenceCache accountSequnceCache = new AccountSequenceCache ();
+
+					accountSequnceCache.OnOrderCacheEvent += (object sen, OrderCachedEventArgs ocev) => {
+						TextHighlighter.Highlightcolor = ocev.GetSuccess ? TextHighlighter.GREEN : TextHighlighter.RED;
+						string message = TextHighlighter.Highlight (ocev.Message);
+						WriteToInfoBox (message);
+					};
+
+
 					WriteToInfoBox ("Syncing Orders Cache.... \n");
-					OrderManagementBot.SyncOrdersCache (wallet.GetStoredReceiveAddress ());
+					accountSequnceCache.SyncOrdersCache (wallet.GetStoredReceiveAddress ());
 					WriteToInfoBox ("Finished Syncing orders cache \n");
 
 					Gtk.Application.Invoke (
@@ -309,7 +319,7 @@ namespace IhildaWallet
 				if (!sure) {
 					return;
 				}
-				OrderManagementBot.DeleteSettingsFile (account);
+				AccountSequenceCache.DeleteSettingsFile (account);
 			};
 
 		}

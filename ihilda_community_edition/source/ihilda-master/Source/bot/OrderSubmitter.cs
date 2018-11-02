@@ -761,12 +761,15 @@ namespace IhildaWallet
 
 		}
 
-		private VerifyEventArgs VerifyTx (RippleOfferTransaction offerTransaction, NetworkInterface networkInterface)
+		private VerifyEventArgs VerifyTx ( RippleOfferTransaction offerTransaction, NetworkInterface networkInterface )
 		{
 			VerifyEventArgs verifyEventArgs = _VerifyTx (offerTransaction, networkInterface);
 
 			OnVerifyingTxReturn?.Invoke (this, verifyEventArgs);
 
+			AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (offerTransaction);
+			AccountSequenceCache sequenceCache = new AccountSequenceCache ();
+			sequenceCache.UpdateOrdersCache (ao, ao.Account);
 			return verifyEventArgs;
 		}
 

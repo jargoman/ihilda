@@ -13772,7 +13772,7 @@ Bot output screen
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Dialog" id="IhildaWallet.RuleCreateDialog" design-size="635 304">
+  <widget class="Gtk.Dialog" id="IhildaWallet.RuleCreateDialog" design-size="660 303">
     <property name="MemberName" />
     <property name="Title" translatable="yes">Ihilda rule creation dialog</property>
     <property name="WindowPosition">CenterOnParent</property>
@@ -13804,7 +13804,7 @@ Bot output screen
               <widget class="Gtk.Notebook" id="notebook1">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">0</property>
+                <property name="CurrentPage">1</property>
                 <child>
                   <widget class="Gtk.Table" id="table1">
                     <property name="MemberName" />

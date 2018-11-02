@@ -273,6 +273,10 @@ namespace IhildaWallet
 
 			fs = ParseFee (ni);
 
+			if (fs == null) {
+				return null;
+			}
+
 			if (this.Multiplier != null) {
 
 				//f *= (int)settings.multiplier;

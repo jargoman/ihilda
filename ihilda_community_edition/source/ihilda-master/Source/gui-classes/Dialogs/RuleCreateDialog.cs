@@ -54,6 +54,39 @@ namespace IhildaWallet
 
 			Modal = true;
 
+			label14.TooltipMarkup = "Pattern filled order must match to trigger rule";
+			label15.TooltipMarkup = "Action to apply to newly created order once rule has been triggered";
+
+			string help = "Mark your newly created order with this value\n* will mark it the same as the mark(string or integer) which triggered this rule\n++ will add one to the mark<span fgcolor=\"grey\">(integer)</span> that triggered the order";
+			label11.TooltipMarkup = help;
+			comboboxentry5.TooltipMarkup = help;
+
+			help = "Pay x amount less when rebuying the same amount\nExample 1.01 = rebuy sold amount at 1% profit";
+			label3.TooltipMarkup = help;
+			comboboxentry1.TooltipMarkup = help;
+
+			help = "Get x amount more than was sold\nExample 1.01 = rebuy 1% more 1% cheaper";
+			label4.TooltipMarkup = help;
+			comboboxentry2.TooltipMarkup = help;
+
+			help = "Same as payless but to the exponent mark\nMark must be an integer greater than zero\nExample 1.01 = rebuy same amount @ 1.01^(mark) cheaper";
+			label13.TooltipMarkup = help;
+			comboboxentry6.TooltipMarkup = help;
+
+			help = "Same as getmore except to the exponet mark\nMark must be an integer greater than zero\nExample 1.01 = rebuy 1.01^(mark) cheaper and get 1.01^(mark) more";
+			label12.TooltipMarkup = help;
+			comboboxentry7.TooltipMarkup = help;
+
+			help = "Trigger this rule when this currency is bought\nIssuer may be left empty to match any issuer";
+			label5.TooltipMarkup = help;
+
+
+			help = "Trigger this rule when this currency was sold\nIssuer may be left empty to match any issuer";
+			label6.TooltipMarkup = help;
+
+			help = "Trigger this rule when filled order is marked with this value\nUse [1-100] to match a range of numbers\nUse [blue,green,yellow] to match more than one mark\nUse * to match any mark that isn't blank\nLeave blank to match orders created with other trading clients";
+			label10.TooltipMarkup = help;
+			comboboxentry4.TooltipMarkup = help;
 
 		}
 

@@ -1,16 +1,9 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Source/bot/Robotics.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Dialogs/RuleCreateDialog.cs">
     <Files>
-      <File FileName="Source/bot/OrderManagementBot.cs" Line="442" Column="1" />
-      <File FileName="Source/bot/AutomatedOrder.cs" Line="176" Column="17" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Nodes/RippleNodeGroup.cs" Line="25" Column="13" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Nodes/RippleNode.cs" Line="11" Column="15" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Network/DataApi.cs" Line="128" Column="11" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Commands/Tx/tx.cs" Line="75" Column="8" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Network/PingObject.cs" Line="1" Column="1" />
-      <File FileName="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs" Line="622" Column="65" />
-      <File FileName="Source/util/FileHelper.cs" Line="237" Column="22" />
-      <File FileName="Source/bot/Robotics.cs" Line="74" Column="6" />
+      <File FileName="Source/bot/Sentiment.cs" Line="5" Column="2" />
+      <File FileName="Source/gui-classes/Dialogs/RuleCreateDialog.cs" Line="89" Column="40" />
+      <File FileName="Source/gui-classes/Widgets/TradeUI/TradePairEntryWidget.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

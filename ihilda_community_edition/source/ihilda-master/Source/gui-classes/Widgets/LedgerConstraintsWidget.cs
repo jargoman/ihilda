@@ -19,7 +19,8 @@ namespace IhildaWallet
 
 
 
-		public void SetLastKnownLedger (string s) {
+		public void SetLastKnownLedger (string s)
+		{
 
 			Gtk.Application.Invoke (delegate {
 
@@ -40,21 +41,22 @@ namespace IhildaWallet
 
 		public void HighLightLimit ()
 		{
-			Application.Invoke ( delegate {
+			Application.Invoke (delegate {
 				Gdk.Color orchid = new Gdk.Color (218, 112, 214);
 				comboboxentry4.ModifyBase (StateType.Normal, orchid);
 				comboboxentry4.Entry.ModifyBase (StateType.Normal, orchid);
 			});
 		}
 
-		public int? GetLimit ( ) {
+		public int? GetLimit ()
+		{
 			ManualResetEvent mre = new ManualResetEvent (false);
 			mre.Reset ();
 			string s = null;
 
-			Application.Invoke ( delegate {
+			Application.Invoke (delegate {
 				s = this.comboboxentry4.Entry.Text;
-				mre.Set();
+				mre.Set ();
 			});
 
 
@@ -69,7 +71,8 @@ namespace IhildaWallet
 			return i;
 		}
 
-		public Int32? GetStartFromLedger () {
+		public Int32? GetStartFromLedger ()
+		{
 
 			ManualResetEvent mre = new ManualResetEvent (false);
 			mre.Reset ();
@@ -96,7 +99,8 @@ namespace IhildaWallet
 
 		}
 
-		public Int32? GetEndLedger () {
+		public Int32? GetEndLedger ()
+		{
 
 			ManualResetEvent mre = new ManualResetEvent (false);
 			mre.Reset ();
@@ -123,8 +127,31 @@ namespace IhildaWallet
 
 		}
 
-		public bool? GetForward () {
-			ManualResetEvent mre = new ManualResetEvent(false);
+		/*
+		public LedgerConstraint GetLedgerConstraint ()
+		{
+			ManualResetEvent mre = new ManualResetEvent (false);
+			mre.Reset ();
+
+			string mins, maxs, limits;
+			bool? b = null;
+
+
+			Application.Invoke ((sender, e) => {
+				mins = this.comboboxentry5.Entry.Text;
+				maxs = this.comboboxentry6.Entry.Text;
+				limits = this.comboboxentry4.Entry.Text;
+				b = checkbutton1.Active;
+				mre.Set ();
+			});
+
+			LedgerConstraint ledgerConstraint = new LedgerConstraint ();
+
+		}*/
+
+		public bool? GetForward ()
+		{
+			ManualResetEvent mre = new ManualResetEvent (false);
 			mre.Reset ();
 			bool? b = null;
 			Application.Invoke ((sender, e) => {
@@ -137,7 +164,8 @@ namespace IhildaWallet
 			return b;
 		}
 
-		public void HideTopRow () {
+		public void HideTopRow ()
+		{
 			//this.label10.Text = "";
 			//this.label9.Text = "";
 
@@ -147,12 +175,38 @@ namespace IhildaWallet
 			this.label9.Visible = false;
 		}
 
-		public void HideForward () {
-			
-			this.checkbutton1.Hide();
+		public void HideForward ()
+		{
+
+			this.checkbutton1.Hide ();
 			this.checkbutton1.Visible = false;
 
 		}
 	}
+
+
+	public class LedgerConstraint
+	{
+		public int Min {
+			get;
+			set;
+		}
+
+		public int Max {
+			get;
+			set;
+		}
+
+		public int Limit {
+			get;
+			set;
+		}
+
+		public bool Forward {
+			get;
+			set;
+		}
+	}
+
 }
 
