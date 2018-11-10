@@ -1332,7 +1332,7 @@ namespace IhildaWallet
 
 			Task.Run (() => {
 				Thread.Sleep (1000);
-				this.SetStatus (index.ToString (), "validating tx", TextHighlighter.GREEN);
+				this.SetStatus (index.ToString (), "Validating Tx", TextHighlighter.GREEN);
 				Thread.Sleep (5000);
 				for (int i = 0; i < 100; i++) {
 
@@ -1359,13 +1359,13 @@ namespace IhildaWallet
 
 					if (transaction.validated != null && (bool)transaction.validated) {
 
-						this.SetResult (index.ToString (), "validated", TextHighlighter.GREEN);
+						this.SetResult (index.ToString (), "Validated", TextHighlighter.GREEN);
 
 
 						AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (offerTransaction);
-						AccountSequenceCache sequenceCache = new AccountSequenceCache ();
-						sequenceCache.UpdateOrdersCache (ao, ao.Account);
-
+						AccountSequenceCache sequenceCache = new AccountSequenceCache (offerTransaction.Account);
+						//sequenceCache.UpdateOrdersCache (ao);
+						sequenceCache.UpdateAndSave (ao);
 						return;
 					}
 

@@ -26,7 +26,13 @@ namespace IhildaWallet
 
 		}
 
-		public Tuple <Int32?, IEnumerable <AutomatedOrder>> DoLogic (RippleWallet wallet, NetworkInterface ni, Int32? ledgerstart, Int32? ledgerend, Int32? limit)
+		public Tuple <Int32?, IEnumerable <AutomatedOrder>> DoLogic (
+			RippleWallet wallet, 
+			NetworkInterface ni, 
+			Int32? ledgerstart, 
+			Int32? ledgerend, 
+			Int32? limit
+		)
 		{
 #if DEBUG
 			string method_sig = clsstr + nameof (DoLogic) + DebugRippleLibSharp.both_parentheses;
@@ -49,37 +55,35 @@ namespace IhildaWallet
 
 			try {
 
-				if (limit == null) {
-					task =
-
-						AccountTx.GetFullTxResult (
+				task = limit == null
+					? AccountTx.GetFullTxResult (
 							wallet.GetStoredReceiveAddress (),
 							ledgerMin,
 							ledgerMax,
 
 							/*false,*/
-							ni);
-					
-
-				} else {
-					task =
-
-						AccountTx.GetFullTxResult (
+							ni)
+					: AccountTx.GetFullTxResult (
 							wallet.GetStoredReceiveAddress (),
 							ledgerMin,
 							ledgerMax,
 							lim,
 							/*false,*/
 							ni);
-					
-				}
 
 				if (task == null) {
 					//return null;
 					throw new NullReferenceException ();
 				}
-				task.Wait ();
 
+				while (!task.IsCompleted) {
+					//if (OnMessage != null) {
+						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Waiting on network\n" });
+					//}
+					task.Wait (1000);
+				}
+
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Received response from network\n" });
 			} catch (Exception e) {
 				
 				StringBuilder errorMessage = new StringBuilder ();
@@ -96,6 +100,8 @@ namespace IhildaWallet
 						e = e.InnerException;
 					}
 				}
+
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = errorMessage.ToString () + "\n" });
 				Logging.WriteBoth (errorMessage.ToString());
 				MessageDialog.ShowMessage (errorMessage.ToString());
 
@@ -105,8 +111,11 @@ namespace IhildaWallet
 			IEnumerable <Response<AccountTxResult>> results = task.Result;
 
 			if (results == null) {
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Null response\n" });
 				return null;
 			}
+
+			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Received response from server\n" });
 
 			List<RippleTxStructure> txStructures = new List<RippleTxStructure> ();
 
@@ -143,10 +152,13 @@ namespace IhildaWallet
 
 			OrderManagementBot omb = new OrderManagementBot (wallet, ni);
 
-
+			omb.OnMessage += (object sender, MessageEventArgs e) => {
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = e.Message });
+			};
 
 			IEnumerable<AutomatedOrder> total = null;
 
+			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Processing transactions\n" });
 			try {
 
 				total = omb.UpdateTx (txStructures);
@@ -176,6 +188,7 @@ namespace IhildaWallet
 
 			IEnumerable<AutomatedOrder> orders = null;
 
+			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Generating buy back orders\n" });
 			try {
 				orders = omb.GetBuyBackOrders (total);
 
@@ -211,6 +224,11 @@ namespace IhildaWallet
 
 		}
 
+		public event EventHandler<MessageEventArgs> OnMessage;
+
+
+
+
 		/*
 		public void LaunchPreviewWidget (IEnumerable<AutomatedOrder> orders)
 		{
@@ -238,6 +256,14 @@ namespace IhildaWallet
 
 	}
 
+	public class MessageEventArgs : EventArgs
+	{
+
+		public string Message {
+			get;
+			set;
+		}
+	}
 
 }
 

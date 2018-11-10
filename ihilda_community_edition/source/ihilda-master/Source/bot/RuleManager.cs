@@ -37,9 +37,9 @@ namespace IhildaWallet
 		}
 
 
-		public void LoadRules ()
+		public void LoadRules (string path)
 		{
-			string str = FileHelper.GetJsonConf (settingsPath);
+			string str = FileHelper.GetJsonConf (path);
 			if (str == null) {
 				return;
 			}
@@ -68,17 +68,34 @@ namespace IhildaWallet
 
 		}
 
-		public void SaveRules ()
+		public void LoadRules ()
+		{
+			LoadRules (settingsPath);
+		}
+
+		public bool SaveRules (string path)
+		{
+			try {
+				ConfStruct rs = new ConfStruct (RulesList) {
+					LastKnownLedger = this.LastKnownLedger
+				};
+
+				string conf = DynamicJson.Serialize (rs);
+				if (string.IsNullOrWhiteSpace(conf)) {
+					return false;
+				}
+
+				return FileHelper.SaveConfig (path, conf);
+			} catch ( Exception e ) {
+				return false;
+			}
+
+		}
+
+		public bool SaveRules ()
 		{
 
-			ConfStruct rs = new ConfStruct (RulesList) {
-				LastKnownLedger = this.LastKnownLedger
-			};
-
-			string conf = DynamicJson.Serialize (rs);
-
-			FileHelper.SaveConfig (settingsPath, conf);
-
+			return SaveRules (settingsPath);
 		}
 
 		private class ConfStruct

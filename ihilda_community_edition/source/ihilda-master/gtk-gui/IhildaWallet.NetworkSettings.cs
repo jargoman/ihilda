@@ -173,7 +173,9 @@ namespace IhildaWallet
 			global::Gtk.Viewport w11 = new global::Gtk.Viewport();
 			w11.ShadowType = ((global::Gtk.ShadowType)(0));
 			// Container child GtkViewport.Gtk.Container+ContainerChild
-			this.serverinfowidget1 = null;
+			this.serverinfowidget1 = new global::IhildaWallet.ServerInfoWidget();
+			this.serverinfowidget1.Events = ((global::Gdk.EventMask)(256));
+			this.serverinfowidget1.Name = "serverinfowidget1";
 			w11.Add(this.serverinfowidget1);
 			this.scrolledwindow1.Add(w11);
 			this.vbox2.Add(this.scrolledwindow1);
@@ -240,7 +242,9 @@ namespace IhildaWallet
 			w19.Expand = false;
 			w19.Fill = false;
 			// Container child hbox8.Gtk.Box+BoxChild
-			this.connecteddisplaywidget1 = null;
+			this.connecteddisplaywidget1 = new global::IhildaWallet.ConnectedDisplayWidget();
+			this.connecteddisplaywidget1.Events = ((global::Gdk.EventMask)(256));
+			this.connecteddisplaywidget1.Name = "connecteddisplaywidget1";
 			this.hbox8.Add(this.connecteddisplaywidget1);
 			global::Gtk.Box.BoxChild w20 = ((global::Gtk.Box.BoxChild)(this.hbox8[this.connecteddisplaywidget1]));
 			w20.PackType = ((global::Gtk.PackType)(1));

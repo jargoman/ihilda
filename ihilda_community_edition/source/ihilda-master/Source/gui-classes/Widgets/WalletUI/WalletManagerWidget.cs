@@ -339,9 +339,42 @@ namespace IhildaWallet
 			wallettree1.GrabFocus ();
 
 			//this.TestConnectivity ();
+
+			SetHelpPopups ();
 		}
 
+		public void SetHelpPopups ()
+		{
+			botbutton.TooltipMarkup = "Create and run trading bot using rules\nSet up passive trading";
+			tradepairButton.TooltipMarkup = "Trade\nView orderbook, depth chart\nManage custom trading pairs";
+			useButton.TooltipMarkup = "Transfer an asset to another wallet\nSend a cross currency payment\nUse pathfinding to send a payment";
+			trustbutton.TooltipMarkup = "Create a trustline\nView/manage trustlines\nRemove trustline";
+			txbutton.TooltipMarkup = "View open orders\nView transaction history";
 
+			newbutton.TooltipMarkup = "Create a new random keypair\nUse an existing secret to create a wallet\nUse a script to make a vanity wallet";
+			editButton.TooltipMarkup = "Edit the selected wallet";
+			button67.TooltipMarkup = "Encrypt the selected wallet";
+			button66.TooltipMarkup = "Decrypt selected wallet";
+			deleteButton.TooltipMarkup = "Delete selected wallet";
+
+			upgradebutton.TooltipMarkup = "";
+			importButton.TooltipMarkup = "Import wallet to .ice file";
+			exportButton.TooltipMarkup = "Export wallet to .ice file";
+			button135.TooltipMarkup = "Prepare a printable document for offline wallet storage";
+			button134.TooltipMarkup = "Remove automatically generated wallet backupfiles\nDeleting a wallet does not remove it's backup";
+
+			networkbutton1.TooltipMarkup = "Change network settings\nConnect to network\nView Server information";
+			rclAccountButton.TooltipMarkup = "Administer wallet account settings\n<span fgcolor=\"red\">Advanced users only</span>";
+			optionsbutton1.TooltipMarkup = "Wallet Options and Settings";
+			consolebutton1.TooltipMarkup = "Open command line interface";
+			button91.TooltipMarkup = "Manaage debbugger output";
+
+			image2.TooltipMarkup = "Select a wallet to view it's balances";
+
+			quitButton.TooltipMarkup = "Exit application";
+
+			walletswitchwidget1.TooltipMarkup = "Switch wallets";
+		}
 
 		public void SetActions () {
 			this.NewAction.Activated += (sender, e) => New_Wallet_Wizard ();
@@ -787,6 +820,9 @@ namespace IhildaWallet
 
 			Gtk.Application.Invoke ( delegate {
 				this.walletswitchwidget1.SetRippleWallet (rippleWallet);
+
+				string qrtooltip = "Click to create QR code for address\n" + rippleWallet.GetStoredReceiveAddress () + "\nand save to image file";
+				image1.TooltipMarkup = qrtooltip;
 
 			});
 
@@ -1591,21 +1627,24 @@ namespace IhildaWallet
 			);
 		}
 
-		public bool TestConnectivity ()
+		public string TestConnectivity ()
 		{
 			NetworkInterface networkInterface = Networking.NetworkController.CurrentInterface;
 
 			if ( networkInterface == null) {
-				return SetConnected (false);
+				return SetConnected (null);
 			}
 
-			return SetConnected (networkInterface.IsConnected ());
+			if (!networkInterface.IsConnected()) {
+				return null;
+			}
+			return SetConnected (networkInterface.GetConnectAttemptInfo().ServerUrl);
 		}
 
-		public bool SetConnected (bool connected)
+		public string SetConnected (string serverUrl)
 		{
-			if (connected) {
-				this.connecteddisplaywidget1.SetConnected ();
+			if (serverUrl != null) {
+				this.connecteddisplaywidget1.SetConnected (serverUrl);
 
 			} else {
 				this.connecteddisplaywidget1.SetDisConnected ();
@@ -1614,7 +1653,7 @@ namespace IhildaWallet
 
 			this.connecteddisplaywidget1.Show ();
 
-			return connected;
+			return serverUrl;
 		}
 
 		public static void ThreadedWalletAdd (object obj)

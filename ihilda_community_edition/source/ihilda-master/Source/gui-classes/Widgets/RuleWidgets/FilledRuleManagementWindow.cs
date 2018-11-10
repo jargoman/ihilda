@@ -47,6 +47,7 @@ namespace IhildaWallet
 				expander1.Add (ledgerconstraintswidget1);
 				ledgerconstraintswidget1.Show ();
 			}
+
 			ledgerconstraintswidget1.HideForward ();
 
 			//_rippleWallet = rw;
@@ -114,7 +115,15 @@ namespace IhildaWallet
 
 				ofr.IsActive = !ofr.IsActive;
 				toggleCell.Active = ofr.IsActive;
-				Task.Run ((System.Action)this.RuleManagerObj.SaveRules);
+				//Task.Run ((System.Action)this.RuleManagerObj.SaveRules);
+
+				Task.Run (
+					delegate {
+						this.RuleManagerObj.SaveRules ();
+
+					}
+				);
+
 				SetRules (this.RuleManagerObj.RulesList);
 			};
 
@@ -260,43 +269,92 @@ namespace IhildaWallet
 			};
 
 			this.button1.Clicked += (object sender, EventArgs e) => {
-
+				WriteToInfoBox ("Syncing Orders Cache.... \n");
 				WalletSwitchWidget walletSwitchWidget = this.walletswitchwidget1;
+
+				//progressbar1.Pulse ();
+
 				RippleWallet wallet = walletSwitchWidget?.GetRippleWallet ();
 				if (wallet == null) {
 					return;
 				}
 
 
+
+				deleteordersbutton.Visible = false;
 				dologicbutton.Visible = false;
 				automatebutton.Visible = false;
-				button171.Visible = false;
+				button171.Visible = true;
 				button1.Visible = false;
+
+				//progressbar1.Pulse ();
 
 				Task.Run ( delegate {
 
-					AccountSequenceCache accountSequnceCache = new AccountSequenceCache ();
+					try {
 
-					accountSequnceCache.OnOrderCacheEvent += (object sen, OrderCachedEventArgs ocev) => {
-						TextHighlighter.Highlightcolor = ocev.GetSuccess ? TextHighlighter.GREEN : TextHighlighter.RED;
-						string message = TextHighlighter.Highlight (ocev.Message);
-						WriteToInfoBox (message);
-					};
+						this.tokenSource = new CancellationTokenSource ();
+
+						CancellationToken token = tokenSource.Token;
+						token.ThrowIfCancellationRequested ();
+
+					
+						this.SetIsRunningUI (true);
 
 
-					WriteToInfoBox ("Syncing Orders Cache.... \n");
-					accountSequnceCache.SyncOrdersCache (wallet.GetStoredReceiveAddress ());
-					WriteToInfoBox ("Finished Syncing orders cache \n");
+						AccountSequenceCache accountSequnceCache = new AccountSequenceCache (this.walletswitchwidget1.GetRippleWallet ().GetStoredReceiveAddress ());
 
-					Gtk.Application.Invoke (
-						delegate {
+						Application.Invoke (delegate {
+							progressbar1.Pulse ();
+
+						});
+
+
+						accountSequnceCache.OnOrderCacheEvent += (object sen, OrderCachedEventArgs ocev) => {
+							TextHighlighter.Highlightcolor = ocev.GetSuccess ? TextHighlighter.GREEN : TextHighlighter.RED;
+							string message = TextHighlighter.Highlight (ocev.Message);
+							WriteToInfoBox (message);
+							Application.Invoke ( delegate {
+								progressbar1.Pulse ();
+
+							});
+						};
+
+
+
+						accountSequnceCache.SyncOrdersCache ( wallet.GetStoredReceiveAddress (), token );
+						Application.Invoke (delegate {
+							progressbar1.Pulse ();
+
+						});
+
+						WriteToInfoBox ("Finished Syncing orders cache \n");
+					} catch (Exception ex) {
+						this.WriteToInfoBox (ex.Message);
+					} finally {
+						this.tokenSource = null;
+						this.SetIsRunningUI (false);
+
+						Application.Invoke (delegate {
+							progressbar1.Fraction = 0;
+							deleteordersbutton.Visible = true;
 							dologicbutton.Visible = true;
 							automatebutton.Visible = true;
 							button171.Visible = false;
 							button1.Visible = true;
+						});
+
+						string message = "Automation thread has stopped\n";
+						//MessageDialog.ShowMessage ("Automation stopped", message);
+						WriteToInfoBox (message);
+					}
+					/*
+					Gtk.Application.Invoke (
+						delegate {
+
 
 						}
-					);
+					);*/
 
 				} );
 
@@ -312,7 +370,10 @@ namespace IhildaWallet
 
 				string account = this.walletswitchwidget1?.GetRippleWallet ()?.GetStoredReceiveAddress ();
 				if (account == null) {
-					MessageDialog.ShowMessage ("Select an account", "No account has been selected for cache deletion");
+					MessageDialog.ShowMessage (
+						"Select an account", 
+						"No account has been selected for cache deletion"
+					);
 					return;
 				}
 				bool sure = AreYouSure.AskQuestion ("Delete cache", "Are you sure you want to delete the orders cache for account " + account + "?");
@@ -322,6 +383,92 @@ namespace IhildaWallet
 				AccountSequenceCache.DeleteSettingsFile (account);
 			};
 
+
+			this.savebutton.Clicked += (sender, e) => {
+
+				string event_sig = clsstr + nameof (FilledRuleManagementWindow) + DebugRippleLibSharp.both_parentheses;
+				//this.RuleManagerObj.
+
+
+				string account = this.walletswitchwidget1?.GetRippleWallet ()?.GetStoredReceiveAddress ();
+				if (account == null) {
+					MessageDialog.ShowMessage (
+						"Select an account",
+						"Can not export rule list. No account has been selected."
+					);
+					return;
+				}
+
+				FileChooserDialog fcd = new FileChooserDialog ("Export Rules",
+									   this,
+									   FileChooserAction.Save,
+									   "Cancel", ResponseType.Cancel,
+									   "Save", ResponseType.Accept);
+
+
+				if (fcd?.Run () == (int)ResponseType.Accept) {
+#if DEBUG
+					if (DebugIhildaWallet.FilledRuleManagementWindow) {
+						Logging.WriteLog ( event_sig + "user chose to export to file " + fcd.Filename + "\n");
+					}
+#endif
+
+					RuleManager ruleManager = new RuleManager (account);
+
+					ruleManager.SaveRules (fcd.Filename);
+
+				}
+
+				fcd?.Destroy ();
+
+			};
+
+			button101.Clicked += (object sender, EventArgs e) => { 
+
+				string account = this.walletswitchwidget1?.GetRippleWallet ()?.GetStoredReceiveAddress ();
+				if (account == null) {
+					MessageDialog.ShowMessage (
+						"Select an account",
+						"Can not import rule list. No account has been selected."
+					);
+					return;
+				}
+
+				RuleManager ruleManager = new RuleManager (account);
+				ruleManager.LoadRules ();
+				if (ruleManager.RulesList.Any()) {
+					bool sure = AreYouSure.AskQuestion (
+						"Overwrite Rules",
+						"Importing a rule list will overwrite current settings. Are you sure you want to continue?"
+					);
+
+					if (!sure) {
+						return;
+					}
+				}
+
+
+
+				FileChooserDialog fcd = new FileChooserDialog (
+					"Import Rules",
+					this,
+					FileChooserAction.Open,
+					"Cancel", 
+					ResponseType.Cancel,
+					"Open",
+					ResponseType.Accept);
+
+				if (fcd?.Run () == (int)ResponseType.Accept) {
+					string p = fcd?.Filename;
+					if (p == null) {
+						return;
+					}
+
+					ruleManager.SaveRules (p);
+
+				}
+
+			};
 		}
 
 		protected void OnDeleteEvent (object sender, DeleteEventArgs a)
@@ -342,7 +489,7 @@ namespace IhildaWallet
 			Application.Invoke (delegate {
 				walletswitchwidget1.Sensitive = !isRunning;
 				label4.Markup = message;
-
+				deleteordersbutton.Visible = !isRunning;
 				button171.Visible = isRunning;
 				automatebutton.Visible = !isRunning;
 				dologicbutton.Visible = !isRunning;
@@ -589,7 +736,8 @@ namespace IhildaWallet
 				bool ShouldContinue = LeIceSense.DoTrialDialog (rw, LicenseType.MARKETBOT);
 				//bool ShouldContinue = LeIceSense.LastDitchAttempt (rw, LicenseType.AUTOMATIC);
 				if (!ShouldContinue) {
-					WriteToInfoBox ("Stopping");
+					// TODO print fee requirement
+					WriteToInfoBox ("Stopping  \n");
 					return;
 				}
 
@@ -628,6 +776,10 @@ namespace IhildaWallet
 					}
 				}
 
+				robot.OnMessage += (object sender, MessageEventArgs e) => {
+					this.WriteToInfoBox (e.Message);
+				};
+
 
 				Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = robot.DoLogic (rw, ni, strt, endStr, lim);
 
@@ -635,20 +787,20 @@ namespace IhildaWallet
 				string title = "No filled";
 				string message = null;
 				if (tuple == null) {
-					message = "Do logic returned null";
+					message = "Do logic returned null\n";
 					MessageDialog.ShowMessage (title, message);
 					WriteToInfoBox (message);
 				}
 
 				if (tuple?.Item1 == null) {
-					message = "Filled orders error";
+					message = "Filled orders error\n";
 					MessageDialog.ShowMessage (title, message);
 					WriteToInfoBox (message);
 					return;
 				}
 
 				if (tuple.Item2 == null) {
-					message = "Filled orders array is null";
+					message = "Filled orders array is null\n";
 					MessageDialog.ShowMessage (title, message);
 					WriteToInfoBox (message);
 					return;
@@ -715,7 +867,7 @@ namespace IhildaWallet
 
 			RippleWallet rw = walletswitchwidget1.GetRippleWallet ();
 			if (rw == null) {
-				MessageDialog.ShowMessage ("No wallet Selected");
+				MessageDialog.ShowMessage ("No wallet Selected\n");
 				//shouldContinue = false;
 
 				return;
@@ -777,7 +929,13 @@ namespace IhildaWallet
 				OrderSubmitter orderSubmitter = new OrderSubmitter ();
 
 				orderSubmitter.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
-					this.WriteToInfoBox ("Fee " + e.FeeAndLastLedger.Item1.ToString() + " is too high, waiting on lower fee/n");
+					this.WriteToInfoBox ("Fee " + e.FeeAndLastLedger.Item1.ToString() + " is too high, waiting on lower fee\n");
+					Application.Invoke (
+						delegate {
+
+							progressbar1.Pulse ();
+						}
+					);
 				};
 				orderSubmitter.OnOrderSubmitted += (object sender, OrderSubmittedEventArgs e) => {
 					StringBuilder stringBuilder = new StringBuilder ();
@@ -833,7 +991,7 @@ namespace IhildaWallet
 					if (e.Success) {
 						stringBuilder.Append ("Transaction ");
 						stringBuilder.Append ((string)(e?.RippleOfferTransaction?.hash ?? ""));
-						stringBuilder.Append ("Verified");
+						stringBuilder.Append (" Verified");
 
 
 						TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
@@ -871,6 +1029,10 @@ namespace IhildaWallet
 
 				this.WriteToInfoBox ("Running automation script for address " + rw.GetStoredReceiveAddress () + "\n");
 				Robotics robot = new Robotics (this.RuleManagerObj);
+
+				robot.OnMessage += (object sender, MessageEventArgs e) => {
+					this.WriteToInfoBox (e.Message);
+				};
 
 				Int32? strt = this.ledgerconstraintswidget1.GetStartFromLedger ();
 

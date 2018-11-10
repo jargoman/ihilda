@@ -1,11 +1,5 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Dialogs/RuleCreateDialog.cs">
-    <Files>
-      <File FileName="Source/bot/Sentiment.cs" Line="5" Column="2" />
-      <File FileName="Source/gui-classes/Dialogs/RuleCreateDialog.cs" Line="89" Column="40" />
-      <File FileName="Source/gui-classes/Widgets/TradeUI/TradePairEntryWidget.cs" Line="1" Column="1" />
-    </Files>
-  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench />
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

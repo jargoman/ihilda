@@ -768,8 +768,9 @@ namespace IhildaWallet
 			OnVerifyingTxReturn?.Invoke (this, verifyEventArgs);
 
 			AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (offerTransaction);
-			AccountSequenceCache sequenceCache = new AccountSequenceCache ();
-			sequenceCache.UpdateOrdersCache (ao, ao.Account);
+			AccountSequenceCache sequenceCache = new AccountSequenceCache (offerTransaction.Account);
+			//sequenceCache.UpdateOrdersCache (ao);
+			sequenceCache.UpdateAndSave (ao);
 			return verifyEventArgs;
 		}
 
@@ -777,12 +778,13 @@ namespace IhildaWallet
 		{
 
 
-			VerifyEventArgs verifyEventArgs = new VerifyEventArgs ();
-			verifyEventArgs.Success = false;
-			verifyEventArgs.RippleOfferTransaction = offerTransaction;
+			VerifyEventArgs verifyEventArgs = new VerifyEventArgs {
+				Success = false,
+				RippleOfferTransaction = offerTransaction
+			};
 
 			Thread.Sleep (1000);
-			Logging.WriteLog ("validating tx\n");
+			Logging.WriteLog ("Validating Tx\n");
 			Thread.Sleep (2000);
 
 			OnVerifyingTxBegin?.Invoke (this, verifyEventArgs);
@@ -817,7 +819,7 @@ namespace IhildaWallet
 
 				if (transaction.validated != null && (bool)transaction.validated) {
 
-					Logging.WriteLog ("validated");
+					Logging.WriteLog ("Validated");
 					verifyEventArgs.Success = true;
 					return verifyEventArgs;
 				}

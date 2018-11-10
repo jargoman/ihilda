@@ -181,10 +181,11 @@ namespace IhildaWallet
 #endif
 
 
-				this.connecteddisplaywidget1.SetConnected ();
+				this.connecteddisplaywidget1.SetConnected (ni.GetConnectAttemptInfo().ServerUrl);
 
 				if (WalletManagerWidget.currentInstance != null) {
-					WalletManagerWidget.currentInstance.SetConnected (true);
+
+					WalletManagerWidget.currentInstance.SetConnected (ni.GetConnectAttemptInfo ().ServerUrl);
 				}
 				//this.saveSettings ();  // It was a good intention but introduced a serious bug that drove me up the wall where the network settings were being saved due to multithreading environment
 
@@ -210,7 +211,7 @@ namespace IhildaWallet
 				this.serverinfowidget1.SetServerInfo (null);
 
 				if (WalletManagerWidget.currentInstance != null) {
-					WalletManagerWidget.currentInstance.SetConnected (false);
+					WalletManagerWidget.currentInstance.SetConnected (null);
 				}
 			};
 
@@ -243,7 +244,7 @@ namespace IhildaWallet
 
 		}
 
-		public void SetUIConnectStatus (bool b)
+		public void SetUIConnectStatus (string serverUrl)
 		{
 			if (this.connecteddisplaywidget1 == null) {
 				// TODO debug
@@ -251,8 +252,8 @@ namespace IhildaWallet
 				return;
 			}
 
-			if (b) {
-				this.connecteddisplaywidget1.SetConnected ();
+			if (serverUrl != null) {
+				this.connecteddisplaywidget1.SetConnected (serverUrl);
 			} else {
 				this.connecteddisplaywidget1.SetDisConnected ();
 			}

@@ -136,12 +136,14 @@ namespace IhildaWallet
 
 			//this.SyncOrdersCache (this.Wallet.GetStoredReceiveAddress());
 
+			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Determining orders filled immediately\n" });
 			IEnumerable<AutomatedOrder> filledImmediately = GetOrdersFilledImmediately (off);
 
 
-
+			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Determining orders filled from orderbook\n" });
 			IEnumerable<RippleNode> nodes = GetNodesFilledOrderBook (off);
 
+			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Tracing nodes to source\n" });
 			IEnumerable<AutomatedOrder> filledOrderBook = TraceNodesToSource (nodes);
 
 			IEnumerable<AutomatedOrder> total = filledImmediately.Concat (filledOrderBook);
@@ -158,9 +160,9 @@ namespace IhildaWallet
 		{
 			List<AutomatedOrder> list = new List<AutomatedOrder> ();
 
-			AccountSequenceCache accountSequnceCache = new AccountSequenceCache ();
+			AccountSequenceCache accountSequnceCache = new AccountSequenceCache (this.Wallet.GetStoredReceiveAddress());
 
-			Dictionary<String, AutomatedOrder> cachedOffers = AccountSequenceCache.Load (Wallet.GetStoredReceiveAddress ());
+			Dictionary<String, AutomatedOrder> cachedOffers = accountSequnceCache.SequenceCache; //.Load (Wallet.GetStoredReceiveAddress ());
 
 			foreach (RippleNode node in nodes) {
 				AutomatedOrder order = null;
@@ -174,14 +176,26 @@ namespace IhildaWallet
 					b = cachedOffers.TryGetValue (bot_id, out order);
 				}
 
+				if (b) {
+					OnMessage?.Invoke (this, new MessageEventArgs () { Message = bot_id + " found in cache\n" });
+					list.Add (order);
+					continue;
+				}
 
-				if (!b || order == null) {
+
+				if (order == null) {
 
 
 					// Unfortunately tracing the order can fail due to server not having full ledger history. 
 					// Somehow repeated attempts may eventually work. 
 					// Far better approad is trying a server with full history
 
+					if (bot_id != null) {
+						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Tracing " + bot_id + " to source\n" });
+					} else 
+					{
+						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Tracing filled order node to source transaction\n" });
+					}
 
 					order = TraceFilledOrderToCreationRobustly (node);
 
@@ -189,14 +203,20 @@ namespace IhildaWallet
 				}
 
 				if (order == null) {
-					throw new NullReferenceException ("Could not retrieve order");
+					string errmessg = "Could not retrieve order\n";
+					OnMessage?.Invoke (this, new MessageEventArgs () { Message = errmessg });
+					throw new NullReferenceException (errmessg);
 				}
 
 
-				accountSequnceCache.UpdateOrdersCache (order, order.Account);
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Updating orders cache : " + order.Bot_ID + "\n" });
+				accountSequnceCache.UpdateOrdersCache (order);
 				list.Add (order);
 
 			}
+
+			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Saving orders cache to file\n" });
+			accountSequnceCache.Save ();
 
 			return list;
 		}
@@ -267,6 +287,7 @@ namespace IhildaWallet
 					break;
 				}
 
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Tracing order to source failed. Trying data api" });
 				order = LookUpSequenceDataApi (account, seq);
 				if (order != null) {
 					break;
@@ -340,8 +361,13 @@ namespace IhildaWallet
 
 			Task<Response<RippleTransaction>> requestTask = tx.GetRequest (PreviousTxnID, this.NetInterface);
 
+			requestTask.Wait (250);
+			while (!requestTask.IsCompleted) {
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Waiting on network\n" });
+				requestTask.Wait (1000);
+			}
 
-			requestTask.Wait ();
+
 
 			Response<RippleTransaction> response = requestTask.Result;
 
@@ -355,18 +381,26 @@ namespace IhildaWallet
 
 				// instead of giving up we are going to try the data api instead. 
 				// response<string is correct>
-				Thread.Sleep (5000);
+				//Thread.Sleep (5000);
 				Task<Response<string>> dataTask = tx.GetRequestDataApi (PreviousTxnID);
 				if (dataTask == null) {
 					return null;
 				}
-				dataTask.Wait ();
+
+				dataTask.Wait (250);
+				while (!dataTask.IsCompleted) {
+					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Waiting on network\n" });
+					dataTask.Wait (1000);
+				}
+
+
 
 				Response<string> dataResp = dataTask?.Result;
 				RippleTxStructure txStruct = dataResp?.transaction;
 				txRes = txStruct?.tx;
 				meta = txStruct.meta;
 				if (txRes == null) {
+					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Transaction result is null\n" });
 					return null;
 				}
 
@@ -428,7 +462,18 @@ namespace IhildaWallet
 		}
 
 
+		public event EventHandler<MessageEventArgs> OnMessage;
 
+		/*
+		public class MessageEventArgs : EventArgs
+		{
+
+			public string Message {
+				get;
+				set;
+			}
+		}
+		*/
 
 
 

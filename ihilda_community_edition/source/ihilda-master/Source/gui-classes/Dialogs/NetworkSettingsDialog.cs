@@ -57,29 +57,29 @@ namespace IhildaWallet
 
 		public void UpdateNetUI ()
 		{
-			bool isConnected = DetermineConnectStatus ();
+			string isConnected = DetermineConnectStatus ();
 
 			this.networksettings1.SetUIConnectStatus (isConnected);
 
-			if (isConnected) {
+			if (isConnected != null) {
 
 			}
 
 		}
 
-		private bool DetermineConnectStatus ()
+		private string DetermineConnectStatus ()
 		{
 #if DEBUG
 			string method_sig = clsstr + "determineConnectStatus () : ";
 #endif
 
 			if (NetworkController.CurrentInterface == null) {
-				return false;
+				return null;
 			}
 
 			try {
 				if (NetworkController.CurrentInterface.IsConnected ()) {
-					return true;
+					return NetworkController.CurrentInterface.GetConnectAttemptInfo().ServerUrl;
 				}
 			}
 
@@ -93,10 +93,10 @@ namespace IhildaWallet
 					Logging.ReportException (method_sig, e);
 				}
 #endif
-				return false;
+				return null;
 			}
 
-			return false;
+			return null;
 		}
 
 		private static NetworkSettingsDialog Instance {
@@ -119,8 +119,8 @@ namespace IhildaWallet
 			//}
 			Instance.UpdateNetUI ();
 
-			bool connected = Instance.DetermineConnectStatus ();
-			if (connected) {
+			string connected = Instance.DetermineConnectStatus ();
+			if (connected != null) {
 				ServerInfoWidget siw = Instance.networksettings1.GetServerInfoWidget ();
 
 				siw.Refresh ();

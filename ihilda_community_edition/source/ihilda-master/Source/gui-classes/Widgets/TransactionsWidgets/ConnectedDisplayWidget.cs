@@ -13,7 +13,7 @@ namespace IhildaWallet
 			this.connectStatusLabel.UseMarkup = true;
 		}
 
-		public void SetConnected ()
+		public void SetConnected (string serverUrl)
 		{
 
 			#if DEBUG
@@ -30,8 +30,8 @@ namespace IhildaWallet
 				}	
 				#endif
 				//this.connectStatusLabel.ma
-				this.connectStatusLabel.Markup = "<span foreground=\"green\"><big><b>Connected</b></big></span>";	
-
+				this.connectStatusLabel.Markup = "<span foreground=\"green\"><big><b>Connected</b></big></span>";
+				this.TooltipMarkup = serverUrl;
 			}
 			);
 		}
@@ -51,8 +51,8 @@ namespace IhildaWallet
 				}	
 				#endif
 
-				this.connectStatusLabel.Markup = "<span foreground=\"red\">Disconnected</span>";	
-
+				this.connectStatusLabel.Markup = "<span foreground=\"red\">Disconnected</span>";
+				this.TooltipMarkup = "";
 
 			});
 
