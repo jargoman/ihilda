@@ -768,7 +768,7 @@ namespace IhildaWallet
 			OnVerifyingTxReturn?.Invoke (this, verifyEventArgs);
 
 			AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (offerTransaction);
-			AccountSequenceCache sequenceCache = new AccountSequenceCache (offerTransaction.Account);
+			AccountSequenceCache sequenceCache = AccountSequenceCache.GetCacheForAccount (offerTransaction.Account);
 			//sequenceCache.UpdateOrdersCache (ao);
 			sequenceCache.UpdateAndSave (ao);
 			return verifyEventArgs;

@@ -27,11 +27,15 @@ namespace IhildaWallet
 				#if DEBUG
 				if (DebugIhildaWallet.ConnectedDisplayWidget) {
 					Logging.WriteLog (clsstr + DebugIhildaWallet.gtkInvoke);
-				}	
-				#endif
+				}
+#endif
 				//this.connectStatusLabel.ma
-				this.connectStatusLabel.Markup = "<span foreground=\"green\"><big><b>Connected</b></big></span>";
-				this.TooltipMarkup = serverUrl;
+
+
+					this.connectStatusLabel.Markup = "<span foreground=\"green\"><big><b>Connected</b></big></span>";
+				if (Program.showPopUps) {
+					this.TooltipMarkup = serverUrl;
+				}
 			}
 			);
 		}

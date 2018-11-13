@@ -20,7 +20,9 @@ namespace IhildaWallet
 			this.vbox1.Name = "vbox1";
 			this.vbox1.Spacing = 6;
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.transactionsubmitwidget1 = null;
+			this.transactionsubmitwidget1 = new global::IhildaWallet.TransactionSubmitWidget();
+			this.transactionsubmitwidget1.Events = ((global::Gdk.EventMask)(256));
+			this.transactionsubmitwidget1.Name = "transactionsubmitwidget1";
 			this.vbox1.Add(this.transactionsubmitwidget1);
 			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.transactionsubmitwidget1]));
 			w1.Position = 0;

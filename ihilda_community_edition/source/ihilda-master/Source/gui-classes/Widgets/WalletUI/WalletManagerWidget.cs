@@ -345,6 +345,11 @@ namespace IhildaWallet
 
 		public void SetHelpPopups ()
 		{
+
+			if (!Program.showPopUps) {
+				return;
+			}
+
 			botbutton.TooltipMarkup = "Create and run trading bot using rules\nSet up passive trading";
 			tradepairButton.TooltipMarkup = "Trade\nView orderbook, depth chart\nManage custom trading pairs";
 			useButton.TooltipMarkup = "Transfer an asset to another wallet\nSend a cross currency payment\nUse pathfinding to send a payment";

@@ -164,7 +164,9 @@ namespace IhildaWallet
 			w10.Expand = false;
 			w10.Fill = false;
 			// Container child vbox4.Gtk.Box+BoxChild
-			this.tradepairtree1 = null;
+			this.tradepairtree1 = new global::IhildaWallet.TradePairTree();
+			this.tradepairtree1.Events = ((global::Gdk.EventMask)(256));
+			this.tradepairtree1.Name = "tradepairtree1";
 			this.vbox4.Add(this.tradepairtree1);
 			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.tradepairtree1]));
 			w11.Position = 1;

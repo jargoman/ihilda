@@ -83,6 +83,10 @@ namespace IhildaWallet
 
 			CONFIG_FOLDER_PATH = Path.Combine (DATA_FOLDER_PATH, DATA_FOLDER, CONFIG_FOLDER);
 			AssureDirectory (CONFIG_FOLDER_PATH);
+
+			COMPLIANCE_FOLDER_PATH = Path.Combine (DATA_FOLDER_PATH, DATA_FOLDER, COMPLIANCE_FOLDER);
+			AssureDirectory (COMPLIANCE_FOLDER_PATH);
+
 		}
 
 		public static String GetSettingsPath (String filename)
@@ -392,10 +396,15 @@ namespace IhildaWallet
 		public static string CONFIG_FOLDER = "config";
 		public static string CONFIG_FOLDER_PATH = null;
 
+		public static string COMPLIANCE_FOLDER = "compliance";
+		public static string COMPLIANCE_FOLDER_PATH = null;
+
 		public static string examplename = "exampleplugin";
 
 		public static string TEMP_EXTENTION = ".tmp";
 		public static string BACKUP_EXT = ".backup";
+
+
 
 #pragma warning restore RECS0122 // Initializing field with default value is redundant
 		//public static Dictionary<String, String> configCache = new Dictionary<String,String>(); // cache of config paths

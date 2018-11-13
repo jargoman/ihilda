@@ -89,9 +89,9 @@ namespace IhildaWallet
 		}
 
 
-		public LinkedList<AutomatedOrder> GetOrdersFilledImmediately (IEnumerable<RippleTxStructure> off)
+		public List<AutomatedOrder> GetOrdersFilledImmediately (IEnumerable<RippleTxStructure> off)
 		{
-			LinkedList<AutomatedOrder> ords = new LinkedList<AutomatedOrder> ();
+			List<AutomatedOrder> ords = new List<AutomatedOrder> ();
 
 			#region created
 			IEnumerable<RippleTxStructure> offernews = from RippleTxStructure st in off
@@ -115,11 +115,10 @@ namespace IhildaWallet
 										 && rng.CreatedNode.LedgerEntryType.Equals ("Offer")
 											 select rng.GetNode ();
 
-				RippleNode no = cr.FirstOrDefault ();
-
-				if (no == null) {
+				//RippleNode no = cr.Any
+				if (cr.Any()) {
 					AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (strc.tx);
-					ords.AddLast (ao);
+					ords.Add (ao);
 				}
 
 			}
@@ -138,16 +137,39 @@ namespace IhildaWallet
 
 			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Determining orders filled immediately\n" });
 			IEnumerable<AutomatedOrder> filledImmediately = GetOrdersFilledImmediately (off);
+			if (filledImmediately == null) {
+				filledImmediately = new List <AutomatedOrder>();
+			}
 
+
+
+			if (!filledImmediately.Any()) {
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "No orders filled immediately\n" });
+			}
 
 			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Determining orders filled from orderbook\n" });
+			IEnumerable<AutomatedOrder> filledOrderBook = null;
 			IEnumerable<RippleNode> nodes = GetNodesFilledOrderBook (off);
+			if (!nodes.Any ()) {
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "No orders filled from orderbook\n" });
+				if (!filledImmediately.Any ()) {
+					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "No orders filled from orderbook\n" });
+					return filledImmediately; // returns empty list
+				}
+			} else {
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Tracing nodes to source\n" });
+				filledOrderBook = TraceNodesToSource (nodes);
 
-			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Tracing nodes to source\n" });
-			IEnumerable<AutomatedOrder> filledOrderBook = TraceNodesToSource (nodes);
+			}
+
+			if (filledOrderBook == null) {
+				filledOrderBook = new List<AutomatedOrder> ();
+			}
+
+
+
 
 			IEnumerable<AutomatedOrder> total = filledImmediately.Concat (filledOrderBook);
-
 
 			return total;
 
@@ -156,11 +178,11 @@ namespace IhildaWallet
 		}
 
 
-		private IEnumerable<AutomatedOrder> TraceNodesToSource (IEnumerable<RippleNode> nodes)
+		private IEnumerable<AutomatedOrder> TraceNodesToSource ( IEnumerable<RippleNode> nodes )
 		{
 			List<AutomatedOrder> list = new List<AutomatedOrder> ();
 
-			AccountSequenceCache accountSequnceCache = new AccountSequenceCache (this.Wallet.GetStoredReceiveAddress());
+			AccountSequenceCache accountSequnceCache = AccountSequenceCache.GetCacheForAccount ( this.Wallet.GetStoredReceiveAddress() );
 
 			Dictionary<String, AutomatedOrder> cachedOffers = accountSequnceCache.SequenceCache; //.Load (Wallet.GetStoredReceiveAddress ());
 
@@ -287,7 +309,7 @@ namespace IhildaWallet
 					break;
 				}
 
-				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Tracing order to source failed. Trying data api" });
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Tracing order to source failed. Trying data api\n" });
 				order = LookUpSequenceDataApi (account, seq);
 				if (order != null) {
 					break;

@@ -140,7 +140,9 @@ namespace IhildaWallet
 			w10.Expand = false;
 			w10.Fill = false;
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.openorderstree1 = null;
+			this.openorderstree1 = new global::IhildaWallet.OpenOrdersTree();
+			this.openorderstree1.Events = ((global::Gdk.EventMask)(256));
+			this.openorderstree1.Name = "openorderstree1";
 			this.vbox1.Add(this.openorderstree1);
 			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.openorderstree1]));
 			w11.Position = 4;

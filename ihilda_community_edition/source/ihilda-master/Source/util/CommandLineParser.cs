@@ -106,8 +106,36 @@ namespace IhildaWallet
 			fab.launch += BalanceTabOptionsWidget.SetFavoriteParam;
 
 
+			IEnumerable<String> tooltips = new String [] { "tooltip", "tooltips", "tips"};
+			Command tooltip = new Command (tooltips);
+			commands.Add (tooltip);
+
+			tooltip.launch += (string param) => {
+				if (param == null) {
+					param = "true";
+				}
+
+				param = param.ToLower ();
+
+				switch (param) {
+				case "false":
+				case "no":
+				case "off":
+				case "disable":
+				case "deactivate":
+				case "remove":
+				case "halt":
+				case "stop":
+					Program.showPopUps = false;
+					return;
+
+				default:
+					return;
+				}
+			};
 
 
+			IEnumerable<String> helps = new String [] { "help", "info", "h"};
 		}
 
 		public static string[] prefixes = {"-", "--", "/", ":"};

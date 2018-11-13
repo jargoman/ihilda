@@ -19,7 +19,7 @@ namespace IhildaWallet
 	{
 		public OrderBookWidget ()
 		{
-
+			string method_sig = clsstr + nameof (OrderBookWidget) + DebugRippleLibSharp.both_parentheses;
 			this.Build ();
 
 			if (orderbooktablewidget1 == null) {
@@ -48,12 +48,53 @@ namespace IhildaWallet
 						await Task.Delay (6000);
 						ResyncNetwork ();
 					} catch (Exception e) {
-
+#if DEBUG
+						if (DebugIhildaWallet.OrderBookWidget) {
+							Logging.ReportException (method_sig, e);
+						}
+#endif
 					}
 				}
 			}
 			);
 
+			
+		}
+
+		public void SetToolTips (TradePair tradePair)
+		{
+			if (!Program.showPopUps) {
+				return;
+
+			}
+
+			if (tradePair == null) {
+				return;
+			}
+
+			if (!Program.showPopUps) {
+				return;
+			}
+
+			var bidmess = 
+				"list of bid orders to buy " + 
+				tradePair.Currency_Base.currency +
+				" with " +
+				tradePair.Currency_Counter.currency;
+
+			var askmess =
+				"list of ask orders selling " +
+				tradePair.Currency_Base.currency +
+				" for " +
+				tradePair.Currency_Counter.currency;
+
+			Gtk.Application.Invoke (
+				delegate {
+					label26.TooltipMarkup = bidmess;
+					label25.TooltipMarkup = askmess;
+
+				}
+			);
 		}
 
 		~OrderBookWidget ()
@@ -87,9 +128,12 @@ namespace IhildaWallet
 					+ (tp?.Currency_Counter?.currency ?? "")
 					+ " </u></b>";
 
+			this.SetToolTips (tp);
+
 			Gtk.Application.Invoke (delegate {
 				this.label27.Hide ();
 				this.label27.Markup = message;
+
 
 			});
 		}

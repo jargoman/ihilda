@@ -54,6 +54,17 @@ namespace IhildaWallet
 
 			Modal = true;
 
+
+
+		}
+
+		public void SetToolTips ()
+		{
+			if (!Program.showPopUps) {
+
+				return;
+			}
+
 			label14.TooltipMarkup = "Pattern filled order must match to trigger rule";
 			label15.TooltipMarkup = "Action to apply to newly created order once rule has been triggered";
 
@@ -110,7 +121,6 @@ namespace IhildaWallet
 
 			label10.TooltipMarkup = help;
 			comboboxentry4.TooltipMarkup = help;
-
 		}
 
 		public OrderFilledRule GetRule () {

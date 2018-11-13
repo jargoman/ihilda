@@ -1,9 +1,27 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/bot/OrderManagementBot.cs">
+    <Files>
+      <File FileName="Source/Program.cs" Line="41" Column="40" />
+      <File FileName="Source/util/CommandLineParser.cs" Line="138" Column="66" />
+      <File FileName="Source/util/DebugIhildaWallet.cs" Line="362" Column="4" />
+      <File FileName="Source/gui-classes/Dialogs/SeedFromHexDialog.cs" Line="34" Column="23" />
+      <File FileName="Source/gui-classes/Widgets/OrderBookWidget.cs" Line="128" Column="12" />
+      <File FileName="Source/gui-classes/Widgets/TransactionsWidgets/ConnectedDisplayWidget.cs" Line="55" Column="7" />
+      <File FileName="Source/gui-classes/Dialogs/FromScriptDialog.cs" Line="28" Column="9" />
+      <File FileName="Source/NotificationSystem/NotificationThread.cs" Line="365" Column="71" />
+      <File FileName="Source/gui-classes/Widgets/OrderBookTableWidget.cs" Line="849" Column="23" />
+      <File FileName="Source/gui-classes/Dialogs/RuleCreateDialog.cs" Line="57" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/WalletUI/WalletManagerWidget.cs" Line="8" Column="27" />
+      <File FileName="Source/bot/AccountSequenceCache.cs" Line="36" Column="1" />
+      <File FileName="Source/bot/OrderManagementBot.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/Source/bot/AccountSequenceCache.cs" relfile="Source/bot/AccountSequenceCache.cs" line="37" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MultiItemStartupConfigurations />
   <MonoDevelop.Ide.ItemProperties.IhildaWallet PreferredExecutionTarget="MonoDevelop.Default" />

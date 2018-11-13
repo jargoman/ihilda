@@ -37,7 +37,9 @@ namespace IhildaWallet
 			w2.Expand = false;
 			w2.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.walletmanagerwidget1 = null;
+			this.walletmanagerwidget1 = new global::IhildaWallet.WalletManagerWidget();
+			this.walletmanagerwidget1.Events = ((global::Gdk.EventMask)(256));
+			this.walletmanagerwidget1.Name = "walletmanagerwidget1";
 			this.vbox2.Add(this.walletmanagerwidget1);
 			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.walletmanagerwidget1]));
 			w3.Position = 1;

@@ -466,6 +466,9 @@
     <Compile Include="Source\gui-classes\Widgets\OrderClusterWidget.cs" />
     <Compile Include="gtk-gui\IhildaWallet.OrderClusterWidget.cs" />
     <Compile Include="Source\bot\AccountSequenceCache.cs" />
+    <Compile Include="Source\util\Compliance.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\AggreementDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.AggreementDialog.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

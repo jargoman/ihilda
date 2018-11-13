@@ -38,7 +38,7 @@ namespace IhildaWallet
 		public static readonly string appname = "ihilda";
 		public static readonly string version = "0.10.4";
 		public static readonly string verboseName = appname + "_community_edition_" + version;
-
+		public static bool showPopUps = true;
 		public static MemoIndice GetClientMemo ()
 		{
 			MemoIndice indice = new MemoIndice () {
@@ -200,6 +200,12 @@ namespace IhildaWallet
 #endif
 
 
+			bool b = Compliance.DoUserAgreement ();
+			if (!b) {
+
+				Application.Quit ();
+				return;
+			}
 
 			Task t1 = InitSplash ();
 

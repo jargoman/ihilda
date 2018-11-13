@@ -17,6 +17,11 @@ namespace IhildaWallet
 	{
 		public CurrencyWidget ()
 		{
+
+#if DEBUG
+			string method_sig = clsstr + nameof (CurrencyWidget) + DebugRippleLibSharp.both_parentheses;
+#endif
+
 			this.Build ();
 
 			this.SetAsUnset ();
@@ -25,11 +30,16 @@ namespace IhildaWallet
 			Task.Factory.StartNew (async () => {
 
 				while (_cont) {
+
 					try {
 						await Task.Delay (30000);
 						UpdateNetwork ();
 					} catch (Exception e) {
-
+#if DEBUG
+						if (DebugIhildaWallet.CurrencyWidget) {
+							Logging.ReportException ( clsstr, e );
+						}
+#endif
 					}
 				}
 			}

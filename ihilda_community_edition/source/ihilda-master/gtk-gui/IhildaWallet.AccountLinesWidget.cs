@@ -108,7 +108,9 @@ namespace IhildaWallet
 			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.scrolledwindow1]));
 			w8.Position = 4;
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.pagerwidget1 = null;
+			this.pagerwidget1 = new global::IhildaWallet.PagerWidget();
+			this.pagerwidget1.Events = ((global::Gdk.EventMask)(256));
+			this.pagerwidget1.Name = "pagerwidget1";
 			this.vbox1.Add(this.pagerwidget1);
 			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.pagerwidget1]));
 			w9.Position = 5;

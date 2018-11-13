@@ -362,6 +362,7 @@ namespace IhildaWallet
 			Application.Invoke (
 				delegate {
 					StatusTrayIcon.Blinking = true;
+					// display even if tooltips disabled, it's functionality not help
 					StatusTrayIcon.Tooltip = grandTotal.ToString () + " Orders have filled";
 				}
 			);

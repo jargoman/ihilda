@@ -20,6 +20,35 @@ namespace IhildaWallet
 
 			this.NamePattern = new WalletNamePattern ();
 
+			SetToolTips ();
+		}
+
+		public void SetToolTips ()
+		{
+			if (!Program.showPopUps) {
+
+			}
+
+			var alphab = "These are the available characters used in the rcl base58 alphabet";
+			label4.TooltipMarkup = alphab;
+			label5.TooltipMarkup = alphab;
+
+			var pattern = "Creat a vanity address that contains this string of characters\v";
+			label2.TooltipMarkup = pattern;
+			patternentry.TooltipMarkup = pattern;
+
+			var thr = "Number of threads to use at once\nRecommended : Number one thread per core or less\n";
+			threadnumentry.TooltipMarkup = thr;
+			label3.TooltipMarkup = thr;
+
+			this.checkbutton1.TooltipMarkup = "Search for an address that begins with pattern";
+			this.checkbutton2.TooltipMarkup = "Search for an address that ends with pattern";
+
+			this.checkbutton3.TooltipMarkup = "Search for an address that contains the pattern";
+			this.checkbutton4.TooltipMarkup = "Do not distignish between uppercase and lowercase letters";
+
+			buttonOk.TooltipMarkup = "Begin thread(s) execution";
+			buttonCancel.TooltipMarkup = "Cancel and close the window";
 		}
 
 		public WalletNamePattern NamePattern {

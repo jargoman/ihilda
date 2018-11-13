@@ -16,11 +16,34 @@ namespace IhildaWallet
 {
 	public class AccountSequenceCache
 	{
-		public AccountSequenceCache (string account)
+		private AccountSequenceCache (string account)
 		{
 			this.Account = account;
 			this.SequenceCache = Load (account);
 		}
+
+		public static AccountSequenceCache GetCacheForAccount (string account)
+		{
+			if (CacheManager.ContainsKey (account)) {
+				bool success = CacheManager.TryGetValue (account, out AccountSequenceCache accountSequenceCache);
+				if (success) {
+					return accountSequenceCache;
+				}
+			}
+
+			AccountSequenceCache accountSequence = new AccountSequenceCache (account);
+			if (accountSequence != null) {
+				if (CacheManager.ContainsKey(account)) {
+					CacheManager.Add (account, accountSequence);
+				}
+
+			}
+
+			return accountSequence;
+
+		}
+
+		private static Dictionary<string, AccountSequenceCache> CacheManager = new Dictionary<string, AccountSequenceCache> ();
 
 		private readonly string Account;
 		public void UpdateOrdersCache (AutomatedOrder order /*, string account*/)

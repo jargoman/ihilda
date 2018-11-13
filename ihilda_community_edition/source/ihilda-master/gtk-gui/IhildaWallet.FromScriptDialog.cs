@@ -205,6 +205,7 @@ namespace IhildaWallet
 			this.GtkScrolledWindow.ShadowType = ((global::Gtk.ShadowType)(1));
 			// Container child GtkScrolledWindow.Gtk.Container+ContainerChild
 			this.textview = new global::Gtk.TextView();
+			this.textview.Buffer.Text = global::Mono.Unix.Catalog.GetString("Note : Brute forcing vanity addressed is cpu intensive ");
 			this.textview.CanFocus = true;
 			this.textview.Name = "textview";
 			this.GtkScrolledWindow.Add(this.textview);

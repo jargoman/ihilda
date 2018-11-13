@@ -302,7 +302,7 @@ namespace IhildaWallet
 						this.SetIsRunningUI (true);
 
 
-						AccountSequenceCache accountSequnceCache = new AccountSequenceCache (this.walletswitchwidget1.GetRippleWallet ().GetStoredReceiveAddress ());
+						AccountSequenceCache accountSequnceCache = AccountSequenceCache.GetCacheForAccount (this.walletswitchwidget1.GetRippleWallet ().GetStoredReceiveAddress ());
 
 						Application.Invoke (delegate {
 							progressbar1.Pulse ();

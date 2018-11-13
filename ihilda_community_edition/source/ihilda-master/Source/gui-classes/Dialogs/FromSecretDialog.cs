@@ -251,6 +251,12 @@ namespace IhildaWallet
 				address = seed.GetPublicRippleAddress ().ToString ();
 			} catch (Exception exception) {
 
+#if DEBUG
+				if (DebugIhildaWallet.FromSecretDialog) {
+					Logging.ReportException (method_sig, exception);
+				}
+#endif
+
 				// It makes sense to print the libraries name to the user
 				TextHighlighter.Highlightcolor = TextHighlighter.RED;
 				label3.Markup = TextHighlighter.Highlight (nameof (RippleLibSharp) + " : Invalid seed");
@@ -263,6 +269,13 @@ namespace IhildaWallet
 				Response<RpcWalletProposeResult> res = LocalRippledWalletPropose.GetResult (secret);
 				address2 = res.result.account_id;
 			} catch (Exception exception) {
+
+
+#if DEBUG
+				if (DebugIhildaWallet.FromSecretDialog) {
+					Logging.ReportException (method_sig, exception);
+				}
+#endif
 
 				TextHighlighter.Highlightcolor = TextHighlighter.RED;
 				label3.Markup = TextHighlighter.Highlight ("No response from rippled");

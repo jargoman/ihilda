@@ -160,7 +160,7 @@ namespace IhildaWallet
 				}
 			};
 
-
+			label2.UseMarkup = true;
 
 		}
 
@@ -462,8 +462,17 @@ namespace IhildaWallet
 			}
 
 			if (hasred) {
-				this.label2.Markup = "<span fgcolor=\"red\">Conflicting orders. Trading with self</span>";
-				this.label2.Show ();
+
+				// gui invove may be needed for timing rather than being on the right thread
+				Application.Invoke (delegate {
+					label2.UseMarkup = true;
+					this.label2.Markup = "<span fgcolor=\"red \">Conflicting orders. Trading with self</span>";
+					this.label2.Show ();
+					this.label2.Visible = true;
+
+
+				});
+
 			}
 			//SetOffers (_offers);
 
@@ -1363,7 +1372,7 @@ namespace IhildaWallet
 
 
 						AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (offerTransaction);
-						AccountSequenceCache sequenceCache = new AccountSequenceCache (offerTransaction.Account);
+						AccountSequenceCache sequenceCache = AccountSequenceCache.GetCacheForAccount (offerTransaction.Account); 
 						//sequenceCache.UpdateOrdersCache (ao);
 						sequenceCache.UpdateAndSave (ao);
 						return;

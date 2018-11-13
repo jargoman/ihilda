@@ -62,7 +62,9 @@ namespace IhildaWallet
 			w2.Expand = false;
 			w2.Fill = false;
 			// Container child vbox3.Gtk.Box+BoxChild
-			this.orderbooktablewidget1 = null;
+			this.orderbooktablewidget1 = new global::IhildaWallet.OrderBookTableWidget();
+			this.orderbooktablewidget1.Events = ((global::Gdk.EventMask)(256));
+			this.orderbooktablewidget1.Name = "orderbooktablewidget1";
 			this.vbox3.Add(this.orderbooktablewidget1);
 			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.orderbooktablewidget1]));
 			w3.Position = 1;
@@ -84,7 +86,9 @@ namespace IhildaWallet
 			w5.Expand = false;
 			w5.Fill = false;
 			// Container child vbox4.Gtk.Box+BoxChild
-			this.orderbooktablewidget2 = null;
+			this.orderbooktablewidget2 = new global::IhildaWallet.OrderBookTableWidget();
+			this.orderbooktablewidget2.Events = ((global::Gdk.EventMask)(256));
+			this.orderbooktablewidget2.Name = "orderbooktablewidget2";
 			this.vbox4.Add(this.orderbooktablewidget2);
 			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.orderbooktablewidget2]));
 			w6.Position = 1;

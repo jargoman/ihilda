@@ -38,7 +38,9 @@ namespace IhildaWallet
 			w2.Expand = false;
 			w2.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.signoptionswidget1 = null;
+			this.signoptionswidget1 = new global::IhildaWallet.SignOptionsWidget();
+			this.signoptionswidget1.Events = ((global::Gdk.EventMask)(256));
+			this.signoptionswidget1.Name = "signoptionswidget1";
 			this.vbox2.Add(this.signoptionswidget1);
 			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.signoptionswidget1]));
 			w3.Position = 1;
