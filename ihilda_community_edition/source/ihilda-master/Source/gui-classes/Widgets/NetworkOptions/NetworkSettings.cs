@@ -282,6 +282,10 @@ namespace IhildaWallet
 			}
 #endif
 
+			if (!Program.network) {
+				return null;
+			}
+
 			string jsn = ReadSettingsFile ();
 
 #if DEBUG
@@ -658,9 +662,11 @@ namespace IhildaWallet
 		}
 
 		protected void Connect () {
+
+
 			
 #if DEBUG
-			string method_sig = clsstr + ": connect () : ";
+			string method_sig = clsstr + nameof (Connect) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.NetworkSettings) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
@@ -749,6 +755,11 @@ namespace IhildaWallet
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
 #endif
+
+			if (!Program.network) {
+				MessageDialog.ShowMessage ("Network Disabled", "Networking has been disabled at the command line with parameter network=false\nTo enable networking restart " + Program.appname + " with parameter option network=true");
+				return;
+			}
 
 			string servers = servertextview.Buffer.Text;
 			if (servers == null || servers.Trim().Equals("")) {

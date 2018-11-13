@@ -16,14 +16,22 @@ namespace IhildaWallet.Networking
 	public static class NetworkController
 	{
 		public static NetworkInterface CurrentInterface {
-			get;
-			set;
+			get {
+				if (!Program.network) {
+					return null;
+				}
+				return _CurrentInterface; 
+			}
+			set { _CurrentInterface = value; }
 		}
 
-
+		private static NetworkInterface _CurrentInterface = null;
 
 		public static NetworkInterface InitNetworking (ConnectionSettings coninf)
 		{
+			if (!Program.network) {
+				return null;
+			}
 			#region debug
 			#if DEBUG
 			String method_sig = clsstr + nameof (InitNetworking) + DebugRippleLibSharp.left_parentheses + nameof (coninf) + DebugRippleLibSharp.equals + DebugRippleLibSharp.ToAssertString (coninf) + DebugRippleLibSharp.right_parentheses;
@@ -131,6 +139,7 @@ namespace IhildaWallet.Networking
 
 
 		public static NetworkInterface GetNetworkInterfaceGuiThread () {
+			if (!Program.network) { return null; }
 			if (CurrentInterface != null) {
 				return CurrentInterface;
 			}
@@ -141,6 +150,7 @@ namespace IhildaWallet.Networking
 		}
 
 		public static NetworkInterface GetNetworkInterfaceNonGUIThread () {
+			if (!Program.network) { return null; }
 			if (CurrentInterface != null) {
 				return CurrentInterface;
 			}
@@ -151,6 +161,10 @@ namespace IhildaWallet.Networking
 		}
 
 		public static bool DoNetworkingDialog () {
+			if (!Program.network) {
+				return false;
+			}
+
 			string title = "Network Error";
 			string message = "You are not connected to the internet would you like to view network settings?";
 
@@ -165,6 +179,10 @@ namespace IhildaWallet.Networking
 		}
 
 		public static bool DoNetworkingDialogNonGUIThread () {
+			if (!Program.network) {
+				return false;
+			}
+
 			string title = "Network Error";
 			string message = "You are not connected to the internet would you like to view network settings?";
 
@@ -218,8 +236,13 @@ namespace IhildaWallet.Networking
 		}
 
 		public static Task<bool> AutoConnect () {
+
+
 			return Task.Run (
 				delegate {
+					if (!Program.network) {
+						return false;
+					}
 					
 					ConnectionSettings conny = NetworkSettings.LoadConnectionInfo();
 

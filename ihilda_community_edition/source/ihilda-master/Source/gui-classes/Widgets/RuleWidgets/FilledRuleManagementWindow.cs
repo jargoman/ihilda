@@ -781,7 +781,8 @@ namespace IhildaWallet
 				};
 
 
-				Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = robot.DoLogic (rw, ni, strt, endStr, lim);
+				Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = 
+					robot.DoLogic (rw, ni, strt, endStr, lim);
 
 
 				string title = "No filled";
@@ -790,45 +791,49 @@ namespace IhildaWallet
 					message = "Do logic returned null\n";
 					MessageDialog.ShowMessage (title, message);
 					WriteToInfoBox (message);
-				}
+				} else
 
 				if (tuple?.Item1 == null) {
 					message = "Filled orders error\n";
 					MessageDialog.ShowMessage (title, message);
 					WriteToInfoBox (message);
 					return;
-				}
+				} else
 
 				if (tuple.Item2 == null) {
 					message = "Filled orders array is null\n";
 					MessageDialog.ShowMessage (title, message);
 					WriteToInfoBox (message);
 					return;
-				}
+				} else
 
 				if (!tuple.Item2.Any ()) {
 					message = "There are no new filled orders\n";
 					MessageDialog.ShowMessage (title, message);
 					WriteToInfoBox (message);
-					return;
+					//return;
+				} else {
+
+					int num = tuple.Item2.Count ();
+
+					message = num + " suggested orders\n";
+					WriteToInfoBox (message);
 				}
-
-				int num = tuple.Item2.Count ();
-
-				message = num + " suggested orders\n";
-				WriteToInfoBox (message);
 
 				Application.Invoke (delegate {
 					this.ledgerconstraintswidget1.SetLastKnownLedger (tuple.Item1.ToString ()); //this.label9.Text = 
 
 
-
+					/*
 					LicenseType licenseT = Util.LicenseType.MARKETBOT;
 					if (LeIceSense.IsLicenseExempt (tuple.Item2.ElementAt (0).taker_gets) || LeIceSense.IsLicenseExempt (tuple.Item2.ElementAt (0).taker_pays)) {
 						licenseT = LicenseType.NONE;
 					}
-
-					OrderSubmitWindow win = new OrderSubmitWindow (rw, licenseT);
+					*/
+					if (tuple?.Item2?.FirstOrDefault() == null) {
+						return;
+					}
+					OrderSubmitWindow win = new OrderSubmitWindow (rw, LicenseType.NONE);
 					win.SetOrders (tuple.Item2);
 
 
@@ -841,6 +846,7 @@ namespace IhildaWallet
 				}
 #endif
 			} finally {
+
 				this.tokenSource = null;
 				this.SetIsRunningUI (false);
 

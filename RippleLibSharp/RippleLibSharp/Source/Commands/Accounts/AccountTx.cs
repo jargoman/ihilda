@@ -277,6 +277,7 @@ namespace RippleLibSharp.Commands.Accounts
 							break;
 						}
 
+
 						list.Add(res);
 
 						accountTx = res.result;

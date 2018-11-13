@@ -182,6 +182,8 @@ namespace IhildaWallet
 
 		public static bool Robotics = false;
 
+		public static bool RuleManager = false;
+
 		public static bool SellOffer = false;
 
 		public static bool SellWidget = false;

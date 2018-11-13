@@ -124,7 +124,7 @@ namespace IhildaWallet
 				WalletManager.currentInstance?.UpdateUI ();
 
 				try {
-					
+
 					RippleCurrency rippleCurrency = AccountInfo.GetNativeBalance (rw.GetStoredReceiveAddress (), ni);
 
 					DateTime dateTime = DateTime.Now;
@@ -200,7 +200,7 @@ namespace IhildaWallet
 					rw.Notification = "<span>Exception thrown in notification thread</span>";
 					continue;
 				} finally {
-					
+
 					WalletManager.currentInstance?.UpdateUI ();
 
 
@@ -250,7 +250,7 @@ namespace IhildaWallet
 			int accnts = 0;
 			int count = 0;
 
-			foreach ( RippleWallet rippleWallet in wallets ) {
+			foreach (RippleWallet rippleWallet in wallets) {
 
 				RippleWallet rw = rippleWallet;
 				//tasks.Add (Task.Run (
@@ -260,79 +260,79 @@ namespace IhildaWallet
 				rw.Notification = "Updating balance...";
 				WalletManager.currentInstance?.UpdateUI ();
 
-							try {
+				try {
 
-							RippleCurrency rippleCurrency = AccountInfo.GetNativeBalance (rw.GetStoredReceiveAddress (), ni);
+					RippleCurrency rippleCurrency = AccountInfo.GetNativeBalance (rw.GetStoredReceiveAddress (), ni);
 
-								DateTime dateTime = DateTime.Now;
+					DateTime dateTime = DateTime.Now;
 
 
-								if (rippleCurrency != null) {
-									rw.LastKnownNativeBalance = rippleCurrency;
-									rw.Notification = "balance updated as of " + dateTime.ToShortTimeString ();
-								} else {
-								rw.Notification = "<span fgcolor=\"red\">Could not update balance " + (string)(rw?.Account ?? "null") + " </span>";
-								}
+					if (rippleCurrency != null) {
+						rw.LastKnownNativeBalance = rippleCurrency;
+						rw.Notification = "balance updated as of " + dateTime.ToShortTimeString ();
+					} else {
+						rw.Notification = "<span fgcolor=\"red\">Could not update balance " + (string)(rw?.Account ?? "null") + " </span>";
+					}
 
-								WalletManager.currentInstance?.UpdateUI ();
+					WalletManager.currentInstance?.UpdateUI ();
 
-								if (rw?.LastKnownLedger == null || rw.LastKnownLedger == 0) {
+					if (rw?.LastKnownLedger == null || rw.LastKnownLedger == 0) {
 
-									rw.LastKnownLedger = ledger;
-									rw.Save ();
+						rw.LastKnownLedger = ledger;
+						rw.Save ();
 						continue;
-									//return;
-								}
+						//return;
+					}
 
 
-								Tuple<uint, IEnumerable<AutomatedOrder>> tuple = DoOfferLogic (rw, ni);
-								if (tuple == null) {
+					Tuple<uint, IEnumerable<AutomatedOrder>> tuple = DoOfferLogic (rw, ni);
+					if (tuple == null) {
 						continue;
-									//return;
-								}
+						//return;
+					}
 
-								IEnumerable<AutomatedOrder> totalFilled = tuple.Item2;
+					IEnumerable<AutomatedOrder> totalFilled = tuple.Item2;
 
 
 
-								int c = totalFilled.Count ();
+					int c = totalFilled.Count ();
 
-								if (c == 0) {
+					if (c == 0) {
 						continue;
-								}
+					}
 
 
-								string message2 =
-									c.ToString () +
-									" new orders";
+					string message2 =
+						c.ToString () +
+						" new orders";
 
-								rw.Notification = message2;
+					rw.Notification = message2;
 
 
-								rw.LastKnownLedger = tuple.Item1;
-								rw.Save ();
+					rw.LastKnownLedger = tuple.Item1;
+					rw.Save ();
 
 					count += c;
 					accnts += 1;
 					continue;
-								//return;
+					//return;
 
-							}
+				}
 #pragma warning disable 0168
 						catch (Exception ex) {
 #pragma warning restore 0168
 
 #if DEBUG
-								Logging.ReportException (method_sig, ex);
+					Logging.ReportException (method_sig, ex);
 #endif
 
 					continue;
-							} finally {
-								WalletManager.currentInstance?.UpdateUI ();
-							}
+				} finally {
+					WalletManager.currentInstance?.UpdateUI ();
+				}
 
 
-						//}
+				//}
 
 
 
@@ -342,12 +342,12 @@ namespace IhildaWallet
 
 			//if (tasks != null && tasks.Count > 0) {
 			//	Task.WaitAll (tasks.ToArray (), 15000);
-				//Task.a
+			//Task.a
 			//}
 
 
 			//var va = from Task<int> t in tasks
-					 //select t.Result;
+			//select t.Result;
 
 			int am = accnts; //va.Count ();
 			int grandTotal = count;
@@ -668,13 +668,7 @@ namespace IhildaWallet
 			}
 
 
-			if (total == null) {
-				return null;
-			}
-
-			return new Tuple<uint, IEnumerable<AutomatedOrder>> (lastKnownLedger, total);
-
-
+			return total == null ? null : new Tuple<uint, IEnumerable<AutomatedOrder>> (lastKnownLedger, total);
 		}
 
 		public Task InitNotificationSystem () => Task.Run (
@@ -694,6 +688,7 @@ namespace IhildaWallet
 							Visible = true
 
 						};
+
 						WalletManagerWindow.currentInstance.ExposeEvent += delegate {
 							StatusTrayIcon.Blinking = false;
 						};
@@ -734,6 +729,11 @@ namespace IhildaWallet
 
 					mre.WaitOne ();
 
+				if (!Program.network) {
+					// if networking explicitly prohibited don't do networking loop. 
+						return;
+
+					}
 					try {
 						//Thread.Sleep(1000);
 						Task.Delay (1000).Wait (1000);

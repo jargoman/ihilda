@@ -14,44 +14,48 @@ using QRCoder;
 using System.Drawing;
 using System.IO;
 using System.Drawing.Imaging;
+using Pango;
 
 namespace IhildaWallet
 {
-	[System.ComponentModel.ToolboxItem(true)]
+	[System.ComponentModel.ToolboxItem (true)]
 	public partial class WalletManagerWidget : Gtk.Bin
 	{
 		public WalletManagerWidget ()
 		{
-			#if DEBUG
+#if DEBUG
 			string method_sig = clsstr + nameof (WalletManagerWidget) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.WalletManagerWidget) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.beginn);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
-			#endif
+#endif
 
 			this.Build ();
 
 			if (this.wallettree1 == null) {
 				this.wallettree1 = new WalletTree ();
 				this.wallettree1.Show ();
-				vbox4.Add ( this.wallettree1 );
+				vbox4.Add (this.wallettree1);
 			}
 
 			this.SetActions ();
 
-			#if DEBUG
+#if DEBUG
 
 			if (DebugIhildaWallet.WalletManagerWidget) {
-				Logging.WriteLog(method_sig + DebugIhildaWallet.buildComp);
+				Logging.WriteLog (method_sig + DebugIhildaWallet.buildComp);
 			}
-			#endif
+#endif
 
 			currentInstance = this;
 
 			this.button91.Clicked += (object sender, EventArgs e) => {
-				DebuggingOptionsDialogWindow debuggingWindow = new DebuggingOptionsDialogWindow ();
-				debuggingWindow.Modal = true;
+				DebuggingOptionsDialogWindow debuggingWindow = new DebuggingOptionsDialogWindow {
+					Modal = true
+				};
+
 				ResponseType response = (ResponseType)debuggingWindow.Run ();
+				debuggingWindow.Destroy ();
 				//debuggingWindow.Show ();
 			};
 
@@ -168,7 +172,7 @@ namespace IhildaWallet
 
 				Task.Run ((System.Action)Txview);
 			};
-		
+
 			this.optionsbutton1.Clicked += (sender, e) => {
 
 
@@ -251,15 +255,15 @@ namespace IhildaWallet
 
 			this.button134.Clicked += (object sender, EventArgs e) => {
 
-				bool sure = AreYouSure.AskQuestion 
-				                      ("Delete Backups?", 
-				                       "Delete wallets with file extention " 
-				                       + FileHelper.BACKUP_EXT 
-				                       + " and " 
-				                       + FileHelper.TEMP_EXTENTION
-				                      );
+				bool sure = AreYouSure.AskQuestion
+						      ("Delete Backups?",
+						       "Delete wallets with file extention "
+						       + FileHelper.BACKUP_EXT
+						       + " and "
+						       + FileHelper.TEMP_EXTENTION
+						      );
 
-				                 
+
 				if (!sure) {
 					return;
 				}
@@ -297,11 +301,13 @@ namespace IhildaWallet
 
 			};
 
-			this.eventbox5.ModifyBase (StateType.Normal, new Gdk.Color(218, 112, 214));
+			this.eventbox5.ModifyBase (StateType.Normal, new Gdk.Color (218, 112, 214));
 
-			this.eventbox5.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
-				NetworkSettingsDialog.ShowDialog ();
-			};
+			if (Program.network) {
+				this.eventbox5.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
+					NetworkSettingsDialog.ShowDialog ();
+				};
+			}
 
 			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
 
@@ -311,20 +317,20 @@ namespace IhildaWallet
 					return;
 				}
 				WalletManager.SetRippleWallet (rippleWallet);
-				Gtk.Application.Invoke ( delegate {
+				Gtk.Application.Invoke (delegate {
 					this.UpdateWalletUI (rippleWallet);
 
 				});
 
 			};
 
-			eventbox3.ModifyBase (StateType.Normal, new Gdk.Color (55,55,55));
+			eventbox3.ModifyBase (StateType.Normal, new Gdk.Color (55, 55, 55));
 			eventbox3.ModifyBg (StateType.Normal, new Gdk.Color (55, 55, 55));
 
 			eventbox4.ModifyBase (StateType.Normal, new Gdk.Color (211, 211, 211));
 			eventbox4.ModifyBg (StateType.Normal, new Gdk.Color (211, 211, 211));
 
-			eventbox6.ModifyBg (StateType.Normal, new Gdk.Color(0, 0, 0));
+			eventbox6.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
 			eventbox6.ModifyBase (StateType.Normal, new Gdk.Color (0, 0, 0));
 
 			//vbox1.ModifyBg (StateType.Normal, new Gdk.Color (75,75,75));
@@ -341,6 +347,32 @@ namespace IhildaWallet
 			//this.TestConnectivity ();
 
 			SetHelpPopups ();
+			/*
+			var pixmap = image2.Pixmap;
+			var pixbuff = image2.Pixbuf;
+
+
+
+			Gdk.GC gc = new Gdk.GC (pixmap);
+
+			Pango.Context context = this.CreatePangoContext ();
+
+			Pango.Layout layout = new Pango.Layout (context) {
+				Width = Pango.Units.FromPixels (scrolledwindow1.WidthRequest)
+			};
+
+			FontDescription desc = FontDescription.FromString ("Serif Bold 100");
+
+			layout.FontDescription = desc;
+
+			layout.Alignment = Pango.Alignment.Center;
+
+			layout.SetText ("Network Disabled");
+
+			gc.RgbFgColor = new Gdk.Color (39, 40, 33);
+
+			pixmap.DrawLayout (gc, 25, 25, layout);
+	*/
 		}
 
 		public void SetHelpPopups ()
@@ -381,7 +413,8 @@ namespace IhildaWallet
 			walletswitchwidget1.TooltipMarkup = "Switch wallets";
 		}
 
-		public void SetActions () {
+		public void SetActions ()
+		{
 			this.NewAction.Activated += (sender, e) => New_Wallet_Wizard ();
 
 			this.EditWalletAction.Activated += (sender, e) => Edit ();
@@ -412,15 +445,16 @@ namespace IhildaWallet
 
 		}
 
-		public void EncryptWallet () {
+		public void EncryptWallet ()
+		{
 
 
-			RippleWallet rw = WalletManager.GetRippleWallet();
+			RippleWallet rw = WalletManager.GetRippleWallet ();
 			if (rw == null) {
 				return;
 			}
 
-		
+
 
 			rw.EncryptWithSideEffects ();
 
@@ -430,8 +464,9 @@ namespace IhildaWallet
 
 		}
 
-		public void DecryptWallet () {
-			RippleWallet rw = WalletManager.GetRippleWallet();
+		public void DecryptWallet ()
+		{
+			RippleWallet rw = WalletManager.GetRippleWallet ();
 			if (rw == null) {
 				return;
 			}
@@ -447,26 +482,27 @@ namespace IhildaWallet
 			this.UpdateUI ();
 		}
 
-		public void Txview () {
-			
-			#if DEBUG
+		public void Txview ()
+		{
+
+#if DEBUG
 			string method_sig = clsstr + nameof (Txview) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.WalletManagerWidget) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
-			#endif
+#endif
 
 			//RippleWallet rw = getRippleWalletNonGtkThread ();
-			RippleWallet rw = WalletManager.GetRippleWallet();
+			RippleWallet rw = WalletManager.GetRippleWallet ();
 			string addr = null;
 			RippleAddress ra = null;
 			if (rw != null) {
-				addr= rw.GetStoredReceiveAddress ();
+				addr = rw.GetStoredReceiveAddress ();
 				ra = new RippleAddress (addr);
 			}
 
-			 
-			 
+
+
 
 			Gtk.Application.Invoke ((sender, e) => {
 				TxWindow txv = new TxWindow (rw);
@@ -475,8 +511,8 @@ namespace IhildaWallet
 				txv.SetRippleWallet (rw);
 				//txv.HideAll();
 			});
-				
-				
+
+
 
 
 
@@ -485,21 +521,21 @@ namespace IhildaWallet
 		public void Delete ()
 		{
 			//RippleWallet rw = wallettree2.getSelected();
-			RippleWallet rw = WalletManager.GetRippleWallet();
-			if (rw!=null) {
-				rw.ForgetDialog();
-			}
-			else {
-				NoWalletSelected();
+			RippleWallet rw = WalletManager.GetRippleWallet ();
+			if (rw != null) {
+				rw.ForgetDialog ();
+			} else {
+				NoWalletSelected ();
 				// todo debug
 			}
 
-			this.UpdateUI();
+			this.UpdateUI ();
 
 		}
 
-		public void TradePair () {
-			
+		public void TradePair ()
+		{
+
 
 			// let this be free and do token licensing in tradePair manager
 
@@ -516,13 +552,11 @@ namespace IhildaWallet
 		public void Export ()
 		{
 			//RippleWallet rw = wallettree2.getSelected();
-			RippleWallet rw = WalletManager.GetRippleWallet();
-			if (rw!=null) {
-				rw.ExportWallet();
-			}
-		
-			else {
-				NoWalletSelected();
+			RippleWallet rw = WalletManager.GetRippleWallet ();
+			if (rw != null) {
+				rw.ExportWallet ();
+			} else {
+				NoWalletSelected ();
 				// todo debug
 			}
 			// this.updateUI();  // TODO, figure out if updating the ui is worth the slowness.  // does nothing anyway
@@ -532,23 +566,23 @@ namespace IhildaWallet
 
 		public void Edit ()
 		{
-			#if DEBUG
+#if DEBUG
 			String method_sig = clsstr + nameof (Edit) + DebugRippleLibSharp.both_parentheses;
-			if ( DebugIhildaWallet.WalletManagerWidget ) {
+			if (DebugIhildaWallet.WalletManagerWidget) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
-			#endif
+#endif
 
 			//RippleWallet rw = wallettree2.getSelected();
-			RippleWallet rw = WalletManager.GetRippleWallet();
-			if (rw==null) {
-				NoWalletSelected();
+			RippleWallet rw = WalletManager.GetRippleWallet ();
+			if (rw == null) {
+				NoWalletSelected ();
 				return;
 			}
-				
-			#if DEBUG
+
+#if DEBUG
 			if (DebugIhildaWallet.WalletManagerWidget) {
-				Logging.WriteLog(method_sig + "wallet is not null");
+				Logging.WriteLog (method_sig + "wallet is not null");
 
 			}
 #endif
@@ -568,7 +602,7 @@ namespace IhildaWallet
 			RippleWallet rw_new = null;
 			while (rw_new == null) {
 				ResponseType ret = (ResponseType)fsd.Run ();
-				
+
 
 				if (ret != ResponseType.Ok) {
 
@@ -582,7 +616,7 @@ namespace IhildaWallet
 
 					break;
 
-				} 
+				}
 
 #if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
@@ -595,7 +629,7 @@ namespace IhildaWallet
 
 #endif
 
-				 rw_new = fsd.GetWallet ();
+				rw_new = fsd.GetWallet ();
 				if (rw_new == null) {
 #if DEBUG
 					if (DebugIhildaWallet.WalletManagerWidget) {
@@ -609,9 +643,9 @@ namespace IhildaWallet
 			if (rw_new != null) {
 				walletManager.Replace (rw, rw_new);
 			}
-			fsd?.Destroy();
+			fsd?.Destroy ();
 			// TODO swtitch these two around?
-			this.UpdateUI();
+			this.UpdateUI ();
 		}
 
 		/*
@@ -686,25 +720,25 @@ namespace IhildaWallet
 		public void Trust ()
 		{
 
-			#if DEBUG
+#if DEBUG
 			String method_sig = clsstr + nameof (Trust) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.WalletManagerWidget) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
-			#endif
+#endif
 
 			LoadingWindow loadingwin = null;
 
 
 
 			//RippleWallet rw = getRippleWalletNonGtkThread ();
-			RippleWallet rw = WalletManager.GetRippleWallet();
+			RippleWallet rw = WalletManager.GetRippleWallet ();
 			if (rw == null) {
-				#if DEBUG
-				if ( DebugIhildaWallet.WalletManagerWidget) {
+#if DEBUG
+				if (DebugIhildaWallet.WalletManagerWidget) {
 					Logging.WriteLog (method_sig + "No wallet selected");
 				}
-				#endif
+#endif
 
 				return;
 			}
@@ -716,16 +750,16 @@ namespace IhildaWallet
 
 			Task t1 = Task.Run (delegate {
 				EventWaitHandle wh = new ManualResetEvent (true);
-				wh.Reset();
+				wh.Reset ();
 				Gtk.Application.Invoke (
 					delegate {
 						loadingwin = new LoadingWindow ();
 						loadingwin.Show ();
-						wh.Set();
+						wh.Set ();
 
 					}
 				);
-				wh.WaitOne();
+				wh.WaitOne ();
 
 			});
 
@@ -753,7 +787,7 @@ namespace IhildaWallet
 			*/
 
 
-			Task[] tasks = { t1, /*t2*/ };
+			Task [] tasks = { t1, /*t2*/ };
 
 			Task.WaitAll (tasks);
 
@@ -761,12 +795,12 @@ namespace IhildaWallet
 			//	paymentVehicleInit(rw); 
 			//});
 
-			Task<TrustManagementWindow> t3 = TrustManagementWindow.InitGUI(rw);
+			Task<TrustManagementWindow> t3 = TrustManagementWindow.InitGUI (rw);
 
-				/*new Task (delegate {
-				
+			/*new Task (delegate {
 
-			});*/
+
+		});*/
 
 
 
@@ -779,7 +813,7 @@ namespace IhildaWallet
 				}
 			);
 
-			tasks = new Task[] { t3, t4 };
+			tasks = new Task [] { t3, t4 };
 
 
 			Task.WaitAll (tasks);
@@ -795,19 +829,19 @@ namespace IhildaWallet
 
 
 			Gtk.Application.Invoke (delegate {
-				loadingwin.Hide();
-				loadingwin.Destroy();
+				loadingwin.Hide ();
+				loadingwin.Destroy ();
 				loadingwin = null;
 
 			});
 
-			Gtk.Application.Invoke( delegate {
-				#if DEBUG
+			Gtk.Application.Invoke (delegate {
+#if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
 					Logging.WriteLog (method_sig + "showing trust window");
 				}
-				#endif
-				trustManagementWindow.Show();
+#endif
+				trustManagementWindow.Show ();
 
 				trustManagementWindow.Visible = true;
 			});
@@ -823,7 +857,7 @@ namespace IhildaWallet
 
 			//this.label7.Markup = "<span fgcolor=\"darkgreen\"><big><b>" + address + "</b></big></span>";
 
-			Gtk.Application.Invoke ( delegate {
+			Gtk.Application.Invoke (delegate {
 				this.walletswitchwidget1.SetRippleWallet (rippleWallet);
 
 				string qrtooltip = "Click to create QR code for address\n" + rippleWallet.GetStoredReceiveAddress () + "\nand save to image file";
@@ -843,34 +877,36 @@ namespace IhildaWallet
 			label3.Visible = true;
 			//Gtk.Application.Invoke (
 			//	delegate {
-					this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (255, 255, 255));
-					this.image1.Pixbuf = rippleWallet.GetQrCode ();
-					this.balancetab1.SetAddress (rippleWallet.GetStoredReceiveAddress ());
+			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (255, 255, 255));
+			this.image1.Pixbuf = rippleWallet.GetQrCode ();
+			this.balancetab1.SetAddress (rippleWallet.GetStoredReceiveAddress ());
 
 			//	}
 			//);
 
-			this.scrolledwindow1.Visible = false;
-			this.balancetab1.Visible = true;
+			if (Program.network) {
+				this.scrolledwindow1.Visible = false;
+				this.balancetab1.Visible = true;
+			}
 			this.UpdateUI ();
 
 		}
 
-		public void Payment (  )
+		public void Payment ()
 		{
-			#if DEBUG
+#if DEBUG
 			String method_sig = clsstr + nameof (Payment) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.WalletManagerWidget) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.beginn);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
-			#endif
+#endif
 
 			LoadingWindow loadingwin = null;
 			Gtk.Application.Invoke (
 				delegate {
-				loadingwin = new LoadingWindow();
-				loadingwin.Show();
-			});
+					loadingwin = new LoadingWindow ();
+					loadingwin.Show ();
+				});
 
 			try {
 
@@ -958,9 +994,7 @@ namespace IhildaWallet
 #if DEBUG
 				Logging.ReportException (method_sig, e);
 #endif
-			}
-
-			finally {
+			} finally {
 
 
 				Application.Invoke ((sender, e) => {
@@ -980,140 +1014,137 @@ namespace IhildaWallet
 
 		public void UpdateUI ()
 		{
-			
-			#if DEBUG
+
+#if DEBUG
 			String method_sig = clsstr + nameof (UpdateUI) + DebugRippleLibSharp.both_parentheses;
 
 			if (DebugIhildaWallet.WalletManagerWidget) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
-			#endif
+#endif
 
 			if (wallettree1 == null) {
-			
-				#if DEBUG
+
+#if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
 					Logging.WriteLog (method_sig + "wallettree == " + DebugRippleLibSharp.null_str);
 				}
-				#endif
+#endif
 
 				return;
 
 			}
 
 			//lock (WalletManager.walletLock) {
-				if (walletManager.wallets == null || walletManager.wallets.Values == null) 
-				{
-					#if DEBUG
-					if (DebugIhildaWallet.WalletManagerWidget) {
-						Logging.WriteLog(method_sig + "null value in walletmanager setting values to zero");
-					}
-					#endif
-
-					//Application.Invoke( delegate {
-					wallettree1.ClearValues();
-					//});
-
-					return;
+			if (walletManager.wallets == null || walletManager.wallets.Values == null) {
+#if DEBUG
+				if (DebugIhildaWallet.WalletManagerWidget) {
+					Logging.WriteLog (method_sig + "null value in walletmanager setting values to zero");
 				}
+#endif
 
-				if (walletManager.wallets.Values.Count > 0) {
-			
-					#if DEBUG
-					if (DebugIhildaWallet.WalletManagerWidget) {
-						Logging.WriteLog(method_sig + "walletManager.wallets.Values.Count = " + walletManager.wallets.Values.Count.ToString());
-	
-						Logging.WriteLog(method_sig + "setting values");
-					}
-					#endif
+				//Application.Invoke( delegate {
+				wallettree1.ClearValues ();
+				//});
 
-				
-					wallettree1.SetValues(walletManager.wallets.Values);
+				return;
+			}
 
-				
+			if (walletManager.wallets.Values.Count > 0) {
 
+#if DEBUG
+				if (DebugIhildaWallet.WalletManagerWidget) {
+					Logging.WriteLog (method_sig + "walletManager.wallets.Values.Count = " + walletManager.wallets.Values.Count.ToString ());
+
+					Logging.WriteLog (method_sig + "setting values");
 				}
+#endif
 
-				else {
-					#if DEBUG
-					if (DebugIhildaWallet.WalletManagerWidget) {
-						Logging.WriteLog(method_sig + "value is not greater than zero, clearing values");
-					}
-					#endif
 
-				
-					wallettree1.ClearValues();
-				
+				wallettree1.SetValues (walletManager.wallets.Values);
 
+
+
+			} else {
+#if DEBUG
+				if (DebugIhildaWallet.WalletManagerWidget) {
+					Logging.WriteLog (method_sig + "value is not greater than zero, clearing values");
 				}
+#endif
+
+
+				wallettree1.ClearValues ();
+
+
+			}
 			//}
-				
+
 
 		}
 
 		public RippleWallet FromSecret ()
 		{
-			#if DEBUG
+#if DEBUG
 			String method_sig = clsstr + nameof (FromSecret) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.WalletManagerWidget) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
-			#endif
-			using (FromSecretDialog fsd = new FromSecretDialog()) {
+#endif
+			using (FromSecretDialog fsd = new FromSecretDialog ()) {
 
 				fsd.Modal = true;
 
 
 				while (true) {
-					#if DEBUG
+#if DEBUG
 					if (DebugIhildaWallet.WalletManagerWidget) {
-						Logging.WriteLog(method_sig + "while (true) begining from secret dialog");
+						Logging.WriteLog (method_sig + "while (true) begining from secret dialog");
 					}
-					#endif
+#endif
 					ResponseType ret = (ResponseType)fsd.Run ();
-					fsd.Hide();
+					fsd.Hide ();
 
 					if (ret != ResponseType.Ok) {
-						#if DEBUG
+#if DEBUG
 						if (DebugIhildaWallet.WalletManagerWidget) {
-							Logging.WriteLog(method_sig + "User did not click ok");
+							Logging.WriteLog (method_sig + "User did not click ok");
 						}
-						#endif
+#endif
 						fsd.Destroy ();
-						 
+
 						return null;
 					}
 
-					#if DEBUG
-						// todo 
+#if DEBUG
+					// todo 
 					if (DebugIhildaWallet.WalletManagerWidget) {
-						Logging.WriteLog(method_sig + "User selected OK");
+						Logging.WriteLog (method_sig + "User selected OK");
 					}
-					#endif
-						
+#endif
+
 					RippleWallet rw = fsd.GetWallet ();
 
 					if (rw == null) {
-						#if DEBUG
+#if DEBUG
 						if (DebugIhildaWallet.WalletManagerWidget) {
-							Logging.WriteLog(method_sig + "rw == null");
+							Logging.WriteLog (method_sig + "rw == null");
 						}
-						#endif
+#endif
 						continue;
 					}
 
-					#if DEBUG
+#if DEBUG
 					if (DebugIhildaWallet.WalletManagerWidget) {
-						Logging.WriteLog(method_sig + "rw != null");
+						Logging.WriteLog (method_sig + "rw != null");
 					}
-					#endif
+#endif
 
 					//walletManager.addWallet (rw);
 					//initiateWalletAddThread(rw);
 
 					fsd.Destroy ();
 					return rw;
-						
+
 
 
 				}
@@ -1128,36 +1159,36 @@ namespace IhildaWallet
 
 		public void New_Wallet_Wizard ()
 		{
-			#if DEBUG
+#if DEBUG
 			String method_sig = clsstr + "new_wallet_wizard : ";
 			if (DebugIhildaWallet.WalletManagerWidget) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 
 			}
-			#endif
+#endif
 
 			if (walletManager == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.WalletManager) {
-					Logging.WriteLog(method_sig + "walletManager == null, returning");
+					Logging.WriteLog (method_sig + "walletManager == null, returning");
 				}
-				#endif
+#endif
 				return;
 			}
 
 
 
-			using ( NewButtonDialog nbd = new NewButtonDialog() ) {
+			using (NewButtonDialog nbd = new NewButtonDialog ()) {
 
 				try {
 
 					ResponseType ret = (ResponseType)nbd.Run ();
-					nbd.Destroy();
+					nbd.Destroy ();
 
 					if (ret == ResponseType.Ok) {
 						RippleWallet rw = null;
-						IhildaWallet.NewButtonDialog.NewOption no = nbd.GetSelection();
-						#if DEBUG
+						IhildaWallet.NewButtonDialog.NewOption no = nbd.GetSelection ();
+#if DEBUG
 						string usel = "user selected ";
 #endif
 						switch (no) {
@@ -1208,8 +1239,8 @@ namespace IhildaWallet
 							break;
 						}  // ends switch
 
-						InitiateWalletAddThread (rw); 
-							return;
+						InitiateWalletAddThread (rw);
+						return;
 					}
 
 
@@ -1218,7 +1249,7 @@ namespace IhildaWallet
 
 #if DEBUG
 					if (DebugIhildaWallet.WalletManagerWidget) {
-						Logging.WriteLog(method_sig + "user didn't select OK");
+						Logging.WriteLog (method_sig + "user didn't select OK");
 					}
 #endif
 
@@ -1228,13 +1259,13 @@ namespace IhildaWallet
 
 #pragma warning disable 0168
 				catch (Exception jic) {
-					#pragma warning restore 0168
+#pragma warning restore 0168
 
-					#if DEBUG
-						if (DebugIhildaWallet.WalletManagerWidget) {
-						Logging.WriteLog (method_sig + DebugRippleLibSharp.exceptionMessage + jic.Message );
-						}
-					#endif
+#if DEBUG
+					if (DebugIhildaWallet.WalletManagerWidget) {
+						Logging.WriteLog (method_sig + DebugRippleLibSharp.exceptionMessage + jic.Message);
+					}
+#endif
 				}
 
 				//finally {
@@ -1249,35 +1280,35 @@ namespace IhildaWallet
 
 		private static void InitiateWalletAddThread (RippleWallet rw)
 		{
-			#if DEBUG
+#if DEBUG
 			// todo double check no secret info being leaked in debug and add if allowinsucure debugging
-			String method_sig = clsstr + nameof (InitiateWalletAddThread) + DebugRippleLibSharp.left_parentheses + DebugIhildaWallet.ToAssertString(rw) + DebugRippleLibSharp.right_parentheses;
+			String method_sig = clsstr + nameof (InitiateWalletAddThread) + DebugRippleLibSharp.left_parentheses + DebugIhildaWallet.ToAssertString (rw) + DebugRippleLibSharp.right_parentheses;
 			if (DebugIhildaWallet.WalletManagerWidget) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
-			#endif
-			
+#endif
 
-			if (rw == null) { 
-				#if DEBUG
+
+			if (rw == null) {
+#if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
-					Logging.WriteLog(method_sig + "rw == null, " + DebugRippleLibSharp.right_parentheses);
+					Logging.WriteLog (method_sig + "rw == null, " + DebugRippleLibSharp.right_parentheses);
 				}
-				#endif
+#endif
 				return;
 			}
 
 
-			#if DEBUG
+#if DEBUG
 			if (DebugIhildaWallet.WalletManagerWidget) {
-				Logging.WriteLog(method_sig + "rw != null");
+				Logging.WriteLog (method_sig + "rw != null");
 			}
-			#endif
-				//walletManager.addWallet(rw);
-			ParameterizedThreadStart thstrart = new ParameterizedThreadStart(ThreadedWalletAdd );
+#endif
+			//walletManager.addWallet(rw);
+			ParameterizedThreadStart thstrart = new ParameterizedThreadStart (ThreadedWalletAdd);
 
-			Thread th = new Thread ( thstrart );
-			th.Start(rw);
+			Thread th = new Thread (thstrart);
+			th.Start (rw);
 		}
 
 		/*
@@ -1335,12 +1366,12 @@ namespace IhildaWallet
 
 		public RippleWallet FromRandom ()
 		{
-			#if DEBUG
+#if DEBUG
 			String method_sig = clsstr + nameof (FromRandom) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.WalletManagerWidget) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.beginn);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
-			#endif
+#endif
 
 			RippleWallet rw = null;
 			FromSecretDialog fsd = null;
@@ -1350,109 +1381,109 @@ namespace IhildaWallet
 			// it used to be a while loop, there was problems with proper flow of logic
 
 			//while (loop) {
-			#if DEBUG
+#if DEBUG
 			if (DebugIhildaWallet.WalletManagerWidget) {
-				Logging.WriteLog(method_sig + "begin loop");
+				Logging.WriteLog (method_sig + "begin loop");
 			}
-			#endif
+#endif
 
-			using (RandomSeedGenerator rsg = new RandomSeedGenerator()) {
-				#if DEBUG
+			using (RandomSeedGenerator rsg = new RandomSeedGenerator ()) {
+#if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
-					Logging.WriteLog(method_sig + "begin using RandomSeedGenerator");
+					Logging.WriteLog (method_sig + "begin using RandomSeedGenerator");
 				}
-				#endif
-				// goto
+#endif
+			// goto
 			RANDOM:
 
 				ResponseType resp = (ResponseType)rsg.Run ();
-				rsg.Hide();
-				#if DEBUG
+				rsg.Hide ();
+#if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
-					Logging.WriteLog(method_sig + "user made selection");
+					Logging.WriteLog (method_sig + "user made selection");
 				}
-				#endif
+#endif
 
 				if (resp != ResponseType.Ok) {
-					#if DEBUG
+#if DEBUG
 					if (DebugIhildaWallet.WalletManagerWidget) {
-						Logging.WriteLog(method_sig + "user did not click ok, breaking");
+						Logging.WriteLog (method_sig + "user did not click ok, breaking");
 					}
-					#endif
+#endif
 
 					goto ENDING;
 				}
 
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
 					Logging.WriteLog (method_sig + "user clicked ok, generating wallet....");
 				}
-				#endif
+#endif
 
 			NEWSEED:
 				RippleSeedAddress seed = rsg.GetGeneratedSeed ();
-	
-				if ( seed == null ) {
-					#if DEBUG
-					if ( DebugIhildaWallet.WalletManagerWidget ) {
-						Logging.WriteLog( method_sig + "seed == null");
+
+				if (seed == null) {
+#if DEBUG
+					if (DebugIhildaWallet.WalletManagerWidget) {
+						Logging.WriteLog (method_sig + "seed == null");
 					}
-					#endif
+#endif
 
 					goto ENDING;
 					//break;
 				}
 
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
-					Logging.WriteLog( method_sig + "seed != null" );
+					Logging.WriteLog (method_sig + "seed != null");
 				}
-				#endif
-						
+#endif
+
 
 				try {
 					rw = new RippleWallet (seed, RippleWalletTypeEnum.Master);
-					#pragma warning disable 0168
+#pragma warning disable 0168
 				} catch (Exception ex) {
-					#pragma warning restore 0168
+#pragma warning restore 0168
 
 
-					#if DEBUG
+#if DEBUG
 					if (DebugIhildaWallet.WalletManagerWidget) {
 						Logging.WriteLog (method_sig + DebugRippleLibSharp.exceptionMessage + ex.Message);
 						//goto DA_END;
 						//break;
 						Logging.WriteLog (method_sig + "trying another seed ...");
 					}
-					#endif
+#endif
 					goto NEWSEED; // try another seed
 
 				}
 
 				if (rw == null) {
-					#if DEBUG
+#if DEBUG
 					if (DebugIhildaWallet.WalletManagerWidget) {
-						Logging.WriteLog(method_sig + "rw == null");
+						Logging.WriteLog (method_sig + "rw == null");
 					}
-					#endif
+#endif
 					//break;
 					goto NEWSEED;
 				}
 
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
-					Logging.WriteLog(method_sig + "rw != null");
-					Logging.WriteLog(method_sig + "Starting confirmation dialog");
+					Logging.WriteLog (method_sig + "rw != null");
+					Logging.WriteLog (method_sig + "Starting confirmation dialog");
 				}
-				#endif
+#endif
 
 				fsd = new FromSecretDialog ("Confirm Wallet", rw);
 
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
-					Logging.WriteLog(method_sig + "Running dialog");
+					Logging.WriteLog (method_sig + "Running dialog");
 				}
-				#endif
+#endif
 
 			CONFIRM:
 				ResponseType ret = (ResponseType)fsd.Run ();
@@ -1488,20 +1519,20 @@ namespace IhildaWallet
 
 			ENDING:
 				// one statement is needed after the label for the goto to index properly
-				#if DEBUG
-				if (DebugIhildaWallet.WalletManagerWidget) { 
-					Logging.WriteLog(method_sig + "ENDING");
+#if DEBUG
+				if (DebugIhildaWallet.WalletManagerWidget) {
+					Logging.WriteLog (method_sig + "ENDING");
 				}
-				#endif
+#endif
 
-				rsg.Destroy();
+				rsg.Destroy ();
 				if (fsd != null) {
-					fsd.Destroy();
+					fsd.Destroy ();
 				}
 			} // end using
 
 
-			
+
 
 			return rw;
 
@@ -1509,12 +1540,12 @@ namespace IhildaWallet
 
 		public void FromScript ()
 		{
-			#if DEBUG
+#if DEBUG
 			String method_sig = clsstr + nameof (FromScript) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.WalletManagerWidget) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
-			#endif
+#endif
 
 			FromScriptDialog.DoDialog ();
 
@@ -1523,84 +1554,85 @@ namespace IhildaWallet
 
 		public static void OnScriptSuccess (RippleSeedAddress seed)
 		{
-			#if DEBUG
+#if DEBUG
 			String method_sig = clsstr + nameof (OnScriptSuccess) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.WalletManagerWidget) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
-			#endif
+#endif
 
 			if (seed == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
 					Logging.WriteLog (method_sig + "seed == null, returning null");
 				}
-				#endif
+#endif
 				return;
-			} 
-			#if DEBUG
-			if (DebugIhildaWallet.WalletManagerWidget ) {
-				Logging.WriteLog(method_sig + "seed = " + DebugIhildaWallet.AssertAllowInsecure(seed));
 			}
-			#endif
+#if DEBUG
+			if (DebugIhildaWallet.WalletManagerWidget) {
+				Logging.WriteLog (method_sig + "seed = " + DebugIhildaWallet.AssertAllowInsecure (seed));
+			}
+#endif
 
 
 			RippleWallet rw = new RippleWallet (seed, RippleWalletTypeEnum.Master);
-			#if DEBUG
+#if DEBUG
 			if (DebugIhildaWallet.WalletManagerWidget) {
-				Logging.WriteLog(method_sig + nameof (RippleWallet) + " rw =" + DebugIhildaWallet.ToAssertString(rw));
+				Logging.WriteLog (method_sig + nameof (RippleWallet) + " rw =" + DebugIhildaWallet.ToAssertString (rw));
 			}
-			#endif
+#endif
 
 			using (FromSecretDialog fsd = new FromSecretDialog ("Save new wallet", rw)) {
 				while (true) {
-					#if DEBUG
+#if DEBUG
 					if (DebugIhildaWallet.WalletManagerWidget) {
-						Logging.WriteLog(method_sig + "while (true)");
+						Logging.WriteLog (method_sig + "while (true)");
 					}
-					#endif
+#endif
 
 					ResponseType resp = (ResponseType)fsd.Run ();
 
 					if (resp == ResponseType.Ok) {
-						#if DEBUG
+#if DEBUG
 						if (DebugIhildaWallet.WalletManagerWidget) {
-							Logging.WriteLog(method_sig + "User selected Ok");
+							Logging.WriteLog (method_sig + "User selected Ok");
 						}
-						#endif
+#endif
 						//threadedWalletAdd(rw);
-						InitiateWalletAddThread(rw);
+						InitiateWalletAddThread (rw);
 						return;
 					}
 
 					if (resp == ResponseType.Cancel) {
-						#if DEBUG
+#if DEBUG
 						if (DebugIhildaWallet.WalletManagerWidget) {
-							Logging.WriteLog(method_sig + "User selected Cancel");
+							Logging.WriteLog (method_sig + "User selected Cancel");
 						}
-						#endif
+#endif
 						return;
 					}
 
-					fsd.Dispose(); // needed !!
+					fsd.Dispose (); // needed !!
 				}
 			}
 		}
 
-		public void SetWalletManager (WalletManager wm) {
+		public void SetWalletManager (WalletManager wm)
+		{
 			this.walletManager = wm;
 
 			//this.walletviewport1.setWallets(walletManager.wallets.Values);
 			if (this.balancetab1 != null) {
 				this.balancetab1.Visible = false;
 			}
-			this.UpdateUI();
+			this.UpdateUI ();
 		}
 
 
 		public static void NoWalletSelected ()
 		{
-			MessageDialog.ShowMessage("You must first select a wallet to perform this action");
+			MessageDialog.ShowMessage ("You must first select a wallet to perform this action");
 		}
 
 		public WalletManager walletManager = null;
@@ -1611,19 +1643,20 @@ namespace IhildaWallet
 #if DEBUG
 		private const string clsstr = nameof (WalletManagerWidget) + DebugRippleLibSharp.colon;
 #endif
-		public void BotButtonClicked () {
-			
-			RippleWallet rw = WalletManager.GetRippleWallet();
+		public void BotButtonClicked ()
+		{
+
+			RippleWallet rw = WalletManager.GetRippleWallet ();
 
 			if (rw == null) {
 				Application.Invoke ((sender, e) => NoWalletSelected ());
 			}
 
-			bool shouldContinue = LeIceSense.DoTrialDialog ( rw, LicenseType.MARKETBOT );
+			bool shouldContinue = LeIceSense.DoTrialDialog (rw, LicenseType.MARKETBOT);
 			if (!shouldContinue) {
 				return;
 			}
-			Application.Invoke(
+			Application.Invoke (
 				(sender, e) => {
 					FilledRuleManagementWindow rulewin = new FilledRuleManagementWindow (rw);
 					rulewin.Show ();
@@ -1636,14 +1669,14 @@ namespace IhildaWallet
 		{
 			NetworkInterface networkInterface = Networking.NetworkController.CurrentInterface;
 
-			if ( networkInterface == null) {
+			if (networkInterface == null) {
 				return SetConnected (null);
 			}
 
-			if (!networkInterface.IsConnected()) {
+			if (!networkInterface.IsConnected ()) {
 				return null;
 			}
-			return SetConnected (networkInterface.GetConnectAttemptInfo().ServerUrl);
+			return SetConnected (networkInterface.GetConnectAttemptInfo ().ServerUrl);
 		}
 
 		public string SetConnected (string serverUrl)
@@ -1663,28 +1696,28 @@ namespace IhildaWallet
 
 		public static void ThreadedWalletAdd (object obj)
 		{
-			#if DEBUG
+#if DEBUG
 			String method_sig = clsstr + nameof (ThreadedWalletAdd) + DebugRippleLibSharp.left_parentheses + obj.ToString () + DebugRippleLibSharp.right_parentheses;
 			if (DebugIhildaWallet.WalletManagerWidget) {
-				Logging.WriteLog( method_sig + DebugRippleLibSharp.beginn );
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
-			#endif
+#endif
 
 
 			// this is running in NON gtk thread.
 
 
-			#if DEBUG
+#if DEBUG
 			if (DebugIhildaWallet.WalletManagerWidget) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
-			#endif
+#endif
 			if (obj == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
 					Logging.WriteLog (method_sig + "object o == null, " + DebugRippleLibSharp.returning);
 				}
-				#endif
+#endif
 				return;
 			}
 
@@ -1698,57 +1731,55 @@ namespace IhildaWallet
 			}
 
 			if (WalletManagerWidget.currentInstance == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
-					Logging.WriteLog(method_sig + "WalletManagerWidget.currentInstance == null");
+					Logging.WriteLog (method_sig + "WalletManagerWidget.currentInstance == null");
 				}
-				#endif
+#endif
 				return;
 			}
 
 			if (WalletManager.currentInstance == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
-					Logging.WriteLog(method_sig + "WalletManager.currentInstance == null");
+					Logging.WriteLog (method_sig + "WalletManager.currentInstance == null");
 				}
-				#endif
+#endif
 				return;
 			}
 
 
 			if (WalletManager.currentInstance.AddWallet (rw)) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
-					Logging.WriteLog(method_sig + "wallet " + rw.WalletName == null ? "null" : rw.WalletName + " added successfully");
+					Logging.WriteLog (method_sig + "wallet " + rw.WalletName == null ? "null" : rw.WalletName + " added successfully");
 				}
-				#endif
+#endif
 
 				if (currentInstance != null) {
-					#if DEBUG
+#if DEBUG
 					if (DebugIhildaWallet.WalletManagerWidget) {
 						Logging.WriteLog (method_sig + "currentInstance != null");
 					}
-					#endif
+#endif
 
 					Application.Invoke ((sender, e) => currentInstance.UpdateUI ());
-				}
-
-				else {
-					#if DEBUG
+				} else {
+#if DEBUG
 					if (DebugIhildaWallet.WalletManagerWidget) {
-						Logging.WriteLog(method_sig + "currentInstance == null"); // would be a bug
+						Logging.WriteLog (method_sig + "currentInstance == null"); // would be a bug
 					}
-					#endif
+#endif
 				}
 
 			} else {
 
-				#if DEBUG
+#if DEBUG
 				// todo error
 				if (DebugIhildaWallet.WalletManagerWidget) {
-					Logging.WriteLog(method_sig + "error adding wallet, continuing");
+					Logging.WriteLog (method_sig + "error adding wallet, continuing");
 				}
-				#endif
+#endif
 
 				// todo alert user to error
 

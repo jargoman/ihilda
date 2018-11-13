@@ -113,7 +113,9 @@ namespace IhildaWallet
 			foreach (String path in paths) {
 				if (path == null) {
 #if DEBUG
-					Logging.WriteLog (method_sig + "null path?");
+					if (DebugIhildaWallet.WalletManager) {
+						Logging.WriteLog (method_sig + "null path?");
+					}
 #endif
 					return;
 				}
@@ -155,7 +157,9 @@ namespace IhildaWallet
 
 							if (rw == null) {
 #if DEBUG
-								Logging.WriteLog (method_sig + "Could not process wallet " + name);
+								if (DebugIhildaWallet.WalletManager) {
+									Logging.WriteLog (method_sig + "Could not process wallet " + name);
+								}
 #endif
 
 								continue;
@@ -163,7 +167,9 @@ namespace IhildaWallet
 
 							if (rw.WalletName == null) {
 #if DEBUG
-								Logging.WriteLog (method_sig + "rw.walletname == null");
+								if (DebugIhildaWallet.WalletManager) {
+									Logging.WriteLog (method_sig + "rw.walletname == null");
+								}
 #endif
 
 								// Todo
@@ -179,8 +185,9 @@ namespace IhildaWallet
 
 #if DEBUG
 						else {
-
-							Logging.WriteLog (method_sig + "Warning : Ignoring non ice file " + path);
+							if (DebugIhildaWallet.WalletManager) {
+								Logging.WriteLog (method_sig + "Warning : Ignoring non ice file " + path);
+							}
 						}
 #endif
 
@@ -189,7 +196,12 @@ namespace IhildaWallet
 						// file doesn't exist
 					}
 				} catch (Exception e) {
-					Logging.WriteLog (e.Message);
+#if DEBUG
+					if (DebugIhildaWallet.WalletManager) {
+						Logging.ReportException (method_sig, e);
+					}
+#endif
+
 					continue;
 				}
 

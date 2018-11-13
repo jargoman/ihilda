@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using RippleLibSharp.Util;
+using System.Text;
 
 namespace IhildaWallet
 {
@@ -12,25 +13,25 @@ namespace IhildaWallet
 		// NOTE : this is the command line parser not the console tabs parser
 		public CommandLineParser ()
 		{
-			#if DEBUG
+#if DEBUG
 			String method_sig = clsstr + nameof (CommandLineParser) + DebugRippleLibSharp.both_parentheses;
 
 			if (DebugIhildaWallet.CommandLineParser) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
-			#endif
+#endif
 
 			#region confdir
 			// command dir=path
-			IEnumerable<String> conf_dir = 
-				new String[] { "dir", "conf_dir", "configuration_directory", 
-				"config_directory", "config_dir", "conf_directory", "confdir", 
-				"config_direct", "conf_direct", "directory", "config", "conf", 
-				"configuration", "conf_folder", "configuration_folder", 
+			IEnumerable<String> conf_dir =
+				new String [] { "dir", "conf_dir", "configuration_directory",
+				"config_directory", "config_dir", "conf_directory", "confdir",
+				"config_direct", "conf_direct", "directory", "config", "conf",
+				"configuration", "conf_folder", "configuration_folder",
 				"folder", "config " };
 
 			Command con = new Command (conf_dir);
-			commands.Add(con);
+			commands.Add (con);
 
 			con.launch += delegate (String param) {
 				//FileHelper.setFolderPath(param);
@@ -41,13 +42,11 @@ namespace IhildaWallet
 				}
 
 
-				if (Directory.Exists(param)) {
+				if (Directory.Exists (param)) {
 					path = param;
-				}
-
-				else {
-					Logging.WriteLog("Path { " + param + " } doesnn't exist");
-					System.Environment.Exit(127);
+				} else {
+					Logging.WriteLog ("Path { " + param + " } doesnn't exist");
+					System.Environment.Exit (127);
 				}
 			};
 			#endregion
@@ -56,7 +55,7 @@ namespace IhildaWallet
 			#region debugger
 
 			// command debug=classname
-			IEnumerable<String> debug = new string[] { "debug" };
+			IEnumerable<String> debug = new string [] { "debug" };
 
 			var attached = AttachSuffixes (debug, new String [] { "ging", "ger" });
 
@@ -65,17 +64,17 @@ namespace IhildaWallet
 			}
 
 			Command debo = new Command (debug);
-			commands.Add(debo);
+			commands.Add (debo);
 
 
 			debo.launch += delegate (String param) {
-				#if DEBUG
+#if DEBUG
 
 				Logging.WriteLog ("Setting debug to param = " + param ?? "null");
-					DebugIhildaWallet.SetDebug(param, true);
-				#else
+				DebugIhildaWallet.SetDebug (param, true);
+#else
 				Logging.WriteBoth ("Command line option debug is not implented in release mode");
-				#endif
+#endif
 
 			};
 
@@ -98,15 +97,15 @@ namespace IhildaWallet
 
 
 			// command favorites=btc,usd,ice
-			IEnumerable<String> fav = new String[] {"favorites", "favorite", "fave", "faves"};
+			IEnumerable<String> fav = new String [] { "favorites", "favorite", "fave", "faves" };
 
-			Command fab = new Command(fav);
-			commands.Add(fab);
+			Command fab = new Command (fav);
+			commands.Add (fab);
 
 			fab.launch += BalanceTabOptionsWidget.SetFavoriteParam;
 
 
-			IEnumerable<String> tooltips = new String [] { "tooltip", "tooltips", "tips"};
+			IEnumerable<String> tooltips = new String [] { "tooltip", "tooltips", "tips" };
 			Command tooltip = new Command (tooltips);
 			commands.Add (tooltip);
 
@@ -134,29 +133,71 @@ namespace IhildaWallet
 				}
 			};
 
+			IEnumerable<String> networks = new String [] { "network", "networking", "net", "websocket", "web", "websockets", "socket", "sockets"};
+			Command network = new Command (networks);
+			commands.Add (network);
+			network.launch += (string param) => {
+				if (param == null) {
+					return;
+				}
 
-			IEnumerable<String> helps = new String [] { "help", "info", "h"};
+				param = param.ToLower ();
+
+				switch (param) {
+				case "false":
+				case "no":
+				case "off":
+				case "disable":
+				case "deactivate":
+				case "remove":
+				case "halt":
+				case "stop":
+					Program.network = false;
+					System.Console.WriteLine ("Networking disabled");
+					return;
+
+				default:
+					return;
+				}
+
+			};
+			IEnumerable<String> helps = new String [] { "help", "info", "h", "example", "examples" };
+			Command help = new Command (helps);
+			commands.Add (help);
+			help.launch += (string param) => {
+
+				StringBuilder stringBuilder = new StringBuilder ();
+				stringBuilder.AppendLine (Program.appname);
+				stringBuilder.AppendLine ();
+				stringBuilder.AppendLine ("Usage : ");
+				stringBuilder.Append ("./");
+				stringBuilder.Append (Program.appname);
+				stringBuilder.AppendLine (" {option1}={value} {option2}={value} {option3}={value} ...");
+				System.Console.WriteLine (stringBuilder.ToString ());
+
+				System.Environment.Exit (0);
+			};
 		}
 
-		public static string[] prefixes = {"-", "--", "/", ":"};
-		public static string[] suffixes = {"=", ":"};
+		public static string [] prefixes = { "-", "--", "/", ":" };
+		public static string [] suffixes = { "=", ":" };
 
 		public static string path = null;
 
-		private static List<Command> commands = new List<Command>();
+		private static List<Command> commands = new List<Command> ();
 
-		public void ParseCommands (String[] args)
+		public void ParseCommands (String [] args)
 		{
-			#if DEBUG
-			string method_sig = clsstr + nameof (ParseCommands) +  " (String[] args)";
+#if DEBUG
+			string method_sig = clsstr + nameof (ParseCommands) + " (String[] args)";
 			if (DebugIhildaWallet.CommandLineParser) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.beginn);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
-			#endif
+#endif
 			foreach (Command com in commands) {
 				String param = ParseCommand (args, com);
-				if (param!=null) {
-					com.launch.Invoke(param);
+				if (param != null) {
+					com.launch.Invoke (param);
 				}
 			}
 		}
@@ -164,7 +205,7 @@ namespace IhildaWallet
 
 		public static String ParseCommand (IEnumerable<String> args, Command command)
 		{
-			#if DEBUG
+#if DEBUG
 			String method_sig = clsstr + nameof (ParseCommand) + DebugRippleLibSharp.both_parentheses;
 
 			if (DebugIhildaWallet.CommandLineParser) {
@@ -173,16 +214,16 @@ namespace IhildaWallet
 
 			if (!args.Any ()) {
 				if (DebugIhildaWallet.CommandLineParser) {
-					Logging.WriteLog(method_sig + "args.Count () < 1, returning");
+					Logging.WriteLog (method_sig + "args.Count () < 1, returning");
 				}
 				return null;
 			}
-			#endif
+#endif
 
 			bool nex = false;
 			foreach (String s in args) {
 				foreach (String com in command.modifiers) {
-					IEnumerable<String> enumerab = new string[] {com};
+					IEnumerable<String> enumerab = new string [] { com };
 
 					var pref = AttachPrefixes (enumerab, prefixes);
 
@@ -194,56 +235,56 @@ namespace IhildaWallet
 					}
 
 
-				
+
 					var suf = AttachSuffixes (next, suffixes);
 
 					IEnumerable<String> combo = suf;
-				
-					if (nex) { 
-						#if DEBUG
+
+					if (nex) {
+#if DEBUG
 						if (DebugIhildaWallet.CommandLineParser) {
-							Logging.WriteLog(method_sig + "nex == true" + DebugRippleLibSharp.comma + DebugRippleLibSharp.returning + s ?? DebugRippleLibSharp.null_str);
+							Logging.WriteLog (method_sig + "nex == true" + DebugRippleLibSharp.comma + DebugRippleLibSharp.returning + s ?? DebugRippleLibSharp.null_str);
 						}
-						#endif
-					
+#endif
+
 						return s;
 					}
-				
-				
-					if (TestNextCombo(s, next)) {
-						#if DEBUG
+
+
+					if (TestNextCombo (s, next)) {
+#if DEBUG
 						if (DebugIhildaWallet.CommandLineParser) {
 						}
-						#endif
+#endif
 
 						nex = true;
 						continue;
 					}
 
-					String value = TestCombo(s, combo);
+					String value = TestCombo (s, combo);
 
 					if (value != null) {
-						#if DEBUG
+#if DEBUG
 						if (DebugIhildaWallet.CommandLineParser) {
-							Logging.WriteLog(method_sig + "returning value == " + value);
+							Logging.WriteLog (method_sig + "returning value == " + value);
 						}
-						#endif
+#endif
 
 						return value;
 					}
 
 
-					#if DEBUG
+#if DEBUG
 					if (DebugIhildaWallet.CommandLineParser) {
-						Logging.WriteLog(method_sig + "value == null, continuing");
+						Logging.WriteLog (method_sig + "value == null, continuing");
 					}
-					#endif
+#endif
 					continue;
 
 
 				}
 			}
-			
+
 
 			return null;
 
@@ -252,38 +293,38 @@ namespace IhildaWallet
 
 		public static bool TestNextCombo (String s, IEnumerable<String> comb)
 		{
-			#if DEBUG
-			String method_sig = clsstr + nameof (TestNextCombo) + DebugRippleLibSharp.left_parentheses + nameof (s) + DebugRippleLibSharp.equals + (s ?? DebugRippleLibSharp.null_str) + DebugRippleLibSharp.comma + nameof(comb) + DebugRippleLibSharp.equals + comb?.ToString () ?? DebugRippleLibSharp.null_str + DebugRippleLibSharp.right_parentheses;
+#if DEBUG
+			String method_sig = clsstr + nameof (TestNextCombo) + DebugRippleLibSharp.left_parentheses + nameof (s) + DebugRippleLibSharp.equals + (s ?? DebugRippleLibSharp.null_str) + DebugRippleLibSharp.comma + nameof (comb) + DebugRippleLibSharp.equals + comb?.ToString () ?? DebugRippleLibSharp.null_str + DebugRippleLibSharp.right_parentheses;
 
 			if (DebugIhildaWallet.CommandLineParser) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
-			#endif
+#endif
 
 			if (s == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.CommandLineParser) {
-					Logging.WriteLog(method_sig + "s ==" + DebugRippleLibSharp.null_str + DebugRippleLibSharp.comma + DebugRippleLibSharp.returning + DebugRippleLibSharp.null_str);
+					Logging.WriteLog (method_sig + "s ==" + DebugRippleLibSharp.null_str + DebugRippleLibSharp.comma + DebugRippleLibSharp.returning + DebugRippleLibSharp.null_str);
 				}
-				#endif
+#endif
 
 				return false;
 			}
 
 			if (comb == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.CommandLineParser) {
-					Logging.WriteLog(method_sig + "comb ==" + DebugRippleLibSharp.null_str + DebugRippleLibSharp.comma + DebugRippleLibSharp.returning + DebugRippleLibSharp.null_str);
+					Logging.WriteLog (method_sig + "comb ==" + DebugRippleLibSharp.null_str + DebugRippleLibSharp.comma + DebugRippleLibSharp.returning + DebugRippleLibSharp.null_str);
 				}
-				#endif
+#endif
 
 				return false;
 			}
 
 			foreach (String test in comb) {
-						if (test.Equals(s)) {
-							return true;
-						}
+				if (test.Equals (s)) {
+					return true;
+				}
 			}
 
 			return false;
@@ -291,30 +332,30 @@ namespace IhildaWallet
 
 		public static String TestCombo (String s, IEnumerable<String> comb)
 		{
-			#if DEBUG
-			String method_sig = clsstr + nameof (TestCombo) + DebugRippleLibSharp.left_parentheses + "s = " + s ?? DebugRippleLibSharp.null_str + ", comb = " + comb?.ToString() ?? DebugRippleLibSharp.null_str + DebugRippleLibSharp.right_parentheses;
+#if DEBUG
+			String method_sig = clsstr + nameof (TestCombo) + DebugRippleLibSharp.left_parentheses + "s = " + s ?? DebugRippleLibSharp.null_str + ", comb = " + comb?.ToString () ?? DebugRippleLibSharp.null_str + DebugRippleLibSharp.right_parentheses;
 
 			if (DebugIhildaWallet.CommandLineParser) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
-			#endif
+#endif
 
 			if (s == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.CommandLineParser) {
-					Logging.WriteLog(method_sig + "s == " + DebugRippleLibSharp.null_str + DebugRippleLibSharp.comma + DebugRippleLibSharp.returning + DebugRippleLibSharp.null_str);
+					Logging.WriteLog (method_sig + "s == " + DebugRippleLibSharp.null_str + DebugRippleLibSharp.comma + DebugRippleLibSharp.returning + DebugRippleLibSharp.null_str);
 				}
-				#endif
+#endif
 
 				return null;
 			}
 
 			if (comb == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.CommandLineParser) {
-					Logging.WriteLog(method_sig + "comb == " + DebugRippleLibSharp.null_str + DebugRippleLibSharp.comma + DebugRippleLibSharp.returning + DebugRippleLibSharp.null_str);
+					Logging.WriteLog (method_sig + "comb == " + DebugRippleLibSharp.null_str + DebugRippleLibSharp.comma + DebugRippleLibSharp.returning + DebugRippleLibSharp.null_str);
 				}
-				#endif
+#endif
 
 				return null;
 			}
@@ -324,15 +365,15 @@ namespace IhildaWallet
 					continue;
 				}
 
-				if (s.StartsWith(test)) {
-					#if DEBUG
+				if (s.StartsWith (test)) {
+#if DEBUG
 					if (DebugIhildaWallet.CommandLineParser) {
-						Logging.WriteLog(method_sig + s + " starts with " + test);
+						Logging.WriteLog (method_sig + s + " starts with " + test);
 					}
-					#endif
+#endif
 
 
-					return s.Remove(0,test.Length);
+					return s.Remove (0, test.Length);
 				}
 			}
 
@@ -340,8 +381,9 @@ namespace IhildaWallet
 		}
 
 
-		public static IEnumerable<String> AttachSuffixes (IEnumerable<String> strings, IEnumerable<string> suffixes) {
-			
+		public static IEnumerable<String> AttachSuffixes (IEnumerable<String> strings, IEnumerable<string> suffixes)
+		{
+
 			if (suffixes == null) {
 				return null;
 			}
@@ -350,56 +392,57 @@ namespace IhildaWallet
 				return null;
 			}
 
-			String[] yo = new string[strings.Count() * suffixes.Count()];
+			String [] yo = new string [strings.Count () * suffixes.Count ()];
 
 
 
-			#if DEBUG
+#if DEBUG
 			String method_sig = clsstr + nameof (AttachSuffixes) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.CommandLineParser) {
 
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 
-				Logging.WriteLog(method_sig + nameof (strings) + DebugRippleLibSharp.equals, strings);
+				Logging.WriteLog (method_sig + nameof (strings) + DebugRippleLibSharp.equals, strings);
 
 				//Logging.write(strings);
 
-				Logging.WriteLog(method_sig + nameof (suffixes) + DebugRippleLibSharp.equals, suffixes);
+				Logging.WriteLog (method_sig + nameof (suffixes) + DebugRippleLibSharp.equals, suffixes);
 
 				//Logging.write(suffixes);
 
 			}
-			#endif
+#endif
 
 			int x = 0;
 			foreach (String val in strings) {
 				foreach (String suf in suffixes) {
-					yo[x++] = val + suf;
+					yo [x++] = val + suf;
 
 				}
 			}
 
-			#if DEBUG
+#if DEBUG
 			if (DebugIhildaWallet.CommandLineParser) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.returning, yo);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.returning, yo);
 			}
-			#endif
+#endif
 
 			return yo;
 		}
 
-		public static IEnumerable<String> AttachPrefixes (IEnumerable<String> strings, IEnumerable<String> prefixes) {
+		public static IEnumerable<String> AttachPrefixes (IEnumerable<String> strings, IEnumerable<String> prefixes)
+		{
 
 
-			#if DEBUG
+#if DEBUG
 			String method_sig = clsstr + nameof (AttachPrefixes) + DebugRippleLibSharp.both_parentheses;
 
 			if (DebugIhildaWallet.CommandLineParser) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 
-				Logging.WriteLog(method_sig + nameof (strings) + DebugRippleLibSharp.equals, strings);
+				Logging.WriteLog (method_sig + nameof (strings) + DebugRippleLibSharp.equals, strings);
 
-				Logging.WriteLog(method_sig + nameof(prefixes) + DebugRippleLibSharp.equals, prefixes);
+				Logging.WriteLog (method_sig + nameof (prefixes) + DebugRippleLibSharp.equals, prefixes);
 			}
 #endif
 
@@ -411,43 +454,45 @@ namespace IhildaWallet
 				return null;
 			}
 
-			String[] returnMe = new string[prefixes.Count() * strings.Count()]; 
+			String [] returnMe = new string [prefixes.Count () * strings.Count ()];
 
 			int x = 0;
 			foreach (String s in strings) {
 				foreach (String p in prefixes) {
-					returnMe[x++] = p + s;
+					returnMe [x++] = p + s;
 				}
 			}
 
-			#if DEBUG
+#if DEBUG
 			if (DebugIhildaWallet.CommandLineParser) {
-				Logging.WriteLog(method_sig + DebugRippleLibSharp.returning, returnMe);
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.returning, returnMe);
 			}
-			#endif
+#endif
 
 			return returnMe;
 		}
 
 
-		public class Command {
-			public Command (IEnumerable<String> modifiers) {
+		public class Command
+		{
+			public Command (IEnumerable<String> modifiers)
+			{
 
-				IEnumerable<String> pre = new String[] {"set", "enable", "allow", "use"};
-				IEnumerable<String> suf = new String[] {"_", "-"};
+				IEnumerable<String> pre = new String [] { "set", "enable", "allow", "use" };
+				IEnumerable<String> suf = new String [] { "_", "-" };
 
 				IEnumerable<String> en = AttachSuffixes (pre, suf);
 
-				pre = pre.Concat(en); // pre contains all the prefixes // set,set-,allow_ ect
+				pre = pre.Concat (en); // pre contains all the prefixes // set,set-,allow_ ect
 
 
-				this.modifiers = modifiers.Concat( AttachPrefixes( modifiers, pre) );
+				this.modifiers = modifiers.Concat (AttachPrefixes (modifiers, pre));
 
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.CommandLineParser) {
-					Logging.WriteLog(cls_str + "new Command : ", this.modifiers);
+					Logging.WriteLog (cls_str + "new Command : ", this.modifiers);
 				}
-				#endif
+#endif
 			}
 
 			private const string cls_str = "CommandLineParser.Command : ";
@@ -462,7 +507,7 @@ namespace IhildaWallet
 
 #if DEBUG
 		private static string clsstr = nameof (CommandLineParser) + DebugRippleLibSharp.colon;
-		#endif
+#endif
 	}
 }
 

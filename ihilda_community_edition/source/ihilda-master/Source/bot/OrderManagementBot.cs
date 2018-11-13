@@ -53,21 +53,21 @@ namespace IhildaWallet
 			LinkedList<RippleNode> nodes = new LinkedList<RippleNode> ();
 
 			IEnumerable<RippleNodeGroup []> aff = from RippleTxStructure st in off
-												  select st.meta.AffectedNodes;
+							      select st.meta.AffectedNodes;
 
 			string acct = this.Wallet.GetStoredReceiveAddress ();
 			foreach (RippleNodeGroup [] arng in aff) {
 
 				IEnumerable<RippleNode> ar =
 					from RippleNodeGroup rng in arng where
-										 "Offer".Equals (rng?.DeletedNode?.LedgerEntryType)
+										 "Offer" == rng?.DeletedNode?.LedgerEntryType
 
 
-											 && acct.Equals (rng?.DeletedNode?.FinalFields?.Account)
+											 && acct == rng?.DeletedNode?.FinalFields?.Account
 
 										 && rng.DeletedNode.FinalFields.TakerGets != null
-										 && rng.DeletedNode.PreviousFields != null
-										 && rng.DeletedNode.PreviousFields.TakerGets != null
+										
+										 && rng.DeletedNode.PreviousFields?.TakerGets != null
 										 && rng.DeletedNode.FinalFields.TakerGets.amount < rng.DeletedNode.PreviousFields.TakerGets.amount
 
 					select rng.GetNode ();
@@ -93,30 +93,27 @@ namespace IhildaWallet
 		{
 			List<AutomatedOrder> ords = new List<AutomatedOrder> ();
 
+			string account = Wallet?.GetStoredReceiveAddress ();
+			if (account == null) {
+				// TODO
+				throw new NullReferenceException ();
+			}
+
 			#region created
 			IEnumerable<RippleTxStructure> offernews = from RippleTxStructure st in off
-
-													   where st.tx.Account != null
-												   && st.tx.Account.Equals (Wallet.GetStoredReceiveAddress ())
-												   && st.tx.TransactionType != null
-												   && st.tx.TransactionType.Equals ("OfferCreate")
-
-													   select st;
+					where st?.tx?.Account == account && st.tx.TransactionType == "OfferCreate"
+					select st;
 
 
 			foreach (RippleTxStructure strc in offernews) {
 
-				IEnumerable<RippleNode> cr = from RippleNodeGroup rng in strc.meta.AffectedNodes
-											 where rng.CreatedNode != null
-										 && rng.CreatedNode.NewFields != null
-										 && rng.CreatedNode.NewFields.Account != null
-										 && rng.CreatedNode.NewFields.Account.Equals (Wallet.GetStoredReceiveAddress ())
-										 && rng.CreatedNode.LedgerEntryType != null
-										 && rng.CreatedNode.LedgerEntryType.Equals ("Offer")
-											 select rng.GetNode ();
+				IEnumerable<RippleNode> cr = 
+					from RippleNodeGroup rng in strc.meta.AffectedNodes where 
+					                                rng?.CreatedNode?.NewFields?.Account == account && rng.CreatedNode.LedgerEntryType == "Offer"
+							     select rng.GetNode ();
 
-				//RippleNode no = cr.Any
-				if (cr.Any()) {
+
+				if (!cr.Any ()) {
 					AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (strc.tx);
 					ords.Add (ao);
 				}
@@ -138,12 +135,12 @@ namespace IhildaWallet
 			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Determining orders filled immediately\n" });
 			IEnumerable<AutomatedOrder> filledImmediately = GetOrdersFilledImmediately (off);
 			if (filledImmediately == null) {
-				filledImmediately = new List <AutomatedOrder>();
+				filledImmediately = new List<AutomatedOrder> ();
 			}
 
 
 
-			if (!filledImmediately.Any()) {
+			if (!filledImmediately.Any ()) {
 				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "No orders filled immediately\n" });
 			}
 
@@ -153,7 +150,7 @@ namespace IhildaWallet
 			if (!nodes.Any ()) {
 				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "No orders filled from orderbook\n" });
 				if (!filledImmediately.Any ()) {
-					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "No orders filled from orderbook\n" });
+					//OnMessage?.Invoke (this, new MessageEventArgs () { Message = "No orders filled from orderbook\n" });
 					return filledImmediately; // returns empty list
 				}
 			} else {
@@ -178,11 +175,11 @@ namespace IhildaWallet
 		}
 
 
-		private IEnumerable<AutomatedOrder> TraceNodesToSource ( IEnumerable<RippleNode> nodes )
+		private IEnumerable<AutomatedOrder> TraceNodesToSource (IEnumerable<RippleNode> nodes)
 		{
 			List<AutomatedOrder> list = new List<AutomatedOrder> ();
 
-			AccountSequenceCache accountSequnceCache = AccountSequenceCache.GetCacheForAccount ( this.Wallet.GetStoredReceiveAddress() );
+			AccountSequenceCache accountSequnceCache = AccountSequenceCache.GetCacheForAccount (this.Wallet.GetStoredReceiveAddress ());
 
 			Dictionary<String, AutomatedOrder> cachedOffers = accountSequnceCache.SequenceCache; //.Load (Wallet.GetStoredReceiveAddress ());
 
@@ -214,8 +211,7 @@ namespace IhildaWallet
 
 					if (bot_id != null) {
 						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Tracing " + bot_id + " to source\n" });
-					} else 
-					{
+					} else {
 						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Tracing filled order node to source transaction\n" });
 					}
 
@@ -298,7 +294,7 @@ namespace IhildaWallet
 			AutomatedOrder order = null;
 
 
-				//LinkedList < RippleNode > failedNodes = new LinkedList < RippleNode > ();
+			//LinkedList < RippleNode > failedNodes = new LinkedList < RippleNode > ();
 
 			int attempts = 3;
 			for (int i = 0; i < attempts; i++) {
@@ -319,9 +315,9 @@ namespace IhildaWallet
 				Thread.Sleep (1000);
 
 			}
-	
 
-			
+
+
 
 
 
@@ -445,10 +441,10 @@ namespace IhildaWallet
 			}
 
 			var n = from RippleNodeGroup gr in nodes
-					where gr.GetNode ().FinalFields != null
-					&& gr.GetNode ().FinalFields.Sequence == targetsequence
+				where gr.GetNode ().FinalFields != null
+				&& gr.GetNode ().FinalFields.Sequence == targetsequence
 
-					select gr.GetNode ();
+				select gr.GetNode ();
 
 			RippleNode p = n.First ();
 

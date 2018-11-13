@@ -1360,9 +1360,9 @@ this.CopyBuffer ();
 
 			Pango.Context context = this.CreatePangoContext ();
 
-			Pango.Layout layout = new Pango.Layout (context);
-
-			layout.Width = Pango.Units.FromPixels (pointFrame.width);
+			Pango.Layout layout = new Pango.Layout (context) {
+				Width = Pango.Units.FromPixels (pointFrame.width)
+			};
 
 
 			FontDescription desc = FontDescription.FromString ("Serif Bold 100");

@@ -209,6 +209,7 @@ namespace IhildaWallet
 				message.Append ("Stakctrace : \n");
 				message.Append (e.StackTrace);
 				MessageDialog.ShowMessage (message.ToString ());
+				OnMessage?.Invoke ( this, new MessageEventArgs () { Message = message.ToString () } );
 				return null;
 			}
 

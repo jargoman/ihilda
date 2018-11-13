@@ -75,18 +75,26 @@ namespace IhildaWallet
 
 		public bool SaveRules (string path)
 		{
+
+#if DEBUG
+			string method_sig = clsstr + nameof (SaveRules) + DebugRippleLibSharp.both_parentheses;
+#endif
+
 			try {
 				ConfStruct rs = new ConfStruct (RulesList) {
 					LastKnownLedger = this.LastKnownLedger
 				};
 
 				string conf = DynamicJson.Serialize (rs);
-				if (string.IsNullOrWhiteSpace(conf)) {
-					return false;
-				}
-
-				return FileHelper.SaveConfig (path, conf);
+				return !string.IsNullOrWhiteSpace (conf) && FileHelper.SaveConfig(path, conf);
 			} catch ( Exception e ) {
+
+#if DEBUG
+				if (DebugIhildaWallet.RuleManager) {
+					Logging.ReportException (method_sig, e);
+				}
+#endif
+
 				return false;
 			}
 

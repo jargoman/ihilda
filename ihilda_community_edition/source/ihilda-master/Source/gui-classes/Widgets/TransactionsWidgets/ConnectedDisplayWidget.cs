@@ -11,6 +11,10 @@ namespace IhildaWallet
 			this.Build ();
 
 			this.connectStatusLabel.UseMarkup = true;
+
+			if (!Program.network) {
+				this.connectStatusLabel.Markup = "<span foreground=\"red\">Networking Disabled</span>";
+			}
 		}
 
 		public void SetConnected (string serverUrl)
@@ -21,7 +25,12 @@ namespace IhildaWallet
 			if (DebugIhildaWallet.NetworkSettings) {
 				Logging.WriteLog( method_sig + DebugRippleLibSharp.beginn );
 			}
-			#endif
+#endif
+
+			if (serverUrl == null) {
+				SetDisConnected ();
+				return;
+			}
 
 			Gtk.Application.Invoke ( delegate {
 				#if DEBUG
@@ -52,8 +61,13 @@ namespace IhildaWallet
 				#if DEBUG
 				if (DebugIhildaWallet.NetworkSettings) {
 					Logging.WriteLog (method_sig + DebugIhildaWallet.gtkInvoke);
-				}	
-				#endif
+				}
+#endif
+
+				if (!Program.network) {
+					this.connectStatusLabel.Markup = "<span foreground=\"red\">Networking Disabled</span>";
+					return;
+				}
 
 				this.connectStatusLabel.Markup = "<span foreground=\"red\">Disconnected</span>";
 				this.TooltipMarkup = "";
