@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Codeplex.Data;
 using RippleLibSharp.Result;
 using RippleLibSharp.Network;
+using System.Threading;
 
 namespace RippleLibSharp.Commands.Accounts
 {
@@ -10,7 +11,7 @@ namespace RippleLibSharp.Commands.Accounts
 	{
 		
 
-		public static Task<Response<AccountCurrenciesResult>> GetResult ( string account, NetworkInterface ni, IdentifierTag identifierTag = null ) {
+		public static Task<Response<AccountCurrenciesResult>> GetResult ( string account, NetworkInterface ni, CancellationToken token, IdentifierTag identifierTag = null ) {
 
 			if (identifierTag == null) {
 				identifierTag = new IdentifierTag {
@@ -26,7 +27,7 @@ namespace RippleLibSharp.Commands.Accounts
 
 			string request = DynamicJson.Serialize (o);
 
-			Task<Response<AccountCurrenciesResult>> task = NetworkRequestTask.RequestResponse <AccountCurrenciesResult> (identifierTag, request, ni);
+			Task<Response<AccountCurrenciesResult>> task = NetworkRequestTask.RequestResponse <AccountCurrenciesResult> (identifierTag, request, ni, token);
 
 			//task.Wait ();
 

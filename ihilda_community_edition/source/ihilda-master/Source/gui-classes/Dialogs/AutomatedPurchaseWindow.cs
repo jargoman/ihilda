@@ -30,7 +30,7 @@ namespace IhildaWallet
 
 			backgroundWorker.DoWork += (object sender, DoWorkEventArgs e) => {
 
-
+				CancellationToken token = this.tokenSource.Token;
 				string accout = automatedOrder.Account;
 				if (accout == null) {
 					//TODO
@@ -68,7 +68,7 @@ namespace IhildaWallet
 				while ( !backgroundWorker.CancellationPending ) {
 
 
-
+				
 					backgroundWorker.ReportProgress (0);
 
 					if (automatedOrder == null) {
@@ -115,7 +115,8 @@ namespace IhildaWallet
 						BookOffers.GetResult (
 							automatedOrder.TakerPays,
 							automatedOrder.TakerGets,
-							ni
+							ni,
+							token
 						);
 
 					/*
@@ -130,7 +131,7 @@ namespace IhildaWallet
 						// TODO error handling
 
 					}
-					task.Wait ();
+					task.Wait (token);
 
 					Response<BookOfferResult> response = task.Result;
 					if (response == null) {
@@ -246,7 +247,7 @@ namespace IhildaWallet
 
 
 
-						Tuple <bool, IEnumerable<OrderSubmittedEventArgs>> tuple = orderSubmitter.SubmitOrders ( automatedOrders, rw, rippleSeedAddress, ni );
+						Tuple <bool, IEnumerable<OrderSubmittedEventArgs>> tuple = orderSubmitter.SubmitOrders ( automatedOrders, rw, rippleSeedAddress, ni, token );
 
 						if (tuple == null) {
 							// TODO likely unreachable code
@@ -293,7 +294,9 @@ namespace IhildaWallet
 
 						//Task.Delay (1000).Wait ();
 
-						manualReset.WaitOne (1000);
+						//manualReset.WaitOne (1000);
+
+						WaitHandle.WaitAny ( new [] {  manualReset , token.WaitHandle  } , 1000 );
 						backgroundWorker.ReportProgress (0);
 					}
 
@@ -413,14 +416,20 @@ namespace IhildaWallet
 
 				);
 				manualReset.Set ();
+				tokenSource?.Cancel ();
+				//tokenSource.Dispose ();
+
+				
 
 			};
 		}
 
+		private CancellationTokenSource tokenSource = null;
+
 		void Startbutton_Clicked (object sender, EventArgs e)
 		{
 			Task.Factory.StartNew ( backgroundWorker.RunWorkerAsync );
-
+			tokenSource = new CancellationTokenSource ();
 			manualReset.Reset ();
 			this.cancelButton.Sensitive = true;
 			this.startbutton.Sensitive = false;

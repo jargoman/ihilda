@@ -31,8 +31,8 @@ namespace IhildaWallet
 
 			Task.Factory.StartNew (async () => {
 
-				while (_cont) {
-					await Task.Delay (30000);
+				while (TokenSource?.IsCancellationRequested != true) {
+					await Task.Delay (30000, TokenSource.Token);
 					Sync ();
 				}
 			}
@@ -42,10 +42,10 @@ namespace IhildaWallet
 
 		~SendRipple ()
 		{
-			_cont = false;
+			TokenSource.Cancel ();
 		}
 
-		private bool _cont = true;
+		private CancellationTokenSource TokenSource = null;
 
 		//String unsynced = "   --   unsynced   --   ";
 
@@ -471,13 +471,13 @@ namespace IhildaWallet
 
 			try {
 
-				Task<Response<AccountInfoResult>> task = AccountInfo.GetResult (account, networkInterface);
+				Task<Response<AccountInfoResult>> task = AccountInfo.GetResult (account, networkInterface, TokenSource.Token);
 
 				if (task == null) {
 					return;
 				}
 
-				task.Wait ();
+				task.Wait (TokenSource.Token);
 
 
 

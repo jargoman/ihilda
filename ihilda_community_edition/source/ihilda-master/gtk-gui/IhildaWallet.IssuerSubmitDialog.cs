@@ -43,9 +43,7 @@ namespace IhildaWallet
 			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.GtkScrolledWindow]));
 			w3.Position = 0;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.addressentry1 = new global::IhildaWallet.AddressEntry();
-			this.addressentry1.Events = ((global::Gdk.EventMask)(256));
-			this.addressentry1.Name = "addressentry1";
+			this.addressentry1 = null;
 			this.vbox2.Add(this.addressentry1);
 			global::Gtk.Box.BoxChild w4 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.addressentry1]));
 			w4.Position = 1;

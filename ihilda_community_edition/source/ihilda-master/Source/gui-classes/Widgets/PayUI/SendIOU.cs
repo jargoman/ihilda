@@ -68,8 +68,8 @@ namespace IhildaWallet
 
 			Task.Factory.StartNew (async () => {
 
-				while (_cont) {
-					await Task.Delay (30000);
+				while (!tokenSource.IsCancellationRequested) {
+					await Task.Delay (30000, tokenSource.Token);
 					Update ();
 				};
 			}
@@ -80,10 +80,11 @@ namespace IhildaWallet
 
 		~SendIOU ()
 		{
-			_cont = false;
+			tokenSource.Cancel ();
+			tokenSource.Dispose ();
 		}
 
-		private bool _cont = true;
+		private CancellationTokenSource tokenSource = new CancellationTokenSource();
 
 
 //#pragma warning disable RECS0122 // Initializing field with default value is redundant
@@ -454,6 +455,9 @@ namespace IhildaWallet
 
 		public void UpdateBalance (string address)
 		{
+
+			CancellationToken token = tokenSource.Token;
+
 			if (address == null) {
 				return;
 			}
@@ -501,7 +505,7 @@ namespace IhildaWallet
 			);  // end invoke
 
 			mre.WaitOne ();
-
+			WaitHandle.WaitAny (new [] { mre, token.WaitHandle });
 			if (cur == null) {
 				return;
 			}
@@ -517,12 +521,12 @@ namespace IhildaWallet
 
 			string s = null;
 			if (issuer == null) {
-				Decimal d = AccountLines.GetCurrencyAsSingleBalance (address, cur, ni);
+				Decimal d = AccountLines.GetCurrencyAsSingleBalance (address, cur, ni, token);
 				s = d.ToString ();
 
 			} else {
 
-				result = AccountLines.GetBalanceForIssuer (cur, issuer, address, ni);
+				result = AccountLines.GetBalanceForIssuer (cur, issuer, address, ni, token);
 				s = result?.amount.ToString ();
 
 			}
@@ -541,6 +545,9 @@ namespace IhildaWallet
 
 		private void UpdateCurrencyIssuers (RippleAddress rippleAddress)
 		{
+
+			CancellationToken token = tokenSource.Token;
+
 			//RippleWallet rw = _rippleWallet;
 			string address = rippleAddress;
 			if (address == null) {
@@ -570,14 +577,16 @@ namespace IhildaWallet
 
 			});
 
-			manualResetEvent.WaitOne ();
+			//manualResetEvent.WaitOne ();
+
+			WaitHandle.WaitAny (new [] { manualResetEvent, token.WaitHandle });
 
 			if (cur == null) {
 				return;
 
 			}
 
-			List<String> lis = AccountLines.GetIssuersForCurrency (cur, address, ni);
+			List<String> lis = AccountLines.GetIssuersForCurrency (cur, address, ni, token);
 			if (lis == null) {
 				return;
 			}
@@ -774,6 +783,8 @@ namespace IhildaWallet
 
 		private void UpdateCurrencies ()
 		{
+
+			CancellationToken token = tokenSource.Token;
 			string account = _rippleWallet?.GetStoredReceiveAddress ();
 			if (account == null) {
 				return;
@@ -784,12 +795,12 @@ namespace IhildaWallet
 				return;
 			}
 
-			Task <Response <AccountCurrenciesResult>> task = AccountCurrencies.GetResult (account, ni);
+			Task <Response <AccountCurrenciesResult>> task = AccountCurrencies.GetResult (account, ni, token);
 			if (task == null) {
 				return;
 			}
 
-			task.Wait ();
+			task.Wait (token);
 			Response<AccountCurrenciesResult> response = task.Result;
 
 

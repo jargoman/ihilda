@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Gtk;
 using IhildaWallet.Networking;
@@ -76,6 +77,11 @@ namespace IhildaWallet
 			button217.Clicked += Button217_Clicked;
 
 			sharetickercomboboxentry.Changed += (object sender, EventArgs e) => {
+
+				shareTickTokenSource?.Cancel ();
+				shareTickTokenSource = new CancellationTokenSource ();
+				CancellationToken token = shareTickTokenSource.Token;
+
 				string str = sharetickercomboboxentry.ActiveText;
 				if (RippleCurrency.NativeCurrency == str) {
 					this.shareIssuerComboboxentry.Entry.Text = "";
@@ -89,6 +95,7 @@ namespace IhildaWallet
 
 				Task.Run (delegate {
 
+
 					NetworkInterface networkInterface = NetworkController.GetNetworkInterfaceNonGUIThread ();
 					if (networkInterface == null) {
 						return;
@@ -97,17 +104,22 @@ namespace IhildaWallet
 					if (account == null) {
 						return;
 					}
-					List<string> issuers = AccountLines.GetIssuersForCurrency (str, account, networkInterface);
+					List<string> issuers = AccountLines.GetIssuersForCurrency (str, account, networkInterface, token);
 
 
 
 					SetShareComboIssuers (issuers);
 
 
-				});
+				}, token);
 			};
 
 			divCurcomboboxentry.Changed += (object sender, EventArgs e) => {
+
+				dicCurTokenSource?.Cancel ();
+				dicCurTokenSource = new CancellationTokenSource ();
+				var token = dicCurTokenSource.Token;
+
 				string str = divCurcomboboxentry.ActiveText;
 				if (RippleCurrency.NativeCurrency == str) {
 					this.divIssuercomboboxentry.Entry.Text = "";
@@ -129,14 +141,14 @@ namespace IhildaWallet
 					if (account == null) {
 						return;
 					}
-					List<string> issuers = AccountLines.GetIssuersForCurrency ( str, account, networkInterface );
+					List<string> issuers = AccountLines.GetIssuersForCurrency ( str, account, networkInterface, token );
 
 
 
 					SetDivComboIssuers (issuers);
 
 
-				} );
+				}, token );
 
 			};
 
@@ -146,8 +158,18 @@ namespace IhildaWallet
 
 		}
 
+		CancellationTokenSource shareTickTokenSource = null;
+		CancellationTokenSource dicCurTokenSource = null;
+		CancellationTokenSource shareIssTokenSource = null;
+		CancellationTokenSource divIssTokenSource = null;
+
 		void ShareIssuerComboboxentry_Changed (object sender, EventArgs e)
 		{
+
+			shareIssTokenSource?.Cancel ();
+			shareIssTokenSource = new CancellationTokenSource ();
+			var token = shareIssTokenSource.Token;
+
 			string str = shareIssuerComboboxentry.ActiveText;
 
 			string account = null;
@@ -171,11 +193,11 @@ namespace IhildaWallet
 					return;
 				}
 
-				Task<Response<AccountCurrenciesResult>> task = AccountCurrencies.GetResult (account, networkInterface);
+				Task<Response<AccountCurrenciesResult>> task = AccountCurrencies.GetResult (account, networkInterface, token);
 				if (task == null) {
 					return;
 				}
-				task.Wait ();
+				task.Wait (token);
 
 				Response<AccountCurrenciesResult> response = task.Result;
 				if (response == null) {
@@ -201,12 +223,16 @@ namespace IhildaWallet
 
 				SetTickerCurrencies (currencies);
 
-			});
+			}, token);
 		}
 
 
 		void DivIssuercomboboxentry_Changed (object sender, EventArgs e)
 		{
+			divIssTokenSource?.Cancel ();
+			divIssTokenSource = new CancellationTokenSource ();
+			CancellationToken token = divIssTokenSource.Token;
+
 			string str = divIssuercomboboxentry.ActiveText;
 			string account = null;
 
@@ -229,11 +255,11 @@ namespace IhildaWallet
 					return;
 				}
 
-				Task <Response <AccountCurrenciesResult>> task = AccountCurrencies.GetResult (account, networkInterface);
+				Task <Response <AccountCurrenciesResult>> task = AccountCurrencies.GetResult (account, networkInterface, token);
 				if (task == null) {
 					return;
 				}
-				task.Wait ();
+				task.Wait (token);
 
 				Response<AccountCurrenciesResult> response = task.Result;
 				if (response == null) {
@@ -635,8 +661,8 @@ namespace IhildaWallet
 			Decimal maximum = max ?? 0;
 			NetworkInterface networkInterface = NetworkController.GetNetworkInterfaceNonGUIThread ();
 
-
-			IEnumerable <Response <AccountLinesResult>> results = AccountLines.GetResultFull (tokenRequires.ShareIssuer, networkInterface);
+			// TODO possibly use a real token
+			IEnumerable <Response <AccountLinesResult>> results = AccountLines.GetResultFull (tokenRequires.ShareIssuer, networkInterface, new CancellationToken());
 
 			List<string> assetHolders = new List<string> ();
 

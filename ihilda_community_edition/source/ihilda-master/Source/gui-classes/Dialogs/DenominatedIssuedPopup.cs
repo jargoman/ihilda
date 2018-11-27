@@ -93,7 +93,7 @@ namespace IhildaWallet
 
 
 			string address = rw.GetStoredReceiveAddress();
-			TrustLine[] lines = AccountLines.GetTrustLines (address, ni);
+			TrustLine[] lines = AccountLines.GetTrustLines (address, ni, new System.Threading.CancellationToken());
 
 
 

@@ -38,8 +38,11 @@ namespace IhildaWallet
 			_rippleWallet = rippleWallet;
 
 			Gtk.Application.Invoke ( delegate {
-			
-				this.label1.Markup = "<b><big><span fgcolor=\"green\">" + rippleWallet.Account + "</span></big></b>";
+				if (Program.darkmode) {
+					this.label1.Markup = "<b><big><span fgcolor=\"chartreuse\">" + rippleWallet.Account + "</span></big></b>";
+				} else {
+					this.label1.Markup = "<b><big><span fgcolor=\"green\">" + rippleWallet.Account + "</span></big></b>";
+				}
 
 			});
 

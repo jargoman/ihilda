@@ -98,7 +98,7 @@ namespace IhildaWallet
 						return;
 					}
 
-					dcw.UpdateBooks ();
+					dcw.UpdateBooks (new CancellationToken());
 					dcw.Show ();
 
 				}

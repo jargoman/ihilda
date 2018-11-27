@@ -18,6 +18,7 @@ using RippleLibSharp.Transactions;
 using RippleLibSharp.Transactions.TxTypes;
 
 using System.Linq;
+using System.Threading;
 
 namespace Source.UnitTesting
 {
@@ -87,7 +88,8 @@ namespace Source.UnitTesting
 		}
 
 		public void TestTrustLines () {
-			var task = AccountLines.GetResult (test_address.ToString(), NetworkInterfaceObj);
+			CancellationToken token = new CancellationToken ();
+			var task = AccountLines.GetResult (test_address.ToString(), NetworkInterfaceObj, token);
 			System.Console.WriteLine ("testTrustLines : waiting....\n");
 			task.Wait ();
 			System.Console.WriteLine ("\n\n testTrustLines : done waiting\n");

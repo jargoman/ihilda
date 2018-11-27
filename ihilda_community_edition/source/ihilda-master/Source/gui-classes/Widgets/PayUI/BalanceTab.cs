@@ -107,8 +107,13 @@ namespace IhildaWallet
 
 		}
 
+
+		private CancellationTokenSource balanceTokenSource = null;
 		public void UpdateBalance ()
 		{
+			balanceTokenSource?.Cancel ();
+			balanceTokenSource = new CancellationTokenSource ();
+
 			Task.Run (
 				delegate {
 					this.Clear ();
@@ -132,9 +137,9 @@ namespace IhildaWallet
 						return;
 					}
 
-					Task<Response<AccountLinesResult>> task = AccountLines.GetResult (ra.ToString (), ni);
+					Task<Response<AccountLinesResult>> task = AccountLines.GetResult (ra.ToString (), ni, balanceTokenSource.Token);
 
-					task.Wait ();
+					task.Wait (balanceTokenSource.Token);
 
 					Response<AccountLinesResult> response = task.Result;
 
@@ -214,7 +219,8 @@ namespace IhildaWallet
 
 						values.Add (new Tuple<string, string, string> (cu, iss, ba));
 					} else {
-						TextHighlighter.Highlightcolor = "\"green\"";
+
+						TextHighlighter.Highlightcolor = Program.darkmode ? "\"chartreuse\"" :"\"green\"";
 						//cu = TextHighlighter.Highlight (cu);
 						//iss = TextHighlighter.Highlight (iss);
 						ba = TextHighlighter.Highlight (ba);

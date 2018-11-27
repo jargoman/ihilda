@@ -14,10 +14,17 @@ namespace RippleLibSharp.Network
 	{
 
 
-		public static Task<Response<T>> RequestResponse<T> (IdentifierTag identifierTag, string request, NetworkInterface networkInterface)
+		public static Task<Response<T>> RequestResponse<T> (
+			IdentifierTag identifierTag, 
+			string request, 
+			NetworkInterface networkInterface, 
+			CancellationToken token
+		)
+
 		{
 			return Task.Run (
 				delegate {
+
 #if DEBUG
 					string method_sig =
 						clsstr
@@ -26,12 +33,17 @@ namespace RippleLibSharp.Network
 						+ typeof (T).ToString ()
 						+ " > "
 								   + DebugRippleLibSharp.left_parentheses
-						            + nameof (identifierTag)
+							    + nameof (identifierTag)
 								   + DebugRippleLibSharp.equals
-						            + identifierTag?.ToString () ?? "null"
+							    + identifierTag?.ToString () ?? "null"
 								   + "..."
 								   + DebugRippleLibSharp.right_parentheses;
 #endif
+
+					if (token.IsCancellationRequested) {
+						return null;
+					}
+
 					if (networkInterface == null) {
 						// TODO connect?, alert user? ect
 
@@ -47,17 +59,31 @@ namespace RippleLibSharp.Network
 
 
 					Response<T> resp = null;
-					for (int i = 1; i < 3; i++) {
+					for ( int i = 1; i < 3; i++ ) {
 
 						stub.Handle.Reset ();
 						ticketCache [ticket] = stub;
-						Task.Run (delegate {
+						Task.Run ( delegate {
+							if (token.IsCancellationRequested) {
+								return;
+							}
 							networkInterface.SendToServer (request);
 						}
 
-						);
-						stub.Handle.WaitOne (MAX_WAIT);
+							  , token);
 
+						//stub.Handle.WaitOne (MAX_WAIT);
+						int ret = 0;
+						do {
+							ret = WaitHandle.WaitAny (new [] { token.WaitHandle, stub.Handle } , 250);
+
+
+						} while (
+							ret == WaitHandle.WaitTimeout && 
+							!token.IsCancellationRequested && 
+							//!ticketCache.ContainsKey (ticket)
+							!stub.HasResponse
+						);
 						//Response<Json_Response> d = stub.response;
 #if DEBUG
 
@@ -85,6 +111,7 @@ namespace RippleLibSharp.Network
 						*/
 						resp = stub?.GetResponse<T> ();
 						if (resp == null) {
+
 							continue;
 						}
 
@@ -97,7 +124,7 @@ namespace RippleLibSharp.Network
 					}
 					return resp;
 				}
-			);
+				, token);
 		}
 
 		public static int ObtainTicket ()
@@ -231,7 +258,10 @@ namespace RippleLibSharp.Network
 					Logging.WriteLog (method_sig + "retrieved ticket stub from json !!!");
 				}
 #endif
+
+
 				ts.JsonResponseObj = d;
+
 #if DEBUG
 
 				if (DebugRippleLibSharp.NetworkRequestTask) {
@@ -271,7 +301,10 @@ namespace RippleLibSharp.Network
 #endif
 
 			} finally {
-				ts?.Handle?.Set ();
+				if (ts != null) {
+					ts.HasResponse = true;
+					ts.Handle?.Set ();
+				}
 			}
 
 
@@ -323,6 +356,10 @@ namespace RippleLibSharp.Network
 
 		public RippleLibSharp.Result.Response<Json_Response> JsonResponseObj { get; set; }
 
+		public bool HasResponse {
+			get;
+			set;
+		}
 
 		public Response<T> GetResponse<T> ()
 		{

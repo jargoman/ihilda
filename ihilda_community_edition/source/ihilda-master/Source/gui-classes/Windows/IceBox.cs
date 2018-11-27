@@ -61,8 +61,14 @@ namespace IhildaWallet
 		//private Decimal balance = 0m;
 		private Decimal difference = 0m;
 
+
+		private CancellationTokenSource tokenSource = null;
 		void Button331_Clicked (object sender, EventArgs e)
 		{
+			tokenSource?.Cancel ();
+			tokenSource = new CancellationTokenSource ();
+			CancellationToken token = tokenSource.Token;
+
 			RippleWallet rw = _rippleWallet;
 
 			// TODO security/stability check. 
@@ -93,11 +99,11 @@ namespace IhildaWallet
 						                                         rw.GetStoredReceiveAddress (),
 						                                         destination_account,
 						                                         rc,
-						                                         ni
-
+						                                         ni,
+						token
 					                                         );
 
-					task.Wait ();
+					task.Wait (token);
 
 					Response<PathFindResult> res = task.Result;
 

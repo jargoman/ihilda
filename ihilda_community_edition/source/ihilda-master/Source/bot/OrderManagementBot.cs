@@ -33,19 +33,19 @@ namespace IhildaWallet
 {
 	public class OrderManagementBot
 	{
-		public OrderManagementBot (RippleWallet rw, NetworkInterface ni)
+		public OrderManagementBot (RippleWallet rw, NetworkInterface ni, CancellationToken token)
 		{
 
 			this.NetInterface = ni;
 
 			this.Wallet = rw;
 
-
+			this.token = token;
 			//this.orderDict = new ConcurrentDictionary< string, AutomatedOrder > ();
 		}
 
 
-
+		private readonly CancellationToken token;
 		public IEnumerable<RippleNode> GetNodesFilledOrderBook (IEnumerable<RippleTxStructure> off)
 		{
 
@@ -181,7 +181,7 @@ namespace IhildaWallet
 
 			AccountSequenceCache accountSequnceCache = AccountSequenceCache.GetCacheForAccount (this.Wallet.GetStoredReceiveAddress ());
 
-			Dictionary<String, AutomatedOrder> cachedOffers = accountSequnceCache.SequenceCache; //.Load (Wallet.GetStoredReceiveAddress ());
+			Dictionary<String, AutomatedOrder> cachedOffers = accountSequnceCache?.SequenceCache; //.Load (Wallet.GetStoredReceiveAddress ());
 
 			foreach (RippleNode node in nodes) {
 				AutomatedOrder order = null;
@@ -268,6 +268,8 @@ namespace IhildaWallet
 						string markNext = MarkAsCommand.DoNextMark (o.BotMarking, rule.MarkAs);
 						ao.BotMarking = markNext;
 
+						ao.Previous_Bot_ID = o.Bot_ID;
+
 						backs.AddLast (ao);
 					}
 				}
@@ -350,6 +352,13 @@ namespace IhildaWallet
 		public AutomatedOrder TraceFilledOfferToCreation (RippleNode node)
 		{
 
+#if DEBUG
+			string method_sig = clsstr + nameof (TraceFilledOfferToCreation) + DebugRippleLibSharp.both_parentheses;
+			if (DebugIhildaWallet.OrderManagementBot) {
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
+			}
+#endif
+
 			if (node == null) {
 
 				return null;
@@ -377,13 +386,30 @@ namespace IhildaWallet
 			}
 
 
-			Task<Response<RippleTransaction>> requestTask = tx.GetRequest (PreviousTxnID, this.NetInterface);
+			Task<Response<RippleTransaction>> requestTask = tx.GetRequest (PreviousTxnID, this.NetInterface, token);
 
-			requestTask.Wait (250);
+			requestTask.Wait (250, token);
+
 			while (!requestTask.IsCompleted) {
-				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Waiting on network\n" });
-				requestTask.Wait (1000);
-			}
+				try {
+					if (!requestTask.IsCompleted) OnMessage?.Invoke ( this, new MessageEventArgs () { Message = "Waiting on network" });
+					for (int i = 0; i < 10 && !requestTask.IsCompleted; i++) {
+						if (!requestTask.IsCompleted) OnMessage?.Invoke ( this, new MessageEventArgs () { Message = "." });
+						requestTask.Wait (1000, token);
+					}
+
+				} catch (Exception e) {
+#if DEBUG
+					Logging.ReportException (method_sig, e);
+#endif
+				}
+
+				finally {
+					OnMessage?.Invoke ( this, new MessageEventArgs () { Message = "\n" });
+				}
+
+
+			} 
 
 
 
@@ -405,10 +431,19 @@ namespace IhildaWallet
 					return null;
 				}
 
-				dataTask.Wait (250);
+				dataTask.Wait (250, token);
 				while (!dataTask.IsCompleted) {
-					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Waiting on network\n" });
-					dataTask.Wait (1000);
+					try {
+						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Waiting on network" });
+						for (int i = 0; i < 10 && !dataTask.IsCompleted; i++) {
+							OnMessage?.Invoke (this, new MessageEventArgs () { Message = "." });
+							dataTask.Wait (1000, token);
+						}
+					} catch (Exception e) {
+						Logging.ReportException (method_sig, e);
+					} finally {
+						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "\n" });
+					}
 				}
 
 

@@ -121,7 +121,7 @@ namespace RippleLibSharp.Transactions
 				}
 #endif
 
-				return GetRippleOfferCanselTransaction (queried_addr);
+				return GetRippleOfferCancelTransaction (queried_addr);
 			}
 
 			if (tx.TransactionType == RippleTransactionType.ACCOUNT_SET) {
@@ -239,10 +239,14 @@ namespace RippleLibSharp.Transactions
 			return new Tuple<string, string> (s, s);
 		}
 
-		private Tuple<string, string> GetRippleOfferCanselTransaction (RippleAddress queried_addr)
+		private Tuple<string, string> GetRippleOfferCancelTransaction (RippleAddress queried_addr)
 		{
+
 #if DEBUG
-			string method_sig = clsstr + nameof (GetRippleOfferCanselTransaction) + DebugRippleLibSharp.left_parentheses + nameof (RippleAddress) + DebugRippleLibSharp.space_char + nameof (queried_addr) + DebugRippleLibSharp.equals + DebugRippleLibSharp.ToAssertString (queried_addr) + DebugRippleLibSharp.right_parentheses;
+			string method_sig = 
+				clsstr + 
+				nameof (GetRippleOfferCancelTransaction) + 
+				DebugRippleLibSharp.left_parentheses + nameof(RippleAddress) + DebugRippleLibSharp.space_char + nameof(queried_addr) + DebugRippleLibSharp.equals + DebugRippleLibSharp.ToAssertString (queried_addr) + DebugRippleLibSharp.right_parentheses;
 			if (DebugRippleLibSharp.RippleTxStructure) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
@@ -271,9 +275,9 @@ namespace RippleLibSharp.Transactions
 					 select rng.GetNode ();
 
 
-			RippleNode canseledOrderNode = null;
+			RippleNode canceledOrderNode = null;
 			try {
-				canseledOrderNode = va.First ();
+				canceledOrderNode = va.First ();
 
 			} catch (Exception e) {
 #if DEBUG
@@ -284,16 +288,16 @@ namespace RippleLibSharp.Transactions
 
 			}
 
-			if (canseledOrderNode != null) {
-				tGets = canseledOrderNode.FinalFields.TakerGets;
-				tPays = canseledOrderNode.FinalFields.TakerPays;
+			if (canceledOrderNode != null) {
+				tGets = canceledOrderNode.FinalFields.TakerGets;
+				tPays = canceledOrderNode.FinalFields.TakerPays;
 			}
 
 
 			builder.Append (acnt);
-			builder.Append (" canseled an order");
+			builder.Append (" canceled an order");
 
-			if (canseledOrderNode != null) {
+			if (canceledOrderNode != null) {
 
 				builder.Append (" to buy ");
 				builder.Append (tPays?.ToString () ?? "null");
@@ -307,9 +311,9 @@ namespace RippleLibSharp.Transactions
 			builder.Clear ();
 
 			builder.Append (acnt);
-			builder.Append (" canseled an order");
+			builder.Append (" canceled an order");
 
-			if (canseledOrderNode != null) {
+			if (canceledOrderNode != null) {
 				builder.Append (" to sell ");
 				builder.Append (tGets?.ToString () ?? "null");
 				builder.Append (" for ");

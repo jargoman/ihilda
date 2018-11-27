@@ -21,7 +21,7 @@ namespace IhildaWallet
 	{
 
 
-		public Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> SubmitOrders (IEnumerable<AutomatedOrder> orders, RippleWallet rw, RippleIdentifier rippleIdentifier, NetworkInterface networkInterface)
+		public Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> SubmitOrders (IEnumerable<AutomatedOrder> orders, RippleWallet rw, RippleIdentifier rippleIdentifier, NetworkInterface networkInterface, CancellationToken token)
 		{
 
 
@@ -54,7 +54,7 @@ namespace IhildaWallet
 
 				foreach (AutomatedOrder order in orders) {
 
-					OrderSubmittedEventArgs submitEvent = _SubmitOrder (order, rw, networkInterface, identifier);
+					OrderSubmittedEventArgs submitEvent = _SubmitOrder (order, rw, networkInterface, token, identifier);
 
 					events.Add (submitEvent);
 
@@ -82,7 +82,7 @@ namespace IhildaWallet
 
 		}
 
-		private OrderSubmittedEventArgs _SubmitOrder (AutomatedOrder order, RippleWallet rw, NetworkInterface networkInterface, RippleIdentifier rippleSeedAddress)
+		private OrderSubmittedEventArgs _SubmitOrder (AutomatedOrder order, RippleWallet rw, NetworkInterface networkInterface, CancellationToken token, RippleIdentifier rippleSeedAddress)
 		{
 #if DEBUG
 			string method_sig = clsstr + nameof (_SubmitOrder) + DebugRippleLibSharp.both_parentheses;
@@ -91,7 +91,7 @@ namespace IhildaWallet
 
 
 			OrderSubmittedEventArgs orderSubmittedEventArgs = new OrderSubmittedEventArgs ();
-			uint sequence = Convert.ToUInt32 (AccountInfo.GetSequence (rw.GetStoredReceiveAddress (), networkInterface));
+			uint sequence = Convert.ToUInt32 (AccountInfo.GetSequence (rw.GetStoredReceiveAddress (), networkInterface, token));
 			int submit_attempt = 0;
 			UInt32? lastFee = null;
 			SignOptions opts = null;
@@ -116,7 +116,7 @@ namespace IhildaWallet
 				this.OnFeeSleep.Invoke (sender,e);
 			};
 
-			Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (networkInterface, lastFee);
+			Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (networkInterface, token, lastFee);
 
 			UInt32 f = tupe.Item1;
 			orderSubmittedEventArgs.RippleOfferTransaction.fee = f.ToString ();
@@ -208,7 +208,11 @@ namespace IhildaWallet
 
 			try {
 				submit_attempt++;
-				task = NetworkController.UiTxNetworkSubmit (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface);
+				task = NetworkController.UiTxNetworkSubmit (
+					orderSubmittedEventArgs.RippleOfferTransaction, 
+					networkInterface, 
+					token
+				);
 
 #if DEBUG
 				if (DebugIhildaWallet.OrderSubmitter) {
@@ -222,7 +226,7 @@ namespace IhildaWallet
 					goto retry;
 				}
 
-				task.Wait ();
+				task.Wait (token);
 
 
 			} catch (Exception e) {
@@ -235,7 +239,7 @@ namespace IhildaWallet
 
 				//this.SetResult (index.ToString (), "Network Error", TextHighlighter.RED);
 
-				VerifyEventArgs verifyResul = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface);
+				VerifyEventArgs verifyResul = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface, token);
 				if (verifyResul == null) {
 					// TODO
 				}
@@ -244,7 +248,8 @@ namespace IhildaWallet
 					orderSubmittedEventArgs.Success = true;
 					return orderSubmittedEventArgs;
 				}
-				Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
+				token.WaitHandle.WaitOne (FAILED_ATTEMPT_RETRY_DELAY);
+				//Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
 				goto retry;
 			}
 
@@ -263,14 +268,15 @@ namespace IhildaWallet
 				}
 #endif
 
-				VerifyEventArgs verifyR = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface);
+				VerifyEventArgs verifyR = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface, token);
 				if (verifyR.Success) {
 					orderSubmittedEventArgs.Success = true;
 					return orderSubmittedEventArgs;
 
 				}
 
-				Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
+				token.WaitHandle.WaitOne (FAILED_ATTEMPT_RETRY_DELAY);
+				//Thread.Sleep ();
 				goto retry;
 			}
 
@@ -288,12 +294,14 @@ namespace IhildaWallet
 				}
 #endif
 
-				VerifyEventArgs verifyR = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface);
+				VerifyEventArgs verifyR = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface, token);
 				if (verifyR.Success) {
 					orderSubmittedEventArgs.Success = true;
 					return orderSubmittedEventArgs;
 				}
-				Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
+
+				token.WaitHandle.WaitOne (FAILED_ATTEMPT_RETRY_DELAY);
+				//Thread.Sleep ();
 				goto retry;
 
 			}
@@ -309,13 +317,14 @@ namespace IhildaWallet
 				}
 #endif
 
-				VerifyEventArgs verifyR = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface);
+				VerifyEventArgs verifyR = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface, token);
 				if (verifyR.Success) {
 					orderSubmittedEventArgs.Success = true;
 					return orderSubmittedEventArgs;
 				}
 
-				Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
+				token.WaitHandle.WaitOne (FAILED_ATTEMPT_RETRY_DELAY);
+				//Thread.Sleep ();
 				goto retry;
 			}
 
@@ -329,12 +338,14 @@ namespace IhildaWallet
 				}
 #endif
 
-				VerifyEventArgs verifyR = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface);
+				VerifyEventArgs verifyR = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface, token);
 				if (verifyR.Success) {
 					orderSubmittedEventArgs.Success = true;
 					return orderSubmittedEventArgs;
 				}
-				Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
+
+				token.WaitHandle.WaitOne (FAILED_ATTEMPT_RETRY_DELAY);
+				//Thread.Sleep ();
 				goto retry;
 			}
 
@@ -352,12 +363,14 @@ namespace IhildaWallet
 				}
 #endif
 
-				var verRes = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface);
+				var verRes = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface, token);
 				if (verRes.Success) {
 					orderSubmittedEventArgs.Success = true;
 					return orderSubmittedEventArgs;
 				}
-				Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
+
+				token.WaitHandle.WaitOne (FAILED_ATTEMPT_RETRY_DELAY);
+				//Thread.Sleep ();
 				goto retry;
 
 
@@ -400,24 +413,29 @@ namespace IhildaWallet
 				LogResult (res.engine_result, res.engine_result_message);
 
 				// TODO verify ?
-				Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
+
+				token.WaitHandle.WaitOne (FAILED_ATTEMPT_RETRY_DELAY);
+				//Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
+
 				// not actually a failure so we are continuing 
 				orderSubmittedEventArgs.Success = true;
 				return orderSubmittedEventArgs;
 
 			case Ter.terQUEUED:
 
-				Thread.Sleep (1000);
+				token.WaitHandle.WaitOne (1000);
+				//Thread.Sleep (1000);
 
 				LogResult (res.engine_result, res.engine_result_message);
 
-				verifyResult = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface);
+				verifyResult = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface, token);
 				if (verifyResult.Success) {
 					orderSubmittedEventArgs.Success = true;
 					return orderSubmittedEventArgs;
 				}
 
-				Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
+				token.WaitHandle.WaitOne (FAILED_ATTEMPT_RETRY_DELAY);
+				//Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
 				goto retry;
 
 
@@ -425,13 +443,14 @@ namespace IhildaWallet
 
 				LogResult (res.engine_result, res.engine_result_message);
 
-				verifyResult = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface);
+				verifyResult = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface, token);
 				if (verifyResult.Success) {
 					orderSubmittedEventArgs.Success = true;
 					return orderSubmittedEventArgs;
 				}
 
-				Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
+				token.WaitHandle.WaitOne (FAILED_ATTEMPT_RETRY_DELAY);
+				//Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
 				goto retry;
 
 			case Ter.terPRE_SEQ:
@@ -441,7 +460,7 @@ namespace IhildaWallet
 				LogResult (res.engine_result, res.engine_result_message);
 				Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
 
-				verifyResult = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface);
+				verifyResult = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface, token);
 				if (verifyResult.Success) {
 					orderSubmittedEventArgs.Success = true;
 					return orderSubmittedEventArgs;
@@ -454,7 +473,7 @@ namespace IhildaWallet
 			case Ter.telCAN_NOT_QUEUE_FULL:
 				LogResult (res.engine_result, res.engine_result_message);
 				Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
-				verifyResult = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface);
+				verifyResult = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface, token);
 				if (verifyResult.Success) {
 					orderSubmittedEventArgs.Success = true;
 					return orderSubmittedEventArgs;
@@ -473,11 +492,13 @@ namespace IhildaWallet
 				}
 
 				lastFee = (UInt32)orderSubmittedEventArgs.RippleOfferTransaction.fee.amount;
-				Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
+
+				token.WaitHandle.WaitOne (FAILED_ATTEMPT_RETRY_DELAY);
+				//Thread.Sleep (FAILED_ATTEMPT_RETRY_DELAY);
 
 				LogResult (res.engine_result + " retrying", res.engine_result_message);
 
-				verifyResult = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface);
+				verifyResult = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface, token);
 				if (verifyResult.Success) {
 					orderSubmittedEventArgs.Success = true;
 					return orderSubmittedEventArgs;
@@ -761,9 +782,9 @@ namespace IhildaWallet
 
 		}
 
-		private VerifyEventArgs VerifyTx ( RippleOfferTransaction offerTransaction, NetworkInterface networkInterface )
+		private VerifyEventArgs VerifyTx ( RippleOfferTransaction offerTransaction, NetworkInterface networkInterface, CancellationToken token )
 		{
-			VerifyEventArgs verifyEventArgs = _VerifyTx (offerTransaction, networkInterface);
+			VerifyEventArgs verifyEventArgs = _VerifyTx (offerTransaction, networkInterface, token);
 
 			OnVerifyingTxReturn?.Invoke (this, verifyEventArgs);
 
@@ -774,7 +795,7 @@ namespace IhildaWallet
 			return verifyEventArgs;
 		}
 
-		private VerifyEventArgs _VerifyTx (RippleOfferTransaction offerTransaction, NetworkInterface networkInterface)
+		private VerifyEventArgs _VerifyTx (RippleOfferTransaction offerTransaction, NetworkInterface networkInterface, CancellationToken token)
 		{
 
 
@@ -783,17 +804,22 @@ namespace IhildaWallet
 				RippleOfferTransaction = offerTransaction
 			};
 
-			Thread.Sleep (1000);
+			token.WaitHandle.WaitOne (1000);
+			//Thread.Sleep (1000);
 			Logging.WriteLog ("Validating Tx\n");
-			Thread.Sleep (2000);
+			//Thread.Sleep (2000);
+			token.WaitHandle.WaitOne (2000);
 
 			OnVerifyingTxBegin?.Invoke (this, verifyEventArgs);
 
 			for (int i = 0; i < 100; i++) {
-				Thread.Sleep (3000);
-				Tuple<string, uint> tuple = ServerInfo.GetFeeAndLedgerSequence (networkInterface);
 
-				Task<Response<RippleTransaction>> task = tx.GetRequest (offerTransaction.hash, networkInterface);
+				token.WaitHandle.WaitOne (3000);
+				//Thread.Sleep (3000);
+
+				Tuple<string, uint> tuple = ServerInfo.GetFeeAndLedgerSequence (networkInterface, token);
+
+				Task<Response<RippleTransaction>> task = tx.GetRequest (offerTransaction.hash, networkInterface, token);
 				if (task == null) {
 					// TODO Debug
 					Logging.WriteLog ("Error : task == null");
@@ -803,7 +829,7 @@ namespace IhildaWallet
 				}
 
 
-				task.Wait ();
+				task.Wait (token);
 
 				Response<RippleTransaction> response = task.Result;
 				if (response == null) {
@@ -822,6 +848,9 @@ namespace IhildaWallet
 					Logging.WriteLog ("Validated");
 					verifyEventArgs.Success = true;
 					return verifyEventArgs;
+
+
+
 				}
 
 				if (tuple.Item2 > offerTransaction.LastLedgerSequence) {

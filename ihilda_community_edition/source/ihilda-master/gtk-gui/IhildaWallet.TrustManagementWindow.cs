@@ -46,9 +46,7 @@ namespace IhildaWallet
 			this.hbox4.Name = "hbox4";
 			this.hbox4.Spacing = 6;
 			// Container child hbox4.Gtk.Box+BoxChild
-			this.walletswitchwidget3 = new global::IhildaWallet.WalletSwitchWidget();
-			this.walletswitchwidget3.Events = ((global::Gdk.EventMask)(256));
-			this.walletswitchwidget3.Name = "walletswitchwidget3";
+			this.walletswitchwidget3 = null;
 			this.hbox4.Add(this.walletswitchwidget3);
 			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.walletswitchwidget3]));
 			w2.Position = 0;
@@ -63,9 +61,7 @@ namespace IhildaWallet
 			this.notebook1.Name = "notebook1";
 			this.notebook1.CurrentPage = 0;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.trustsetter2 = new global::IhildaWallet.TrustSetter();
-			this.trustsetter2.Events = ((global::Gdk.EventMask)(256));
-			this.trustsetter2.Name = "trustsetter2";
+			this.trustsetter2 = null;
 			this.notebook1.Add(this.trustsetter2);
 			// Notebook tab
 			this.trustlabel = new global::Gtk.Label();
@@ -74,9 +70,7 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.trustsetter2, this.trustlabel);
 			this.trustlabel.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.accountlineswidget1 = new global::IhildaWallet.AccountLinesWidget();
-			this.accountlineswidget1.Events = ((global::Gdk.EventMask)(256));
-			this.accountlineswidget1.Name = "accountlineswidget1";
+			this.accountlineswidget1 = null;
 			this.notebook1.Add(this.accountlineswidget1);
 			global::Gtk.Notebook.NotebookChild w5 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.accountlineswidget1]));
 			w5.Position = 1;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Gtk;
 using IhildaWallet.Networking;
@@ -24,7 +25,7 @@ namespace IhildaWallet
 		{
 			this.Build ();
 
-			bool sen = false;
+			//bool sen = false;
 
 			/*
 			mincheckbox.Sensitive = sen;
@@ -58,6 +59,11 @@ namespace IhildaWallet
 			button217.Clicked += Button217_Clicked;
 
 			sharetickercomboboxentry.Changed += (object sender, EventArgs e) => {
+
+				sharetictokensource?.Cancel ();
+				sharetictokensource = new CancellationTokenSource ();
+				var token = sharetictokensource.Token;
+
 				string str = sharetickercomboboxentry.ActiveText;
 				if (RippleCurrency.NativeCurrency == str) {
 					this.shareissuercomboboxentry.Entry.Text = "";
@@ -79,17 +85,22 @@ namespace IhildaWallet
 					if (account == null) {
 						return;
 					}
-					List<string> issuers = AccountLines.GetIssuersForCurrency (str, account, networkInterface);
+					List<string> issuers = AccountLines.GetIssuersForCurrency (str, account, networkInterface, token);
 
 
 
 					SetShareComboIssuers (issuers);
 
 
-				});
+				}, token);
 			};
 
 			divcurcomboboxentry.Changed += (object sender, EventArgs e) => {
+
+				divCurrTokenSource?.Cancel ();
+				divCurrTokenSource = new CancellationTokenSource ();
+				var token = divCurrTokenSource.Token;
+
 				string str = divcurcomboboxentry.ActiveText;
 				if (RippleCurrency.NativeCurrency == str) {
 					this.divissuercomboboxentry.Entry.Text = "";
@@ -111,7 +122,7 @@ namespace IhildaWallet
 					if (account == null) {
 						return;
 					}
-					List<string> issuers = AccountLines.GetIssuersForCurrency (str, account, networkInterface);
+					List<string> issuers = AccountLines.GetIssuersForCurrency (str, account, networkInterface, token);
 
 
 
@@ -128,9 +139,18 @@ namespace IhildaWallet
 
 		}
 
+		private CancellationTokenSource sharetictokensource = null;
+		private CancellationTokenSource shareIssTokenSource = null;
+		private CancellationTokenSource divCurrTokenSource = null;
+		private CancellationTokenSource divIssTokenSource = null;
 
 		void ShareIssuerComboboxentry_Changed (object sender, EventArgs e)
 		{
+
+			shareIssTokenSource?.Cancel ();
+			shareIssTokenSource = new CancellationTokenSource ();
+			var token = shareIssTokenSource.Token;
+
 			string str = shareissuercomboboxentry.ActiveText;
 
 			string account = null;
@@ -154,11 +174,11 @@ namespace IhildaWallet
 					return;
 				}
 
-				Task<Response<AccountCurrenciesResult>> task = AccountCurrencies.GetResult (account, networkInterface);
+				Task<Response<AccountCurrenciesResult>> task = AccountCurrencies.GetResult (account, networkInterface, token);
 				if (task == null) {
 					return;
 				}
-				task.Wait ();
+				task.Wait (token);
 
 				Response<AccountCurrenciesResult> response = task.Result;
 				if (response == null) {
@@ -190,6 +210,11 @@ namespace IhildaWallet
 
 		void DivIssuercomboboxentry_Changed (object sender, EventArgs e)
 		{
+
+			divIssTokenSource?.Cancel ();
+			divIssTokenSource = new CancellationTokenSource ();
+			var token = divIssTokenSource.Token;
+
 			string str = divissuercomboboxentry.ActiveText;
 			string account = null;
 
@@ -212,11 +237,11 @@ namespace IhildaWallet
 					return;
 				}
 
-				Task<Response<AccountCurrenciesResult>> task = AccountCurrencies.GetResult (account, networkInterface);
+				Task<Response<AccountCurrenciesResult>> task = AccountCurrencies.GetResult (account, networkInterface, token);
 				if (task == null) {
 					return;
 				}
-				task.Wait ();
+				task.Wait (token);
 
 				Response<AccountCurrenciesResult> response = task.Result;
 				if (response == null) {
@@ -674,8 +699,8 @@ namespace IhildaWallet
 		{
 			NetworkInterface networkInterface = NetworkController.GetNetworkInterfaceNonGUIThread ();
 
-
-			IEnumerable<Response<AccountLinesResult>> results = AccountLines.GetResultFull (tokenRequires.ShareIssuer, networkInterface);
+			// TODO investigate possibly using a real cancellation token
+			IEnumerable<Response<AccountLinesResult>> results = AccountLines.GetResultFull (tokenRequires.ShareIssuer, networkInterface, new CancellationToken());
 
 			List< Tuple <string, Decimal> > assetHolders = new List< Tuple <string, Decimal>> ();
 

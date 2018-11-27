@@ -62,20 +62,27 @@ namespace IhildaWallet
 			Task.Run ((System.Action)Refresh);
 		}
 
-
+		private CancellationTokenSource tokenSource = null;
 		public void Refresh ()
 		{
+			CancellationTokenSource ts = new CancellationTokenSource ();
 
+			tokenSource?.Cancel ();
+			tokenSource = ts;
+			CancellationToken token = ts.Token;
 
-
- 			NetworkInterface ni = NetworkController.CurrentInterface;
+			NetworkInterface ni = NetworkController.CurrentInterface;
 			if (ni == null) {
-				return ;
+				return;
 			}
 			//ConnectAttemptInfo connectAttemptInfo = ni.GetConnectAttemptInfo ();
 
-			Task<Response<ServerInfoResult>> tsk = ServerInfo.GetResult (ni);
-			tsk.Wait ();
+			Task<Response<ServerInfoResult>> tsk = ServerInfo.GetResult (ni, token);
+			tsk.Wait (token);
+
+			if (token.IsCancellationRequested) {
+				return;
+			}
 
 			Response<ServerInfoResult> resp = tsk.Result;
 
@@ -90,8 +97,9 @@ namespace IhildaWallet
 
 					string server = connectInfo?.ServerUrl;
 
-					this.label26.Markup = "<b>Server Info : <span fgcolor=\"green\">" + (string)(server ?? "null") + "</span></b>";
-
+					this.label26.Markup = Program.darkmode
+						? "<b>Server Info : <span fgcolor=\"chartreuse\">" + (string)(server ?? "null") + "</span></b>"
+						: "<b>Server Info : <span fgcolor=\"green\">" + (string)(server ?? "null") + "</span></b>";
 
 				}
 			);

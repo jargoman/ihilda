@@ -178,9 +178,15 @@ namespace IhildaWallet
 				if (Account == null ) {
 					return null;
 				}
+
 				return Account + Sequence.ToString(); 
 			}
 			//set { }
+		}
+
+		public string Previous_Bot_ID {
+			get;
+			set;
 		}
 
 

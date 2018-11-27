@@ -17,7 +17,7 @@ namespace RippleLibSharp.Commands.Tx
 	public static class tx
 #pragma warning restore IDE1006 // Naming Styles
 	{
-		public static Task<Response<RippleTransaction>> GetRequest ( string tx_id, NetworkInterface ni, IdentifierTag identifierTag = null)
+		public static Task<Response<RippleTransaction>> GetRequest ( string tx_id, NetworkInterface ni, CancellationToken token, IdentifierTag identifierTag = null)
 		{
 			if (identifierTag == null) {
 				identifierTag = new IdentifierTag {
@@ -35,7 +35,7 @@ namespace RippleLibSharp.Commands.Tx
 			string request = DynamicJson.Serialize (o);
 
 			Task< Response<RippleTransaction>> task = 
-				NetworkRequestTask.RequestResponse < RippleTransaction> (identifierTag, request, ni);
+				NetworkRequestTask.RequestResponse < RippleTransaction> (identifierTag, request, ni, token);
 
 
 			return task;

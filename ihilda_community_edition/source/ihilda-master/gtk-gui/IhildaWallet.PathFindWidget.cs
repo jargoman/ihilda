@@ -189,9 +189,7 @@ namespace IhildaWallet
 			w13.Fill = false;
 			w13.Padding = ((uint)(3));
 			// Container child vbox3.Gtk.Box+BoxChild
-			this.pathstree1 = new global::IhildaWallet.PathsTree();
-			this.pathstree1.Events = ((global::Gdk.EventMask)(256));
-			this.pathstree1.Name = "pathstree1";
+			this.pathstree1 = null;
 			this.vbox3.Add(this.pathstree1);
 			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.pathstree1]));
 			w14.Position = 3;

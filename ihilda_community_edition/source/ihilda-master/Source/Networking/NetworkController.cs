@@ -197,7 +197,7 @@ namespace IhildaWallet.Networking
 		}
 
 
-		public static Task<Response< RippleSubmitTxResult>> UiTxNetworkSubmit (RippleTransaction rt, NetworkInterface ni) {
+		public static Task<Response< RippleSubmitTxResult>> UiTxNetworkSubmit (RippleTransaction rt, NetworkInterface ni, CancellationToken token) {
 			return Task.Run (
 				delegate {
 					
@@ -216,8 +216,10 @@ namespace IhildaWallet.Networking
 
 					);
 
-					mre.WaitOne ();
-					Response<RippleSubmitTxResult> tsk = rt.Submit(ni);
+					//mre.WaitOne ();
+					WaitHandle.WaitAny (new [] { mre, token.WaitHandle });
+
+					Response<RippleSubmitTxResult> tsk = rt.Submit(ni, token);
 
 
 					Gtk.Application.Invoke (
@@ -250,10 +252,7 @@ namespace IhildaWallet.Networking
 						return false;
 					}
 					NetworkInterface ni = NetworkController.InitNetworking (conny);
-					if (ni == null) {
-						return false;
-					}
-					return ni.Connect ();
+					return ni != null && ni.Connect();
 				}
 			);
 

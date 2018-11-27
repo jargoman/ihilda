@@ -386,14 +386,14 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 
 
-		public UInt32 AutoRequestFee (NetworkInterface ni)
+		public UInt32 AutoRequestFee (NetworkInterface ni, CancellationToken token)
 		{
-			Tuple<string, UInt32> tupe = RippleLibSharp.Commands.Server.ServerInfo.GetFeeAndLedgerSequence (ni);
+			Tuple<string, UInt32> tupe = RippleLibSharp.Commands.Server.ServerInfo.GetFeeAndLedgerSequence (ni, token);
 			fee = tupe.Item1;
 			return tupe.Item2;
 		}
 
-		public uint AutoRequestSequence (RippleAddress rw, NetworkInterface ni)
+		public uint AutoRequestSequence (RippleAddress rw, NetworkInterface ni, CancellationToken token)
 		{
 			if (rw == null) {
 				Sequence = 0;
@@ -405,13 +405,14 @@ namespace RippleLibSharp.Transactions.TxTypes
 				Sequence = 0;
 				return 0;
 			}
-			Sequence = AccountInfo.GetSequence (rw?.ToString (), ni) ?? 0;
 
+			Sequence = AccountInfo.GetSequence (rw?.ToString (), ni, token) ?? 0;
+			 
 			return Sequence;
 		}
 
 
-		protected Response<T> SubmitToNetwork<T> (NetworkInterface ni, IdentifierTag identifierTag = null)
+		protected Response<T> SubmitToNetwork<T> (NetworkInterface ni, CancellationToken token, IdentifierTag identifierTag = null)
 		{
 
 			if (this.SignedTransactionBlob == null) {
@@ -449,9 +450,9 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 
 
-			var tsk = NetworkRequestTask.RequestResponse<T> (identifierTag, json, ni);
+			var tsk = NetworkRequestTask.RequestResponse<T> (identifierTag, json, ni, token);
 
-			tsk.Wait ();
+			tsk.Wait (token);
 
 
 
@@ -463,10 +464,10 @@ namespace RippleLibSharp.Transactions.TxTypes
 		}
 
 
-		public Response<RippleSubmitTxResult> Submit (NetworkInterface ni)
+		public Response<RippleSubmitTxResult> Submit (NetworkInterface ni, CancellationToken token)
 		{
 
-			return this.SubmitToNetwork<RippleSubmitTxResult> (ni);
+			return this.SubmitToNetwork<RippleSubmitTxResult> (ni, token);
 
 
 

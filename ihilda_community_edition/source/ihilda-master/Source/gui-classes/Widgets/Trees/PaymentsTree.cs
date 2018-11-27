@@ -49,7 +49,7 @@ namespace IhildaWallet
 		}
 
 
-		public bool SubmitOrderAtIndex ( int index , uint sequence, NetworkInterface ni, RippleIdentifier rsa) {
+		public bool SubmitOrderAtIndex ( int index , uint sequence, NetworkInterface ni, CancellationToken token, RippleIdentifier rsa) {
 
 			#if DEBUG
 			string method_sig = clsstr + nameof (SubmitOrderAtIndex) + DebugRippleLibSharp.both_parentheses;
@@ -83,13 +83,13 @@ namespace IhildaWallet
 					this.SetResult (index.ToString(), "Fee " + e.FeeAndLastLedger.Item1.ToString() + " is too high, waiting on lower fee", TextHighlighter.BLACK);
 				};
 
-				Tuple< UInt32,UInt32 > tupe = feeSettings.GetFeeAndLastLedgerFromSettings ( ni );
+				Tuple< UInt32,UInt32 > tupe = feeSettings.GetFeeAndLastLedgerFromSettings ( ni, token );
 
 
-				if (stop) {
+				if (token.IsCancellationRequested) {
 
 					this.SetResult(index.ToString(), "Aborted", TextHighlighter.RED);
-					stop = false;
+					
 					return false;
 				}
 				//UInt32 f = tupe.Item1; 
@@ -150,9 +150,9 @@ namespace IhildaWallet
 
 
 
-				if (stop) {
+				if (token.IsCancellationRequested) {
 					this.SetResult(index.ToString(), "Aborted", TextHighlighter.RED);
-					stop = false;
+					//stop = false;
 					return false;
 				}
 
@@ -161,9 +161,9 @@ namespace IhildaWallet
 				Task< Response <RippleSubmitTxResult>> task = null;
 
 				try {
-					task = NetworkController.UiTxNetworkSubmit (tx, ni);
+					task = NetworkController.UiTxNetworkSubmit (tx, ni, token);
 					this.SetStatus(index.ToString(), "Submitted via websocket", TextHighlighter.GREEN);
-					task.Wait ();
+					task.Wait (token);
 
 
 				}
@@ -252,7 +252,8 @@ namespace IhildaWallet
 					return false;
 
 				case "terQUEUED":
-					Thread.Sleep(1000);
+					//Thread.Sleep(1000);
+					token.WaitHandle.WaitOne (1000);
 					this.SetResult (index.ToString (), res.engine_result, TextHighlighter.GREEN);
 					return true;
 
@@ -554,8 +555,10 @@ namespace IhildaWallet
 
 		public void Stopbutton_Clicked (object sender, EventArgs e)
 		{
-			this.stop = true;
-
+			//this.stop = true;
+			tokenSource?.Cancel ();
+			tokenSource.Dispose ();
+			tokenSource = null;
 		}
 
 		public Tuple <RipplePaymentTransaction[], bool []> _payments_tuple {
@@ -567,7 +570,7 @@ namespace IhildaWallet
 		ListStore listStore;
 
 #pragma warning disable RECS0122 // Initializing field with default value is redundant
-		public bool stop = false;
+		public CancellationTokenSource tokenSource = null;
 #pragma warning restore RECS0122 // Initializing field with default value is redundant
 
 #if DEBUG

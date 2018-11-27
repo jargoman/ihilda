@@ -133,6 +133,8 @@ namespace IhildaWallet
 			// show all might show this. Oh well. 
 			this.infoBarLabel.Hide ();
 
+			button3329.Visible = false;
+
 			this.ledgerconstraintswidget3.HideTopRow ();
 
 			//this.Visible = true;
@@ -203,6 +205,14 @@ namespace IhildaWallet
 				}
 #endif
 
+
+				Cancel ();
+				tokenSource = new CancellationTokenSource ();
+				CancellationToken token = tokenSource.Token;
+
+				button3329.Visible = true;
+
+				progressbar2.Pulse ();
 				this.SpinWaitObj?.Show ();
 
 				string addr = this.AccountEntry.Entry.Text;
@@ -222,13 +232,21 @@ namespace IhildaWallet
 				catch (FormatException fe) {
 #pragma warning restore 0168
 
+					string messg = addr + " is not a properlay formatted ripple address";
+
 #if DEBUG
 					if (DebugIhildaWallet.TxViewWidget) {
 						Logging.ReportException (method_sig, fe);
 					}
+
+					MessageDialog.ShowMessage (messg);
 #endif
+
+					infoBarLabel.Text = "<span fgcolor=\"red\">" + messg + "</span>";
+					infoBarLabel.Visible = true;
+
 					SpinWaitObj.Hide ();
-					MessageDialog.ShowMessage (addr + " is not a properlay formatted ripple address\n");
+
 
 					return;
 				}
@@ -237,14 +255,21 @@ namespace IhildaWallet
 				catch (Exception ex) {
 #pragma warning restore 0168
 
+
+					string messg = "Error processing ripple address";
 #if DEBUG
 					if (DebugIhildaWallet.TxViewWidget) {
 						Logging.ReportException (method_sig, ex);
 					}
+
+					MessageDialog.ShowMessage (messg);
 #endif
 
+					infoBarLabel.Markup = "<span fgcolor=\"red\">" + messg + "</span>";
+					infoBarLabel.Visible = true;
+
 					SpinWaitObj.Hide ();
-					MessageDialog.ShowMessage ("Error processing ripple address\n");
+
 					return;
 				}
 
@@ -262,26 +287,52 @@ namespace IhildaWallet
 
 				//this.spinwait.ShowAll();
 
-				SubscribeParam sp = new SubscribeParam (ra.ToString (), 0);
+				SubscribeParam sp = new SubscribeParam (
+					ra.ToString (), 
+					0,
+					token
+				);
 
-				ParameterizedThreadStart pst = new ParameterizedThreadStart (Subscribe);
+				ParameterizedThreadStart pst = 
+					new ParameterizedThreadStart (Subscribe);
+
 				Thread thr = new Thread (pst);
 				thr.Start (sp);
 
 				//subscribe(ra, 0);
-
+				progressbar2.Pulse ();
 			};
 
+
+			button3329.Clicked += (object sender, EventArgs e) => {
+				Cancel ();	
+			};
 		}
+
+		~TxViewWidget ()
+		{
+			Cancel ();
+		}
+
+		public void Cancel ()
+		{
+			tokenSource?.Cancel ();
+			tokenSource?.Dispose ();
+			tokenSource = null;
+		}
+
+		private CancellationTokenSource tokenSource = null;
 
 		class SubscribeParam
 		{
-			public SubscribeParam (String addres, int max_num)
+			public SubscribeParam (String addres, int max_num, CancellationToken token)
 			{
 				this.address = addres;
 				this.max_num = max_num;
+				this.cancellationToken = token;
 			}
 
+			public CancellationToken cancellationToken;
 			public string address;
 			public int max_num;
 		}
@@ -295,7 +346,6 @@ namespace IhildaWallet
 		{
 			// NON GUI thread
 
-
 #if DEBUG
 			string method_sig = clsstr + nameof (Subscribe) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.TxViewWidget) {
@@ -303,20 +353,45 @@ namespace IhildaWallet
 
 			}
 #endif
+			Gtk.Application.Invoke (
+				delegate {
+					progressbar2.Pulse ();
+
+				}
+			);
+
 			try {
 
 				if (!(o is SubscribeParam para)) {
 					return;
 				}
+
+				CancellationToken token = para.cancellationToken;
+				if (token.IsCancellationRequested) {
+					Gtk.Application.Invoke (
+						delegate {
+							progressbar2.Fraction = 0;
+
+						}
+					);
+					return;
+				}
+
 #if DEBUG
 				if (DebugIhildaWallet.TxViewWidget) {
 					Logging.WriteLog (method_sig + "para.address=" + para.address);
-
 				}
 #endif
 
 				//NetworkInterface ni = NetworkController.getNetworkInterfaceGuiThread();
 				NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
+
+				Gtk.Application.Invoke (
+					delegate {
+						progressbar2.Pulse ();
+
+					}
+				);
 
 				if (ni == null) {
 					NetworkController.DoNetworkingDialogNonGUIThread ();
@@ -325,6 +400,14 @@ namespace IhildaWallet
 
 				int? min = ledgerconstraintswidget3.GetStartFromLedger ();
 				int? max = ledgerconstraintswidget3.GetEndLedger ();
+
+				Gtk.Application.Invoke (
+					delegate {
+						progressbar2.Pulse ();
+
+					}
+				);
+
 				int? limit = ledgerconstraintswidget3.GetLimit ();
 				bool? b = ledgerconstraintswidget3.GetForward ();
 
@@ -339,7 +422,7 @@ namespace IhildaWallet
 
 						return;
 					}
-					DoFullSync (para.address, ni);
+					DoFullSync (para.address, ni, token);
 					return;
 				}
 
@@ -367,17 +450,30 @@ namespace IhildaWallet
 							max?.ToString () ?? (-1).ToString (),
 							lim,
 							
-							ni);
+							ni,
+						token
+					);
 				} else {
 					tsk = AccountTx.GetFullTxResult (
 						para.address,
 						min?.ToString () ?? (-1).ToString (),
 						max?.ToString () ?? (-1).ToString (),
 
-						ni
+						ni,
+						token
 					);
 				}
-				tsk.Wait ();
+
+				while (!token.IsCancellationRequested && !tsk.IsCompleted) {
+					tsk.Wait (250, token);
+					Gtk.Application.Invoke (
+						delegate {
+							progressbar2.Pulse ();
+
+						}
+					);
+				}
+
 
 				IEnumerable <Response<AccountTxResult>> results = tsk.Result;
 
@@ -412,16 +508,20 @@ namespace IhildaWallet
 
 		}
 
-		private void DoFullSync (string account, NetworkInterface ni)
+		private void DoFullSync (string account, NetworkInterface ni, CancellationToken token)
 		{
 #if DEBUG
-			string method_sig = clsstr + nameof (DoFullSync) + DebugRippleLibSharp.both_parentheses;
+			string method_sig = 
+				clsstr + 
+				nameof (DoFullSync) + 
+				DebugRippleLibSharp.both_parentheses;
 #endif
+
 			try {
 
 				Task<IEnumerable<Response<AccountTxResult>>> task =
 					//AccountTx.GetFullTxResult (account, ni);
-					AccountTx.GetFullTxResult (account, (-1).ToString (), (-1).ToString (), ni);
+					AccountTx.GetFullTxResult (account, (-1).ToString (), (-1).ToString (), ni, token);
 				if (task == null) {
 					Gtk.Application.Invoke (
 						(object sender, EventArgs e) => {
@@ -432,7 +532,19 @@ namespace IhildaWallet
 
 					return;
 				}
-				task.Wait ();
+
+				while (!token.IsCancellationRequested && !task.IsCompleted) {
+
+
+					task.Wait (250, token);
+					Gtk.Application.Invoke (
+						delegate {
+							progressbar2.Pulse ();
+
+						}
+					);
+				}
+
 
 
 
@@ -473,6 +585,19 @@ namespace IhildaWallet
 					}
 				);
 
+			} catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException) {
+
+#if DEBUG
+				Logging.ReportException (method_sig, ex);
+#endif
+				Gtk.Application.Invoke (
+					(object sender, EventArgs event_args) => {
+						this.infoBarLabel.Text = "Task cancelled. Results, if any, may be incomplete";
+						this.infoBarLabel.Show ();
+						this.progressbar2.Fraction = 0.5;
+					}
+				);
+
 			} catch (Exception e) {
 
 #if DEBUG
@@ -481,8 +606,9 @@ namespace IhildaWallet
 
 				Gtk.Application.Invoke (
 					(object sender, EventArgs event_args) => {
-						this.infoBarLabel.Text = "Bug: AccountTx Task returned null value";
+						this.infoBarLabel.Text = "<span fgcolor=\"red\">Bug: AccountTx Task returned null value</span>";
 						this.infoBarLabel.Show ();
+						this.progressbar2.Fraction = 0;
 					}
 				);
 
@@ -508,6 +634,7 @@ namespace IhildaWallet
 					SpinWaitObj.Hide ();
 
 					this.ledgerconstraintswidget3.HideTopRow ();
+					button3329.Visible = false;
 				}
 			);
 		}
@@ -741,6 +868,8 @@ namespace IhildaWallet
 				this.txwidget10?.Hide ();
 
 				this.infoBarLabel?.Hide ();
+
+				button3329?.Hide ();
 			});
 
 		}

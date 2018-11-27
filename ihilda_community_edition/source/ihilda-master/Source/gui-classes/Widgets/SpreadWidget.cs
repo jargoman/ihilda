@@ -6,6 +6,7 @@ using RippleLibSharp.Transactions;
 using RippleLibSharp.Network;
 using IhildaWallet.Networking;
 using Gtk;
+using System.Threading;
 
 namespace IhildaWallet
 {
@@ -18,8 +19,8 @@ namespace IhildaWallet
 
 			Task.Factory.StartNew (async () => {
 
-				while (_cont) {
-					await Task.Delay (30000);
+				while (!TokenSource.IsCancellationRequested) {
+					await Task.Delay (30000, TokenSource.Token);
 					Update ();
 				}
 			}
@@ -29,10 +30,10 @@ namespace IhildaWallet
 
 		~SpreadWidget()
 		{
-			_cont = false;
+			TokenSource.Cancel (); // = false;
 		}
 
-		private bool _cont = true;
+		private CancellationTokenSource TokenSource = new CancellationTokenSource ();
 
 		private TradePair _tradePair = null;
 
@@ -52,7 +53,7 @@ namespace IhildaWallet
 
 			);
 
-			Task.Run ((System.Action)Update);
+			Task.Run ( (System.Action)Update);
 			//Update ();
 		}
 
@@ -68,12 +69,13 @@ namespace IhildaWallet
 				return;
 			}
 
-			Task<Response<BookOfferResult>> buyTask = 
+			Task<Response<BookOfferResult>> buyTask =
 				BookOffers.GetResult (
 					tp.Currency_Counter,
 					tp.Currency_Base,
 					2,
-					ni
+					ni,
+					this.TokenSource.Token
 
 			);
 			Task<Response<BookOfferResult>> sellTask = 
@@ -81,10 +83,11 @@ namespace IhildaWallet
 					tp.Currency_Base,
 					tp.Currency_Counter,
 					2,
-					ni
+					ni,
+					TokenSource.Token
 			);
 
-			Task.WaitAll ( new Task[] { buyTask, sellTask } );
+			Task.WaitAll ( new Task[] { buyTask, sellTask } , TokenSource.Token);
 
 			Offer[] buyoffers = buyTask?.Result?.result?.offers;
 			Offer[] selloffers = sellTask?.Result?.result?.offers;

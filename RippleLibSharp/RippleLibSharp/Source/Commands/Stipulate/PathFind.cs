@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Codeplex.Data;
 using RippleLibSharp.Network;
@@ -9,7 +10,7 @@ namespace RippleLibSharp.Commands.Stipulate
 {
 	public static class PathFind
 	{
-		public static  Task<Response<PathFindResult>> GetResult ( string source_account, string destination_account, RippleCurrency destination_amount, NetworkInterface ni, IdentifierTag identifierTag = null) {
+		public static  Task<Response<PathFindResult>> GetResult ( string source_account, string destination_account, RippleCurrency destination_amount, NetworkInterface ni, CancellationToken token, IdentifierTag identifierTag = null) {
 
 			if (identifierTag == null) {
 				identifierTag = new IdentifierTag {
@@ -30,7 +31,7 @@ namespace RippleLibSharp.Commands.Stipulate
 
 			string request = DynamicJson.Serialize (o);
 
-			Task< Response<PathFindResult>> task = NetworkRequestTask.RequestResponse <PathFindResult> (identifierTag, request, ni);
+			Task< Response<PathFindResult>> task = NetworkRequestTask.RequestResponse <PathFindResult> (identifierTag, request, ni, token);
 
 			return task;
 		}

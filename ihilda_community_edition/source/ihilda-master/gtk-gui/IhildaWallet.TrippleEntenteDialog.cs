@@ -20,7 +20,7 @@ namespace IhildaWallet
 
 		private global::Gtk.VBox vbox3;
 
-		private global::IhildaWallet.PinCodeWidget pincodewidget2;
+		private global::IhildaWallet.PinCodeWidget pincodewidget1;
 
 		private global::Gtk.Label label3;
 
@@ -61,7 +61,7 @@ namespace IhildaWallet
 			this.notebook2 = new global::Gtk.Notebook();
 			this.notebook2.CanFocus = true;
 			this.notebook2.Name = "notebook2";
-			this.notebook2.CurrentPage = 0;
+			this.notebook2.CurrentPage = 2;
 			// Container child notebook2.Gtk.Notebook+NotebookChild
 			this.vbox5 = new global::Gtk.VBox();
 			this.vbox5.Name = "vbox5";
@@ -99,11 +99,11 @@ namespace IhildaWallet
 			this.vbox3.Name = "vbox3";
 			this.vbox3.Spacing = 6;
 			// Container child vbox3.Gtk.Box+BoxChild
-			this.pincodewidget2 = new global::IhildaWallet.PinCodeWidget();
-			this.pincodewidget2.Events = ((global::Gdk.EventMask)(256));
-			this.pincodewidget2.Name = "pincodewidget2";
-			this.vbox3.Add(this.pincodewidget2);
-			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.pincodewidget2]));
+			this.pincodewidget1 = new global::IhildaWallet.PinCodeWidget();
+			this.pincodewidget1.Events = ((global::Gdk.EventMask)(256));
+			this.pincodewidget1.Name = "pincodewidget1";
+			this.vbox3.Add(this.pincodewidget1);
+			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.pincodewidget1]));
 			w6.Position = 0;
 			w6.Expand = false;
 			w6.Fill = false;

@@ -24,6 +24,7 @@ namespace RippleLibSharp.Commands.Accounts
 
 			bool forward,
 			NetworkInterface ni,
+			CancellationToken token,
 			IdentifierTag identifierTag = null
 		) {
 			if (identifierTag == null) {
@@ -47,7 +48,7 @@ namespace RippleLibSharp.Commands.Accounts
 			string request = DynamicJson.Serialize (o);
 
 			Task< Response<AccountTxResult>> task = 
-				NetworkRequestTask.RequestResponse < AccountTxResult> (identifierTag, request, ni);
+				NetworkRequestTask.RequestResponse < AccountTxResult> (identifierTag, request, ni, token);
 
 
 			return task;
@@ -57,10 +58,11 @@ namespace RippleLibSharp.Commands.Accounts
 		public static Task< IEnumerable< Response < AccountTxResult >> > GetFullTxResult (
 			string account,
 
-			NetworkInterface ni
+			NetworkInterface ni,
+			CancellationToken token
 		) {
 			
-			return GetFullTxResult (account, (-1).ToString(), (-1).ToString(), ni);
+			return GetFullTxResult (account, (-1).ToString(), (-1).ToString(), ni, token);
 		}
 
 		public static Task<IEnumerable<Response<AccountTxResult>>> GetFullTxResult (
@@ -68,7 +70,8 @@ namespace RippleLibSharp.Commands.Accounts
 			string ledger_index_min,
 			string ledger_index_max,
 			int limit,
-			NetworkInterface ni
+			NetworkInterface ni,
+			CancellationToken token
 		)
 		{
 			return Task.Run (
@@ -98,13 +101,13 @@ namespace RippleLibSharp.Commands.Accounts
 					string request = DynamicJson.Serialize (o);
 
 					Task<Response<AccountTxResult>> task =
-						NetworkRequestTask.RequestResponse<AccountTxResult> (identifierTag, request, ni);
+						NetworkRequestTask.RequestResponse<AccountTxResult> (identifierTag, request, ni, token);
 
 					if (task == null) {
 						//TODO
 					}
 
-					task.Wait ();
+					task.Wait (token);
 
 
 					Response<AccountTxResult> res = task.Result;
@@ -119,7 +122,7 @@ namespace RippleLibSharp.Commands.Accounts
 
 					limit -= accountTx.transactions.Count ();
 
-					while (accountTx?.marker != null && limit > 0) {
+					while (accountTx?.marker != null && limit > 0 && !token.IsCancellationRequested) {
 						//Thread.Sleep(18000);
 
 						identifierTag = new IdentifierTag {
@@ -134,14 +137,14 @@ namespace RippleLibSharp.Commands.Accounts
 							//ledger_index_min = accountTx.marker,
 							ledger_index_max,
 							binary = false,
-							limit = limit,
+							limit,
 							forward,
 							marker = accountTx.marker.GetObject ()
 						};
 
 						request = DynamicJson.Serialize (o);
 						task = null; // set it to null so you know it failed rather than still having old value
-						task = NetworkRequestTask.RequestResponse<AccountTxResult> (identifierTag, request, ni);
+						task = NetworkRequestTask.RequestResponse<AccountTxResult> (identifierTag, request, ni, token);
 
 
 						if (task == null) {
@@ -150,7 +153,7 @@ namespace RippleLibSharp.Commands.Accounts
 							break;
 						}
 
-						task.Wait ();
+						task.Wait (token);
 
 
 
@@ -172,7 +175,7 @@ namespace RippleLibSharp.Commands.Accounts
 
 					return list.AsEnumerable ();
 				}
-			);
+				, token);
 		}
 
 		public static Task< IEnumerable< Response < AccountTxResult >> > GetFullTxResult (
@@ -182,7 +185,8 @@ namespace RippleLibSharp.Commands.Accounts
 			/*count = false,*/
 			//int limit,
 
-			NetworkInterface ni
+			NetworkInterface ni,
+			CancellationToken token
 			//IdentifierTag identifierTag = null
 
 		) 
@@ -214,13 +218,13 @@ namespace RippleLibSharp.Commands.Accounts
 					string request = DynamicJson.Serialize (o);
 
 					Task< Response<AccountTxResult>> task = 
-						NetworkRequestTask.RequestResponse < AccountTxResult> (identifierTag, request, ni);
+						NetworkRequestTask.RequestResponse < AccountTxResult> (identifierTag, request, ni, token);
 
 					if (task == null) {
 						//TODO
 					}
 
-					task.Wait();
+					task.Wait(token);
 
 
 					Response<AccountTxResult> res = task.Result;
@@ -256,7 +260,7 @@ namespace RippleLibSharp.Commands.Accounts
 
 						request = DynamicJson.Serialize (o);
 						task = null; // set it to null so you know it failed rather than still having old value
-						task = NetworkRequestTask.RequestResponse < AccountTxResult> (identifierTag, request, ni);
+						task = NetworkRequestTask.RequestResponse < AccountTxResult> (identifierTag, request, ni, token);
 
 
 						if (task == null) {
@@ -265,7 +269,7 @@ namespace RippleLibSharp.Commands.Accounts
 							break;
 						}
 
-						task.Wait();
+						task.Wait(token);
 
 
 

@@ -14,6 +14,7 @@ using RippleLibSharp.Commands.Accounts;
 
 using RippleLibSharp.Transactions;
 using RippleLibSharp.Util;
+using System.Threading;
 
 namespace IhildaWallet
 {
@@ -26,20 +27,27 @@ namespace IhildaWallet
 
 		}
 
-		public Tuple <Int32?, IEnumerable <AutomatedOrder>> DoLogic (
-			RippleWallet wallet, 
-			NetworkInterface ni, 
-			Int32? ledgerstart, 
-			Int32? ledgerend, 
-			Int32? limit
+		public Tuple<Int32?, IEnumerable<AutomatedOrder>> DoLogic (
+			RippleWallet wallet,
+			NetworkInterface ni,
+			Int32? ledgerstart,
+			Int32? ledgerend,
+			Int32? limit,
+			CancellationToken cancelationToken
 		)
 		{
+
 #if DEBUG
 			string method_sig = clsstr + nameof (DoLogic) + DebugRippleLibSharp.both_parentheses;
 #endif
-				
+
+			if (cancelationToken.IsCancellationRequested) {
+				return null;
+			}
+
 			string ledgerMax = ledgerend?.ToString() ?? (-1).ToString ();
 			string ledgerMin = ledgerstart?.ToString();
+
 			if (ledgerMin == null) {
 				
 				if (RuleManagerObj?.LastKnownLedger == null) {
@@ -49,6 +57,7 @@ namespace IhildaWallet
 				ledgerMin = lastRuleLedger.ToString();
 
 			}
+
 			int lim = limit ?? 0;
 
 			Task<IEnumerable <Response<AccountTxResult>>> task = null;
@@ -62,29 +71,62 @@ namespace IhildaWallet
 							ledgerMax,
 
 							/*false,*/
-							ni)
+							ni,
+						cancelationToken
+					)
 					: AccountTx.GetFullTxResult (
 							wallet.GetStoredReceiveAddress (),
 							ledgerMin,
 							ledgerMax,
 							lim,
 							/*false,*/
-							ni);
+							ni,
+							   cancelationToken
+							  );
 
 				if (task == null) {
 					//return null;
 					throw new NullReferenceException ();
 				}
 
-				while (!task.IsCompleted) {
-					//if (OnMessage != null) {
-						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Waiting on network\n" });
-					//}
-					task.Wait (1000);
+				while (!task.IsCompleted && !cancelationToken.IsCancellationRequested) {
+					try {
+						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Waiting on network" });
+						for (int i = 0; i < 10 && !task.IsCompleted && !cancelationToken.IsCancellationRequested; i++) {
+							OnMessage?.Invoke (this, new MessageEventArgs () { Message = "." });
+							task.Wait (1000, cancelationToken);
+						}
+					} catch (Exception e) {
+
+#if DEBUG
+						if (DebugIhildaWallet.Robotics) {
+							Logging.ReportException (method_sig, e);
+						}
+#endif
+
+
+
+					} finally {
+						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "\n" });
+
+					}
+
+
 				}
 
 				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Received response from network\n" });
-			} catch (Exception e) {
+			} catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException) {
+#if DEBUG
+				if (DebugIhildaWallet.Robotics) {
+					Logging.ReportException (method_sig, ex);
+				}
+#endif
+				throw ex;
+			}
+
+			catch (Exception e) {
+
+
 				
 				StringBuilder errorMessage = new StringBuilder ();
 
@@ -105,6 +147,10 @@ namespace IhildaWallet
 				Logging.WriteBoth (errorMessage.ToString());
 				MessageDialog.ShowMessage (errorMessage.ToString());
 
+				return null;
+			}
+
+			if (cancelationToken.IsCancellationRequested) {
 				return null;
 			}
 
@@ -150,7 +196,7 @@ namespace IhildaWallet
 				lastledger = accTxResult.ledger_index_max;
 			}
 
-			OrderManagementBot omb = new OrderManagementBot (wallet, ni);
+			OrderManagementBot omb = new OrderManagementBot (wallet, ni, cancelationToken);
 
 			omb.OnMessage += (object sender, MessageEventArgs e) => {
 				OnMessage?.Invoke (this, new MessageEventArgs () { Message = e.Message });
@@ -188,32 +234,35 @@ namespace IhildaWallet
 
 			IEnumerable<AutomatedOrder> orders = null;
 
-			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Generating buy back orders\n" });
-			try {
-				orders = omb.GetBuyBackOrders (total);
+
+
+			if (total.Any()) {
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Generating buy back orders\n" });
+				try {
+					orders = omb.GetBuyBackOrders (total);
 
 #pragma warning disable 0168
-			} catch (Exception e) {
+				} catch (Exception e) {
 #pragma warning restore 0168
 
 #if DEBUG
-				if (DebugIhildaWallet.Robotics) {
-					Logging.ReportException (method_sig, e);
-				}
+					if (DebugIhildaWallet.Robotics) {
+						Logging.ReportException (method_sig, e);
+					}
 #endif
 
-				StringBuilder message = new StringBuilder ();
-				message.Append ("Exception calculating buyorders...\nMessage : \n");
-				message.Append (e.Message);
-				message.Append ("\n");
-				message.Append ("Stakctrace : \n");
-				message.Append (e.StackTrace);
-				MessageDialog.ShowMessage (message.ToString ());
-				OnMessage?.Invoke ( this, new MessageEventArgs () { Message = message.ToString () } );
-				return null;
+					StringBuilder message = new StringBuilder ();
+					message.Append ("Exception calculating buyorders...\nMessage : \n");
+					message.Append (e.Message);
+					message.Append ("\n");
+					message.Append ("Stakctrace : \n");
+					message.Append (e.StackTrace);
+					MessageDialog.ShowMessage (message.ToString ());
+					OnMessage?.Invoke (this, new MessageEventArgs () { Message = message.ToString () });
+					return null;
+				}
+
 			}
-
-
 
 			RuleManagerObj.LastKnownLedger = lastledger;
 			RuleManagerObj.SaveRules ();

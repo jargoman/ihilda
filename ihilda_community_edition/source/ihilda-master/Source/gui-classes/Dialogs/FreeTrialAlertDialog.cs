@@ -25,7 +25,7 @@ namespace IhildaWallet
 			buttonOk.Hide ();
 		}
 
-
+		//private CancellationTokenSource tokenSource = new CancellationTokenSource ();
 		public void SetMessageString (RippleWallet rw, string amount)
 		{
 			StringBuilder sb = new StringBuilder ();
@@ -65,6 +65,7 @@ namespace IhildaWallet
 
 				});
 
+			
 			ev.WaitOne ();
 
 
@@ -93,6 +94,8 @@ namespace IhildaWallet
 		public static bool DoPurchaseDialog (RippleWallet rippleWallet, Decimal ICE_amount)
 		{
 
+			// TODO investigate using real cancellationtoken
+			CancellationToken token = new CancellationToken ();
 
 			AutomatedOrder offer = new AutomatedOrder ();
 
@@ -112,8 +115,8 @@ namespace IhildaWallet
 				issuer = Util.LeIceSense.LICENSE_ISSUER
 			};
 
-			Task<Response<BookOfferResult>> task = BookOffers.GetResult (baseCurrency, counterCurrency, ni);
-			task.Wait ();
+			Task<Response<BookOfferResult>> task = BookOffers.GetResult (baseCurrency, counterCurrency, ni, token);
+			task.Wait (token);
 
 			Response<BookOfferResult> response = task.Result;
 			if (response == null) {

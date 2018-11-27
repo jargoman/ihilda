@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using RippleLibSharp.Util;
 
 namespace IhildaWallet
@@ -40,8 +41,11 @@ namespace IhildaWallet
 #endif
 				//this.connectStatusLabel.ma
 
-
-					this.connectStatusLabel.Markup = "<span foreground=\"green\"><big><b>Connected</b></big></span>";
+				StringBuilder stringBuilder = new StringBuilder ();
+				stringBuilder.Append ("<span foreground=\"");
+				stringBuilder.Append (Program.darkmode ? "chartreuse" : "green");
+				stringBuilder.Append ("\"><big><b>Connected</b></big></span>");
+				this.connectStatusLabel.Markup = stringBuilder.ToString();
 				if (Program.showPopUps) {
 					this.TooltipMarkup = serverUrl;
 				}

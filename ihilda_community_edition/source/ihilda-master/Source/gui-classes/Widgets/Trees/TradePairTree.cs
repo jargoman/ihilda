@@ -5,6 +5,7 @@ using RippleLibSharp.Transactions;
 using Gtk;
 using RippleLibSharp.Util;
 using System.Text;
+using System.Threading;
 
 namespace IhildaWallet
 {
@@ -104,7 +105,7 @@ namespace IhildaWallet
 						}
 						DepthChartWindow dcw = new DepthChartWindow (WalletManager.GetRippleWallet(), tp);
 
-						dcw.GetWidget ().UpdateBooks ();
+						dcw.GetWidget ().UpdateBooks (new CancellationToken());
 					};
 
 					menu.Add (depthMenu);

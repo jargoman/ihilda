@@ -177,9 +177,10 @@ namespace IhildaWallet
 					return;
 				}
 
-				Task<Response<AccountLinesResult>> task = AccountLines.GetResult (
-					ra,
-					ni
+			Task<Response<AccountLinesResult>> task = AccountLines.GetResult (
+				ra,
+				ni,
+				new CancellationToken ()
 				);
 
 				if (task == null) {

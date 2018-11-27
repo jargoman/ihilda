@@ -20,7 +20,7 @@ namespace IhildaWallet
 
 		private global::Gtk.Label label52;
 
-		private global::IhildaWallet.CanselTxWidget canseltxwidget1;
+		private global::IhildaWallet.CancelTxWidget canceltxwidget1;
 
 		private global::Gtk.Label label55;
 
@@ -40,7 +40,7 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 3;
+			this.notebook1.CurrentPage = 1;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.txviewwidget1 = new global::IhildaWallet.TxViewWidget();
 			this.txviewwidget1.Events = ((global::Gdk.EventMask)(256));
@@ -79,17 +79,17 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.orderstreewidget1, this.label52);
 			this.label52.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.canseltxwidget1 = new global::IhildaWallet.CanselTxWidget();
-			this.canseltxwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.canseltxwidget1.Name = "canseltxwidget1";
-			this.notebook1.Add(this.canseltxwidget1);
-			global::Gtk.Notebook.NotebookChild w4 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.canseltxwidget1]));
+			this.canceltxwidget1 = new global::IhildaWallet.CancelTxWidget();
+			this.canceltxwidget1.Events = ((global::Gdk.EventMask)(256));
+			this.canceltxwidget1.Name = "canceltxwidget1";
+			this.notebook1.Add(this.canceltxwidget1);
+			global::Gtk.Notebook.NotebookChild w4 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.canceltxwidget1]));
 			w4.Position = 3;
 			// Notebook tab
 			this.label55 = new global::Gtk.Label();
 			this.label55.Name = "label55";
 			this.label55.LabelProp = global::Mono.Unix.Catalog.GetString("Cancel");
-			this.notebook1.SetTabLabel(this.canseltxwidget1, this.label55);
+			this.notebook1.SetTabLabel(this.canceltxwidget1, this.label55);
 			this.label55.ShowAll();
 			this.vbox3.Add(this.notebook1);
 			global::Gtk.Box.BoxChild w5 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.notebook1]));

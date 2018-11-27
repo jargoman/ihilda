@@ -9,6 +9,7 @@ using RippleLibSharp.Result;
 using RippleLibSharp.Transactions;
 using RippleLibSharp.Keys;
 using RippleLibSharp.Util;
+using System.Threading;
 
 namespace IhildaWallet
 {
@@ -17,6 +18,9 @@ namespace IhildaWallet
 	{
 		public CurrencyWidget ()
 		{
+
+			TokenSource = new CancellationTokenSource ();
+			var token = TokenSource.Token;
 
 #if DEBUG
 			string method_sig = clsstr + nameof (CurrencyWidget) + DebugRippleLibSharp.both_parentheses;
@@ -29,11 +33,13 @@ namespace IhildaWallet
 
 			Task.Factory.StartNew (async () => {
 
-				while (_cont) {
+
+
+				while (!token.IsCancellationRequested) {
 
 					try {
-						await Task.Delay (30000);
-						UpdateNetwork ();
+						await Task.Delay (30000, token);
+						UpdateNetwork (TokenSource.Token);
 					} catch (Exception e) {
 #if DEBUG
 						if (DebugIhildaWallet.CurrencyWidget) {
@@ -49,10 +55,12 @@ namespace IhildaWallet
 
 		~CurrencyWidget ()
 		{
-			_cont = false;
+			TokenSource?.Cancel ();
+			TokenSource?.Dispose ();
+			TokenSource = null;
 		}
 
-		private bool _cont = true;
+		private CancellationTokenSource TokenSource = null;
 
 		/* note : there is subtle differences between the the 
 		 * various set functions
@@ -134,7 +142,7 @@ namespace IhildaWallet
 
 		}
 
-		public void UpdateNetwork ()
+		public void UpdateNetwork (CancellationToken token)
 		{
 
 #if DEBUG
@@ -168,17 +176,18 @@ namespace IhildaWallet
 			#endif
 
 			if ( RippleCurrency.NativeCurrency ==  _currency ) {
-				UpdateNative ( _rippleAddress, ni );
+				UpdateNative ( _rippleAddress, ni, token );
 			} else {
-				UpdateIOU (_rippleAddress, _currency, ni);
+				UpdateIOU (_rippleAddress, _currency, ni, token);
 			}
 
 		}
 
-		private void UpdateIOU ( RippleAddress rippleAddress, String currency, NetworkInterface ni) {
+		private void UpdateIOU ( RippleAddress rippleAddress, String currency, NetworkInterface ni, CancellationToken token) {
 			Task<Response<AccountLinesResult>> task = AccountLines.GetResult(
 				rippleAddress,
-				ni
+				ni,
+				token
 			);
 
 			if (task == null) {
@@ -187,7 +196,7 @@ namespace IhildaWallet
 				return;
 			}
 
-			task.Wait ();
+			task.Wait (token);
 
 			Response<AccountLinesResult> resp = task.Result;
 
@@ -214,7 +223,7 @@ namespace IhildaWallet
 
 		}
 
-		private void UpdateNative ( RippleAddress rippleAddress, NetworkInterface ni ) {
+		private void UpdateNative ( RippleAddress rippleAddress, NetworkInterface ni, CancellationToken token ) {
 
 			if (rippleAddress == null) {
 				return;
@@ -223,7 +232,8 @@ namespace IhildaWallet
 
 			Task <Response < AccountInfoResult >> task = AccountInfo.GetResult (
 				rippleAddress.ToString(),
-				ni
+				ni,
+				token
 			);
 
 			if (task == null) {
@@ -231,7 +241,7 @@ namespace IhildaWallet
 				return;
 			}
 
-			task.Wait ();
+			task.Wait (token);
 
 			Response<AccountInfoResult> resp = task.Result;
 
@@ -293,7 +303,7 @@ namespace IhildaWallet
 			this._rippleAddress = rippleWallet;
 			this.SetAsUnSynced ();
 
-			UpdateNetwork ();
+			UpdateNetwork (TokenSource.Token);
 		}
 
 		private RippleAddress _rippleAddress = null;

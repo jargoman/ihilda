@@ -179,6 +179,11 @@ namespace IhildaWallet
 			//this.sentimenttreeview.
 
 
+			this.checkbutton2.Clicked += (object sender, EventArgs e) => {
+				this.StopWhenConvenient = checkbutton2.Active;
+			};
+			this.StopWhenConvenient = checkbutton2.Active;
+
 			this.addbutton.Clicked += (object sender, EventArgs e) => {
 				OrderFilledRule rule = RuleCreateDialog.DoDialog ();
 
@@ -244,32 +249,36 @@ namespace IhildaWallet
 			this.dologicbutton.Clicked += (object sender, EventArgs e) => {
 
 
-				Task.Run ((System.Action)DoLogicClicked);
+				Task.Run ( (System.Action) DoLogicClicked);
 			};
 
 			this.automatebutton.Clicked += (object sender, EventArgs e) => {
+
 				if (tokenSource != null) {
 					MessageDialog.ShowMessage ("Automation thread is already running");
 					return;
 				}
 
+				StopWhenConvenient = false;
+				checkbutton2.Active = false;
+				checkbutton2.Visible = true;
 
+				Task.Run ( (System.Action) AutomateClicked);
 
-				Task.Run ((System.Action)AutomateClicked);
 			};
 
 			button171.Clicked += (object sender, EventArgs e) => {
-				if (tokenSource == null) {
-					MessageDialog.ShowMessage ("Thread has already been stopped\n");
+				if ( tokenSource == null ) {
+					MessageDialog.ShowMessage ( "Thread has already been stopped\n" );
 					return;
 				}
 
-				tokenSource.Cancel ();
+				tokenSource?.Cancel ();
 				tokenSource = null;
 			};
 
 			this.button1.Clicked += (object sender, EventArgs e) => {
-				WriteToInfoBox ("Syncing Orders Cache.... \n");
+				WriteToInfoBox ( "Syncing Orders Cache.... \n" );
 				WalletSwitchWidget walletSwitchWidget = this.walletswitchwidget1;
 
 				//progressbar1.Pulse ();
@@ -525,6 +534,7 @@ namespace IhildaWallet
 
 			Application.Invoke (delegate {
 				label6.Markup = label6.Text + message;
+				scrolledwindow1.Vadjustment.Value = scrolledwindow1.Vadjustment.Upper;
 			});
 		}
 
@@ -768,7 +778,7 @@ namespace IhildaWallet
 						"You haven't specified a starting ledger and no previous lastledger value has been saved. " +
 						"This will cause the automation to process all transaction history and may not be what you intended" +
 						"Should the script continue?"
-					
+
 					);
 
 					if (!b) {
@@ -781,13 +791,17 @@ namespace IhildaWallet
 				};
 
 
-				Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = 
-					robot.DoLogic (rw, ni, strt, endStr, lim);
+				Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple =
+					robot.DoLogic (rw, ni, strt, endStr, lim, token);
 
+
+				if (token.IsCancellationRequested) {
+					return;
+				}
 
 				string title = "No filled";
 				string message = null;
-				if (tuple == null) {
+				if ( tuple == null ) {
 					message = "Do logic returned null\n";
 					MessageDialog.ShowMessage (title, message);
 					WriteToInfoBox (message);
@@ -799,15 +813,15 @@ namespace IhildaWallet
 					WriteToInfoBox (message);
 					return;
 				} else
-
+						/*
 				if (tuple.Item2 == null) {
 					message = "Filled orders array is null\n";
 					MessageDialog.ShowMessage (title, message);
 					WriteToInfoBox (message);
 					return;
-				} else
+				} else */
 
-				if (!tuple.Item2.Any ()) {
+						if (tuple.Item2 == null || !tuple.Item2.Any ()) {
 					message = "There are no new filled orders\n";
 					MessageDialog.ShowMessage (title, message);
 					WriteToInfoBox (message);
@@ -830,7 +844,7 @@ namespace IhildaWallet
 						licenseT = LicenseType.NONE;
 					}
 					*/
-					if (tuple?.Item2?.FirstOrDefault() == null) {
+					if (tuple?.Item2?.FirstOrDefault () == null) {
 						return;
 					}
 					OrderSubmitWindow win = new OrderSubmitWindow (rw, LicenseType.NONE);
@@ -839,7 +853,28 @@ namespace IhildaWallet
 
 
 				});
-			} catch (Exception e) {
+			} catch (TaskCanceledException cancelException) {
+#if DEBUG
+				if (DebugIhildaWallet.FilledRuleManagementWindow) {
+					Logging.ReportException (method_sig, cancelException);
+				}
+#endif
+
+				WriteToInfoBox ("Task cancelled\n");
+
+			} catch (OperationCanceledException opCanException) {
+#if DEBUG
+				if (DebugIhildaWallet.FilledRuleManagementWindow) {
+					Logging.ReportException (method_sig, opCanException);
+				}
+#endif
+
+				WriteToInfoBox ("Operation cancelled\n");
+			}
+
+
+
+			catch (Exception e) {
 #if DEBUG
 				if (DebugIhildaWallet.FilledRuleManagementWindow) {
 					Logging.ReportException (method_sig, e);
@@ -866,24 +901,57 @@ namespace IhildaWallet
 		//private CancellationToken token = this.tokenSource.Token;
 		public void AutomateClicked ()
 		{
+
+
+#if DEBUG
+			string method_sig = nameof (AutomateClicked) + DebugRippleLibSharp.both_parentheses;
+			if (DebugIhildaWallet.FilledRuleManagementWindow) {
+				Logging.WriteLog (method_sig, DebugRippleLibSharp.beginn);
+			}
+#endif
 			if (this.tokenSource != null) {
-				WriteToInfoBox ("A rule script is already running\n");
+
+				string srmessage = "A rule script is already running\n";
+				WriteToInfoBox (srmessage);
+
+#if DEBUG
+				if (DebugIhildaWallet.FilledRuleManagementWindow) {
+					Logging.WriteLog (method_sig, srmessage);
+				}
+#endif
 				return;
 			}
 
 			RippleWallet rw = walletswitchwidget1.GetRippleWallet ();
 			if (rw == null) {
-				MessageDialog.ShowMessage ("No wallet Selected\n");
+
+				string nwmessage = "No wallet Selected\n";
+				MessageDialog.ShowMessage (nwmessage);
+
+#if DEBUG
+				if (DebugIhildaWallet.FilledRuleManagementWindow) {
+					Logging.WriteLog (nwmessage);
+				}
+#endif
 				//shouldContinue = false;
 
 				return;
 			}
 
+
+
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
 			if (ni == null) {
 
-				MessageDialog.ShowMessage ("Network Warning", "Could not connect to network");
-				//shouldContinue = false;
+				string netmessage = "Could not connect to network";
+				MessageDialog.ShowMessage ("Network Warning", netmessage);
+
+#if DEBUG
+				if (DebugIhildaWallet.FilledRuleManagementWindow) {
+					Logging.WriteLog (method_sig, netmessage);
+				}
+#endif
+
 				return;
 			}
 
@@ -891,7 +959,7 @@ namespace IhildaWallet
 
 			bool should = LeIceSense.LastDitchAttempt (rw, licenseT);
 			if (!should) {
-				//shouldContinue = false;
+
 				return;
 			}
 
@@ -903,7 +971,7 @@ namespace IhildaWallet
 				delegate {
 						// TODO more explicit warning
 
-						progressbar1.Pulse ();
+					progressbar1.Pulse ();
 					cont = AreYouSure.AskQuestion ("Warning !!!", "<markup><span foreground=\"red\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>" + rw.GetStoredReceiveAddress () + "</b></markup>");
 					progressbar1.Pulse ();
 					manualResetEvent.Set ();
@@ -935,7 +1003,7 @@ namespace IhildaWallet
 				OrderSubmitter orderSubmitter = new OrderSubmitter ();
 
 				orderSubmitter.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
-					this.WriteToInfoBox ("Fee " + e.FeeAndLastLedger.Item1.ToString() + " is too high, waiting on lower fee\n");
+					this.WriteToInfoBox ("Fee " + e.FeeAndLastLedger.Item1.ToString () + " is too high, waiting on lower fee\n");
 					Application.Invoke (
 						delegate {
 
@@ -979,6 +1047,9 @@ namespace IhildaWallet
 					stringBuilder.Append ((string)(e.RippleOfferTransaction.hash ?? ""));
 					stringBuilder.AppendLine ();
 
+
+
+
 					Application.Invoke (
 						delegate {
 
@@ -987,7 +1058,7 @@ namespace IhildaWallet
 					);
 
 					this.WriteToInfoBox (stringBuilder.ToString ());
-						
+
 				};
 
 
@@ -1001,6 +1072,7 @@ namespace IhildaWallet
 
 
 						TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
+
 
 
 
@@ -1033,7 +1105,12 @@ namespace IhildaWallet
 					progressbar1.Pulse ();
 				});
 
-				this.WriteToInfoBox ("Running automation script for address " + rw.GetStoredReceiveAddress () + "\n");
+				this.WriteToInfoBox (
+					"Running automation script for address " + 
+					rw.GetStoredReceiveAddress () + 
+					"\n"
+				);
+
 				Robotics robot = new Robotics (this.RuleManagerObj);
 
 				robot.OnMessage += (object sender, MessageEventArgs e) => {
@@ -1055,15 +1132,28 @@ namespace IhildaWallet
 
 				RippleIdentifier rippleSeedAddress = rw.GetDecryptedSeed ();
 
-				do {
+				while (!token.IsCancellationRequested && !StopWhenConvenient) {
+
+					if (endStr != null) {
+						if (strt > endStr) {
+							// TODO
+
+							string maxMessage = "Maximum ledger " + endStr + " reached \n";
+							this.WriteToInfoBox (maxMessage);
+							break;
+						}
+					}
 
 					Application.Invoke (delegate {
 						progressbar1.Pulse ();
 
 					});
 
-					this.WriteToInfoBox ("Polling data for " + (string)(rw?.GetStoredReceiveAddress () ?? "null") + "\n");
-					//this.WriteToInfoBox ("Starting from ledger " + (string)(strt?.ToString () ?? "null") + "\n");
+					this.WriteToInfoBox (
+						"Polling data for " 
+						+ (string)(rw?.GetStoredReceiveAddress () ?? "null") 
+						+ "\n");
+
 
 
 					int last = RuleManagerObj.LastKnownLedger;
@@ -1073,19 +1163,18 @@ namespace IhildaWallet
 
 
 						this.WriteToInfoBox ("Starting ledger is null\n Using last known ledger " + last + "\n");
-					}
+						if (last == 0) {
+							bool b = AreYouSure.AskQuestion (
+								"Process entire transaction history?",
+								"You haven't specified a starting ledger and no previous lastledger value has been saved. " +
+								"This will cause the automation to process all transaction history and may not be what you intended" +
+								"Should the script continue?"
 
-					if (last == 0) {
-						bool b = AreYouSure.AskQuestion (
-							"Process entire transaction history?",
-							"You haven't specified a starting ledger and no previous lastledger value has been saved. " +
-							"This will cause the automation to process all transaction history and may not be what you intended" +
-							"Should the script continue?"
+							);
 
-						);
-
-						if (!b) {
-							return;
+							if (!b) {
+								return;
+							}
 						}
 					}
 
@@ -1094,7 +1183,9 @@ namespace IhildaWallet
 
 
 
-					Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = robot.DoLogic (rw, ni, strt, endStr, lim);
+
+
+					Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = robot.DoLogic (rw, ni, strt, endStr, lim, token);
 					if (tuple == null) {
 						MessageDialog.ShowMessage ("Automate : DoLogic tuple == null");
 						break;
@@ -1106,15 +1197,7 @@ namespace IhildaWallet
 					});
 
 					strt = tuple.Item1 + 1;
-					if (endStr != null) {
-						if (strt > endStr) {
-							// TODO
 
-							string maxMessage = "Maximum ledger " + endStr + " reached \n";
-							this.WriteToInfoBox (maxMessage);
-							break;
-						}
-					}
 
 					IEnumerable<AutomatedOrder> orders = tuple.Item2;
 					if (orders == null || !orders.Any ()) {
@@ -1133,17 +1216,17 @@ namespace IhildaWallet
 
 						for (int sec = 0; sec < seconds; sec++) {
 							//for (int i = 0; i < 4; i++) {
-								if (token.IsCancellationRequested) {
-									return;
-								}
-								//Thread.Sleep (250);
+							if (token.IsCancellationRequested) {
+								return;
+							}
+							//Thread.Sleep (250);
 
-								token.WaitHandle.WaitOne (1000);
-								//Task.Delay (250).Wait ();
-								Application.Invoke (delegate {
-									progressbar1.Pulse ();
+							token.WaitHandle.WaitOne (1000);
+							//Task.Delay (250).Wait ();
+							Application.Invoke (delegate {
+								progressbar1.Pulse ();
 
-								});
+							});
 							//}
 
 
@@ -1159,7 +1242,10 @@ namespace IhildaWallet
 
 						progressbar1.Pulse ();
 					});
-					Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> tupleResp = orderSubmitter.SubmitOrders (orders, rw, rippleSeedAddress,  ni);
+					Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> tupleResp = 
+						orderSubmitter.SubmitOrders (
+							orders, rw, rippleSeedAddress, ni, token
+						);
 					Application.Invoke (delegate {
 
 						progressbar1.Pulse ();
@@ -1184,12 +1270,30 @@ namespace IhildaWallet
 						progressbar1.Pulse ();
 					});
 
-				} while (!token.IsCancellationRequested);
+					/*
+					var cache = AccountSequenceCache.GetCacheForAccount (rw.GetStoredReceiveAddress ());
 
-			} catch (Exception e) {
+					cache.RemoveAndSavePrevious(orders);
+						*/
+
+				} 
+
+			} catch (Exception canEx) when (canEx is OperationCanceledException || canEx is TaskCanceledException) {
+#if DEBUG
+				if (DebugIhildaWallet.FilledRuleManagementWindow) {
+					Logging.ReportException (method_sig, canEx);
+				}
+#endif
+
+			}
+
+
+
+			catch (Exception e) {
 				this.WriteToInfoBox (e.Message);
 			} finally {
 				//tokenSource.Dispose ();
+				this.tokenSource?.Cancel ();
 				this.tokenSource = null;
 				this.SetIsRunningUI (false);
 
@@ -1201,13 +1305,18 @@ namespace IhildaWallet
 				string message = "Automation thread has stopped\n";
 				MessageDialog.ShowMessage ("Automation stopped", message);
 				WriteToInfoBox (message);
+
+				checkbutton2.Visible = false;
+				checkbutton2.Active = false;
+				StopWhenConvenient = false;
+
 			}
 
 
 		}
 
 
-
+		private bool StopWhenConvenient;
 
 
 

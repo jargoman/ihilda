@@ -23,6 +23,7 @@ namespace IhildaWallet
 	{
 		public WalletManagerWidget ()
 		{
+
 #if DEBUG
 			string method_sig = clsstr + nameof (WalletManagerWidget) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.WalletManagerWidget) {
@@ -37,6 +38,8 @@ namespace IhildaWallet
 				this.wallettree1.Show ();
 				vbox4.Add (this.wallettree1);
 			}
+
+
 
 			this.SetActions ();
 
@@ -301,7 +304,7 @@ namespace IhildaWallet
 
 			};
 
-			this.eventbox5.ModifyBase (StateType.Normal, new Gdk.Color (218, 112, 214));
+
 
 			if (Program.network) {
 				this.eventbox5.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
@@ -309,7 +312,8 @@ namespace IhildaWallet
 				};
 			}
 
-			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
+
+
 
 			this.walletswitchwidget1.WalletChangedEvent += (object source, WalletChangedEventArgs eventArgs) => {
 				RippleWallet rippleWallet = eventArgs?.GetRippleWallet ();
@@ -324,14 +328,7 @@ namespace IhildaWallet
 
 			};
 
-			eventbox3.ModifyBase (StateType.Normal, new Gdk.Color (55, 55, 55));
-			eventbox3.ModifyBg (StateType.Normal, new Gdk.Color (55, 55, 55));
 
-			eventbox4.ModifyBase (StateType.Normal, new Gdk.Color (211, 211, 211));
-			eventbox4.ModifyBg (StateType.Normal, new Gdk.Color (211, 211, 211));
-
-			eventbox6.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
-			eventbox6.ModifyBase (StateType.Normal, new Gdk.Color (0, 0, 0));
 
 			//vbox1.ModifyBg (StateType.Normal, new Gdk.Color (75,75,75));
 			//vbox1.ModifyBase (StateType.Normal, new Gdk.Color (75, 75, 75));
@@ -347,6 +344,15 @@ namespace IhildaWallet
 			//this.TestConnectivity ();
 
 			SetHelpPopups ();
+
+
+			if (Program.darkmode) {
+				DarkMode ();
+			}
+
+			eventbox6.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
+			eventbox6.ModifyBase (StateType.Normal, new Gdk.Color (0, 0, 0));
+
 			/*
 			var pixmap = image2.Pixmap;
 			var pixbuff = image2.Pixbuf;
@@ -373,6 +379,38 @@ namespace IhildaWallet
 
 			pixmap.DrawLayout (gc, 25, 25, layout);
 	*/
+
+
+		}
+
+
+
+		public void DarkMode ()
+		{
+
+			label4.UseMarkup = true;
+			label5.UseMarkup = true;
+			label6.UseMarkup = true;
+			label9.UseMarkup = true;
+
+			label4.Markup = "<span fgcolor=\"orchid\" bgcolor=\"black\" size=\"x-large\"><b> Transact </b></span>";
+			label5.Markup = "<span fgcolor=\"orchid\" bgcolor=\"black\" size=\"x-large\"><b> Keys </b></span>";
+			label6.Markup = "<span fgcolor=\"orchid\" bgcolor = \"black\" size =\"x-large\" ><b> Restore </b></span>";
+			label9.Markup = "<span size=\"x-large\" fgcolor=\"orchid\" bgcolor=\"black\"><b> Options </b></span>";
+
+			//this.eventbox5.ModifyBg (StateType.Normal, new Gdk.Color (218, 112, 214));
+			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
+
+			eventbox3.ModifyBase (StateType.Normal, new Gdk.Color (55, 55, 55));
+			eventbox3.ModifyBg (StateType.Normal, new Gdk.Color (55, 55, 55));
+
+			//eventbox4.ModifyBase (StateType.Normal, new Gdk.Color (211, 211, 211));
+			//eventbox4.ModifyBg (StateType.Normal, new Gdk.Color (211, 211, 211));
+
+			//eventbox4.ModifyBase (StateType.Normal, new Gdk.Color (211, 211, 211));
+			eventbox4.ModifyBg (StateType.Normal, new Gdk.Color (60, 60, 60));
+
+
 		}
 
 		public void SetHelpPopups ()

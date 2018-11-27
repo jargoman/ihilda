@@ -112,6 +112,10 @@ namespace IhildaWallet
 		private void SubmitAll ()
 		{
 
+			tokenSource?.Cancel ();
+			tokenSource = new CancellationTokenSource ();
+			CancellationToken token = tokenSource.Token;
+
 #if DEBUG
 			string method_sig = clsstr + nameof (SubmitAll) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.PaymentPreviewSubmitWidget) {
@@ -148,8 +152,7 @@ namespace IhildaWallet
 			for (int index = 0; index < this._tx_tuple.Item1.Length; index++) {
 
 
-				if (this.stop) {
-					this.stop = false;
+				if (token.IsCancellationRequested) {
 					return;
 				}
 
@@ -160,7 +163,7 @@ namespace IhildaWallet
 				}
 
 
-				bool suceeded = this.SubmitOrderAtIndex (index, ni, rsa);
+				bool suceeded = this.SubmitOrderAtIndex (index, ni, token, rsa);
 				if (!suceeded) {
 					return;
 				}
@@ -185,7 +188,7 @@ namespace IhildaWallet
 
 		}
 
-		public bool SubmitOrderAtIndex (int index, NetworkInterface ni, RippleIdentifier rsa)
+		public bool SubmitOrderAtIndex (int index, NetworkInterface ni, CancellationToken token, RippleIdentifier rsa)
 		{
 
 #if DEBUG
@@ -212,7 +215,7 @@ namespace IhildaWallet
 					return false;
 				}
 
-				uint sequence = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence (tx.Account, ni));
+				uint sequence = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence (tx.Account, ni, token));
 
 
 				SignOptions opts = SignOptions.LoadSignOptions ();
@@ -220,13 +223,13 @@ namespace IhildaWallet
 
 				this.SetStatus (index.ToString (), "Requesting Fee", TextHighlighter.GREEN);
 
-				Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni);
+				Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, token);
 
 
-				if (stop) {
+				if (token.IsCancellationRequested) {
 
 					this.SetResult (index.ToString (), "Aborted", TextHighlighter.RED);
-					stop = false;
+
 					return false;
 				}
 				//UInt32 f = tupe.Item1; 
@@ -292,9 +295,10 @@ namespace IhildaWallet
 
 
 
-				if (stop) {
+				if (token.IsCancellationRequested) {
+
 					this.SetResult (index.ToString (), "Aborted", TextHighlighter.RED);
-					stop = false;
+					
 					return false;
 				}
 
@@ -303,9 +307,9 @@ namespace IhildaWallet
 				Task<Response<RippleSubmitTxResult>> task = null;
 
 				try {
-					task = NetworkController.UiTxNetworkSubmit (tx, ni);
+					task = NetworkController.UiTxNetworkSubmit (tx, ni, token);
 					this.SetStatus (index.ToString (), "Submitted via websocket", TextHighlighter.GREEN);
-					task.Wait ();
+					task.Wait (token);
 
 
 				} catch (Exception e) {
@@ -560,12 +564,12 @@ namespace IhildaWallet
 
 		public void Stopbutton_Clicked (object sender, EventArgs e)
 		{
-			this.stop = true;
-
+			//this.stop = true;
+			tokenSource?.Cancel ();
 		}
 
 		#pragma warning disable RECS0122 // Initializing field with default value is redundant
-		public bool stop = false;
+		public CancellationTokenSource tokenSource = null;
 #pragma warning restore RECS0122 // Initializing field with default value is redundant
 
 

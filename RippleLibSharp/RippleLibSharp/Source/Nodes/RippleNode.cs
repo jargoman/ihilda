@@ -299,6 +299,7 @@ namespace RippleLibSharp.Nodes
 				sb.Append (gets);
 				sb.Append (" : price ");
 				sb.Append (price);
+				sb.AppendLine ();
 
 				price = p / g;
 
@@ -309,9 +310,17 @@ namespace RippleLibSharp.Nodes
 				sb2.Append (pays);
 				sb2.Append (" : price ");
 				sb2.Append (price);
+				sb2.AppendLine ();
 
-				if (this.nodeType == BinaryFieldType.DeletedNode) {
-					string s = "this order has filled";
+				if ( this.nodeType == BinaryFieldType.DeletedNode ) {
+
+					string s = 
+						this.FinalFields.TakerGets.amount != Decimal.Zero ||
+						this.FinalFields.TakerPays.amount != Decimal.Zero
+
+						? "<span fgcolor=\"red\">Rest of the order cancelled due to lack of funds</span>"
+						: "this order has filled";
+
 					sb.Append (s);
 					sb2.Append (s);
 				}

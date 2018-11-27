@@ -213,8 +213,8 @@ namespace IhildaWallet
 			FileHelper.SaveConfig (settingsPath, conf);
 		}
 
-		public static Tuple<UInt32, UInt32> ParseFee (NetworkInterface ni) {
-			Tuple< string, UInt32 > tupe = RippleLibSharp.Commands.Server.ServerInfo.GetFeeAndLedgerSequence (ni);
+		public static Tuple<UInt32, UInt32> ParseFee (NetworkInterface ni, CancellationToken token) {
+			Tuple< string, UInt32 > tupe = RippleLibSharp.Commands.Server.ServerInfo.GetFeeAndLedgerSequence (ni, token);
 
 			if (tupe == null) {
 				return null;
@@ -232,7 +232,7 @@ namespace IhildaWallet
 			return new Tuple<UInt32, UInt32>(f, tupe.Item2);
 		}
 
-		public Tuple<UInt32,UInt32> GetFeeAndLastLedgerFromSettings (NetworkInterface ni, UInt32? lastFee = null) {
+		public Tuple<UInt32,UInt32> GetFeeAndLastLedgerFromSettings (NetworkInterface ni, CancellationToken token, UInt32? lastFee = null) {
 
 			/*
 			if (Settings == null) {
@@ -244,7 +244,7 @@ namespace IhildaWallet
 
 			int feeRetry = 0; 
 			START:
-			Tuple<UInt32,UInt32> fs = ParseFee (ni);
+			Tuple<UInt32,UInt32> fs = ParseFee (ni, token);
 
 
 
@@ -271,7 +271,7 @@ namespace IhildaWallet
 
 
 
-			fs = ParseFee (ni);
+			fs = ParseFee (ni, token);
 
 			if (fs == null) {
 				return null;
@@ -340,10 +340,13 @@ namespace IhildaWallet
 					}
 
 
-					FeeSleepEventArgs feeSleepEventArgs = new FeeSleepEventArgs ();
-					feeSleepEventArgs.FeeAndLastLedger = fs;
+					FeeSleepEventArgs feeSleepEventArgs = new FeeSleepEventArgs {
+						FeeAndLastLedger = fs
+					};
+
 					OnFeeSleep?.Invoke (this, feeSleepEventArgs);
-					Thread.Sleep (3000);
+					//Thread.Sleep (3000);
+					token.WaitHandle.WaitOne (3000);
 					goto START;
 				}
 			}

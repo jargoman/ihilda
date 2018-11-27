@@ -45,10 +45,14 @@ namespace IhildaWallet
 
 		}
 
+
+		private CancellationTokenSource tokenSource = null;
 		void Button5_Clicked (object sender, EventArgs e)
 		{
 
-
+			tokenSource?.Cancel ();
+			tokenSource = new CancellationTokenSource ();
+			CancellationToken token = new CancellationToken ();
 			//string source_account = null;
 
 			RippleWallet rw = _rippleWallet;
@@ -96,7 +100,8 @@ namespace IhildaWallet
 						rw.GetStoredReceiveAddress (),
 						destination_account,
 						rc,
-						ni
+						ni,
+						token
 
 					);
 
@@ -105,7 +110,7 @@ namespace IhildaWallet
 						return;
 					}
 
-					task.Wait ();
+					task.Wait (token);
 
 
 					Response<PathFindResult> response = task.Result;
@@ -137,7 +142,7 @@ namespace IhildaWallet
 					}
 					this.pathstree1.SetPathFindResult (result);
 				}
-			);
+				, token);
 			//);
 
 			//thread.Start ();

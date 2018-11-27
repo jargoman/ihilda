@@ -10,8 +10,7 @@ using RippleLibSharp.Keys;
 using RippleLibSharp.Transactions;
 
 using RippleLibSharp.Trust;
-
-
+using System.Threading;
 
 namespace RippleLibSharp.Commands.Accounts
 {
@@ -19,7 +18,7 @@ namespace RippleLibSharp.Commands.Accounts
 	{
 		
 
-		public static Task<Response<AccountLinesResult>> GetResult ( string account, NetworkInterface ni, IdentifierTag identifierTag = null ) {
+		public static Task<Response<AccountLinesResult>> GetResult ( string account, NetworkInterface ni, CancellationToken token, IdentifierTag identifierTag = null ) {
 
 			if (identifierTag == null) {
 				identifierTag = new IdentifierTag {
@@ -37,7 +36,7 @@ namespace RippleLibSharp.Commands.Accounts
 			string request = DynamicJson.Serialize (o);
 
 			Task< Response<AccountLinesResult>> task = 
-				NetworkRequestTask.RequestResponse <AccountLinesResult> ( identifierTag, request, ni );
+				NetworkRequestTask.RequestResponse <AccountLinesResult> ( identifierTag, request, ni, token );
 
 			//task.Wait ();
 
@@ -47,15 +46,15 @@ namespace RippleLibSharp.Commands.Accounts
 		}
 
 
-		public static IEnumerable<Response<AccountLinesResult>> GetResultFull (string account, NetworkInterface ni) {
+		public static IEnumerable<Response<AccountLinesResult>> GetResultFull (string account, NetworkInterface ni, CancellationToken token) {
 
 			List<Response<AccountLinesResult>> results = new List<Response<AccountLinesResult>> ();
 
-			Task<Response<AccountLinesResult>> task = GetResult (account, ni);
+			Task<Response<AccountLinesResult>> task = GetResult (account, ni, token);
 			if (task == null) {
 				return null;
 			}
-			task.Wait ();
+			task.Wait (token);
 
 			Response<AccountLinesResult> resp = task.Result;
 		
@@ -67,7 +66,7 @@ namespace RippleLibSharp.Commands.Accounts
 
 
 
-			while (res?.marker != null) {
+			while (res?.marker != null && !token.IsCancellationRequested) {
 				
 				IdentifierTag identifierTag = new IdentifierTag {
 					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
@@ -84,9 +83,9 @@ namespace RippleLibSharp.Commands.Accounts
 				string request = DynamicJson.Serialize (o);
 
 				Task< Response<AccountLinesResult>> task2 = 
-					NetworkRequestTask.RequestResponse <AccountLinesResult> (identifierTag, request, ni);
+					NetworkRequestTask.RequestResponse <AccountLinesResult> (identifierTag, request, ni, token);
 				
-				task2.Wait ();
+				task2.Wait (token);
 
 				resp = task2.Result;
 
@@ -102,14 +101,14 @@ namespace RippleLibSharp.Commands.Accounts
 		}
 
 
-		public static TrustLine[] GetTrustLines (string account, NetworkInterface ni) {
+		public static TrustLine[] GetTrustLines (string account, NetworkInterface ni, CancellationToken token) {
 			if (account == null || ni == null) {
 				throw new NullReferenceException ();
 			}
 
-			Task<Response<AccountLinesResult>> task = AccountLines.GetResult (account, ni);
+			Task<Response<AccountLinesResult>> task = AccountLines.GetResult (account, ni, token);
 
-			task.Wait ();
+			task.Wait (token);
 
 			Response <AccountLinesResult> resp = task.Result;
 			if (resp == null) {
@@ -117,22 +116,19 @@ namespace RippleLibSharp.Commands.Accounts
 			}
 
 			AccountLinesResult result = resp.result;
-			if (result == null) {
-				return null;
-			}
 
-			return result.lines;
-
+			return result?.lines;
 
 		}
 
 
-		public static List<RippleCurrency> GetCurrencyBalances (RippleAddress ra, String currency, NetworkInterface ni) {
+		public static List<RippleCurrency> GetCurrencyBalances (RippleAddress ra, String currency, NetworkInterface ni, CancellationToken token) {
 			
 
 			Task<Response<AccountLinesResult>> task = AccountLines.GetResult (
 				ra,
-				ni
+				ni,
+				token
 
 			);
 
@@ -154,9 +150,9 @@ namespace RippleLibSharp.Commands.Accounts
 			return list;
 		}
 
-		public static Decimal GetCurrencyAsSingleBalance (RippleAddress ra, String currency, NetworkInterface ni) {
+		public static Decimal GetCurrencyAsSingleBalance (RippleAddress ra, String currency, NetworkInterface ni, CancellationToken token) {
 
-			List<RippleCurrency> balances = GetCurrencyBalances (ra, currency, ni);
+			List<RippleCurrency> balances = GetCurrencyBalances (ra, currency, ni, token);
 
 			Decimal totalbalance = 0;
 			if (balances == null) {
@@ -172,8 +168,8 @@ namespace RippleLibSharp.Commands.Accounts
 		}
 
 
-		public static List<string> GetIssuersForCurrency( string cur, RippleAddress address, NetworkInterface ni) {
-			List<RippleCurrency> list = GetCurrencyBalances (address, cur, ni);
+		public static List<string> GetIssuersForCurrency( string cur, RippleAddress address, NetworkInterface ni, CancellationToken token) {
+			List<RippleCurrency> list = GetCurrencyBalances (address, cur, ni, token);
 			if (list == null) {
 				return null;
 			}
@@ -186,7 +182,7 @@ namespace RippleLibSharp.Commands.Accounts
 			return v.ToList ();
 		}
 
-		public static RippleCurrency GetBalanceForIssuer ( string cur, RippleAddress issuer, RippleAddress address, NetworkInterface ni ) {
+		public static RippleCurrency GetBalanceForIssuer ( string cur, RippleAddress issuer, RippleAddress address, NetworkInterface ni, CancellationToken token ) {
 			if (address == null) {
 				return null;
 			}
@@ -195,7 +191,7 @@ namespace RippleLibSharp.Commands.Accounts
 			}
 
 
-			List<RippleCurrency> balances = GetCurrencyBalances ( address, cur, ni);
+			List<RippleCurrency> balances = GetCurrencyBalances ( address, cur, ni, token);
 
 			foreach ( RippleCurrency currency in balances ) {
 				if (issuer.ToString().Equals(currency?.issuer)) {

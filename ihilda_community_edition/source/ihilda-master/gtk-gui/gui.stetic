@@ -4912,7 +4912,7 @@ drops</property>
                                 <property name="MemberName" />
                                 <property name="Xpad">1</property>
                                 <property name="Xalign">0</property>
-                                <property name="LabelProp" translatable="yes">&lt;span fgcolor="orchid" bgcolor="black" size="x-large"&gt;&lt;b&gt; Transact   &lt;/b&gt;&lt;/span&gt;</property>
+                                <property name="LabelProp" translatable="yes">&lt;span size="x-large"&gt;&lt;b&gt; Transact   &lt;/b&gt;&lt;/span&gt;</property>
                                 <property name="UseMarkup">True</property>
                               </widget>
                               <packing>
@@ -5047,7 +5047,7 @@ drops</property>
                               <widget class="Gtk.Label" id="label5">
                                 <property name="MemberName" />
                                 <property name="Xalign">0</property>
-                                <property name="LabelProp" translatable="yes">&lt;span fgcolor="orchid" bgcolor="black" size="x-large"&gt;&lt;b&gt; Keys            &lt;/b&gt;&lt;/span&gt;</property>
+                                <property name="LabelProp" translatable="yes">&lt;span size="x-large"&gt;&lt;b&gt; Keys            &lt;/b&gt;&lt;/span&gt;</property>
                                 <property name="UseMarkup">True</property>
                               </widget>
                               <packing>
@@ -5181,7 +5181,7 @@ drops</property>
                               <widget class="Gtk.Label" id="label6">
                                 <property name="MemberName" />
                                 <property name="Xalign">0</property>
-                                <property name="LabelProp" translatable="yes">&lt;span fgcolor="orchid" bgcolor="black" size="x-large"&gt;&lt;b&gt; Restore     &lt;/b&gt;&lt;/span&gt;</property>
+                                <property name="LabelProp" translatable="yes">&lt;span size="x-large"&gt;&lt;b&gt; Restore     &lt;/b&gt;&lt;/span&gt;</property>
                                 <property name="UseMarkup">True</property>
                               </widget>
                               <packing>
@@ -5281,7 +5281,7 @@ drops</property>
                               <widget class="Gtk.Label" id="label9">
                                 <property name="MemberName" />
                                 <property name="Xalign">0</property>
-                                <property name="LabelProp" translatable="yes">&lt;span size="x-large" fgcolor="orchid" bgcolor="black"&gt;&lt;b&gt; Options      &lt;/b&gt;&lt;/span&gt;</property>
+                                <property name="LabelProp" translatable="yes">&lt;span size="x-large" &gt;&lt;b&gt; Options      &lt;/b&gt;&lt;/span&gt;</property>
                                 <property name="UseMarkup">True</property>
                               </widget>
                               <packing>
@@ -5445,7 +5445,7 @@ drops</property>
                       <packing>
                         <property name="PackType">End</property>
                         <property name="Position">1</property>
-                        <property name="AutoSize">True</property>
+                        <property name="AutoSize">False</property>
                         <property name="Expand">False</property>
                         <property name="Fill">False</property>
                         <property name="Padding">8</property>
@@ -6968,7 +6968,7 @@ drops</property>
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Window" id="IhildaWallet.TradeWindow" design-size="554 611">
+  <widget class="Gtk.Window" id="IhildaWallet.TradeWindow" design-size="580 611">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -9385,6 +9385,7 @@ example: USD/CAD</property>
         <child>
           <widget class="Gtk.Label" id="label7">
             <property name="MemberName" />
+            <property name="Visible">False</property>
             <property name="LabelProp" translatable="yes">&lt;big&gt;&lt;b&gt;&lt;u&gt;Transactions&lt;/u&gt;&lt;/b&gt;&lt;/big&gt;</property>
             <property name="UseMarkup">True</property>
           </widget>
@@ -9423,6 +9424,31 @@ example: USD/CAD</property>
               </packing>
             </child>
             <child>
+              <widget class="Gtk.ProgressBar" id="progressbar2">
+                <property name="MemberName" />
+              </widget>
+              <packing>
+                <property name="Position">2</property>
+                <property name="AutoSize">True</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Button" id="button3329">
+                <property name="MemberName" />
+                <property name="CanFocus">True</property>
+                <property name="Type">TextOnly</property>
+                <property name="Label" translatable="yes">Stop</property>
+                <property name="UseUnderline">True</property>
+              </widget>
+              <packing>
+                <property name="PackType">End</property>
+                <property name="Position">3</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
               <widget class="Gtk.Button" id="syncbutton">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
@@ -9432,7 +9458,7 @@ example: USD/CAD</property>
               </widget>
               <packing>
                 <property name="PackType">End</property>
-                <property name="Position">2</property>
+                <property name="Position">4</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -9653,7 +9679,7 @@ example: USD/CAD</property>
           <widget class="Gtk.Notebook" id="notebook1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="CurrentPage">3</property>
+            <property name="CurrentPage">1</property>
             <child>
               <widget class="IhildaWallet.TxViewWidget" id="txviewwidget1">
                 <property name="MemberName" />
@@ -9706,7 +9732,7 @@ example: USD/CAD</property>
               </packing>
             </child>
             <child>
-              <widget class="IhildaWallet.CanselTxWidget" id="canseltxwidget1">
+              <widget class="IhildaWallet.CancelTxWidget" id="canceltxwidget1">
                 <property name="MemberName" />
                 <property name="Events">ButtonPressMask</property>
               </widget>
@@ -13328,7 +13354,7 @@ example: USD/CAD</property>
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Window" id="IhildaWallet.FilledRuleManagementWindow" design-size="691 444">
+  <widget class="Gtk.Window" id="IhildaWallet.FilledRuleManagementWindow" design-size="804 420">
     <property name="MemberName" />
     <property name="Title" translatable="yes">Filled Rule Management </property>
     <property name="WindowPosition">CenterOnParent</property>
@@ -13624,7 +13650,7 @@ example: USD/CAD</property>
                               </widget>
                             </child>
                             <child>
-                              <widget class="Gtk.Label" id="GtkLabel9">
+                              <widget class="Gtk.Label" id="GtkLabel10">
                                 <property name="MemberName" />
                                 <property name="LabelProp" translatable="yes">Ledger Contraint</property>
                                 <property name="UseUnderline">True</property>
@@ -13752,6 +13778,20 @@ Bot output screen
                                 <property name="AutoSize">True</property>
                                 <property name="Expand">False</property>
                                 <property name="Fill">False</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="Gtk.CheckButton" id="checkbutton2">
+                                <property name="MemberName" />
+                                <property name="CanFocus">True</property>
+                                <property name="Label" translatable="yes">Stop When Convenient</property>
+                                <property name="DrawIndicator">True</property>
+                                <property name="HasLabel">True</property>
+                                <property name="UseUnderline">True</property>
+                              </widget>
+                              <packing>
+                                <property name="Position">5</property>
+                                <property name="AutoSize">True</property>
                               </packing>
                             </child>
                           </widget>
@@ -14518,7 +14558,7 @@ Bot output screen
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Bin" id="IhildaWallet.CanselTxWidget" design-size="834 411">
+  <widget class="Gtk.Bin" id="IhildaWallet.CancelTxWidget" design-size="834 411">
     <property name="MemberName" />
     <property name="Visible">False</property>
     <child>
@@ -14528,7 +14568,7 @@ Bot output screen
         <child>
           <widget class="Gtk.Label" id="label2">
             <property name="MemberName" />
-            <property name="LabelProp" translatable="yes">&lt;b&gt;&lt;u&gt;Cansel A Pending Transaction&lt;/u&gt;&lt;/b&gt;</property>
+            <property name="LabelProp" translatable="yes">&lt;b&gt;&lt;u&gt;Cancel A Pending Transaction&lt;/u&gt;&lt;/b&gt;</property>
             <property name="UseMarkup">True</property>
           </widget>
           <packing>
@@ -14579,7 +14619,7 @@ Bot output screen
             <property name="MemberName" />
             <property name="CanFocus">True</property>
             <property name="Type">TextOnly</property>
-            <property name="Label" translatable="yes">Cansel Transaction</property>
+            <property name="Label" translatable="yes">Cancel Transaction</property>
             <property name="UseUnderline">True</property>
           </widget>
           <packing>
@@ -14587,6 +14627,21 @@ Bot output screen
             <property name="AutoSize">True</property>
             <property name="Expand">False</property>
             <property name="Fill">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.Label" id="label3">
+            <property name="MemberName" />
+            <property name="Xalign">0.04</property>
+            <property name="Yalign">0.1</property>
+            <property name="LabelProp" translatable="yes">Cancel a transaction using it's transaction hash
+
+Note : Orders can be viewed and cancelled with the orders widget</property>
+            <property name="UseMarkup">True</property>
+          </widget>
+          <packing>
+            <property name="Position">5</property>
+            <property name="AutoSize">False</property>
           </packing>
         </child>
       </widget>
@@ -14633,7 +14688,7 @@ Bot output screen
               <widget class="Gtk.Notebook" id="notebook2">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">0</property>
+                <property name="CurrentPage">2</property>
                 <child>
                   <widget class="Gtk.VBox" id="vbox5">
                     <property name="MemberName" />
@@ -14681,7 +14736,7 @@ Bot output screen
                     <property name="MemberName" />
                     <property name="Spacing">6</property>
                     <child>
-                      <widget class="IhildaWallet.PinCodeWidget" id="pincodewidget2">
+                      <widget class="IhildaWallet.PinCodeWidget" id="pincodewidget1">
                         <property name="MemberName" />
                         <property name="Events">ButtonPressMask</property>
                       </widget>
@@ -16460,7 +16515,7 @@ Bot output screen
       <widget class="Gtk.Notebook" id="notebook1">
         <property name="MemberName" />
         <property name="CanFocus">True</property>
-        <property name="CurrentPage">1</property>
+        <property name="CurrentPage">0</property>
         <child>
           <widget class="Gtk.VBox" id="vbox2">
             <property name="MemberName" />
@@ -17589,6 +17644,15 @@ Bot output screen
               </packing>
             </child>
             <child>
+              <widget class="Gtk.ProgressBar" id="progressbar1">
+                <property name="MemberName" />
+              </widget>
+              <packing>
+                <property name="Position">2</property>
+                <property name="AutoSize">True</property>
+              </packing>
+            </child>
+            <child>
               <widget class="Gtk.Button" id="button74">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
@@ -17598,7 +17662,7 @@ Bot output screen
               </widget>
               <packing>
                 <property name="PackType">End</property>
-                <property name="Position">2</property>
+                <property name="Position">3</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -17614,7 +17678,7 @@ Bot output screen
               </widget>
               <packing>
                 <property name="PackType">End</property>
-                <property name="Position">3</property>
+                <property name="Position">4</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -17630,7 +17694,7 @@ Bot output screen
               </widget>
               <packing>
                 <property name="PackType">End</property>
-                <property name="Position">4</property>
+                <property name="Position">5</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -17646,7 +17710,7 @@ Bot output screen
               </widget>
               <packing>
                 <property name="PackType">End</property>
-                <property name="Position">5</property>
+                <property name="Position">6</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>

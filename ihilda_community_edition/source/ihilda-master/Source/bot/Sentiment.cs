@@ -38,7 +38,11 @@ namespace IhildaWallet
 			case SentimentRatingEnum.Bullish:
 			case SentimentRatingEnum.Very_Bullish:
 			case SentimentRatingEnum.Mooning:
-				return "<span fgcolor=\"green\">" + Rating + "</span>";
+				if (Program.darkmode) {
+					return "<span fgcolor=\"chartreuse\">" + Rating + "</span>";
+				} else {
+					return "<span fgcolor=\"green\">" + Rating + "</span>";
+				}
 			}
 
 			return Rating;

@@ -66,7 +66,7 @@ namespace IhildaWallet
 				}
 
 
-				var info = ServerInfo.GetFeeAndLedgerSequence (ni);
+				var info = ServerInfo.GetFeeAndLedgerSequence (ni, _token);
 
 				if (info == null || info.Item2 == 0) {
 					return;
@@ -82,10 +82,10 @@ namespace IhildaWallet
 
 				if (wallets.Count < 10 && !_token.IsCancellationRequested) {
 
-					DoExtensiveNotification (info.Item2, ni, wal);
+					DoExtensiveNotification (info.Item2, ni, _token, wal);
 
 				} else if (wallets.Count < 100 && !_token.IsCancellationRequested) {
-					DoBasicNotification (info.Item2, ni, wal);
+					DoBasicNotification (info.Item2, ni, _token, wal);
 				}
 
 
@@ -101,7 +101,7 @@ namespace IhildaWallet
 		}
 
 
-		private void DoExtensiveNotification (uint ledger, NetworkInterface ni, IEnumerable<RippleWallet> wallets)
+		private void DoExtensiveNotification (uint ledger, NetworkInterface ni, CancellationToken token, IEnumerable<RippleWallet> wallets)
 		{
 
 #if DEBUG
@@ -125,7 +125,7 @@ namespace IhildaWallet
 
 				try {
 
-					RippleCurrency rippleCurrency = AccountInfo.GetNativeBalance (rw.GetStoredReceiveAddress (), ni);
+					RippleCurrency rippleCurrency = AccountInfo.GetNativeBalance (rw.GetStoredReceiveAddress (), ni, token);
 
 					DateTime dateTime = DateTime.Now;
 
@@ -134,7 +134,7 @@ namespace IhildaWallet
 						rw.LastKnownNativeBalance = rippleCurrency;
 						rw.Notification = "balance updated as of " + dateTime.ToShortTimeString ();
 					} else {
-						rw.Notification = "<span fgcolor=\"red\">Could not update balance</span>";
+						rw.Notification = "<span fgcolor=\"salmon\">Could not update balance</span>";
 					}
 
 					WalletManager.currentInstance?.UpdateUI ();
@@ -237,7 +237,7 @@ namespace IhildaWallet
 
 		}
 
-		private void DoBasicNotification (uint ledger, NetworkInterface ni, IEnumerable<RippleWallet> wallets)
+		private void DoBasicNotification (uint ledger, NetworkInterface ni, CancellationToken token, IEnumerable<RippleWallet> wallets)
 		{
 
 #if DEBUG
@@ -262,7 +262,7 @@ namespace IhildaWallet
 
 				try {
 
-					RippleCurrency rippleCurrency = AccountInfo.GetNativeBalance (rw.GetStoredReceiveAddress (), ni);
+					RippleCurrency rippleCurrency = AccountInfo.GetNativeBalance (rw.GetStoredReceiveAddress (), ni, token);
 
 					DateTime dateTime = DateTime.Now;
 
@@ -271,7 +271,7 @@ namespace IhildaWallet
 						rw.LastKnownNativeBalance = rippleCurrency;
 						rw.Notification = "balance updated as of " + dateTime.ToShortTimeString ();
 					} else {
-						rw.Notification = "<span fgcolor=\"red\">Could not update balance " + (string)(rw?.Account ?? "null") + " </span>";
+						rw.Notification = "<span fgcolor=\"salmon\">Could not update balance " + (string)(rw?.Account ?? "null") + " </span>";
 					}
 
 					WalletManager.currentInstance?.UpdateUI ();
@@ -581,7 +581,8 @@ namespace IhildaWallet
 						wallet.Account,
 						ledgerMin,
 						ledgerMax,
-						networkInterface
+						networkInterface,
+						_token
 					);
 				if (task == null) {
 					//return null;
@@ -645,7 +646,7 @@ namespace IhildaWallet
 
 
 
-			OrderManagementBot omb = new OrderManagementBot (wallet, networkInterface);
+			OrderManagementBot omb = new OrderManagementBot (wallet, networkInterface, _token);
 
 			IEnumerable<AutomatedOrder> total = null;
 
@@ -727,7 +728,8 @@ namespace IhildaWallet
 
 					});
 
-					mre.WaitOne ();
+					//mre.WaitOne ();
+				WaitHandle.WaitAny (new [] { mre, _token.WaitHandle });
 
 				if (!Program.network) {
 					// if networking explicitly prohibited don't do networking loop. 
@@ -736,7 +738,7 @@ namespace IhildaWallet
 					}
 					try {
 						//Thread.Sleep(1000);
-						Task.Delay (1000).Wait (1000);
+					Task.Delay (1000).Wait (1000, _token);
 					}
 #pragma warning disable 0168
 					catch (Exception ex) {
@@ -748,7 +750,7 @@ namespace IhildaWallet
 					//Thread thread = new Thread(ts);
 					//thread.Start();
 
-					Task.Run ((System.Action)DoLoop);
+				Task.Run ((System.Action)DoLoop, _token);
 				}
 			);
 

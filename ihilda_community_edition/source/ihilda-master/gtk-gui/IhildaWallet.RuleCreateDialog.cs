@@ -156,9 +156,7 @@ namespace IhildaWallet
 			w7.XOptions = ((global::Gtk.AttachOptions)(4));
 			w7.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
-			this.tradepairentrywidget1 = new global::IhildaWallet.TradePairEntryWidget();
-			this.tradepairentrywidget1.Events = ((global::Gdk.EventMask)(256));
-			this.tradepairentrywidget1.Name = "tradepairentrywidget1";
+			this.tradepairentrywidget1 = null;
 			this.table1.Add(this.tradepairentrywidget1);
 			global::Gtk.Table.TableChild w8 = ((global::Gtk.Table.TableChild)(this.table1[this.tradepairentrywidget1]));
 			w8.BottomAttach = ((uint)(3));

@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
+
 using Gtk;
 using IhildaWallet.Networking;
 using RippleLibSharp.Commands.Accounts;
@@ -20,11 +23,13 @@ namespace IhildaWallet
 		{
 			this.Build ();
 			listStore = new ListStore (
+				typeof (string), // #
 				typeof (bool), // select
 				typeof (string), // buy
 				typeof (string),  // sell
 				typeof (string),  // price
 				typeof (string),   // cost
+				typeof (string), // marking
 				typeof (string),   //status
 				typeof (string));  // result
 
@@ -38,17 +43,19 @@ namespace IhildaWallet
 				Editable = false
 			};
 
-			treeview1.AppendColumn ("Select", toggle, "active", 0);
+
+			treeview1.AppendColumn ("#", txtr, "markup", 0);
+			treeview1.AppendColumn ("Select", toggle, "active", 1);
 
 			//this.treeview1.AppendColumn ("<span fgcolor=\"green\">Buy</span>", txtr, "markup", 1);
 
-			this.treeview1.AppendColumn ("Buy", txtr, "markup", 1);
-			this.treeview1.AppendColumn ("Sell", txtr, "markup", 2);
-			this.treeview1.AppendColumn ("Price", txtr, "markup", 3);
-			this.treeview1.AppendColumn ("Cost", txtr, "markup", 4);
-			this.treeview1.AppendColumn ("Marking", txtr, "markup", 5);
-			this.treeview1.AppendColumn ("Status", txtr, "markup", 6);
-			this.treeview1.AppendColumn ("Result", txtr, "markup", 7);
+			this.treeview1.AppendColumn ("Buy", txtr, "markup", 2);
+			this.treeview1.AppendColumn ("Sell", txtr, "markup", 3);
+			this.treeview1.AppendColumn ("Price", txtr, "markup", 4);
+			this.treeview1.AppendColumn ("Cost", txtr, "markup", 5);
+			this.treeview1.AppendColumn ("Marking", txtr, "markup", 6);
+			this.treeview1.AppendColumn ("Status", txtr, "markup", 7);
+			this.treeview1.AppendColumn ("Result", txtr, "markup", 8);
 
 			this.treeview1.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
 				Logging.WriteLog ("ButtonReleaseEvent at x=" + args.Event.X.ToString () + " y=" + args.Event.Y.ToString ());
@@ -92,7 +99,7 @@ namespace IhildaWallet
 
 			Application.Invoke ((object sender, EventArgs e) => {
 				if (listStore.GetIterFromString (out TreeIter iter, path)) {
-					listStore.SetValue (iter, 6, s);
+					listStore.SetValue (iter, 7, s);
 				}
 			});
 
@@ -106,7 +113,7 @@ namespace IhildaWallet
 
 			Gtk.Application.Invoke ((object sender, EventArgs e) => {
 				if (listStore.GetIterFromString (out TreeIter iter, path)) {
-					listStore.SetValue (iter, 6, s);
+					listStore.SetValue (iter, 7, s);
 				}
 			});
 
@@ -118,11 +125,11 @@ namespace IhildaWallet
 
 			Gtk.Menu menu = new Menu ();
 
-			Gtk.MenuItem cansel = new MenuItem ("Cancel");
-			cansel.Show ();
-			menu.Add (cansel);
+			Gtk.MenuItem cancel = new MenuItem ("Cancel");
+			cancel.Show ();
+			menu.Add (cancel);
 
-			cansel.Activated += (object sender, EventArgs e) => {
+			cancel.Activated += (object sender, EventArgs e) => {
 #if DEBUG
 				if (DebugIhildaWallet.OpenOrdersTree) {
 					Logging.WriteLog ("Cancel Selected");
@@ -131,8 +138,8 @@ namespace IhildaWallet
 				Task.Run (
 					delegate {
 						NetworkInterface networkInterface = NetworkController.GetNetworkInterfaceNonGUIThread ();
-
-						uint se = Convert.ToUInt32 (AccountInfo.GetSequence (ao.Account, networkInterface));
+						// TODO possibly use real token
+						uint se = Convert.ToUInt32 (AccountInfo.GetSequence (ao.Account, networkInterface, new CancellationToken ()));
 
 						RippleIdentifier rippleSeedAddress = _rippleWallet.GetDecryptedSeed ();
 
@@ -298,15 +305,16 @@ namespace IhildaWallet
 
 				FeeSettings feeSettings = FeeSettings.LoadSettings ();
 				feeSettings.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
-					this.SetIsSubmitted (index.ToString(), "Fee " + e.FeeAndLastLedger.Item1.ToString() + " is too high, waiting on lower fee");
+					this.SetIsSubmitted (index.ToString (), "Fee " + e.FeeAndLastLedger.Item1.ToString () + " is too high, waiting on lower fee");
 				};
 
-				Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni);
+				// TODO possibly use a real token
+				Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, new CancellationToken ());
 
-				if (stop) {
+				if (tokenSource?.IsCancellationRequested == true) {
 
 					this.SetFailed (index.ToString (), "Aborted");
-					stop = false;
+					//stop = false;
 					return false;
 				}
 				//UInt32 f = tupe.Item1; 
@@ -361,9 +369,9 @@ namespace IhildaWallet
 
 
 
-				if (stop) {
+				if (tokenSource?.IsCancellationRequested == true) {
 					this.SetFailed (index.ToString (), "Aborted");
-					stop = false;
+					//stop = false;
 					return false;
 				}
 
@@ -372,7 +380,7 @@ namespace IhildaWallet
 				Task<Response<RippleSubmitTxResult>> task = null;
 
 				try {
-					task = NetworkController.UiTxNetworkSubmit (tx, ni);
+					task = NetworkController.UiTxNetworkSubmit (tx, ni, new CancellationToken ());
 					this.SetIsSubmitted (index.ToString (), "Submitted via websocket");
 					task.Wait ();
 
@@ -544,14 +552,65 @@ namespace IhildaWallet
 
 		}
 
-		public void SetOffers (AutomatedOrder [] offers)
+		public void SetOffers (IEnumerable<Offer> offers)
 		{
 
+			int count = offers.Count ();
 
-			this._offers = new AutomatedOrder [offers.Length];
+			this._offers = new AutomatedOrder [count];
 
 			Gtk.Application.Invoke ((object sender, EventArgs e) => {
 				listStore.Clear ();
+				//});
+
+				int index = 0;
+				foreach (Offer offer in offers) {
+
+					AutomatedOrder o = new AutomatedOrder (offer);
+
+					Decimal price = o.TakerGets.GetNativeAdjustedPriceAt (o.TakerPays);
+					Decimal cost = o.TakerPays.GetNativeAdjustedPriceAt (o.TakerGets);
+
+					this._offers [index++] = o;
+
+					listStore.AppendValues (
+						(index).ToString (),
+						o.Selected,
+						o.TakerPays.ToString (),
+						o.TakerGets.ToString (),
+						price.ToString (),
+						cost.ToString (),
+						o.BotMarking ?? "",
+						"",
+						""
+					);
+
+				}
+
+
+				treeview1.Model = listStore;
+			});
+
+
+		}
+
+		public void AppendOrders (AutomatedOrder [] offers)
+		{
+			int offset = 0;
+			if (this._offers == null) {
+
+				this._offers = new AutomatedOrder [offers.Length];
+			} else {
+
+				offset = this._offers.Length;
+				var snew = new AutomatedOrder [offers.Length + offset];
+				Array.Copy (_offers, snew, _offers.Length);
+				this._offers = snew;
+
+
+			}
+			Gtk.Application.Invoke ((object sender, EventArgs e) => {
+				//listStore.Clear ();
 
 				for (int i = 0; i < offers.Length; i++) {
 
@@ -560,18 +619,26 @@ namespace IhildaWallet
 					Decimal price = o.TakerGets.GetNativeAdjustedPriceAt (o.TakerPays);
 					Decimal cost = o.TakerPays.GetNativeAdjustedPriceAt (o.TakerGets);
 
-					listStore.AppendValues (o.Selected, o.TakerPays.ToString (), o.TakerGets.ToString (), price.ToString (), cost.ToString (), o.BotMarking);
+					listStore.AppendValues (
+						(i + 1).ToString (),
+						o.Selected,
+						o.TakerPays.ToString (),
+						o.TakerGets.ToString (),
+						price.ToString (),
+						cost.ToString (),
+						o?.BotMarking ?? "",
+						"",
+						"");
 
 					//o.selected = true;
 
-					this._offers [i] = o;
+					this._offers [i + offset] = o;
 
 				}
 
 
 				treeview1.Model = listStore;
 			});
-
 
 		}
 
@@ -583,8 +650,8 @@ namespace IhildaWallet
 			int index = Convert.ToInt32 (args.Path);
 
 			if (listStore.GetIterFromString (out TreeIter iter, args.Path)) {
-				bool val = (bool)listStore.GetValue (iter, 0);
-				listStore.SetValue (iter, 0, !val);
+				bool val = (bool)listStore.GetValue (iter, 1);
+				listStore.SetValue (iter, 1, !val);
 
 
 				_offers [index].Selected = !val;
@@ -614,7 +681,7 @@ namespace IhildaWallet
 
 		private RippleWallet _wallet = null;
 
-		public bool stop = false;
+		public CancellationTokenSource tokenSource = null;
 
 #if DEBUG
 		private const String clsstr = nameof (OpenOrdersTree) + DebugRippleLibSharp.colon;

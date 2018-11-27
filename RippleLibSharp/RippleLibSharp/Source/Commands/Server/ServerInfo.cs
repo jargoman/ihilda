@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Codeplex.Data;
 using RippleLibSharp.Network;
@@ -9,7 +10,7 @@ namespace RippleLibSharp.Commands.Server
 	public static class ServerInfo
 	{
 
-		public static  Task<Response<ServerInfoResult>> GetResult (NetworkInterface ni, IdentifierTag identifierTag = null) {
+		public static  Task<Response<ServerInfoResult>> GetResult (NetworkInterface ni, CancellationToken token, IdentifierTag identifierTag = null) {
 			if (identifierTag == null) {
 				identifierTag = new IdentifierTag {
 					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
@@ -23,22 +24,22 @@ namespace RippleLibSharp.Commands.Server
 
 			string request = DynamicJson.Serialize (o);
 
-			Task< Response<ServerInfoResult>> task = NetworkRequestTask.RequestResponse <ServerInfoResult> ( identifierTag, request, ni );
+			Task< Response<ServerInfoResult>> task = NetworkRequestTask.RequestResponse <ServerInfoResult> ( identifierTag, request, ni, token );
 
 		
 			return task;
 		}
 
-		public static Tuple<string, UInt32> GetFeeAndLedgerSequence (NetworkInterface ni) {
+		public static Tuple<string, UInt32> GetFeeAndLedgerSequence (NetworkInterface ni, CancellationToken token) {
 			try {
 
-				Task< Response<ServerInfoResult>> task = GetResult (ni);
+				Task< Response<ServerInfoResult>> task = GetResult (ni, token);
 
 				if (task == null) {
 					return null;
 				}
 
-				task.Wait (15000);
+				task.Wait (15000, token);
 
 				Response<ServerInfoResult> res = task?.Result;
 				if (res == null) {

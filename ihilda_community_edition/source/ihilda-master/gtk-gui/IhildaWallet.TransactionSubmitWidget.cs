@@ -51,9 +51,7 @@ namespace IhildaWallet
 			this.hbox1.Name = "hbox1";
 			this.hbox1.Spacing = 6;
 			// Container child hbox1.Gtk.Box+BoxChild
-			this.walletswitchwidget1 = new global::IhildaWallet.WalletSwitchWidget();
-			this.walletswitchwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.walletswitchwidget1.Name = "walletswitchwidget1";
+			this.walletswitchwidget1 = null;
 			this.hbox1.Add(this.walletswitchwidget1);
 			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.walletswitchwidget1]));
 			w3.Position = 0;

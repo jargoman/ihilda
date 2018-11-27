@@ -6,6 +6,7 @@ using RippleLibSharp.Network;
 using RippleLibSharp.Result;
 using RippleLibSharp.Transactions;
 using RippleLibSharp.Keys;
+using System.Threading;
 
 namespace RippleLibSharp.Commands.Stipulate
 {
@@ -18,6 +19,7 @@ namespace RippleLibSharp.Commands.Stipulate
 			RippleAddress taker,
 			int?  limit,
 			NetworkInterface ni,
+			CancellationToken token,
 			IdentifierTag identifierTag = null
 		
 		) {
@@ -73,7 +75,7 @@ namespace RippleLibSharp.Commands.Stipulate
 
 			string request = sb.ToString ();
 
-			Task< Response<BookOfferResult>> task = NetworkRequestTask.RequestResponse <BookOfferResult> (identifierTag, request, ni);
+			Task< Response<BookOfferResult>> task = NetworkRequestTask.RequestResponse <BookOfferResult> (identifierTag, request, ni, token);
 
 			//task.Wait ();
 
@@ -86,9 +88,10 @@ namespace RippleLibSharp.Commands.Stipulate
 			RippleCurrency taker_pays,
 			RippleAddress taker,
 			NetworkInterface ni,
+			CancellationToken token,
 			IdentifierTag identifierTag = null
 		) {
-			return GetResult (taker_gets, taker_pays, taker, null, ni, identifierTag);
+			return GetResult (taker_gets, taker_pays, taker, null, ni, token, identifierTag);
 		}
 
 		public static  Task<Response<BookOfferResult>> GetResult (
@@ -96,18 +99,20 @@ namespace RippleLibSharp.Commands.Stipulate
 			RippleCurrency taker_pays,
 			int? limit,
 			NetworkInterface ni,
+			CancellationToken token,
 			IdentifierTag identifierTag = null
 		) {
-			return GetResult (taker_gets, taker_pays, null, limit, ni, identifierTag);
+			return GetResult (taker_gets, taker_pays, null, limit, ni, token, identifierTag);
 		}
 
 		public static  Task<Response<BookOfferResult>> GetResult (
 			RippleCurrency taker_gets,
 			RippleCurrency taker_pays,
 			NetworkInterface ni,
+			CancellationToken token,
 			IdentifierTag identifierTag = null
 		) {
-			return GetResult (taker_gets, taker_pays, null, null, ni, identifierTag);
+			return GetResult (taker_gets, taker_pays, null, null, ni, token, identifierTag);
 		}
 
 

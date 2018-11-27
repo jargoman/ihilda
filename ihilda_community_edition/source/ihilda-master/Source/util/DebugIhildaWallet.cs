@@ -22,6 +22,7 @@ namespace IhildaWallet
 #pragma warning disable RECS0122 // Initializing field with default value is redundant
 		public static bool AccountLinesWidget = false;
 
+		public static bool AccountSequenceCache = false;
 
 		public static bool AccountOrders = false;
 
@@ -116,6 +117,8 @@ namespace IhildaWallet
 		public static bool OrderBookWidget = false;
 
 		public static bool OrderBookTableWidget = false;
+
+		public static bool OrderManagementBot = false;
 
 		public static bool OrderPreviewSubmitWidget = false;
 

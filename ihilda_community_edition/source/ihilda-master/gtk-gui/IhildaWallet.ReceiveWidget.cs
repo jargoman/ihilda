@@ -21,9 +21,7 @@ namespace IhildaWallet
 			this.hbox6.Name = "hbox6";
 			this.hbox6.Spacing = 6;
 			// Container child hbox6.Gtk.Box+BoxChild
-			this.addressdisplaywidget1 = new global::IhildaWallet.AddressDisplayWidget();
-			this.addressdisplaywidget1.Events = ((global::Gdk.EventMask)(256));
-			this.addressdisplaywidget1.Name = "addressdisplaywidget1";
+			this.addressdisplaywidget1 = null;
 			this.hbox6.Add(this.addressdisplaywidget1);
 			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.hbox6[this.addressdisplaywidget1]));
 			w1.Position = 0;

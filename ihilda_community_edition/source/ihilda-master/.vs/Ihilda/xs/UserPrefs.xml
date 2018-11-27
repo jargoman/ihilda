@@ -1,47 +1,47 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Widgets/TransactionsWidgets/ConnectedDisplayWidget.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/encryption/Rijndaelio.cs">
     <Files>
-      <File FileName="Source/util/WalletManager.cs" Line="204" Column="6" />
-      <File FileName="Source/util/DebugIhildaWallet.cs" Line="185" Column="42" />
-      <File FileName="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs" Line="719" Column="6" />
-      <File FileName="Source/bot/Robotics.cs" Line="29" Column="56" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Commands/Accounts/AccountTx.cs" Line="102" Column="6" />
-      <File FileName="Source/gui-classes/Widgets/LedgerConstraintsWidget.cs" Line="38" Column="5" />
-      <File FileName="Source/gui-classes/Widgets/OrderPreviewSubmitWidget.cs" Line="8" Column="34" />
-      <File FileName="Source/gui-classes/Windows/OrderSubmitWindow.cs" Line="1" Column="1" />
-      <File FileName="Source/bot/RuleManager.cs" Line="97" Column="5" />
-      <File FileName="Source/NotificationSystem/NotificationThread.cs" Line="714" Column="9" />
-      <File FileName="Source/bot/OrderManagementBot.cs" Line="158" Column="50" />
-      <File FileName="Source/gui-classes/Widgets/TransactionsWidgets/ConnectedDisplayWidget.cs" Line="15" Column="9" />
+      <File FileName="Source/util/WalletManager.cs" Line="276" Column="5" />
+      <File FileName="Source/util/CommandLineParser.cs" Line="38" Column="58" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Network/NetworkRequestTask.cs" Line="62" Column="34" />
+      <File FileName="Source/bot/OrderSubmitter.cs" Line="455" Column="5" />
+      <File FileName="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs" Line="1145" Column="7" />
+      <File FileName="Source/Program.cs" Line="201" Column="62" />
+      <File FileName="Files/CommandLineHelpText.txt" Line="3" Column="2" />
+      <File FileName="Source/WalletClasses/RippleWallet.cs" Line="535" Column="20" />
+      <File FileName="Source/gui-classes/Dialogs/TrippleEntenteDialog.cs" Line="121" Column="70" />
+      <File FileName="Source/encryption/Rijndaelio.cs" Line="17" Column="15" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="Ihilda" expanded="True">
             <Node name="IhildaWallet" expanded="True">
-              <Node name="UserInterface" expanded="True" />
+              <Node name="Files" expanded="True" />
               <Node name="Source" expanded="True">
                 <Node name="bot" expanded="True" />
+                <Node name="encryption" expanded="True">
+                  <Node name="Rijndaelio.cs" selected="True" />
+                </Node>
                 <Node name="gui-classes" expanded="True">
+                  <Node name="Dialogs" expanded="True" />
                   <Node name="Widgets" expanded="True">
-                    <Node name="Charting" expanded="True" />
                     <Node name="RuleWidgets" expanded="True" />
-                    <Node name="TransactionsWidgets" expanded="True">
-                      <Node name="ConnectedDisplayWidget.cs" selected="True" />
-                    </Node>
+                    <Node name="TransactionsWidgets" expanded="True" />
                     <Node name="WalletUI" expanded="True" />
                   </Node>
-                  <Node name="Windows" expanded="True" />
                 </Node>
+                <Node name="Networking" expanded="True" />
                 <Node name="NotificationSystem" expanded="True" />
                 <Node name="util" expanded="True" />
+                <Node name="WalletClasses" expanded="True" />
               </Node>
             </Node>
             <Node name="RippleLibSharp" expanded="True">
               <Node name="Source" expanded="True">
-                <Node name="Commands" expanded="True">
-                  <Node name="Accounts" expanded="True" />
-                </Node>
+                <Node name="Binary" expanded="True" />
+                <Node name="Network" expanded="True" />
+                <Node name="Nodes" expanded="True" />
               </Node>
             </Node>
           </Node>
@@ -53,7 +53,7 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/Source/bot/AccountSequenceCache.cs" relfile="Source/bot/AccountSequenceCache.cs" line="37" column="1" />
+      <Breakpoint file="/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/Source/bot/AccountSequenceCache.cs" relfile="Source/bot/AccountSequenceCache.cs" line="160" column="6" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MultiItemStartupConfigurations />

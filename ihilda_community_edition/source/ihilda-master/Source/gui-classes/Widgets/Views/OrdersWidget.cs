@@ -464,6 +464,8 @@ namespace IhildaWallet
 
 		}
 
+
+		private CancellationTokenSource tokenSource = null;
 		public void SyncClicked ( object address ) {
 			#if DEBUG
 			string method_sig = clsstr + nameof (SyncClicked) + DebugRippleLibSharp.left_parentheses + nameof (address) + DebugRippleLibSharp.right_parentheses;
@@ -471,10 +473,13 @@ namespace IhildaWallet
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
 
-		#endif
+#endif
 
+			var ts = new CancellationTokenSource ();
+			CancellationToken token = ts.Token;
+			tokenSource?.Cancel ();
 
-
+			tokenSource = ts;
 
 
 			if (!(address is OAParam oap)) {
@@ -537,12 +542,19 @@ namespace IhildaWallet
 				return;
 			}
 
+			if (token.IsCancellationRequested) {
+				return;
+			}
+
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread (); //getNetworkInterfaceNonGuiThread();
 
-			Task <IEnumerable<Response<AccountOffersResult>> > task = AccountOffers.GetFullOfferList (addr, ni);
-			task.Wait ();
+			Task <IEnumerable<Response<AccountOffersResult>> > task = AccountOffers.GetFullOfferList (addr, ni, token);
+			task.Wait (token);
 
 
+			if (token.IsCancellationRequested) {
+				return;
+			}
 
 			IEnumerable<Response<AccountOffersResult>> responses = task.Result;
 
@@ -550,6 +562,9 @@ namespace IhildaWallet
 			if (first.HasError()) {
 				Gtk.Application.Invoke (
 					delegate {
+						if (token.IsCancellationRequested) {
+							return;
+						}
 						string DEFAULT_ERROR = "Error";
 						this.infoBarLabel.Text = 
 							"<span fgcolor=\"red\">" 
@@ -567,7 +582,7 @@ namespace IhildaWallet
 				return;
 			}
 
-			if (firstOffs.Length == 0) {
+			if (!firstOffs.Any()) {
 
 				Gtk.Application.Invoke (
 					delegate {

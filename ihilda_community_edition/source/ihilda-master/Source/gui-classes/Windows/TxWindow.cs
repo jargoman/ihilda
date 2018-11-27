@@ -45,13 +45,13 @@ namespace IhildaWallet
 				notebook1.AppendPage (orderstreewidget1, this.label52 );
 			}
 
-			if (canseltxwidget1 == null) {
-				canseltxwidget1 = new CanselTxWidget ();
-				canseltxwidget1.Show ();
+			if (canceltxwidget1 == null) {
+				canceltxwidget1 = new CancelTxWidget ();
+				canceltxwidget1.Show ();
 				if (label55 == null) {
 					label55 = new Gtk.Label ("<b>Cancel</b>");
 				}
-				notebook1.AppendPage (canseltxwidget1, this.label55);
+				notebook1.AppendPage (canceltxwidget1, this.label55);
 			}
 
 

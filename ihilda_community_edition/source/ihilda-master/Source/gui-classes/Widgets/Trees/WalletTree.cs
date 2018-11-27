@@ -606,10 +606,19 @@ namespace IhildaWallet
 					if (rw?.AccountType == RippleWalletTypeEnum.Master || rw?.AccountType == RippleWalletTypeEnum.MasterPrivateKey) {
 						sb.Append ("<span ");
 						if (b) {
-							sb.Append ("bgcolor=\"lavender\"");
+							if (!Program.darkmode) {
+								sb.Append ("bgcolor=\"lavender\"");
+							} else {
+								sb.Append ("bgcolor=\"black\"");
+							}
 						}
 
-						sb.Append ("fgcolor=\"green\"><big>");
+						if (!Program.darkmode) {
+							sb.Append ("fgcolor=\"green\"><big>");
+						} else {
+							sb.Append ("fgcolor=\"chartreuse\"><big>");
+						}
+
 						if (b) {
 							sb.Append ("<b><u>");
 						}
@@ -623,7 +632,11 @@ namespace IhildaWallet
 
 						sb.Append ("</big></span>");
 
-						sb.Append ("<span fgcolor=\"darkblue\" size=\"x-large\">");
+						if (Program.darkmode) {
+							sb.Append ("<span fgcolor=\"deepskyblue\" size=\"x-large\">");
+						} else {
+							sb.Append ("<span fgcolor=\"darkblue\" size=\"x-large\">");
+						}
 
 						if (balance != null) {
 							sb.AppendLine ();
@@ -641,10 +654,19 @@ namespace IhildaWallet
 					if (rw?.AccountType == RippleWalletTypeEnum.Regular) {
 						sb.Append ("<span ");
 						if (b) {
-							sb.Append ("bgcolor=\"lavender\"");
+							if (!Program.darkmode) {
+								sb.Append ("bgcolor=\"lavender\"");
+							} else {
+								sb.Append ("bgcolor=\"black\"");
+							}
 						}
 
-						sb.Append ("fgcolor=\"green\">");
+						if (Program.darkmode) {
+							sb.Append ("fgcolor=\"chartreuse\">");
+						} else {
+							sb.Append ("fgcolor=\"green\">");
+						}
+
 						sb.Append (rw?.GetStoredReceiveAddress () ?? " ");
 						sb.Append ("</span>");
 
@@ -654,14 +676,22 @@ namespace IhildaWallet
 						sb.AppendLine ();
 						sb.Append ("<span ");
 						if (b) {
-							sb.Append ("bgcolor=\"antiquewhite\"");
+							if (!Program.darkmode) {
+								sb.Append ("bgcolor=\"antiquewhite\"");
+							} else {
+								sb.Append ("bgcolor=\"black\"");
+							}
 						}
 
 						sb.Append ("fgcolor=\"grey\">");
 						sb.Append (rw?.Regular_Key_Account ?? " ");
 						sb.Append ("</span>");
 
-						sb.Append ("<span fgcolor=\"darkblue\" size=\"x-large\">");
+						if (Program.darkmode) {
+							sb.Append ("<span fgcolor=\"deepskyblue\" size=\"x-large\">");
+						} else {
+							sb.Append ("<span fgcolor=\"darkblue\" size=\"x-large\">");
+						}
 						if (balance != null) {
 							sb.AppendLine ();
 							sb.Append (balance);
@@ -683,7 +713,11 @@ namespace IhildaWallet
 
 					string name = rw?.WalletName ?? "";
 					if (b) {
-						name = "<span fgcolor=\"green\" bgcolor=\"lavender\"><b><u>" + name + "</u></b></span>";
+						if (Program.darkmode) {
+							name = "<span fgcolor=\"chartreuse\" bgcolor=\"black\"><b><u>" + name + "</u></b></span>";
+						} else {
+							name = "<span fgcolor=\"green\" bgcolor=\"lavender\"><b><u>" + name + "</u></b></span>";
+						}
 					}
 					store.AppendValues (
 						b,

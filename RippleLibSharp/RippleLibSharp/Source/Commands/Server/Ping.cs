@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Codeplex.Data;
 using RippleLibSharp.Network;
@@ -9,7 +10,7 @@ namespace RippleLibSharp.Commands.Server
 	public static class Ping
 	{
 
-		public static  Task<Response<PingObject>> getResult (NetworkInterface ni, IdentifierTag identifierTag = null) {
+		public static  Task<Response<PingObject>> getResult (NetworkInterface ni, CancellationToken token, IdentifierTag identifierTag = null) {
 			if (identifierTag == null) {
 				identifierTag = new IdentifierTag {
 					IdentificationNumber = NetworkRequestTask.ObtainTicket ()
@@ -23,7 +24,7 @@ namespace RippleLibSharp.Commands.Server
 
 			string request = DynamicJson.Serialize (o);
 
-			Task< Response<PingObject>> task = NetworkRequestTask.RequestResponse <PingObject> (identifierTag, request, ni);
+			Task< Response<PingObject>> task = NetworkRequestTask.RequestResponse <PingObject> (identifierTag, request, ni, token);
 
 			return task;
 		}

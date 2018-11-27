@@ -47,7 +47,8 @@ namespace IhildaWallet
 				}
 				#endif
 				*/
-				DATA_FOLDER_PATH = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
+				//DATA_FOLDER_PATH = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
+				DATA_FOLDER_PATH = DEFAULT_DATA_FOLDER_PATH = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
 			}
 
 			if (DATA_FOLDER_PATH == null) {
@@ -192,12 +193,7 @@ namespace IhildaWallet
 				//	return false;
 				//}
 
-				if (File.Exists (path)) {
-					return false;
-				}
-
-				return true;
-
+				return !File.Exists (path);
 			}
 
 #pragma warning disable 0168
@@ -220,8 +216,9 @@ namespace IhildaWallet
 		public static void AssureDirectory (String dir)
 		{
 #if DEBUG
+			string method_sig = clsstr + nameof (AssureDirectory) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.FileHelper) {
-				Logging.WriteLog("FileHelper : Assuring directory " + dir );
+				Logging.WriteLog(method_sig + dir );
 			}
 #endif
 
@@ -404,7 +401,8 @@ namespace IhildaWallet
 		public static string TEMP_EXTENTION = ".tmp";
 		public static string BACKUP_EXT = ".backup";
 
-
+		public static string DEFAULT_DATA_FOLDER_PATH = Environment.GetFolderPath ( Environment.SpecialFolder.ApplicationData );
+		public static string DEFAULT_CONFIG_FOLDER_PATH = Path.Combine ( DEFAULT_DATA_FOLDER_PATH, DATA_FOLDER );
 
 #pragma warning restore RECS0122 // Initializing field with default value is redundant
 		//public static Dictionary<String, String> configCache = new Dictionary<String,String>(); // cache of config paths
@@ -412,9 +410,10 @@ namespace IhildaWallet
 
 
 
-		#if DEBUG
+#if DEBUG
 		private const string clsstr = nameof (FileHelper) + DebugRippleLibSharp.colon;
-		#endif
+#endif
+
 	}
 }
 

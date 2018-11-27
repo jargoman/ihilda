@@ -60,7 +60,10 @@ namespace RippleLibSharp.Result
 		}
 		public Marker marker { get; set; }
 
-		public Offer[] offers { get; set; }
+		//public Offer[] offers { get; set; }
+
+		public IEnumerable<Offer> offers { get; set; }
+
 		public bool validated { get; set; }
 #pragma warning restore IDE1006 // Naming Styles
 	}

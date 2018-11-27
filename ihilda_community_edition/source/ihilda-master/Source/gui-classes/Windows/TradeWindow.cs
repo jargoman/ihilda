@@ -304,8 +304,10 @@ namespace IhildaWallet
 
 		}
 
-		public void Update ()
+		public void Update (CancellationToken token)
 		{
+
+			// TODO I think this does nothing and called by nothing
 			NetworkInterface ni = NetworkController.CurrentInterface;
 			if (ni == null) {
 				return;
@@ -316,14 +318,15 @@ namespace IhildaWallet
 					this._TradePairInstance.Currency_Base,
 					this._TradePairInstance.Currency_Counter,
 					1,
-					ni
+					ni,
+					token
 				);
 
 			if (task == null) {
 				return;
 			}
 
-			task.Wait ();
+			task.Wait (token);
 
 			Response<BookOfferResult> resp = task.Result;
 			if (resp == null) {

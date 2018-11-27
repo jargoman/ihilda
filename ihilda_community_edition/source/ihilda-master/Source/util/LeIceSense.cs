@@ -94,7 +94,7 @@ namespace IhildaWallet.Util
 				return null;
 			} 
 
-			Task<Response<AccountLinesResult>> task = AccountLines.GetResult (addr, ni);
+			Task<Response<AccountLinesResult>> task = AccountLines.GetResult (addr, ni, new CancellationToken());
 
 
 #if DEBUG
@@ -443,6 +443,9 @@ namespace IhildaWallet.Util
 
 		internal static bool LastDitchAttempt (RippleWallet rw, LicenseType licenseType)
 		{
+			// TODO should a real cancellable token from a token source be used instead?
+			CancellationToken token = new CancellationToken ();
+
 			if (rw == null) {
 
 				StringBuilder stringBuilder = new StringBuilder ();
@@ -526,8 +529,8 @@ namespace IhildaWallet.Util
 
 				});
 
-			ev.WaitOne ();
-
+			//ev.WaitOne ();
+			WaitHandle.WaitAny ( new [] { ev, token.WaitHandle } );
 			if ( r == ResponseType.Cancel ) {
 				return false;
 			}
@@ -551,8 +554,8 @@ namespace IhildaWallet.Util
 				issuer = Util.LeIceSense.LICENSE_ISSUER
 			};
 
-			Task<Response<BookOfferResult>> task = BookOffers.GetResult (baseCurrency, counterCurrency, ni);
-			task.Wait ();
+			Task<Response<BookOfferResult>> task = BookOffers.GetResult (baseCurrency, counterCurrency, ni, token);
+			task.Wait (token);
 
 			Response<BookOfferResult> response = task.Result;
 			if (response == null) {
@@ -615,16 +618,7 @@ namespace IhildaWallet.Util
 		{
 
 			string key = rippleAddress.ToString ();
-			if (key == RippleAddress.RIPPLE_ADDRESS_JARGOMAN) {
-				return true;
-			}
-
-			if (key == RippleAddress.RIPPLE_ADDRESS_DAHLIOO) {
-				return true;
-			}
-
-			return false;
-
+			return (key == RippleAddress.RIPPLE_ADDRESS_JARGOMAN || key == RippleAddress.RIPPLE_ADDRESS_DAHLIOO); // ? true : false;
 		}
 
 		private static LeIceSense license = null;

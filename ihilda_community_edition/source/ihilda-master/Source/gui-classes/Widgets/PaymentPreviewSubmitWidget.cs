@@ -8,6 +8,7 @@ using RippleLibSharp.Util;
 using System.Collections.Generic;
 using IhildaWallet.Util;
 using System.Linq;
+using System.Threading;
 
 namespace IhildaWallet
 {
@@ -82,6 +83,8 @@ namespace IhildaWallet
 			this._licenseType = licenseType;
 		}
 
+
+		private CancellationTokenSource tokenSource = null;
 		public void SubmitAll ()
 		{
 			
@@ -91,6 +94,10 @@ namespace IhildaWallet
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
 #endif
+
+			tokenSource?.Cancel ();
+			tokenSource = new CancellationTokenSource ();
+			var token = tokenSource.Token;
 
 			RippleWallet rw = walletswitchwidget1.GetRippleWallet();
 			if (rw == null) {
@@ -115,15 +122,15 @@ namespace IhildaWallet
 				return;
 			}
 
-			uint se = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence ( rw.GetStoredReceiveAddress (), ni) );
+			uint se = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence ( rw.GetStoredReceiveAddress (), ni, token) );
 
 
 			RippleIdentifier rsa = rw.GetDecryptedSeed ();
 			for (int index = 0; index < this.paymentstree1._payments_tuple.Item1.Length; index++) {
 
 
-				if (this.paymentstree1.stop) {
-					this.paymentstree1.stop = false;
+				if (this.paymentstree1.tokenSource.IsCancellationRequested) {
+					//this.paymentstree1.stop = false;
 					return;
 				}
 
@@ -134,7 +141,7 @@ namespace IhildaWallet
 				}
 
 
-				bool suceeded = this.paymentstree1.SubmitOrderAtIndex (index, se++, ni, rsa);
+				bool suceeded = this.paymentstree1.SubmitOrderAtIndex (index, se++, ni, token, rsa);
 				if (!suceeded) {
 					return;
 				}

@@ -26,7 +26,7 @@ namespace IhildaWallet
 		public void SetToolTips ()
 		{
 			if (!Program.showPopUps) {
-
+				return;
 			}
 
 			var alphab = "These are the available characters used in the rcl base58 alphabet";

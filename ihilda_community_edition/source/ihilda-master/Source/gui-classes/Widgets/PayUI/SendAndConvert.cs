@@ -245,8 +245,13 @@ namespace IhildaWallet
 			this.sendmaxentry.GrabFocus ();
 		}
 
+
+		private CancellationTokenSource destcancelSource = null;
 		void Destinationentry_Changed (object sender, EventArgs e)
 		{
+			destcancelSource?.Cancel ();
+			destcancelSource = new CancellationTokenSource ();
+			CancellationToken token = destcancelSource.Token;
 
 			string account = destinationentry?.Text;
 			Task.Run (
@@ -267,11 +272,11 @@ namespace IhildaWallet
 						return;
 					}
 
-					Task<Response<AccountCurrenciesResult>> task = AccountCurrencies.GetResult (account, networkInterface);
+					Task<Response<AccountCurrenciesResult>> task = AccountCurrencies.GetResult (account, networkInterface, token);
 					if (task == null) {
 						return;
 					}
-					task.Wait ();
+					task.Wait (token);
 					Response<AccountCurrenciesResult> response = task.Result;
 
 
@@ -581,6 +586,8 @@ namespace IhildaWallet
 
 		} // end sendConvertPayment
 
+
+		private CancellationTokenSource IssuerTokenSource = null;
 		private void UpdateCurrencyIssuers ()
 		{
 #if DEBUG
@@ -589,6 +596,10 @@ namespace IhildaWallet
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
 #endif
+
+			IssuerTokenSource?.Cancel ();
+			IssuerTokenSource = new CancellationTokenSource ();
+			CancellationToken token = IssuerTokenSource.Token;
 
 			Task.Run (
 				delegate {
@@ -632,7 +643,8 @@ namespace IhildaWallet
 
 					});
 
-					manualResetEvent.WaitOne ();
+					//manualResetEvent.WaitOne (token);
+					WaitHandle.WaitAny (new [] { manualResetEvent, token.WaitHandle});
 
 
 					NetworkInterface ni = NetworkController.CurrentInterface;
@@ -643,7 +655,7 @@ namespace IhildaWallet
 
 
 
-					List<String> lis = AccountLines.GetIssuersForCurrency (cur, address, ni);
+					List<String> lis = AccountLines.GetIssuersForCurrency (cur, address, ni, token);
 
 					manualResetEvent.Reset ();
 					Application.Invoke ((object sender, EventArgs e) => {
@@ -657,7 +669,9 @@ namespace IhildaWallet
 						this.issuerentry.Model = store;
 						manualResetEvent.Set ();
 					});
-					manualResetEvent.WaitOne ();
+					//manualResetEvent.WaitOne ();
+
+					WaitHandle.WaitAny (new [] { manualResetEvent, token.WaitHandle });
 
 					UpdateBalanceIOU (_rippleWallet?.GetStoredReceiveAddress ());
 
@@ -666,8 +680,15 @@ namespace IhildaWallet
 		}
 
 
+
+		private CancellationTokenSource updateCurrCancelSource = null;
 		private void UpdateCurrencies ()
 		{
+
+			updateCurrCancelSource?.Cancel ();
+			updateCurrCancelSource = new CancellationTokenSource ();
+			CancellationToken token = updateCurrCancelSource.Token;
+
 			string account = _rippleWallet?.GetStoredReceiveAddress ();
 			if (account == null) {
 				return;
@@ -678,12 +699,12 @@ namespace IhildaWallet
 				return;
 			}
 
-			Task<Response<AccountCurrenciesResult>> task = AccountCurrencies.GetResult (account, ni);
+			Task<Response<AccountCurrenciesResult>> task = AccountCurrencies.GetResult (account, ni, token);
 			if (task == null) {
 				return;
 			}
 
-			task.Wait ();
+			task.Wait (token);
 			Response<AccountCurrenciesResult> response = task.Result;
 
 
@@ -694,7 +715,7 @@ namespace IhildaWallet
 			SetCurrencies (sendCurrencies);
 		}
 
-
+		private CancellationTokenSource xrpTokenSource = null;
 		public void SyncXRPBalance ()
 		{
 #if DEBUG
@@ -703,7 +724,9 @@ namespace IhildaWallet
 #endif
 
 
-
+			xrpTokenSource?.Cancel ();
+			xrpTokenSource = new CancellationTokenSource ();
+			CancellationToken token = xrpTokenSource.Token;
 
 			string labelText = "";
 			try {
@@ -720,14 +743,14 @@ namespace IhildaWallet
 					return;
 				}
 
-				Task<Response<AccountInfoResult>> task = AccountInfo.GetResult (account, networkInterface);
+				Task<Response<AccountInfoResult>> task = AccountInfo.GetResult (account, networkInterface, token);
 
 				if (task == null) {
 
 					return;
 				}
 
-				task.Wait ();
+				task.Wait (token);
 
 
 
@@ -770,8 +793,16 @@ namespace IhildaWallet
 
 		}
 
+
+		private CancellationTokenSource iouCancel = null;
+
 		public void UpdateBalanceIOU (string address)
 		{
+
+			iouCancel?.Cancel ();
+			iouCancel = new CancellationTokenSource ();
+			CancellationToken token = iouCancel.Token;
+
 			if (address == null) {
 				return;
 			}
@@ -818,7 +849,9 @@ namespace IhildaWallet
 
 			);  // end invoke
 
-			mre.WaitOne ();
+			//mre.WaitOne (token);
+			WaitHandle.WaitAny (new [] { mre, token.WaitHandle });
+
 
 			if (cur == null) {
 				return;
@@ -835,12 +868,12 @@ namespace IhildaWallet
 
 			string s = null;
 			if (issuer == null) {
-				Decimal d = AccountLines.GetCurrencyAsSingleBalance (address, cur, ni);
+				Decimal d = AccountLines.GetCurrencyAsSingleBalance (address, cur, ni, token);
 				s = d.ToString ();
 
 			} else {
 
-				result = AccountLines.GetBalanceForIssuer (cur, issuer, address, ni);
+				result = AccountLines.GetBalanceForIssuer (cur, issuer, address, ni, token);
 				s = result?.amount.ToString ();
 
 			}

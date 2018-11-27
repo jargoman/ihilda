@@ -22,9 +22,7 @@ namespace IhildaWallet
 			this.vbox3.Name = "vbox3";
 			this.vbox3.Spacing = 6;
 			// Container child vbox3.Gtk.Box+BoxChild
-			this.orderbookwidget1 = new global::IhildaWallet.OrderBookWidget();
-			this.orderbookwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.orderbookwidget1.Name = "orderbookwidget1";
+			this.orderbookwidget1 = null;
 			this.vbox3.Add(this.orderbookwidget1);
 			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.orderbookwidget1]));
 			w1.Position = 0;

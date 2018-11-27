@@ -602,24 +602,33 @@ namespace Codeplex.Data
 
         private object DeserializeArray(Type targetType)
         {
-            if (targetType.IsArray) // Foo[]
-            {
-                var elemType = targetType.GetElementType();
-                dynamic array = Array.CreateInstance(elemType, xml.Elements().Count());
-                var index = 0;
-                foreach (var item in xml.Elements())
-                {
-                    array[index++] = DeserializeValue(item, elemType);
-                }
-                return array;
-            }
+			if (targetType.IsArray) // Foo[]
+			{
+				var elemType = targetType.GetElementType ();
+				dynamic array = Array.CreateInstance (elemType, xml.Elements ().Count ());
+				var index = 0;
+				foreach (var item in xml.Elements ()) {
+					array [index++] = DeserializeValue (item, elemType);
+				}
+				return array;
+			} 
             else // List<Foo>
             {
 		Type[] ta = targetType.GetGenericArguments ();
+				//targetType.getg
 				Type elemType = null;
 				if (ta.Length > 0) {
 					elemType = ta[0];
 				}
+
+
+				//var gen = typeof (IEnumerable<>).MakeGenericType (elemType);
+
+				//if (!(gen).IsAssignableFrom(targetType)) {
+					targetType = typeof (List<>).MakeGenericType (elemType);
+				//}
+
+				
                 dynamic list = Activator.CreateInstance(targetType);
 
 				//int i = 0;

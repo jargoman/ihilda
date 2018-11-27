@@ -11,6 +11,7 @@ using RippleLibSharp.Commands.Accounts;
 using IhildaWallet.Networking;
 using System.Linq;
 using RippleLibSharp.Util;
+using System.Threading;
 
 namespace IhildaWallet
 {
@@ -43,10 +44,10 @@ namespace IhildaWallet
 
 			Task.Factory.StartNew (async () => {
 
-				while (_cont) {
+				while (!tokenSource.IsCancellationRequested) {
 					try {
-						await Task.Delay (6000);
-						ResyncNetwork ();
+						await Task.Delay (6000, tokenSource.Token);
+						ResyncNetwork (tokenSource.Token);
 					} catch (Exception e) {
 #if DEBUG
 						if (DebugIhildaWallet.OrderBookWidget) {
@@ -99,10 +100,10 @@ namespace IhildaWallet
 
 		~OrderBookWidget ()
 		{
-			_cont = false;
+			tokenSource?.Cancel ();  // = false;
 		}
 
-		private bool _cont = true;
+		private CancellationTokenSource tokenSource = new CancellationTokenSource();
 
 
 		public void SetRippleWallet (RippleWallet rippleWallet)
@@ -141,7 +142,7 @@ namespace IhildaWallet
 
 		private TradePair _tradePair = null;
 
-		public void ResyncNetwork ( )
+		public void ResyncNetwork ( CancellationToken token )
 		{
 			#if DEBUG
 			String method_sig = clsstr + nameof (ResyncNetwork) + DebugRippleLibSharp.both_parentheses;
@@ -202,14 +203,14 @@ namespace IhildaWallet
 			*/
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
 
-			Task< Response<BookOfferResult>> buyTask = RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (counter_currency, cur_base, ni);
-			Task< Response<BookOfferResult>> sellTask = RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (cur_base, counter_currency, ni);
+			Task< Response<BookOfferResult>> buyTask = RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (counter_currency, cur_base, ni, token);
+			Task< Response<BookOfferResult>> sellTask = RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (cur_base, counter_currency, ni, token);
 
 
 			if (true) {
 
 			}
-			Task.WaitAll ( new Task[] { buyTask, sellTask } );
+			Task.WaitAll ( new Task[] { buyTask, sellTask }, token );
 
 			//buyTask.Wait ();
 			//sellTask.Wait ();

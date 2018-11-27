@@ -62,7 +62,7 @@ namespace IhildaWallet
 
 		private global::IhildaWallet.LedgerConstraintsWidget ledgerconstraintswidget1;
 
-		private global::Gtk.Label GtkLabel9;
+		private global::Gtk.Label GtkLabel10;
 
 		private global::Gtk.ScrolledWindow scrolledwindow1;
 
@@ -79,6 +79,8 @@ namespace IhildaWallet
 		private global::Gtk.Button button1;
 
 		private global::Gtk.Button deleteordersbutton;
+
+		private global::Gtk.CheckButton checkbutton2;
 
 		private global::Gtk.Label label5;
 
@@ -310,11 +312,11 @@ namespace IhildaWallet
 			this.ledgerconstraintswidget1.Events = ((global::Gdk.EventMask)(256));
 			this.ledgerconstraintswidget1.Name = "ledgerconstraintswidget1";
 			this.expander1.Add(this.ledgerconstraintswidget1);
-			this.GtkLabel9 = new global::Gtk.Label();
-			this.GtkLabel9.Name = "GtkLabel9";
-			this.GtkLabel9.LabelProp = global::Mono.Unix.Catalog.GetString("Ledger Contraint");
-			this.GtkLabel9.UseUnderline = true;
-			this.expander1.LabelWidget = this.GtkLabel9;
+			this.GtkLabel10 = new global::Gtk.Label();
+			this.GtkLabel10.Name = "GtkLabel10";
+			this.GtkLabel10.LabelProp = global::Mono.Unix.Catalog.GetString("Ledger Contraint");
+			this.GtkLabel10.UseUnderline = true;
+			this.expander1.LabelWidget = this.GtkLabel10;
 			this.vbox4.Add(this.expander1);
 			global::Gtk.Box.BoxChild w22 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.expander1]));
 			w22.Position = 0;
@@ -403,14 +405,24 @@ namespace IhildaWallet
 			w31.Position = 4;
 			w31.Expand = false;
 			w31.Fill = false;
+			// Container child hbox3.Gtk.Box+BoxChild
+			this.checkbutton2 = new global::Gtk.CheckButton();
+			this.checkbutton2.CanFocus = true;
+			this.checkbutton2.Name = "checkbutton2";
+			this.checkbutton2.Label = global::Mono.Unix.Catalog.GetString("Stop When Convenient");
+			this.checkbutton2.DrawIndicator = true;
+			this.checkbutton2.UseUnderline = true;
+			this.hbox3.Add(this.checkbutton2);
+			global::Gtk.Box.BoxChild w32 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.checkbutton2]));
+			w32.Position = 5;
 			this.vbox4.Add(this.hbox3);
-			global::Gtk.Box.BoxChild w32 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hbox3]));
-			w32.Position = 2;
-			w32.Expand = false;
-			w32.Fill = false;
-			this.notebook1.Add(this.vbox4);
-			global::Gtk.Notebook.NotebookChild w33 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.vbox4]));
+			global::Gtk.Box.BoxChild w33 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hbox3]));
 			w33.Position = 2;
+			w33.Expand = false;
+			w33.Fill = false;
+			this.notebook1.Add(this.vbox4);
+			global::Gtk.Notebook.NotebookChild w34 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.vbox4]));
+			w34.Position = 2;
 			// Notebook tab
 			this.label5 = new global::Gtk.Label();
 			this.label5.Name = "label5";
@@ -418,22 +430,22 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.vbox4, this.label5);
 			this.label5.ShowAll();
 			this.vbox3.Add(this.notebook1);
-			global::Gtk.Box.BoxChild w34 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.notebook1]));
-			w34.Position = 1;
-			w34.Padding = ((uint)(6));
+			global::Gtk.Box.BoxChild w35 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.notebook1]));
+			w35.Position = 1;
+			w35.Padding = ((uint)(6));
 			this.hbox5.Add(this.vbox3);
-			global::Gtk.Box.BoxChild w35 = ((global::Gtk.Box.BoxChild)(this.hbox5[this.vbox3]));
-			w35.Position = 0;
-			this.vbox2.Add(this.hbox5);
-			global::Gtk.Box.BoxChild w36 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hbox5]));
+			global::Gtk.Box.BoxChild w36 = ((global::Gtk.Box.BoxChild)(this.hbox5[this.vbox3]));
 			w36.Position = 0;
+			this.vbox2.Add(this.hbox5);
+			global::Gtk.Box.BoxChild w37 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hbox5]));
+			w37.Position = 0;
 			this.Add(this.vbox2);
 			if ((this.Child != null))
 			{
 				this.Child.ShowAll();
 			}
-			this.DefaultWidth = 691;
-			this.DefaultHeight = 444;
+			this.DefaultWidth = 804;
+			this.DefaultHeight = 420;
 			this.button171.Hide();
 			this.Show();
 		}

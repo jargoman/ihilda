@@ -20,10 +20,17 @@ namespace IhildaWallet
 #endif
 			this.Build ();
 
-			Gdk.Color col = new Gdk.Color (255, 234, 254);
+
+			if (!Program.darkmode) {
+				Gdk.Color col = new Gdk.Color (255, 234, 254);
+				this.eventbox1.ModifyBg (StateType.Normal, col);
+			} else {
+				Gdk.Color col = new Gdk.Color (5,5,5);
+				this.eventbox1.ModifyBg (StateType.Normal, col);
+			}
 
 
-			this.eventbox1.ModifyBg (StateType.Normal, col);
+
 
 
 			this.label1.Text = Tx_Type;

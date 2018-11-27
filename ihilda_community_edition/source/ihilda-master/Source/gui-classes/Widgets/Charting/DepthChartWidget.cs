@@ -28,6 +28,9 @@ namespace IhildaWallet
 		{
 			this.Build ();
 
+			TokenSource = new CancellationTokenSource ();
+			var token = TokenSource.Token;
+			this.darkmodecheckbox.Active = Program.darkmode;
 
 
 			if (this.drawingarea1 == null) {
@@ -145,11 +148,11 @@ this.CopyBuffer ();
 			};
 			Task.Factory.StartNew (async () => {
 
-				while (_cont) {
-					await Task.Delay (30000);
-					UpdateBooks ();
-					System.GC.Collect ();
-					System.GC.WaitForPendingFinalizers ();
+				while (!token.IsCancellationRequested) {
+					await Task.Delay (30000, token);
+					UpdateBooks (token);
+					//System.GC.Collect ();
+					//System.GC.WaitForPendingFinalizers ();
 				}
 			}
 			);
@@ -158,11 +161,14 @@ this.CopyBuffer ();
 
 		~DepthChartWidget ()
 		{
-			_cont = false;
+			TokenSource?.Cancel (); // = false;
+			TokenSource?.Dispose ();
+			//TokenSource = null;
 			this.Dispose ();
 		}
 
-		private bool _cont = true;
+		private CancellationTokenSource TokenSource;
+		//private bool _cont = true;
 
 		private TradeWindow ShowTradeWindow ()
 		{
@@ -905,8 +911,10 @@ this.CopyBuffer ();
 
 
 
-		public void UpdateBooks ()
+		public void UpdateBooks (CancellationToken token)
 		{
+
+
 #if DEBUG
 			String method_sig = clsstr + nameof (UpdateBooks) + DebugRippleLibSharp.both_parentheses;
 #endif
@@ -945,8 +953,20 @@ this.CopyBuffer ();
 
 			this._tradePair.UpdateBalances (_rippleWallet.GetStoredReceiveAddress (), ni);
 
-			Task<IEnumerable<AutomatedOrder>> bidsTask = Task.Run (delegate { return UpdateBids (ni, tradePair); });
-			Task<IEnumerable<AutomatedOrder>> askTask = Task.Run (delegate { return UpdateAsks (ni, tradePair); });
+			Task<IEnumerable<AutomatedOrder>> bidsTask = 
+				Task.Run (
+					delegate { 
+						return UpdateBids (ni, tradePair); 
+					}
+					, token
+				);
+
+			Task<IEnumerable<AutomatedOrder>> askTask = 
+				Task.Run (
+					delegate { 
+						return UpdateAsks (ni, tradePair); 
+					}, token
+				);
 
 			Task [] tasks = { bidsTask, askTask };
 			Task.WaitAll (tasks);
@@ -1041,8 +1061,8 @@ this.CopyBuffer ();
 				return null;
 			}
 
-			Task<Response<BookOfferResult>> buyTask = BookOffers.GetResult (counter_currency, cur_base, ni);
-			buyTask.Wait ();
+			Task<Response<BookOfferResult>> buyTask = BookOffers.GetResult (counter_currency, cur_base, ni, TokenSource.Token);
+			buyTask.Wait (TokenSource.Token);
 #if DEBUG
 
 			if (DebugIhildaWallet.DepthChartWidget) {
@@ -1090,8 +1110,8 @@ this.CopyBuffer ();
 				return null;
 			}
 
-			Task<Response<BookOfferResult>> sellTask = BookOffers.GetResult (cur_base, counter_currency, ni);
-			sellTask.Wait ();
+			Task<Response<BookOfferResult>> sellTask = BookOffers.GetResult (cur_base, counter_currency, ni, TokenSource.Token);
+			sellTask.Wait (TokenSource.Token);
 #if DEBUG
 
 			if (DebugIhildaWallet.DepthChartWidget) {

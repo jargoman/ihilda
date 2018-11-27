@@ -138,9 +138,7 @@ namespace IhildaWallet
 			this.vbox3.Name = "vbox3";
 			this.vbox3.Spacing = 6;
 			// Container child vbox3.Gtk.Box+BoxChild
-			this.pincodewidget1 = new global::IhildaWallet.PinCodeWidget();
-			this.pincodewidget1.Events = ((global::Gdk.EventMask)(256));
-			this.pincodewidget1.Name = "pincodewidget1";
+			this.pincodewidget1 = null;
 			this.vbox3.Add(this.pincodewidget1);
 			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.pincodewidget1]));
 			w9.Position = 0;
@@ -160,9 +158,7 @@ namespace IhildaWallet
 			this.vbox7.Name = "vbox7";
 			this.vbox7.Spacing = 6;
 			// Container child vbox7.Gtk.Box+BoxChild
-			this.prismwidget2 = new global::IhildaWallet.PrismWidget();
-			this.prismwidget2.Events = ((global::Gdk.EventMask)(256));
-			this.prismwidget2.Name = "prismwidget2";
+			this.prismwidget2 = null;
 			this.vbox7.Add(this.prismwidget2);
 			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.vbox7[this.prismwidget2]));
 			w11.Position = 0;

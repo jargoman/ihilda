@@ -33,9 +33,7 @@ namespace IhildaWallet
 			this.vbox2.Name = "vbox2";
 			this.vbox2.Spacing = 6;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.paymentstree1 = new global::IhildaWallet.PaymentsTree();
-			this.paymentstree1.Events = ((global::Gdk.EventMask)(256));
-			this.paymentstree1.Name = "paymentstree1";
+			this.paymentstree1 = null;
 			this.vbox2.Add(this.paymentstree1);
 			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.paymentstree1]));
 			w1.Position = 0;
@@ -44,9 +42,7 @@ namespace IhildaWallet
 			this.hbox1.Name = "hbox1";
 			this.hbox1.Spacing = 6;
 			// Container child hbox1.Gtk.Box+BoxChild
-			this.walletswitchwidget1 = new global::IhildaWallet.WalletSwitchWidget();
-			this.walletswitchwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.walletswitchwidget1.Name = "walletswitchwidget1";
+			this.walletswitchwidget1 = null;
 			this.hbox1.Add(this.walletswitchwidget1);
 			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.walletswitchwidget1]));
 			w2.Position = 0;

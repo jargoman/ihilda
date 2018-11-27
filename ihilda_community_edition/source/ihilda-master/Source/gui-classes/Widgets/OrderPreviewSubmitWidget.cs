@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -195,7 +196,10 @@ namespace IhildaWallet
 
 		public void IndexSubmit (object ind)
 		{
+
+
 #if DEBUG
+
 			StringBuilder stringBuilder = new StringBuilder ();
 			stringBuilder.Append (nameof (IndexSubmit));
 			stringBuilder.Append (DebugRippleLibSharp.left_parentheses);
@@ -206,11 +210,12 @@ namespace IhildaWallet
 			stringBuilder.Append (ind ?? ind);
 			stringBuilder.Append (DebugRippleLibSharp.right_parentheses);
 
-
-
-
 			string method_sig = stringBuilder.ToString ();
 #endif
+
+			tokenSource?.Cancel ();
+			tokenSource = new CancellationTokenSource ();
+			CancellationToken token = tokenSource.Token;
 
 			int? index = ind as int?;
 			if (index == null) {
@@ -245,11 +250,11 @@ namespace IhildaWallet
 			//}
 
 
-			uint se = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence (rw.GetStoredReceiveAddress (), ni));
+			uint se = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence (rw.GetStoredReceiveAddress (), ni, token));
 
 
 			RippleIdentifier rsa = rw.GetDecryptedSeed ();
-			this.SubmitOrderAtIndex ((int)index, se, ni, rsa);
+			this.SubmitOrderAtIndex ((int)index, se, ni, token, rsa);
 		}
 
 
@@ -557,7 +562,9 @@ namespace IhildaWallet
 
 		void Stopbutton_Clicked (object sender, EventArgs e)
 		{
-			this.stop = true;
+			this.tokenSource.Cancel ();
+			this.tokenSource.Dispose ();
+			this.tokenSource = null;
 
 		}
 
@@ -771,7 +778,7 @@ namespace IhildaWallet
 			});
 		}
 
-		public bool SubmitOrderAtIndex (int index, uint sequence, NetworkInterface ni, RippleIdentifier rsa)
+		public bool SubmitOrderAtIndex (int index, uint sequence, NetworkInterface ni, CancellationToken token, RippleIdentifier rsa)
 		{
 
 #if DEBUG
@@ -856,8 +863,8 @@ namespace IhildaWallet
 
 					});
 
-
-					manualReset.WaitOne ();
+					WaitHandle.WaitAny (new [] { manualReset, token.WaitHandle });
+					//manualReset.WaitOne ();
 
 					switch (type) {
 					case ResponseType.Ok:
@@ -873,7 +880,7 @@ namespace IhildaWallet
 				}
 
 				// the way to break the loop is to click cancel or to have feesetting load correctly
-				while (true);
+				while (!token.IsCancellationRequested);
 
 
 
@@ -888,17 +895,17 @@ namespace IhildaWallet
 				feeSettings.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
 					this.SetResult (index.ToString (), "Fee " + e.FeeAndLastLedger.Item1.ToString () + " is too high, waiting on lower fee", TextHighlighter.BLACK);
 				};
-				Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, lastFee);
+				Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, token, lastFee);
 
 				if (tupe == null) {
 					this.SetResult (index.ToString (), "Error retrieving fee", TextHighlighter.RED);
 					return false;
 				}
 
-				if (stop) {
+				if (token.IsCancellationRequested) {
 
 					this.SetResult (index.ToString (), "Aborted", TextHighlighter.RED);
-					stop = false;
+				
 					return false;
 				}
 				//UInt32 f = tupe.Item1; 
@@ -966,9 +973,9 @@ namespace IhildaWallet
 				}
 				  
 
-				if (stop) {
+				if (token.IsCancellationRequested) {
 					this.SetResult (index.ToString (), "Aborted", TextHighlighter.RED);
-					stop = false;
+
 					return false;
 				}
 
@@ -977,9 +984,9 @@ namespace IhildaWallet
 				Task<Response<RippleSubmitTxResult>> task = null;
 
 				try {
-					task = NetworkController.UiTxNetworkSubmit (tx, ni);
+					task = NetworkController.UiTxNetworkSubmit (tx, ni, token);
 					this.SetStatus (index.ToString (), "Submitted via websocket", TextHighlighter.GREEN);
-					task.Wait ();
+					task.Wait (token);
 
 
 				} catch (Exception e) {
@@ -1104,19 +1111,23 @@ namespace IhildaWallet
 
 				case Ter.terQUEUED:
 
-					Thread.Sleep (1000);
+					Thread.Sleep (500);
+					/*
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.GREEN);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.GREEN);
 
 
-					this.VerifyTx (index, tx, ni);
+					this.VerifyTx (index, tx, ni, token);
 					return true;
+					*/
+					goto case Ter.tesSUCCESS;
 
 				case Ter.tesSUCCESS:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.GREEN);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.GREEN);
-					this.VerifyTx (index, tx, ni);
+					this.VerifyTx (index, tx, off.Previous_Bot_ID, ni, token);
 
+				
 					return true;
 
 				case Ter.terPRE_SEQ:
@@ -1139,7 +1150,9 @@ namespace IhildaWallet
 					}
 
 					lastFee = (UInt32)tx.fee.amount;
-					Thread.Sleep (6000);
+
+					token.WaitHandle.WaitOne (6000);
+					//Thread.Sleep (6000);
 					this.SetStatus (index.ToString (), res.engine_result + " retrying", TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
 					goto retry;
@@ -1334,26 +1347,28 @@ namespace IhildaWallet
 		}
 
 
-		public void VerifyTx (int index, RippleOfferTransaction offerTransaction, NetworkInterface ni)
+		public void VerifyTx (int index, RippleOfferTransaction offerTransaction, string prevBotID, NetworkInterface ni, CancellationToken token)
 		{
 
 
 
 			Task.Run (() => {
-				Thread.Sleep (1000);
+				token.WaitHandle.WaitOne (1000);
+				//Thread.Sleep (1000);
 				this.SetStatus (index.ToString (), "Validating Tx", TextHighlighter.GREEN);
-				Thread.Sleep (5000);
+				token.WaitHandle.WaitOne (5000);
+				//Thread.Sleep (5000);
 				for (int i = 0; i < 100; i++) {
 
-					Tuple<string, uint> tuple = ServerInfo.GetFeeAndLedgerSequence (ni);
+					Tuple<string, uint> tuple = ServerInfo.GetFeeAndLedgerSequence (ni, token);
 
-					Task<Response<RippleTransaction>> task = tx.GetRequest (offerTransaction.hash, ni);
+					Task<Response<RippleTransaction>> task = tx.GetRequest (offerTransaction.hash, ni, token);
 					if (task == null) {
 						// TODO Debug
 						this.SetResult (index.ToString (), "Error : task == null", TextHighlighter.RED);
 						return;
 					}
-					task.Wait ();
+					task.Wait (token);
 
 					Response<RippleTransaction> response = task.Result;
 					if (response == null) {
@@ -1372,9 +1387,12 @@ namespace IhildaWallet
 
 
 						AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (offerTransaction);
-						AccountSequenceCache sequenceCache = AccountSequenceCache.GetCacheForAccount (offerTransaction.Account); 
+
+						//sequenceCache.RemoveAndSave (ao.p);
+
+						AccountSequenceCache sequenceCache = AccountSequenceCache.GetCacheForAccount (offerTransaction.Account);
 						//sequenceCache.UpdateOrdersCache (ao);
-						sequenceCache.UpdateAndSave (ao);
+						sequenceCache.RemoveAndSave (prevBotID);
 						return;
 					}
 
@@ -1383,7 +1401,8 @@ namespace IhildaWallet
 					}
 
 					this.SetResult (index.ToString (), "Not validated yet " + i.ToString (), TextHighlighter.RED);
-					Thread.Sleep (3000);
+					//Thread.Sleep (3000);
+					token.WaitHandle.WaitOne (3000);
 				}
 			});
 
@@ -1391,6 +1410,7 @@ namespace IhildaWallet
 
 		}
 
+		private CancellationTokenSource tokenSource = null;
 		public void SubmitAll ()
 		{
 			
@@ -1400,6 +1420,10 @@ namespace IhildaWallet
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
 #endif
+
+			tokenSource?.Cancel ();
+			tokenSource = new CancellationTokenSource ();
+			CancellationToken token = new CancellationToken ();
 
 			AllSubmitted = false;
 
@@ -1454,7 +1478,7 @@ namespace IhildaWallet
 			//}
 
 
-			uint sequence = Convert.ToUInt32 (AccountInfo.GetSequence (rw.GetStoredReceiveAddress (), ni));
+			uint sequence = Convert.ToUInt32 (AccountInfo.GetSequence (rw.GetStoredReceiveAddress (), ni, token));
 
 
 			//LinkedList< AutomatedOrder > failedorders = new LinkedList<AutomatedOrder>();
@@ -1463,8 +1487,8 @@ namespace IhildaWallet
 			RippleIdentifier rsa = rw.GetDecryptedSeed ();
 			for (int index = 0; index < _offers.Length; index++) {
 
-				if (stop) {
-					stop = false;
+				if (token.IsCancellationRequested) {
+				
 					return;
 				}
 
@@ -1475,7 +1499,7 @@ namespace IhildaWallet
 				}
 
 
-				bool suceeded = this.SubmitOrderAtIndex (index, sequence++, ni, rsa);
+				bool suceeded = this.SubmitOrderAtIndex (index, sequence++, ni, token, rsa);
 				if (!suceeded) {
 					return;
 				}
@@ -1522,7 +1546,7 @@ namespace IhildaWallet
 
 
 
-		private bool stop = false;
+		//private bool stop = false;
 
 		#if DEBUG
 		private const string clsstr = nameof (OrderPreviewSubmitWidget) + DebugRippleLibSharp.colon;

@@ -43,8 +43,9 @@ namespace IhildaWallet
 
 			Task.Factory.StartNew (async () => {
 
-				while (_cont) {
-					await Task.Delay (30000);
+				var token = tokenSource.Token;
+				while (token.IsCancellationRequested) {
+					await Task.Delay (30000, token);
 					Update ();
 				}
 			}
@@ -53,10 +54,12 @@ namespace IhildaWallet
 		}
 
 		~CurrencyWidgetSelector () {
-			_cont = false;
+			tokenSource?.Cancel (); // = false;
+			tokenSource?.Dispose ();
+			tokenSource = null;
 		}
 
-		private bool _cont = true;
+		private CancellationTokenSource tokenSource = new CancellationTokenSource();
 
 		public void SetCurrencies (IEnumerable<String> currencies)
 		{
@@ -81,6 +84,8 @@ namespace IhildaWallet
 
 		public void Update ()
 		{
+
+			var token = tokenSource.Token;
 
 			Task.Run (delegate {
 
@@ -116,6 +121,11 @@ namespace IhildaWallet
 
 				mre.WaitOne ();
 
+				WaitHandle.WaitAny (new [] { mre, token.WaitHandle});
+				if (token.IsCancellationRequested) {
+					return;
+				}
+				
 				if (cur == null) {
 					//TODO Debud
 					ClearUI ();
@@ -126,7 +136,7 @@ namespace IhildaWallet
 
 				if (RippleCurrency.NativeCurrency.Equals (cur.ToUpper ())) {
 					RippleCurrency rc = null;
-					rc = AccountInfo.GetNativeBalance (rippleAddress, ni);
+					rc = AccountInfo.GetNativeBalance (rippleAddress, ni, token);
 					if (rc == null) {
 						return;
 					}
@@ -135,13 +145,14 @@ namespace IhildaWallet
 
 				} else {
 
-					Decimal d = AccountLines.GetCurrencyAsSingleBalance (rippleAddress, cur, ni);
+					Decimal d = AccountLines.GetCurrencyAsSingleBalance (rippleAddress, cur, ni, token);
 					message = d.ToString ();
 				}
 
 
 
 				Application.Invoke (delegate {
+
 					this.label2.Text = message;
 				});
 

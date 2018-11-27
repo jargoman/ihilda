@@ -273,6 +273,7 @@ namespace IhildaWallet
 			//lock (walletLock) {
 			if (!wallets.TryGetValue (s, out RippleWallet rw)) {
 				// todo debug
+
 			}
 			//}
 			return rw;
@@ -713,8 +714,9 @@ namespace IhildaWallet
 					} else {
 						//MessageDialog.showMessage ("Secret is not defined\n");
 #if DEBUG
-
-						Logging.WriteLog (method_sig + "Secret is not defined");  // 
+						if (DebugIhildaWallet.WalletManager) {
+							Logging.WriteLog (method_sig + "Secret is not defined");  // 
+						}
 #endif
 						//return false;  // do not return. secret may be encrypted
 

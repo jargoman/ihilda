@@ -106,7 +106,10 @@ namespace IhildaWallet
 					+ DebugRippleLibSharp.exceptionMessage
 					#endif
 					;
-				Logging.WriteLog ( m + e.Message + "/n");
+
+			
+					Logging.WriteLog (m + e.Message + "/n");
+
 				return null;
 			}
 
@@ -115,7 +118,11 @@ namespace IhildaWallet
 
 		public byte[] Decrypt ( byte [] cipher, byte[] salt, RippleAddress ra) {
 
-			String password = GetPasswordInput ();
+			string password = Program.botMode == null ? GetPasswordInput () : Program.GetPassword ();
+
+			if (password == null) {
+				// TODO
+			}
 
 			try {
 

@@ -31,7 +31,7 @@ namespace IhildaWallet
 			});
 
 			orderbookwidget1.SetTradePair (tp);
-			orderbookwidget1.ResyncNetwork();
+			orderbookwidget1.ResyncNetwork(new System.Threading.CancellationToken());
 		}
 	}
 }

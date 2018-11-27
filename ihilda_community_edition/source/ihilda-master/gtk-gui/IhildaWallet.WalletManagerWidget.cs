@@ -348,7 +348,7 @@ namespace IhildaWallet
 			this.label4.Name = "label4";
 			this.label4.Xpad = 1;
 			this.label4.Xalign = 0F;
-			this.label4.LabelProp = global::Mono.Unix.Catalog.GetString("<span fgcolor=\"orchid\" bgcolor=\"black\" size=\"x-large\"><b> Transact   </b></span>");
+			this.label4.LabelProp = global::Mono.Unix.Catalog.GetString("<span size=\"x-large\"><b> Transact   </b></span>");
 			this.label4.UseMarkup = true;
 			this.notebook1.SetTabLabel(this.eventbox4, this.label4);
 			this.label4.ShowAll();
@@ -426,8 +426,7 @@ namespace IhildaWallet
 			this.label5 = new global::Gtk.Label();
 			this.label5.Name = "label5";
 			this.label5.Xalign = 0F;
-			this.label5.LabelProp = global::Mono.Unix.Catalog.GetString("<span fgcolor=\"orchid\" bgcolor=\"black\" size=\"x-large\"><b> Keys            </b></s" +
-					"pan>");
+			this.label5.LabelProp = global::Mono.Unix.Catalog.GetString("<span size=\"x-large\"><b> Keys            </b></span>");
 			this.label5.UseMarkup = true;
 			this.notebook1.SetTabLabel(this.table1, this.label5);
 			this.label5.ShowAll();
@@ -504,8 +503,7 @@ namespace IhildaWallet
 			this.label6 = new global::Gtk.Label();
 			this.label6.Name = "label6";
 			this.label6.Xalign = 0F;
-			this.label6.LabelProp = global::Mono.Unix.Catalog.GetString("<span fgcolor=\"orchid\" bgcolor=\"black\" size=\"x-large\"><b> Restore     </b></span>" +
-					"");
+			this.label6.LabelProp = global::Mono.Unix.Catalog.GetString("<span size=\"x-large\"><b> Restore     </b></span>");
 			this.label6.UseMarkup = true;
 			this.notebook1.SetTabLabel(this.table2, this.label6);
 			this.label6.ShowAll();
@@ -580,8 +578,7 @@ namespace IhildaWallet
 			this.label9 = new global::Gtk.Label();
 			this.label9.Name = "label9";
 			this.label9.Xalign = 0F;
-			this.label9.LabelProp = global::Mono.Unix.Catalog.GetString("<span size=\"x-large\" fgcolor=\"orchid\" bgcolor=\"black\"><b> Options      </b></span" +
-					">");
+			this.label9.LabelProp = global::Mono.Unix.Catalog.GetString("<span size=\"x-large\" ><b> Options      </b></span>");
 			this.label9.UseMarkup = true;
 			this.notebook1.SetTabLabel(this.vbox7, this.label9);
 			this.label9.ShowAll();

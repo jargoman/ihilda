@@ -14,10 +14,7 @@ namespace IhildaWallet
 			this.Title = global::Mono.Unix.Catalog.GetString("OrderSubmitWindow");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Container child IhildaWallet.OrderSubmitWindow.Gtk.Container+ContainerChild
-			this.orderpreviewsubmitwidget1 = new global::IhildaWallet.OrderPreviewSubmitWidget();
-			this.orderpreviewsubmitwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.orderpreviewsubmitwidget1.Name = "orderpreviewsubmitwidget1";
-			this.orderpreviewsubmitwidget1.AllSubmitted = false;
+			this.orderpreviewsubmitwidget1 = null;
 			this.Add(this.orderpreviewsubmitwidget1);
 			if ((this.Child != null))
 			{

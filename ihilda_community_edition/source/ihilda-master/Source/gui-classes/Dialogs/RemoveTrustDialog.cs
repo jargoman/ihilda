@@ -45,7 +45,7 @@ namespace IhildaWallet
 		}
 
 
-		public static void RemoveTrust (RippleWallet rippleWallet, string issuer, string cur)
+		public static void RemoveTrust (RippleWallet rippleWallet, string issuer, string cur, CancellationToken token)
 		{
 
 #if DEBUG
@@ -100,9 +100,9 @@ namespace IhildaWallet
 			SignOptions opts = SignOptions.LoadSignOptions ();
 			FeeSettings feeSettings = FeeSettings.LoadSettings ();
 
-			Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni);
+			Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, token);
 
-			uint se = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence (rw.GetStoredReceiveAddress (), ni));
+			uint se = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence (rw.GetStoredReceiveAddress (), ni, token));
 
 
 			UInt32 f = tupe.Item1;
@@ -148,9 +148,9 @@ namespace IhildaWallet
 			Task<Response<RippleSubmitTxResult>> task = null;
 
 			try {
-				task = NetworkController.UiTxNetworkSubmit (rts, ni);
+				task = NetworkController.UiTxNetworkSubmit (rts, ni, token);
 				Logging.WriteLog ("Submitted via websocket");
-				task.Wait ();
+				task.Wait (token);
 
 
 			} catch (Exception e) {
@@ -165,6 +165,10 @@ namespace IhildaWallet
 #endif
 				//may or may not keep a slight delay here for orders to process
 				Thread.Sleep (10);
+			}
+
+			if (token.IsCancellationRequested) {
+				return;
 			}
 
 			var r = task.Result;

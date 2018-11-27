@@ -88,9 +88,7 @@ namespace IhildaWallet
 			this.table15.RowSpacing = ((uint)(6));
 			this.table15.ColumnSpacing = ((uint)(6));
 			// Container child table15.Gtk.Table+TableChild
-			this.currencywidgetselector1 = new global::IhildaWallet.CurrencyWidgetSelector();
-			this.currencywidgetselector1.Events = ((global::Gdk.EventMask)(256));
-			this.currencywidgetselector1.Name = "currencywidgetselector1";
+			this.currencywidgetselector1 = null;
 			this.table15.Add(this.currencywidgetselector1);
 			global::Gtk.Table.TableChild w2 = ((global::Gtk.Table.TableChild)(this.table15[this.currencywidgetselector1]));
 			w2.LeftAttach = ((uint)(2));
@@ -107,9 +105,7 @@ namespace IhildaWallet
 			w3.XOptions = ((global::Gtk.AttachOptions)(4));
 			w3.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table15.Gtk.Table+TableChild
-			this.walletswitchwidget1 = new global::IhildaWallet.WalletSwitchWidget();
-			this.walletswitchwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.walletswitchwidget1.Name = "walletswitchwidget1";
+			this.walletswitchwidget1 = null;
 			this.table15.Add(this.walletswitchwidget1);
 			global::Gtk.Table.TableChild w4 = ((global::Gtk.Table.TableChild)(this.table15[this.walletswitchwidget1]));
 			w4.YOptions = ((global::Gtk.AttachOptions)(4));
@@ -135,9 +131,7 @@ namespace IhildaWallet
 			this.notebook1.Scrollable = true;
 			this.notebook1.BorderWidth = ((uint)(16));
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.walletshowwidget1 = new global::IhildaWallet.WalletShowWidget();
-			this.walletshowwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.walletshowwidget1.Name = "walletshowwidget1";
+			this.walletshowwidget1 = null;
 			this.notebook1.Add(this.walletshowwidget1);
 			// Notebook tab
 			this.label15 = new global::Gtk.Label();
@@ -148,9 +142,7 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.walletshowwidget1, this.label15);
 			this.label15.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.balancetab1 = new global::IhildaWallet.BalanceTab();
-			this.balancetab1.Events = ((global::Gdk.EventMask)(256));
-			this.balancetab1.Name = "balancetab1";
+			this.balancetab1 = null;
 			this.notebook1.Add(this.balancetab1);
 			global::Gtk.Notebook.NotebookChild w8 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.balancetab1]));
 			w8.Position = 1;
@@ -163,9 +155,7 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.balancetab1, this.label35);
 			this.label35.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.sendripple1 = new global::IhildaWallet.SendRipple();
-			this.sendripple1.Events = ((global::Gdk.EventMask)(256));
-			this.sendripple1.Name = "sendripple1";
+			this.sendripple1 = null;
 			this.notebook1.Add(this.sendripple1);
 			global::Gtk.Notebook.NotebookChild w9 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.sendripple1]));
 			w9.Position = 2;
@@ -178,9 +168,7 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.sendripple1, this.label40);
 			this.label40.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.sendiou1 = new global::IhildaWallet.SendIOU();
-			this.sendiou1.Events = ((global::Gdk.EventMask)(256));
-			this.sendiou1.Name = "sendiou1";
+			this.sendiou1 = null;
 			this.notebook1.Add(this.sendiou1);
 			global::Gtk.Notebook.NotebookChild w10 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.sendiou1]));
 			w10.Position = 3;
@@ -193,9 +181,7 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.sendiou1, this.label48);
 			this.label48.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.sendice1 = new global::IhildaWallet.SendIce();
-			this.sendice1.Events = ((global::Gdk.EventMask)(256));
-			this.sendice1.Name = "sendice1";
+			this.sendice1 = null;
 			this.notebook1.Add(this.sendice1);
 			global::Gtk.Notebook.NotebookChild w11 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.sendice1]));
 			w11.Position = 4;
@@ -208,9 +194,7 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.sendice1, this.label57);
 			this.label57.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.sendandconvert1 = new global::IhildaWallet.SendAndConvert();
-			this.sendandconvert1.Events = ((global::Gdk.EventMask)(256));
-			this.sendandconvert1.Name = "sendandconvert1";
+			this.sendandconvert1 = null;
 			this.notebook1.Add(this.sendandconvert1);
 			global::Gtk.Notebook.NotebookChild w12 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.sendandconvert1]));
 			w12.Position = 5;
@@ -223,9 +207,7 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.sendandconvert1, this.label65);
 			this.label65.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.pathfindwidget1 = new global::IhildaWallet.PathFindWidget();
-			this.pathfindwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.pathfindwidget1.Name = "pathfindwidget1";
+			this.pathfindwidget1 = null;
 			this.notebook1.Add(this.pathfindwidget1);
 			global::Gtk.Notebook.NotebookChild w13 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.pathfindwidget1]));
 			w13.Position = 6;
@@ -238,9 +220,7 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.pathfindwidget1, this.label37);
 			this.label37.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.dividendwidget1 = new global::IhildaWallet.DividendWidget();
-			this.dividendwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.dividendwidget1.Name = "dividendwidget1";
+			this.dividendwidget1 = null;
 			this.notebook1.Add(this.dividendwidget1);
 			global::Gtk.Notebook.NotebookChild w14 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.dividendwidget1]));
 			w14.Position = 7;
@@ -253,9 +233,7 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.dividendwidget1, this.label46);
 			this.label46.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.masspaymentwidget1 = new global::IhildaWallet.MassPaymentWidget();
-			this.masspaymentwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.masspaymentwidget1.Name = "masspaymentwidget1";
+			this.masspaymentwidget1 = null;
 			this.notebook1.Add(this.masspaymentwidget1);
 			global::Gtk.Notebook.NotebookChild w15 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.masspaymentwidget1]));
 			w15.Position = 8;

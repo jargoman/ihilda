@@ -449,9 +449,14 @@ namespace IhildaWallet
 
 		//public string _view_account = null;
 
-
+		private CancellationTokenSource tokenSource = null;
 		public void SyncClicked (object address)
 		{
+
+			tokenSource?.Cancel ();
+
+			tokenSource = new CancellationTokenSource ();
+			CancellationToken token = tokenSource.Token;
 
 #if DEBUG
 			string method_sig = clsstr + nameof(SyncClicked) + DebugRippleLibSharp.left_parentheses + nameof(address) + DebugRippleLibSharp.right_parentheses;
@@ -492,9 +497,15 @@ namespace IhildaWallet
 
 			Logging.WriteLog ("erase this else it's for testing");
 
-			IEnumerable<Response<AccountLinesResult>> results = AccountLines.GetResultFull (addr, ni);
+			if (token.IsCancellationRequested) {
+				return;
+			}
 
+			IEnumerable<Response<AccountLinesResult>> results = AccountLines.GetResultFull (addr, ni, token);
 
+			if (token.IsCancellationRequested) {
+				return;
+			}
 
 			Response<AccountLinesResult> res = results.FirstOrDefault ();
 			if (res == null) {
@@ -502,7 +513,9 @@ namespace IhildaWallet
 				this.ClearTable ();
 				Application.Invoke (
 					delegate {
-
+						if (token.IsCancellationRequested) {
+							return;
+						}
 						// TODO
 						this.infoBarLabel.Markup = "<span fgcolor=\"red\">Unkown Error</span>";
 						this.infoBarLabel.Show ();
@@ -527,6 +540,10 @@ namespace IhildaWallet
 				Application.Invoke (
 					delegate {
 
+						if (token.IsCancellationRequested) {
+							return;
+						}
+
 						System.Text.StringBuilder sb = new StringBuilder ();
 						sb.Append ("<span fgcolor=\"red\">");
 						//sb.Append(res.error_code);
@@ -538,6 +555,10 @@ namespace IhildaWallet
 				);
 			}
 
+
+
+
+
 			IEnumerable<TrustLine> all = results.Where (x => x?.result?.lines != null).SelectMany (x => x.result.lines);
 
 			//TrustLine[] tla = AccountLines.getResultFull (addr, ni).ToArray();
@@ -545,6 +566,9 @@ namespace IhildaWallet
 				this.ClearTable ();
 				Application.Invoke (
 					delegate {
+						if (token.IsCancellationRequested) {
+							return;
+						}
 						this.infoBarLabel.Markup = "<span fgcolor=\"red\">This account has no trustlines</span>";
 						//this.infoBarLabel.Markup = "This account has no trustlines";
 						this.infoBarLabel.Show ();
@@ -553,6 +577,11 @@ namespace IhildaWallet
 
 				return;
 			}
+
+			if (token.IsCancellationRequested) {
+				return;
+			}
+
 			this.SetTrustLines (all);
 			this.SetTableGUI (all);
 

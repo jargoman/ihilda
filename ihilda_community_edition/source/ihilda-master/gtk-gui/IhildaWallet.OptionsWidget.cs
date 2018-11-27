@@ -88,9 +88,7 @@ namespace IhildaWallet
 			this.notebook1.Name = "notebook1";
 			this.notebook1.CurrentPage = 2;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.splashoptionswidget1 = new global::IhildaWallet.SplashOptionsWidget();
-			this.splashoptionswidget1.Events = ((global::Gdk.EventMask)(256));
-			this.splashoptionswidget1.Name = "splashoptionswidget1";
+			this.splashoptionswidget1 = null;
 			this.notebook1.Add(this.splashoptionswidget1);
 			// Notebook tab
 			this.label16 = new global::Gtk.Label();
@@ -100,9 +98,7 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.splashoptionswidget1, this.label16);
 			this.label16.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.feeoptionswidget1 = new global::IhildaWallet.FeeOptionsWidget();
-			this.feeoptionswidget1.Events = ((global::Gdk.EventMask)(256));
-			this.feeoptionswidget1.Name = "feeoptionswidget1";
+			this.feeoptionswidget1 = null;
 			this.notebook1.Add(this.feeoptionswidget1);
 			global::Gtk.Notebook.NotebookChild w5 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.feeoptionswidget1]));
 			w5.Position = 1;
@@ -114,9 +110,7 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.feeoptionswidget1, this.label2);
 			this.label2.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.signoptionswidget1 = new global::IhildaWallet.SignOptionsWidget();
-			this.signoptionswidget1.Events = ((global::Gdk.EventMask)(256));
-			this.signoptionswidget1.Name = "signoptionswidget1";
+			this.signoptionswidget1 = null;
 			this.notebook1.Add(this.signoptionswidget1);
 			global::Gtk.Notebook.NotebookChild w6 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.signoptionswidget1]));
 			w6.Position = 2;
