@@ -10,6 +10,7 @@ using RippleLibSharp.Keys;
 using RippleLibSharp.Binary;
 using System.Text;
 using System.Linq;
+using System.Threading;
 
 namespace IhildaWallet
 {
@@ -173,18 +174,15 @@ namespace IhildaWallet
 		*/
 
 
-		public string Bot_ID {
-			get { 
-				if (Account == null ) {
-					return null;
-				}
-
-				return Account + Sequence.ToString(); 
-			}
-			//set { }
-		}
+		public string Bot_ID => Account == null ? null : Account + Sequence.ToString ();
 
 		public string Previous_Bot_ID {
+			get;
+			set;
+		}
+
+		public bool IsValidated
+		{
 			get;
 			set;
 		}

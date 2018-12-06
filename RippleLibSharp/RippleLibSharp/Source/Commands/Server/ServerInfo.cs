@@ -39,7 +39,7 @@ namespace RippleLibSharp.Commands.Server
 					return null;
 				}
 
-				task.Wait (15000, token);
+				task.Wait (150000, token);
 
 				Response<ServerInfoResult> res = task?.Result;
 				if (res == null) {

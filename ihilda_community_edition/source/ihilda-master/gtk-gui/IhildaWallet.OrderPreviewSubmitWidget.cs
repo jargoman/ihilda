@@ -26,6 +26,8 @@ namespace IhildaWallet
 
 		private global::Gtk.Button selectbutton;
 
+		private global::Gtk.Button button209;
+
 		private global::Gtk.Button analysisbutton;
 
 		private global::Gtk.Button applyRuleButton;
@@ -133,16 +135,27 @@ namespace IhildaWallet
 			w9.Expand = false;
 			w9.Fill = false;
 			// Container child hbox1.Gtk.Box+BoxChild
+			this.button209 = new global::Gtk.Button();
+			this.button209.CanFocus = true;
+			this.button209.Name = "button209";
+			this.button209.UseUnderline = true;
+			this.button209.Label = global::Mono.Unix.Catalog.GetString("Deselect Validated");
+			this.hbox1.Add(this.button209);
+			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.button209]));
+			w10.Position = 5;
+			w10.Expand = false;
+			w10.Fill = false;
+			// Container child hbox1.Gtk.Box+BoxChild
 			this.analysisbutton = new global::Gtk.Button();
 			this.analysisbutton.CanFocus = true;
 			this.analysisbutton.Name = "analysisbutton";
 			this.analysisbutton.UseUnderline = true;
 			this.analysisbutton.Label = global::Mono.Unix.Catalog.GetString("Analysis");
 			this.hbox1.Add(this.analysisbutton);
-			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.analysisbutton]));
-			w10.Position = 5;
-			w10.Expand = false;
-			w10.Fill = false;
+			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.analysisbutton]));
+			w11.Position = 6;
+			w11.Expand = false;
+			w11.Fill = false;
 			// Container child hbox1.Gtk.Box+BoxChild
 			this.applyRuleButton = new global::Gtk.Button();
 			this.applyRuleButton.CanFocus = true;
@@ -150,10 +163,10 @@ namespace IhildaWallet
 			this.applyRuleButton.UseUnderline = true;
 			this.applyRuleButton.Label = global::Mono.Unix.Catalog.GetString("Apply Rule To Red");
 			this.hbox1.Add(this.applyRuleButton);
-			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.applyRuleButton]));
-			w11.Position = 6;
-			w11.Expand = false;
-			w11.Fill = false;
+			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.applyRuleButton]));
+			w12.Position = 7;
+			w12.Expand = false;
+			w12.Fill = false;
 			// Container child hbox1.Gtk.Box+BoxChild
 			this.marketbutton = new global::Gtk.Button();
 			this.marketbutton.CanFocus = true;
@@ -161,10 +174,10 @@ namespace IhildaWallet
 			this.marketbutton.UseUnderline = true;
 			this.marketbutton.Label = global::Mono.Unix.Catalog.GetString("Market Compare");
 			this.hbox1.Add(this.marketbutton);
-			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.marketbutton]));
-			w12.Position = 7;
-			w12.Expand = false;
-			w12.Fill = false;
+			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.marketbutton]));
+			w13.Position = 8;
+			w13.Expand = false;
+			w13.Fill = false;
 			// Container child hbox1.Gtk.Box+BoxChild
 			this.resetbutton = new global::Gtk.Button();
 			this.resetbutton.CanFocus = true;
@@ -172,21 +185,22 @@ namespace IhildaWallet
 			this.resetbutton.UseUnderline = true;
 			this.resetbutton.Label = global::Mono.Unix.Catalog.GetString("Reset to default");
 			this.hbox1.Add(this.resetbutton);
-			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.resetbutton]));
-			w13.Position = 8;
-			w13.Expand = false;
-			w13.Fill = false;
-			this.vbox2.Add(this.hbox1);
-			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hbox1]));
-			w14.Position = 2;
+			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.resetbutton]));
+			w14.Position = 9;
 			w14.Expand = false;
 			w14.Fill = false;
+			this.vbox2.Add(this.hbox1);
+			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hbox1]));
+			w15.Position = 2;
+			w15.Expand = false;
+			w15.Fill = false;
 			this.Add(this.vbox2);
 			if ((this.Child != null))
 			{
 				this.Child.ShowAll();
 			}
 			this.label2.Hide();
+			this.button209.Hide();
 			this.Hide();
 		}
 	}

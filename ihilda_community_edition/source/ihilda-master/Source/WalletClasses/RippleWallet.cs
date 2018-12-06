@@ -537,7 +537,13 @@ namespace IhildaWallet
 
 				case EncryptionType.TrippleEntente:
 
-					ie = TrippleEntenteDialog.DoDialog ();
+					var tripple = RememberedEntente ?? TrippleEntenteDialog.DoDialog ();
+					if (tripple.RememberPassword) {
+						RememberedEntente = tripple;
+					}
+
+					ie = tripple;
+
 					break;
 
 				}
@@ -551,7 +557,11 @@ namespace IhildaWallet
 				byte [] decoded = Base58.Decode (enc_wal_str);
 
 
-				byte [] decrypted = ie.Decrypt (decoded, salty, Account);
+				byte [] decrypted = ie.Decrypt (
+					decoded, 
+					salty, 
+					Account
+				);
 
 				RippleSeedAddress decryptedSeed = null;
 				RipplePrivateKey decryptedPrivateKey = null;
@@ -609,6 +619,8 @@ namespace IhildaWallet
 				return null;
 			}
 		}
+
+		private TrippleEntente RememberedEntente = null; 
 
 		public RippleIdentifier GetDecryptedSeed ()
 		{

@@ -44,7 +44,7 @@ namespace IhildaWallet
 				hbox1.Add (walletswitchwidget1);
 			}
 
-			walletswitchwidget1.WalletChangedEvent += (object source, WalletChangedEventArgs eventArgs) => { 
+			walletswitchwidget1.WalletChangedEvent += (object source, WalletChangedEventArgs eventArgs) => {
 				RippleWallet rippleWallet = eventArgs.GetRippleWallet ();
 				string acc = rippleWallet?.GetStoredReceiveAddress ();
 				if (acc == null) {
@@ -70,7 +70,7 @@ namespace IhildaWallet
 				typeof (string), // Buy 
 				typeof (string), // Sell
 				typeof (string), // Price
-				//typeof (string), // Cost
+						 //typeof (string), // Cost
 				typeof (string), // Color
 				typeof (string),  // Status
 				typeof (string)); // Result
@@ -163,6 +163,19 @@ namespace IhildaWallet
 
 			label2.UseMarkup = true;
 
+			button209.Clicked += (object sender, EventArgs e) => {
+
+				foreach (AutomatedOrder offer in _offers) {
+					if (offer.IsValidated) {
+
+						offer.Selected = false;
+
+					}
+				}
+
+				SetOffers (_offers);
+			};
+
 		}
 
 
@@ -250,11 +263,21 @@ namespace IhildaWallet
 			//}
 
 
-			uint se = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence (rw.GetStoredReceiveAddress (), ni, token));
+			uint se = Convert.ToUInt32 (
+				AccountInfo.GetSequence (
+					rw.GetStoredReceiveAddress (),
+					ni,
+					token)
+			);
 
 
 			RippleIdentifier rsa = rw.GetDecryptedSeed ();
-			this.SubmitOrderAtIndex ((int)index, se, ni, token, rsa);
+
+			SignOptions opts = LoadSignOptions (token);
+
+		
+
+			this.SubmitOrderAtIndex ((int)index, se, opts, ni, token, rsa);
 		}
 
 
@@ -342,7 +365,9 @@ namespace IhildaWallet
 				}
 #endif
 
-				Thread th = new Thread (new ParameterizedThreadStart (IndexSubmit));
+				Thread th = new Thread (
+					new ParameterizedThreadStart (IndexSubmit)
+				);
 
 
 
@@ -379,14 +404,57 @@ namespace IhildaWallet
 
 		}
 
+		private void DoMarketCompare ()
+		{
+
+
+		}
+
 		void ApplyRuleButtonClicked (object sender, EventArgs e)
 		{
-			
+
+			string acc = walletswitchwidget1.GetRippleWallet ().Account;
+
+			SentimentManager sentimentManager = new SentimentManager (acc);
+			sentimentManager.LoadSentiments ();
+
+
 			for (int i = 0; i < _offers.Length; i++) {
 				bool b = _offers [i].Red;
 				if (b) {
-					_offers [i].TakerGets /= 1.005m;
-					_offers [i].TakerPays *= 1.005m;
+
+					string getsCur = _offers [i].taker_pays.currency; // opposite is intended
+					string paysCur = _offers [i].taker_gets.currency;
+
+					Sentiment getsSent = sentimentManager.LookUpSentiment (getsCur);
+					Sentiment paysSent = sentimentManager.LookUpSentiment (paysCur);
+
+					int getsShare = 0;
+					int paysShare = 0;
+					if (getsSent != null) {
+						SentimentRatingEnum en = (SentimentRatingEnum)Enum.Parse (typeof (SentimentRatingEnum), getsSent.Rating);
+						getsShare = (int)en;
+					} else {
+						getsShare = (int)SentimentRatingEnum.Neutral;
+					}
+					if (paysSent != null) {
+						SentimentRatingEnum en = (SentimentRatingEnum)Enum.Parse (typeof (SentimentRatingEnum), paysSent.Rating);
+						paysShare = (int)en;
+					} else {
+						paysShare = (int)SentimentRatingEnum.Neutral;
+					}
+
+					int totalShare = getsShare + paysShare;
+
+					if (totalShare != 0) {
+						double profitShare = 0.005 / totalShare;
+
+						_offers [i].TakerGets /= (Decimal)(1 + (profitShare * getsShare));
+						_offers [i].TakerPays *= (Decimal)(1 + (profitShare * paysShare));
+					} else {
+						_offers [i].TakerGets /= 1.0025m;
+						_offers [i].TakerPays *= 1.0025m;
+					}
 				}
 			}
 
@@ -399,6 +467,8 @@ namespace IhildaWallet
 
 		void Analysisbutton_Clicked (object sender, EventArgs e)
 		{
+
+
 
 
 			for (int a = 0; a < _offers.Length; a++) {
@@ -468,10 +538,10 @@ namespace IhildaWallet
 
 			if (hasred) {
 
-				// gui invove may be needed for timing rather than being on the right thread
+				// gui invoke may be needed for timing rather than being on the right thread
 				Application.Invoke (delegate {
 					label2.UseMarkup = true;
-					this.label2.Markup = "<span fgcolor=\"red \">Conflicting orders. Trading with self</span>";
+					this.label2.Markup = "<span fgcolor=\"red\">Conflicting orders. Trading with self</span>";
 					this.label2.Show ();
 					this.label2.Visible = true;
 
@@ -590,10 +660,10 @@ namespace IhildaWallet
 
 			Liststore.Clear ();
 			if (offers == null) {
-				Application.Invoke ( delegate {
+				Application.Invoke (delegate {
 					label2.Markup = "<span fgcolor=\"red\">Error null offer list\n</span>";
 
-				}); 
+				});
 				return;
 			}
 
@@ -609,7 +679,7 @@ namespace IhildaWallet
 					// TODO 
 				}
 
-				if (string.IsNullOrWhiteSpace(o.Account)) {
+				if (string.IsNullOrWhiteSpace (o.Account)) {
 					o.Account = this.walletswitchwidget1?.GetRippleWallet ()?.Account;
 				}
 
@@ -641,7 +711,7 @@ namespace IhildaWallet
 				if (!o.TakerPays.IsNative) {
 					paysString.Append (o.TakerPays.amount.ToString ());
 				} else {
-					paysString.Append ( (o.TakerPays.amount / 1000000).ToString ());
+					paysString.Append ((o.TakerPays.amount / 1000000).ToString ());
 				}
 				paysString.Append (" ");
 				paysString.Append (o.TakerPays.currency);
@@ -650,17 +720,30 @@ namespace IhildaWallet
 					paysString.Append (o.TakerPays.issuer);
 				}
 
-				Liststore.AppendValues (
-					o.Selected,
-					(i + 1).ToString(),
+				if (!o.IsValidated) {
+					Liststore.AppendValues (
+						o.Selected,
+						(i + 1).ToString (),
 
-					paysString.ToString (),
-					getsString.ToString (),
-					priceString.ToString(),
-					//cost.ToString (),
-					o.BotMarking?.ToString ()
+						paysString.ToString (),
+						getsString.ToString (),
+						priceString.ToString (),
+						//cost.ToString (),
+						o.BotMarking?.ToString ()
 
-				);
+
+					);
+				} else {
+					Liststore.AppendValues (
+						o.Selected,
+						(i + 1).ToString (),
+						paysString.ToString (),
+						getsString.ToString (),
+						priceString.ToString (),
+						o.BotMarking?.ToString (), // ?? ""  // should we add the null check?
+						"Validated"
+					);
+				}
 
 				//o.selected = true;
 
@@ -668,14 +751,14 @@ namespace IhildaWallet
 
 			}
 
-			Application.Invoke ( delegate {
-			
+			Application.Invoke (delegate {
+
 				treeview1.Model = Liststore;
 				label2.Visible = false;
 			});
 
 
-			Analysisbutton_Clicked (null,null);
+			Analysisbutton_Clicked (null, null);
 
 
 		}
@@ -738,7 +821,7 @@ namespace IhildaWallet
 
 		public void SetResult (string path, string message, string colorName)
 		{
-			
+
 			TextHighlighter.Highlightcolor = colorName;
 			string s = TextHighlighter.Highlight (message ?? "null");
 
@@ -778,7 +861,91 @@ namespace IhildaWallet
 			});
 		}
 
-		public bool SubmitOrderAtIndex (int index, uint sequence, NetworkInterface ni, CancellationToken token, RippleIdentifier rsa)
+
+		public SignOptions LoadSignOptions ( CancellationToken token) {
+
+			SignOptions opts = null;
+
+
+
+
+			do {
+
+				opts = SignOptions.LoadSignOptions ();
+				if (opts != null) break;
+
+
+				ManualResetEvent manualReset = new ManualResetEvent (false);
+				manualReset.Reset ();
+
+				ResponseType type = ResponseType.None;
+				Gtk.Application.Invoke (delegate {
+					using (SignOptionsDialog signOptionsDialog = new SignOptionsDialog ()) {
+						type = (ResponseType)signOptionsDialog.Run ();
+						if (type == ResponseType.Ok) {
+							signOptionsDialog.ProcessSignOptionsWidget ();
+						}
+						signOptionsDialog.Destroy ();
+					}
+					manualReset.Set ();
+
+				});
+
+				WaitHandle.WaitAny (new [] {
+						manualReset,
+						token.WaitHandle
+					});
+				//manualReset.WaitOne ();
+
+				switch (type) {
+				case ResponseType.Ok:
+
+					continue;
+				default:
+					return null;
+
+				}
+
+
+
+			}
+
+			// the way to break the loop is to click cancel or to have feesetting load correctly
+			while (!token.IsCancellationRequested);
+
+			return opts;
+		}
+
+		public FeeSettings LoadFeeSettings (CancellationToken token)
+		{
+			FeeSettings feeSettings = FeeSettings.LoadSettings ();
+			if (feeSettings == null) {
+
+
+				Gtk.Application.Invoke (
+					delegate {
+
+						if (token.IsCancellationRequested) {
+							return;
+
+						}
+						label2.Markup =
+							"<span fgcolor=\"red\">" +
+							"Could not load xrp fee preferences. \n" +
+							"Configure fee settings at : \n" +
+							"{wallet manager > Options Tab > Options > XRP fee options}" +
+							"</span>";
+
+						label2.Visible = true;
+					}
+				);
+				//return false;
+			}
+
+			return feeSettings;
+		}
+
+		public bool SubmitOrderAtIndex (int index, uint sequence, SignOptions opts, NetworkInterface ni, CancellationToken token, RippleIdentifier rsa)
 		{
 
 #if DEBUG
@@ -788,20 +955,114 @@ namespace IhildaWallet
 			}
 #endif
 
+			StringBuilder stringBuilder = new StringBuilder ();
+
+			stringBuilder.Append ("Tx <b>");
+			stringBuilder.Append ((index + 1).ToString ());
+			stringBuilder.Append ("</b>");
+
+			stringBuilder.Append (DebugRippleLibSharp.colon);
+
+			string txAtIndexStr =  stringBuilder.ToString();
+
+			stringBuilder.Clear ();
+
+			stringBuilder.Append ("<span fgcolor=\"green\">Submitting ");
+			stringBuilder.Append (txAtIndexStr);
+			stringBuilder.Append ("</span>");
+
+			string infoBarMessage = stringBuilder.ToString ();
 			Application.Invoke ( delegate {
 
-				this.label2.Markup = "<span>Submitting order at index " + index.ToString() + "</span>";
+				this.label2.Markup = infoBarMessage;
+				this.label2.Visible = true;
 			});
 
 			try {
 				ClearIndex (index);
 
-				//
-				this.SetStatus (index.ToString (), "Queued", TextHighlighter.GREEN);
-
-
 				UInt32? lastFee = null;
 			retry:
+
+				/*
+				string queStr = "Queued";
+
+				this.SetStatus (index.ToString (), queStr, TextHighlighter.GREEN);
+
+				stringBuilder.Clear ();
+				stringBuilder.Append (txAtIndexStr);
+				stringBuilder.Append (queStr);
+
+				string ms2 = stringBuilder.ToString ();
+				Application.Invoke (
+					delegate {
+
+						this.label2.Markup = ms2;
+						this.label2.Visible = true;
+
+					}
+				); */
+
+				string feeReq = "Requesting Fee";
+				stringBuilder.Clear ();
+				stringBuilder.Append ("<span fgcolor=\"green\">");
+				stringBuilder.Append (txAtIndexStr);
+				stringBuilder.Append (feeReq);
+				stringBuilder.Append ("</span>");
+
+				string ms3 = stringBuilder.ToString ();
+				this.SetStatus (index.ToString (), feeReq, TextHighlighter.GREEN);
+
+				Application.Invoke (
+					delegate {
+						label2.Markup = ms3;
+						label2.Visible = true;
+
+					}
+				);
+
+
+				Tuple<UInt32, UInt32> tupe = null;
+
+				var getFeeTask = Task.Run (delegate {
+
+					FeeSettings feeSettings = LoadFeeSettings (token);
+
+
+					feeSettings.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
+
+						StringBuilder sb = new StringBuilder ();
+
+						sb.Append ("Fee ");
+						sb.Append (e.FeeAndLastLedger.Item1.ToString ());
+						sb.Append (" is too high, waiting on lower fee");
+
+						var feestr = sb.ToString ();
+
+
+						this.SetResult (
+							index.ToString (),
+							feestr, TextHighlighter.BLACK);
+
+						sb.Clear ();
+						sb.Append (txAtIndexStr);
+						sb.Append (feestr);
+
+						string ms4 = sb.ToString ();
+						Application.Invoke (delegate {
+							label2.Markup = ms4;
+							label2.Visible = true;
+
+						});
+
+					};
+
+					tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, token, lastFee);
+
+
+				}, token);
+
+
 				AutomatedOrder off = _offers [index];
 
 
@@ -816,7 +1077,7 @@ namespace IhildaWallet
 
 
 
-	#region markmemo
+				#region markmemo
 				if (off.BotMarking != null) {
 					MemoIndice markIndice = new MemoIndice {
 						Memo = new RippleMemo {
@@ -827,87 +1088,106 @@ namespace IhildaWallet
 					};
 
 					off.AddMemo (markIndice);
-				} 
+				}
 
-#endregion
+				#endregion
 
 
 				RippleOfferTransaction tx = new RippleOfferTransaction (off.Account, off);
 
 
 
-				SignOptions opts = null;
 
 
 
 
-				do {
 
-					opts = SignOptions.LoadSignOptions ();
-					if (opts != null) break;
-
-
-					ManualResetEvent manualReset = new ManualResetEvent (false);
-					manualReset.Reset ();
-
-					ResponseType type = ResponseType.None;
-					Gtk.Application.Invoke (delegate {
-						using (SignOptionsDialog signOptionsDialog = new SignOptionsDialog ()) {
-							type = (ResponseType)signOptionsDialog.Run ();
-							if (type == ResponseType.Ok) {
-								signOptionsDialog.ProcessSignOptionsWidget ();
-							}
-							signOptionsDialog.Destroy ();
-						}
-						manualReset.Set ();
-
-					});
-
-					WaitHandle.WaitAny (new [] { manualReset, token.WaitHandle });
-					//manualReset.WaitOne ();
-
-					switch (type) {
-					case ResponseType.Ok:
-
-						continue;
-					default:
-						return false;
-
-					}
-
-
-
-				}
-
-				// the way to break the loop is to click cancel or to have feesetting load correctly
-				while (!token.IsCancellationRequested);
-
-
-
-
-				this.SetStatus (index.ToString (), "Requesting Fee", TextHighlighter.GREEN);
-				FeeSettings feeSettings = FeeSettings.LoadSettings ();
-				if (feeSettings == null) {
-					// TODO
-					return false;
-				}
-
-				feeSettings.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
-					this.SetResult (index.ToString (), "Fee " + e.FeeAndLastLedger.Item1.ToString () + " is too high, waiting on lower fee", TextHighlighter.BLACK);
-				};
-				Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, token, lastFee);
-
-				if (tupe == null) {
-					this.SetResult (index.ToString (), "Error retrieving fee", TextHighlighter.RED);
-					return false;
-				}
 
 				if (token.IsCancellationRequested) {
 
-					this.SetResult (index.ToString (), "Aborted", TextHighlighter.RED);
-				
+
+					string canstr = "Aborted";
+					this.SetResult (index.ToString (), canstr, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (canstr);
+					stringBuilder.Append ("</span>");
+					string ms6 = stringBuilder.ToString ();
+
+					Application.Invoke (
+
+						delegate {
+							label2.Markup = ms6;
+							label2.Visible = true;
+
+						}
+					);
 					return false;
 				}
+
+
+				int feeDots = 0;
+				while (!getFeeTask.IsCompleted && !getFeeTask.IsCanceled && !getFeeTask.IsFaulted) {
+
+					feeDots++;
+
+					StringBuilder feeReq2 = new StringBuilder(feeReq);
+					for (int i = 0; i < feeDots && !getFeeTask.IsCompleted && !getFeeTask.IsCanceled && !getFeeTask.IsFaulted; i++) {
+						feeReq2.Append (".");
+					}
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"green\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (feeReq2);
+					stringBuilder.Append ("</span>");
+
+					string mssg = stringBuilder.ToString ();
+					this.SetStatus (
+						index.ToString (), 
+						feeReq2.ToString(), 
+						TextHighlighter.GREEN
+					);
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = mssg;
+							label2.Visible = true;
+
+						}
+					);
+
+					getFeeTask.Wait (500, token);
+
+					if (feeDots == 10) {
+						feeDots = 0;
+					}
+
+				}
+
+				if (tupe == null) {
+
+					string feeEr = "Error retrieving fee and last ledger sequence";
+					this.SetResult (index.ToString (), feeEr, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (feeEr);
+
+					string ms5 = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = ms5;
+							label2.Visible = true;
+
+						}
+					);
+					return false;
+				}
+
 				//UInt32 f = tupe.Item1; 
 				UInt32 f = tupe.Item1;
 				tx.fee = f.ToString ();
@@ -929,14 +1209,50 @@ namespace IhildaWallet
 				tx.LastLedgerSequence = tupe.Item2 + lls;
 
 				if (tx.fee.amount == 0 || tx.Sequence == 0) {
-					this.SetResult (index.ToString (), "Invalid Fee or Sequence", TextHighlighter.RED);
+
+					string invstr = "Invalid Fee or Sequence";
+					this.SetResult (index.ToString (), invstr, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (invstr);
+					stringBuilder.Append ("</span>");
+					string ms7 = stringBuilder.ToString ();
+					Application.Invoke (
+						delegate {
+							label2.Markup = ms7;
+							label2.Visible = true;
+
+						}
+					);
 					throw new Exception ();
 				}
 
 
 
 				if (opts.UseLocalRippledRPC) {
-					this.SetStatus (index.ToString (), "Signing using rpc", TextHighlighter.GREEN);
+
+					string rpsStr = "Signing using rpc";
+					this.SetStatus (index.ToString (), rpsStr, TextHighlighter.GREEN);
+
+					stringBuilder.Clear ();
+
+					stringBuilder.Append ("<span fgcolor=\"green\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (rpsStr);
+					stringBuilder.Append ("</span>");
+
+					string ms8 = stringBuilder.ToString ();
+					Application.Invoke (
+						delegate {
+							label2.Markup = ms8;
+							label2.Visible = true;
+
+						}
+					);
+
+
 					try {
 						tx.SignLocalRippled (rsa);
 					} catch (Exception ex) {
@@ -945,37 +1261,167 @@ namespace IhildaWallet
 							Logging.ReportException (method_sig, ex);
 						}
 #endif
-						this.SetStatus (index.ToString (), "Error signing over rpc. Is rippled running?", TextHighlighter.RED);
+
+						string rpcErr = "Error signing over rpc. Is rippled running?";
+
+						this.SetStatus (index.ToString (), rpcErr, TextHighlighter.RED);
+
+						stringBuilder.Clear ();
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+						stringBuilder.Append (txAtIndexStr);
+						stringBuilder.Append (rpcErr);
+						stringBuilder.Append ("</span>");
+						string ms9 = stringBuilder.ToString ();
+
+						Application.Invoke (
+							delegate {
+								label2.Markup = ms9;
+								label2.Visible = true;
+
+							}
+						);
 						return false;
 					}
-					this.SetStatus (index.ToString (), "Signed rpc", TextHighlighter.GREEN);
+
+
+					string rpcStr = "Signed rpc";
+					this.SetStatus (index.ToString (), rpsStr, TextHighlighter.GREEN);
+					stringBuilder.Clear ();
+
+					stringBuilder.Append ("<span fgcolor=\"green\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (rpcStr);
+					stringBuilder.Append ("</span>");
+
+					string ms10 = stringBuilder.ToString ();
+					Application.Invoke (
+						delegate {
+							label2.Markup = ms10;
+							label2.Visible = true;
+
+						}
+					);
+
+
 				} else {
-					this.SetStatus (index.ToString (), "Signing using RippleLibSharp", TextHighlighter.GREEN);
+
+					string rlsstr = "Signing using RippleLibSharp";
+
+					this.SetStatus ( index.ToString (), rlsstr, TextHighlighter.GREEN );
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ( "<span fgcolor=\"green\">" );
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (rlsstr);
+					stringBuilder.Append ( "</span>" );
+
+					string ms11 = stringBuilder.ToString ();
+					Application.Invoke (
+						delegate {
+
+							label2.Markup = ms11;
+							label2.Visible = true;
+
+						}
+					);
+
 					try {
 						tx.Sign (rsa);
-					} catch ( Exception exception ) {
-						
+					} catch (Exception exception) {
+
 #if DEBUG
 						if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
 							Logging.ReportException (method_sig, exception);
 						}
 #endif
-						this.SetStatus (index.ToString (), "Error signing using RippleLibSharp.", TextHighlighter.RED);
+
+						string errrls = "Error signing using RippleLibSharp";
+						this.SetStatus (index.ToString (), errrls, TextHighlighter.RED);
+
+						stringBuilder.Clear ();
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+						stringBuilder.Append (txAtIndexStr);
+						stringBuilder.Append (errrls);
+						stringBuilder.Append ("</span>");
+
+						string ms12 = stringBuilder.ToString ();
+
+						Application.Invoke (
+							delegate {
+								label2.Markup = ms12;
+								label2.Visible = true;
+
+							}
+						);
 						return false;
 					}
-					this.SetStatus (index.ToString (), "Signed RippleLibSharp", TextHighlighter.GREEN);
 
+					string sgnstr = "Signed RippleLibSharp";
+					this.SetStatus (index.ToString (), sgnstr , TextHighlighter.GREEN);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"green\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (sgnstr);
+					stringBuilder.Append ("</span>");
+
+					string ms13 = stringBuilder.ToString ();
+					Application.Invoke (
+						delegate {
+							label2.Markup = ms13;
+							label2.Visible = true;
+
+						}
+					);
 				}
 
-				if (tx.GetSignedTxBlob() == null) {
-					this.SetResult (index.ToString(), "Error signing transaction", TextHighlighter.RED);
+				if (tx.GetSignedTxBlob () == null) {
+
+					string errstr = "Error signing transaction";
+					this.SetResult (index.ToString (), errstr, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (errstr);
+					stringBuilder.Append ("</span>");
+
+					string m14 = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = m14;
+							label2.Visible = true;
+
+					}
+					);
+
 					return false;
 				}
-				  
+
 
 				if (token.IsCancellationRequested) {
-					this.SetResult (index.ToString (), "Aborted", TextHighlighter.RED);
 
+					string abostr = "Aborted";
+					this.SetResult (index.ToString (), abostr, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (abostr);
+					stringBuilder.Append ("</span>");
+
+
+					string ms15 = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = ms15;
+							label2.Visible = true;
+
+						}
+					);
 					return false;
 				}
 
@@ -985,12 +1431,87 @@ namespace IhildaWallet
 
 				try {
 					task = NetworkController.UiTxNetworkSubmit (tx, ni, token);
-					this.SetStatus (index.ToString (), "Submitted via websocket", TextHighlighter.GREEN);
-					task.Wait (token);
+
+					string subWit = "Submitted via websocket";
+					this.SetStatus (index.ToString (), subWit, TextHighlighter.GREEN);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"green\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (subWit);
+					stringBuilder.Append ("</span>");
+
+					string submitStr = stringBuilder.ToString ();
+					Application.Invoke (
+						delegate {
+							label2.Markup = submitStr;
+							label2.Visible = true;
+
+						}
+					);
 
 
+					int MAXDOTS = 5;
+					int x = 0;
+
+					//StringBuilder message = new StringBuilder ();
+					string wtmessg = "Waiting on network";
+					while (!task.IsCompleted && !task.IsCanceled && !token.IsCancellationRequested) {
+
+						stringBuilder.Clear ();
+						stringBuilder.Append (wtmessg);
+
+						int dots = x++ % MAXDOTS;
+
+						// the first time 0 dots then 1 then 2,3,4,5
+						for (int i = 0; i < dots; i++) {
+							stringBuilder.Append (".");
+						}
+
+						string tmpstr = stringBuilder.ToString ();
+						this.SetResult (index.ToString (), tmpstr, TextHighlighter.GREEN);
+
+						stringBuilder.Clear ();
+						stringBuilder.Append ("<span fgcolor=\"green\">");
+						stringBuilder.Append (txAtIndexStr);
+						stringBuilder.Append (tmpstr);
+						stringBuilder.Append ("</span>");
+
+						string wtms = stringBuilder.ToString ();
+						Application.Invoke ( delegate {
+							label2.Markup = wtms;
+							label2.Visible = true;
+
+						});
+
+						task.Wait (500, token);
+					}
+
+
+				} catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException) {
+
+#if DEBUG
+					if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
+						Logging.ReportException (method_sig, ex);
+					}
+#endif
+					stringBuilder.Clear ();
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append ("Operation Cancelled");
+
+					string cancmess = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = cancmess;
+							label2.Visible = true;
+
+						}
+					);
+					return false;
 				} catch (Exception e) {
 
+					// TODO catch actual net exception
 					Logging.WriteLog (e.Message);
 					this.SetResult (index.ToString (), "Network Error", TextHighlighter.RED);
 					return false;
@@ -1009,7 +1530,20 @@ namespace IhildaWallet
 
 					string warningMessage = "response == null";
 					this.SetResult (index.ToString (), warningMessage, TextHighlighter.GREEN);
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"green\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (warningMessage);
+					stringBuilder.Append ("</span>");
 
+					string msg = stringBuilder.ToString ();
+					Application.Invoke (
+						delegate {
+							label2.Markup = msg;
+							label2.Visible = true;
+
+						}
+					);
 
 #if DEBUG
 					if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
@@ -1025,19 +1559,32 @@ namespace IhildaWallet
 				//if ( response.status == null || !response.status.Equals ("success")) {
 				if (response.HasError ()) {
 
-					StringBuilder sb = new StringBuilder ();
-					sb.Append ("Error response : ");
-					sb.Append (response?.error_message ?? "");
+					stringBuilder.Clear ();
+					stringBuilder.Append ("Error response : ");
+					stringBuilder.Append (response?.error_message ?? "");
 
-					this.SetResult (index.ToString (), sb.ToString (), TextHighlighter.RED);
+					string hasErrstr = stringBuilder.ToString ();
+
+					this.SetResult (index.ToString (), hasErrstr, TextHighlighter.RED);
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (hasErrstr);
+					stringBuilder.Append ("</span>");
 #if DEBUG
 					if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
 						Logging.WriteLog ("Error submitting transaction ");
 						Logging.WriteLog (tx.ToJson ());
-						Logging.WriteLog (sb.ToString ());
+						Logging.WriteLog (hasErrstr);
 					}
 #endif
+					string haserrmess = stringBuilder.ToString ();
+					Application.Invoke (
+						delegate {
+							label2.Markup = hasErrstr;
+							label2.Visible = true;
 
+						}
+					);
 
 					return false;
 
@@ -1048,8 +1595,24 @@ namespace IhildaWallet
 				RippleSubmitTxResult res = response?.result;
 
 				if (res == null) {
+					string bugstr = "res == null, Bug?";
+					this.SetResult (index.ToString (), bugstr, TextHighlighter.RED);
 
-					this.SetResult (index.ToString (), "res == null, Bug?", TextHighlighter.RED);
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+
+					stringBuilder.Append (bugstr);
+					stringBuilder.Append ("</span>");
+
+					string ms17 = stringBuilder.ToString ();
+					Application.Invoke (
+						delegate {
+							label2.Markup = ms17;
+							label2.Visible = true;
+
+						}
+					);
 					return false;
 				}
 
@@ -1058,7 +1621,27 @@ namespace IhildaWallet
 				string een = res?.engine_result;
 
 				if (een == null) {
-					this.SetStatus (index.ToString (), "engine_result null", TextHighlighter.RED);
+
+					string engnull = "engine_result null";
+
+					this.SetStatus (index.ToString (), engnull, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (engnull);
+					stringBuilder.Append ("</span>");
+
+					string ms18 = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = ms18;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 				}
 				Ter ter;
@@ -1073,7 +1656,26 @@ namespace IhildaWallet
 						Logging.ReportException (method_sig, exc);
 					}
 #endif
-					this.SetStatus (index.ToString (), "null exception", TextHighlighter.RED);
+
+					string argnull = "null exception";
+					this.SetStatus (index.ToString (), argnull, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (argnull);
+					stringBuilder.Append ("</span>");
+
+
+					string ms19 = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = ms19;
+							label2.Visible = true;
+						}
+					);
+
 					return false;
 				} catch (OverflowException overFlowException) {
 #if DEBUG
@@ -1081,7 +1683,26 @@ namespace IhildaWallet
 						Logging.ReportException (method_sig, overFlowException);
 					}
 #endif
-					this.SetStatus (index.ToString (), "Overflow Exception", TextHighlighter.RED);
+
+					string flowstr = "Overflow Exception";
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (flowstr);
+					stringBuilder.Append ("</span>");
+
+					string ms20 = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = ms20;
+							label2.Visible = true;
+
+						}
+					);
+
+					this.SetStatus (index.ToString (), flowstr, TextHighlighter.RED);
 					return false;
 				} catch (ArgumentException argumentException) {
 #if DEBUG
@@ -1089,8 +1710,26 @@ namespace IhildaWallet
 						Logging.ReportException (method_sig, argumentException);
 					}
 #endif
+					string argexc = "Argument Exception";
 
-					this.SetStatus (index.ToString (), "Argument Exception", TextHighlighter.RED);
+					this.SetStatus (index.ToString (), argexc, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (argexc);
+					stringBuilder.Append ("</span>");
+
+
+					string ms21 = stringBuilder.ToString ();
+					Application.Invoke (
+						delegate {
+							label2.Markup = ms21;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 				} catch (Exception e) {
 #if DEBUG
@@ -1098,20 +1737,58 @@ namespace IhildaWallet
 						Logging.ReportException (method_sig, e);
 					}
 #endif
-					this.SetStatus (index.ToString (), "Unknown Exception", TextHighlighter.RED);
+					string unkexc = "Unknown Exception";
+
+					this.SetStatus (index.ToString (), unkexc, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (unkexc);
+					stringBuilder.Append ("</span>");
+
+					string ms22 = stringBuilder.ToString ();
+					Application.Invoke (
+						delegate {
+							label2.Markup = ms22;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 				}
 
 				switch (ter) {
 
 				case Ter.tefALREADY:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.GREEN);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.GREEN);
+					this.SetStatus ( index.ToString (), res.engine_result, TextHighlighter.GREEN );
+					this.SetResult ( index.ToString (), res.engine_result_message, TextHighlighter.GREEN );
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"green\">");
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string alstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = alstr;
+							label2.Visible = true;
+
+						}
+					);
+
+
+					this._offers [index].IsValidated = true;
+
 					return true;
 
 				case Ter.terQUEUED:
 
-					Thread.Sleep (500);
+					//Thread.Sleep (50);
+
+					token.WaitHandle.WaitOne (100);
 					/*
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.GREEN);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.GREEN);
@@ -1125,9 +1802,25 @@ namespace IhildaWallet
 				case Ter.tesSUCCESS:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.GREEN);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.GREEN);
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"green\">");
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string sustr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = sustr;
+							label2.Visible = true;
+
+						}
+					);
+
+
 					this.VerifyTx (index, tx, off.Previous_Bot_ID, ni, token);
 
-				
+
+
 					return true;
 
 				case Ter.terPRE_SEQ:
@@ -1135,6 +1828,21 @@ namespace IhildaWallet
 				case Ter.tefMAX_LEDGER:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string maxstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = maxstr;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 
 				case Ter.terRETRY:
@@ -1151,27 +1859,121 @@ namespace IhildaWallet
 
 					lastFee = (UInt32)tx.fee.amount;
 
-					token.WaitHandle.WaitOne (6000);
+					int secs = 6;
+					stringBuilder.Clear ();
+
+					stringBuilder.Append ("Waiting ");
+					stringBuilder.Append (secs.ToString ());
+					stringBuilder.Append ("seconds");
+
+
+
+					token.WaitHandle.WaitOne (1000);
+
+					// secs - 1 because you already waited a second
+					for (int i = 0; i < secs - 1; i++) {
+
+						string waitingForSecsString = stringBuilder.ToString ();
+
+						this.SetResult (index.ToString (), stringBuilder.ToString (), TextHighlighter.BLACK);
+						Application.Invoke ( delegate {
+							label2.Markup = txAtIndexStr + waitingForSecsString;
+							label2.Visible = true;
+
+						});
+
+
+						token.WaitHandle.WaitOne (1000);
+						stringBuilder.Append (".");
+					}
+
 					//Thread.Sleep (6000);
 					this.SetStatus (index.ToString (), res.engine_result + " retrying", TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string retstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = retstr;
+							label2.Visible = true;
+
+						}
+					);
+
+
 					goto retry;
 
 
 				case Ter.temBAD_AMOUNT:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string badamstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = badamstr;
+							label2.Visible = true;
+
+						}
+					);
+
+
+
 					return false;
 
 				case Ter.tecNO_ISSUER:
 				case Ter.temBAD_ISSUER:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string noissstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = noissstr;
+							label2.Visible = true;
+
+						}
+					);
+
+
 					return false;
 
 				case Ter.tecUNFUNDED_OFFER:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string unfstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = unfstr;
+							label2.Visible = true;
+
+						}
+					);
+
+
 					return false;
 
 				case Ter.tecUNFUNDED:
@@ -1182,6 +1984,23 @@ namespace IhildaWallet
 
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string nolinestr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = nolinestr;
+							label2.Visible = true;
+
+						}
+					);
+
+
+
 					return false;
 
 				case Ter.temBAD_AUTH_MASTER:
@@ -1189,29 +2008,105 @@ namespace IhildaWallet
 				case Ter.tefMASTER_DISABLED:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string masterdisstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = masterdisstr;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 
 
 				case Ter.terNO_ACCOUNT:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string noaccstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = noaccstr;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 
 				case Ter.tecNO_AUTH: // Not authorized to hold IOUs.
 				case Ter.tecNO_LINE:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string noauthstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = noauthstr;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 
 				case Ter.tecFROZEN:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string frozenstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = frozenstr;
+							label2.Visible = true;
+
+						}
+					);
 					return false;
 
 				case Ter.tefFAILURE:
 					// TODO what to do?
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string failurestr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = failurestr;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 
 				case Ter.temBAD_FEE:
@@ -1231,56 +2126,230 @@ namespace IhildaWallet
 				case Ter.tecINVARIANT_FAILED:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string invstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = invstr;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 
 				case Ter.tecPATH_DRY:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string drystr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = drystr;
+							label2.Visible = true;
+
+						}
+					);
 					return false;
 
 				case Ter.tecPATH_PARTIAL:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string partstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = partstr;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 
 				case Ter.tecOVERSIZE:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string oversizestr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = oversizestr;
+							label2.Visible = true;
+
+						}
+					);
 					return false;
 
 				case Ter.tefINTERNAL:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string internalstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = internalstr;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 
 				case Ter.tefEXCEPTION:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string excstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = excstr;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 
 				case Ter.tefBAD_LEDGER:
 					// report bug to ripple labs
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string badledstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = badledstr;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 
 				case Ter.tecDIR_FULL:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string dirfullstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = dirfullstr;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 
 				case Ter.tecCLAIM:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string claimstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = claimstr;
+							label2.Visible = true;
+
+						}
+					);
 					return false;
 
 				case Ter.tecEXPIRED:
 					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
 					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (res.engine_result_message);
+					stringBuilder.Append ("</span>");
+					string expstr = stringBuilder.ToString ();
+
+					Application.Invoke (
+						delegate {
+							label2.Markup = expstr;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 
 				default:
-					this.SetStatus (index.ToString (), "Response " + res.engine_result + " not imlemented", TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("Response ");
+					stringBuilder.Append (res.engine_result);
+					stringBuilder.Append (" not imlemented");
+
+					string statstr = stringBuilder.ToString ();
+					this.SetStatus (index.ToString (), statstr , TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (statstr);
+
+					string areWethereYet = stringBuilder.ToString ();
+					Application.Invoke (
+						delegate {
+							label2.Markup = areWethereYet;
+							label2.Visible = true;
+
+						}
+					);
+
 					return false;
 
 				}
@@ -1318,6 +2387,23 @@ namespace IhildaWallet
 
 				*/
 
+			} catch (Exception cancExc) when (cancExc is TaskCanceledException || cancExc is OperationCanceledException) {
+#if DEBUG
+				if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
+					Logging.ReportException (method_sig, cancExc);
+				}
+#endif
+
+				string mssg = "Operation cancelled";
+				this.SetResult (index.ToString (), mssg, TextHighlighter.RED);
+
+				Application.Invoke (delegate {
+					this.label2.Markup = mssg;
+					this.label2.Visible = true;
+
+				});
+
+				return false;
 			}
 
 #pragma warning disable 0168
@@ -1334,7 +2420,8 @@ namespace IhildaWallet
 				this.SetResult ( index.ToString (), mssg, TextHighlighter.RED);
 
 				Application.Invoke (delegate {
-					this.label2.Markup = e.Message + "\n" + e.StackTrace;
+					this.label2.Markup = mssg;
+					this.label2.Visible = true;
 
 				});
 
@@ -1353,11 +2440,30 @@ namespace IhildaWallet
 
 
 			Task.Run (() => {
-				token.WaitHandle.WaitOne (1000);
+
+				int verifyWaitTime = 6;
+
+				StringBuilder stringBuilder = new StringBuilder ();
+				string valStr = "Validating Tx";
+
+				for (int i = verifyWaitTime; i > 0; i--) {
+
+					stringBuilder.Clear ();
+					stringBuilder.Append (valStr);
+					stringBuilder.Append (" in ");
+					stringBuilder.Append (i);
+
+					this.SetStatus (index.ToString (), stringBuilder.ToString (), TextHighlighter.GREEN);
+					token.WaitHandle.WaitOne (1000);
+				}
+
+
 				//Thread.Sleep (1000);
-				this.SetStatus (index.ToString (), "Validating Tx", TextHighlighter.GREEN);
-				token.WaitHandle.WaitOne (5000);
-				//Thread.Sleep (5000);
+
+
+				this.SetStatus (index.ToString (), valStr, TextHighlighter.GREEN);
+
+
 				for (int i = 0; i < 100; i++) {
 
 					Tuple<string, uint> tuple = ServerInfo.GetFeeAndLedgerSequence (ni, token);
@@ -1384,9 +2490,11 @@ namespace IhildaWallet
 					if (transaction.validated != null && (bool)transaction.validated) {
 
 						this.SetResult (index.ToString (), "Validated", TextHighlighter.GREEN);
+						this._offers [index].IsValidated = true;
 
+						button209.Visible = true;
 
-						AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (offerTransaction);
+						//AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (offerTransaction);
 
 						//sequenceCache.RemoveAndSave (ao.p);
 
@@ -1400,11 +2508,22 @@ namespace IhildaWallet
 						this.SetResult (index.ToString (), "failed to validate before LastLedgerSequence exceeded", TextHighlighter.RED);
 					}
 
-					this.SetResult (index.ToString (), "Not validated yet " + i.ToString (), TextHighlighter.RED);
+					string str = "Not validated ";
+					stringBuilder.Clear ();
+					stringBuilder.Append (str);
+					stringBuilder.Append (i.ToString ());
+
+					this.SetResult (index.ToString (), stringBuilder.ToString(), TextHighlighter.RED);
 					//Thread.Sleep (3000);
-					token.WaitHandle.WaitOne (3000);
+					for (int ind = 0; ind < 1; ind++) {
+						token.WaitHandle.WaitOne (1000);
+						stringBuilder.Append (".");
+						this.SetResult (index.ToString (), stringBuilder.ToString (), TextHighlighter.RED);
+					}
+				
+
 				}
-			});
+			}, token);
 
 
 
@@ -1426,6 +2545,10 @@ namespace IhildaWallet
 			CancellationToken token = new CancellationToken ();
 
 			AllSubmitted = false;
+
+
+
+
 
 			// TODO verify inteneded address
 			RippleWallet rw = this.walletswitchwidget1.GetRippleWallet ();
@@ -1459,7 +2582,48 @@ namespace IhildaWallet
 				return;
 			}
 
-			bool ShouldContinue = LeIceSense.LastDitchAttempt (rw, _licenseType);
+
+
+
+			bool ShouldContinue = false;
+			var contTask = Task.Run (
+				delegate {
+					ShouldContinue = LeIceSense.LastDitchAttempt (rw, _licenseType);
+
+
+				}
+			);
+
+
+			uint sequence = 0;
+			var seqTask = Task.Run (delegate {
+				sequence =
+				Convert.ToUInt32 (
+					AccountInfo.GetSequence (
+						rw.GetStoredReceiveAddress (),
+						ni,
+						token
+					)
+				);
+
+			});
+
+
+			//int? f = FeeSettings.getFeeFromSettings (ni);
+			//if (f == null) {
+			//	return;
+			//}
+
+
+
+
+
+
+			SignOptions signOptions = LoadSignOptions (token);
+
+			contTask.Wait (token);
+
+
 			if (!ShouldContinue) {
 				Application.Invoke (delegate {
 					this.label2.Markup =
@@ -1472,19 +2636,12 @@ namespace IhildaWallet
 				});
 				return;
 			}
-			//int? f = FeeSettings.getFeeFromSettings (ni);
-			//if (f == null) {
-			//	return;
-			//}
 
 
-			uint sequence = Convert.ToUInt32 (AccountInfo.GetSequence (rw.GetStoredReceiveAddress (), ni, token));
-
-
-			//LinkedList< AutomatedOrder > failedorders = new LinkedList<AutomatedOrder>();
-			//LinkedList< AutomatedOrder > filledorders = new LinkedList<AutomatedOrder>();
-			//LinkedList<AutomatedOrder> terQuedorers = new LinkedList<AutomatedOrder> ();
 			RippleIdentifier rsa = rw.GetDecryptedSeed ();
+
+			seqTask.Wait (token);
+
 			for (int index = 0; index < _offers.Length; index++) {
 
 				if (token.IsCancellationRequested) {
@@ -1499,11 +2656,20 @@ namespace IhildaWallet
 				}
 
 
-				bool suceeded = this.SubmitOrderAtIndex (index, sequence++, ni, token, rsa);
+				bool suceeded = this.SubmitOrderAtIndex (index, sequence++, signOptions, ni, token, rsa);
 				if (!suceeded) {
 					return;
 				}
 			}
+
+			Gtk.Application.Invoke ( delegate {
+
+				this.label2.Markup = 
+					"<span fgcolor=\"green\">All orders have been submitted successfully</span>";
+
+				this.label2.Visible = true;
+
+			});
 
 			AllSubmitted = true;
 
@@ -1515,7 +2681,7 @@ namespace IhildaWallet
 			set;
 		}
 
-		public void SetRippleWallet (RippleWallet rippleWallet)
+		public void SetRippleWallet ( RippleWallet rippleWallet ) 
 		{
 			this.walletswitchwidget1.SetRippleWallet (rippleWallet);
 		}
@@ -1530,6 +2696,9 @@ namespace IhildaWallet
 
 		public void SetDefaultOrders (IEnumerable<AutomatedOrder> orders)
 		{
+
+			orders = from o in orders select new AutomatedOrder(o);
+
 			_default_offers = orders.ToArray ();
 		}
 

@@ -40,6 +40,15 @@ namespace IhildaWallet
 #if DEBUG
 			string method_sig = clsstr + nameof (DoLogic) + DebugRippleLibSharp.both_parentheses;
 #endif
+			OrderManagementBot omb = null;
+
+			var ombTask = Task.Run (delegate {
+				 omb = new OrderManagementBot (wallet, ni, cancelationToken);
+
+				omb.OnMessage += (object sender, MessageEventArgs e) => {
+					OnMessage?.Invoke (this, new MessageEventArgs () { Message = e.Message });
+				};
+			}, cancelationToken);
 
 			if (cancelationToken.IsCancellationRequested) {
 				return null;
@@ -195,12 +204,25 @@ namespace IhildaWallet
 
 				lastledger = accTxResult.ledger_index_max;
 			}
+			if (!ombTask.IsCompleted && !ombTask.IsCanceled && !ombTask.IsFaulted) {
+				try {
+					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Waiting on order management bot to load" });
+					cancelationToken.WaitHandle.WaitOne (1000);
+					while (!ombTask.IsCompleted && !ombTask.IsCanceled && !ombTask.IsFaulted) {
+						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "." });
+						cancelationToken.WaitHandle.WaitOne (1000);
+					}
+				} catch (Exception e) {
 
-			OrderManagementBot omb = new OrderManagementBot (wallet, ni, cancelationToken);
+				} finally {
+					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "\n" });
+				}
+			}
 
-			omb.OnMessage += (object sender, MessageEventArgs e) => {
-				OnMessage?.Invoke (this, new MessageEventArgs () { Message = e.Message });
-			};
+			if (omb == null) {
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Order management bot failed to load\n" });
+				return null;
+			}
 
 			IEnumerable<AutomatedOrder> total = null;
 

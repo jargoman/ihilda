@@ -213,7 +213,11 @@ namespace IhildaWallet
 			FileHelper.SaveConfig (settingsPath, conf);
 		}
 
-		public static Tuple<UInt32, UInt32> ParseFee (NetworkInterface ni, CancellationToken token) {
+		public static Tuple<UInt32, UInt32> ParseFee (
+			NetworkInterface ni, 
+			CancellationToken token
+		) {
+
 			Tuple< string, UInt32 > tupe = RippleLibSharp.Commands.Server.ServerInfo.GetFeeAndLedgerSequence (ni, token);
 
 			if (tupe == null) {
@@ -224,9 +228,9 @@ namespace IhildaWallet
 				// TODO debug
 				var x = new InvalidCastException ();
 				//x.Message = "fee returned from network can not be parsed to an int";
-				throw x;
+				//throw x;
 
-				//return null;
+				return null;
 			}
 
 			return new Tuple<UInt32, UInt32>(f, tupe.Item2);
@@ -240,14 +244,19 @@ namespace IhildaWallet
 				return ParseFee (ni);
 			}
 			*/
+			int nullFeeCount = 0;
+
+			int feeRetry = 0;
+		START:
+			Tuple<UInt32, UInt32> fs = ParseFee (ni, token);
 
 
-			int feeRetry = 0; 
-			START:
-			Tuple<UInt32,UInt32> fs = ParseFee (ni, token);
-
-
-
+			if (fs == null) {
+				if (nullFeeCount++ > 5) {
+					return null;
+				}
+				goto START;
+			}
 
 
 			if (this.Specify != null) {
@@ -255,14 +264,9 @@ namespace IhildaWallet
 				// you have to get the last ledger anyway
 
 				// we already know the last fee was explicitly specified so we blindly increase it by the retry factor
-				if (this.RetryFactor != null && lastFee != null) {
-
-					fs = new Tuple<uint, uint> ((uint)(this.Specify * this.RetryFactor), fs.Item2);
-
-
-				} else {
-					fs = new Tuple<uint, uint> ((uint)this.Specify, fs.Item2);
-				}
+				fs = this.RetryFactor != null && lastFee != null
+					? new Tuple<uint, uint> ((uint)(this.Specify * this.RetryFactor), fs.Item2)
+					: new Tuple<uint, uint> ((uint)this.Specify, fs.Item2);
 
 				// we are going to wait for the lowest fee specified 
 				goto Wait;
@@ -274,7 +278,12 @@ namespace IhildaWallet
 			fs = ParseFee (ni, token);
 
 			if (fs == null) {
-				return null;
+
+				if (nullFeeCount++ > 5) {
+					return null;
+				}
+
+				goto START;
 			}
 
 			if (this.Multiplier != null) {
@@ -344,9 +353,21 @@ namespace IhildaWallet
 						FeeAndLastLedger = fs
 					};
 
+					feeSleepEventArgs.State = FeeSleepState.Begin;
+
 					OnFeeSleep?.Invoke (this, feeSleepEventArgs);
 					//Thread.Sleep (3000);
-					token.WaitHandle.WaitOne (3000);
+
+					feeSleepEventArgs.State = FeeSleepState.PumpUI;
+
+					for (int i = 0; i < 3; i++) {
+						OnFeeSleep?.Invoke (this, feeSleepEventArgs);
+						token.WaitHandle.WaitOne (1000);
+					}
+
+					feeSleepEventArgs.State = FeeSleepState.Wake;
+					OnFeeSleep?.Invoke (this, feeSleepEventArgs);
+
 					goto START;
 				}
 			}
@@ -358,7 +379,13 @@ namespace IhildaWallet
 
 
 				if (fs.Item1 > this.Warn ) {
-					var v = AreYouSure.AskQuestionNonGuiThread("Approve High Fee", "The current fee is " + fs.Item1.ToString() + " drops. Do you wish to submit the transaction anyway?");
+					var v = 
+						AreYouSure.AskQuestionNonGuiThread (
+							"Approve High Fee", 
+							"The current fee is " + 
+							fs.Item1.ToString() + 
+							" drops. Do you wish to submit the transaction anyway?" );
+
 					if (!v) {
 						return null;
 					}
@@ -393,6 +420,10 @@ namespace IhildaWallet
 
 	public class FeeSleepEventArgs : EventArgs
 	{
+		internal FeeSleepState State {
+			get;
+			set;
+		}
 
 		public Tuple< uint,uint >  FeeAndLastLedger {
 			get;
@@ -402,7 +433,14 @@ namespace IhildaWallet
 
 	}
 
+	public enum FeeSleepState
+	{
 
+		Begin,
+		PumpUI,
+		Wake
+
+	}
 
 }
 

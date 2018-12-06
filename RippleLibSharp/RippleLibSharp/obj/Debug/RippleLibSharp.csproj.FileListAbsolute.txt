@@ -19,8 +19,8 @@
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/System.Xml.Linq.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/WebSocket4Net.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/System.Configuration.dll
+/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Debug/RippleLibSharp.csprojAssemblyReference.cache
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Debug/RippleLibSharp.csproj.CoreCompileInputs.cache
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Debug/RippleLibSharp.csproj.CopyComplete
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Debug/riplibsharp.exe
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Debug/riplibsharp.pdb
-/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Debug/RippleLibSharp.csprojAssemblyReference.cache

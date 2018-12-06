@@ -641,16 +641,7 @@ namespace IhildaWallet
 
 		private Sentiment ParseObject (object o)
 		{
-			if (o == null) {
-				return null;
-			}
-
-			if (!(o is String val)) {
-				return null;
-			}
-
-			return SentimentManagerObject.LookUpSentiment (val);
-
+			return o != null && (o is String val) ? SentimentManagerObject.LookUpSentiment (val) : null;
 		}
 
 
@@ -743,7 +734,7 @@ namespace IhildaWallet
 					return;
 				}
 
-				bool ShouldContinue = LeIceSense.DoTrialDialog (rw, LicenseType.MARKETBOT);
+				bool ShouldContinue = LeIceSense.DoTrialDialog ( rw, LicenseType.MARKETBOT );
 				//bool ShouldContinue = LeIceSense.LastDitchAttempt (rw, LicenseType.AUTOMATIC);
 				if (!ShouldContinue) {
 					// TODO print fee requirement
@@ -919,6 +910,7 @@ namespace IhildaWallet
 					Logging.WriteLog (method_sig, srmessage);
 				}
 #endif
+
 				return;
 			}
 
@@ -972,13 +964,19 @@ namespace IhildaWallet
 						// TODO more explicit warning
 
 					progressbar1.Pulse ();
-					cont = AreYouSure.AskQuestion ("Warning !!!", "<markup><span foreground=\"red\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>" + rw.GetStoredReceiveAddress () + "</b></markup>");
+					cont = AreYouSure.AskQuestion (
+						"Warning !!!", 
+
+						"<markup><span foreground=\"red\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>" 
+						+ rw.GetStoredReceiveAddress () 
+						+ "</b></markup>");
 					progressbar1.Pulse ();
 					manualResetEvent.Set ();
 
 
 				}
 			);
+
 
 			manualResetEvent.WaitOne ();
 			if (!cont) {
@@ -1003,24 +1001,38 @@ namespace IhildaWallet
 				OrderSubmitter orderSubmitter = new OrderSubmitter ();
 
 				orderSubmitter.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
-					this.WriteToInfoBox ("Fee " + e.FeeAndLastLedger.Item1.ToString () + " is too high, waiting on lower fee\n");
+					switch (e.State) {
+
+					case FeeSleepState.Begin:
+						this.WriteToInfoBox ("Fee " + e.FeeAndLastLedger.Item1.ToString () + " is too high, waiting on lower fee");
+						break;
+
+					case FeeSleepState.PumpUI:
+						this.WriteToInfoBox (".");
+						break;
+
+					case FeeSleepState.Wake:
+						this.WriteToInfoBox ("\n");
+						break;
+
+					}
+
 					Application.Invoke (
 						delegate {
 
 							progressbar1.Pulse ();
+
 						}
 					);
 				};
 				orderSubmitter.OnOrderSubmitted += (object sender, OrderSubmittedEventArgs e) => {
+
 					StringBuilder stringBuilder = new StringBuilder ();
 
 
 					if (e.Success) {
 						stringBuilder.Append ("Submitted Order Successfully ");
 						stringBuilder.Append ((string)(e?.RippleOfferTransaction?.hash ?? ""));
-
-
-
 
 					} else {
 						stringBuilder.Append ("Failed to submit order ");
@@ -1139,6 +1151,9 @@ namespace IhildaWallet
 							// TODO
 
 							string maxMessage = "Maximum ledger " + endStr + " reached \n";
+
+
+
 							this.WriteToInfoBox (maxMessage);
 							break;
 						}
@@ -1185,16 +1200,25 @@ namespace IhildaWallet
 
 
 
-					Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = robot.DoLogic (rw, ni, strt, endStr, lim, token);
+					Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = 
+						robot.DoLogic (rw, ni, strt, endStr, lim, token);
+
+
 					if (tuple == null) {
+
+#if DEBUG
 						MessageDialog.ShowMessage ("Automate : DoLogic tuple == null");
+#endif 
+
 						break;
 					}
 
-					Application.Invoke (delegate {
-						this.ledgerconstraintswidget1.SetLastKnownLedger (tuple.Item1.ToString ());
-						progressbar1.Pulse ();
-					});
+					Application.Invoke (
+						delegate {
+							this.ledgerconstraintswidget1.SetLastKnownLedger (tuple.Item1.ToString ());
+							progressbar1.Pulse ();
+						}
+					);
 
 					strt = tuple.Item1 + 1;
 
@@ -1204,7 +1228,7 @@ namespace IhildaWallet
 
 						int seconds = 60;
 
-						string infoMessage = "Sleeping for " + seconds + " seconds \n";
+						string infoMessage = "Sleeping for " + seconds + " seconds";
 
 #if DEBUG
 						if (DebugIhildaWallet.FilledRuleManagementWindow) {
@@ -1214,22 +1238,30 @@ namespace IhildaWallet
 
 						this.WriteToInfoBox (infoMessage);
 
-						for (int sec = 0; sec < seconds; sec++) {
-							//for (int i = 0; i < 4; i++) {
-							if (token.IsCancellationRequested) {
-								return;
+						try {
+							for (int sec = 0; sec < seconds; sec++) {
+								//for (int i = 0; i < 4; i++) {
+								if (token.IsCancellationRequested || StopWhenConvenient) {
+									return;
+								}
+								//Thread.Sleep (250);
+								if (sec % 5 == 0) {
+									this.WriteToInfoBox (".");
+								}
+								token.WaitHandle.WaitOne (1000);
+								//Task.Delay (250).Wait ();
+								Application.Invoke (delegate {
+									progressbar1.Pulse ();
+
+								});
+								//}
+
+
 							}
-							//Thread.Sleep (250);
-
-							token.WaitHandle.WaitOne (1000);
-							//Task.Delay (250).Wait ();
-							Application.Invoke (delegate {
-								progressbar1.Pulse ();
-
-							});
-							//}
-
-
+						} catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException) {
+							return;
+						} finally {
+							this.WriteToInfoBox ("\n");
 						}
 						//success = true;
 						continue;
@@ -1252,7 +1284,9 @@ namespace IhildaWallet
 					});
 
 					if (tupleResp == null) {
-						// TODO. probably unreachable code
+						// 
+						MessageDialog.ShowMessage ("Scripting error", "Application behaved unexpectedly");
+						return;
 					}
 					success = tupleResp.Item1;
 					if (!success) {
@@ -1284,13 +1318,15 @@ namespace IhildaWallet
 					Logging.ReportException (method_sig, canEx);
 				}
 #endif
-
+				return;
 			}
 
 
 
 			catch (Exception e) {
 				this.WriteToInfoBox (e.Message);
+				return;
+
 			} finally {
 				//tokenSource.Dispose ();
 				this.tokenSource?.Cancel ();

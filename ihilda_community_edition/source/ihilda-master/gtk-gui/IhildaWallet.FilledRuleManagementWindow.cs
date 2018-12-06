@@ -447,6 +447,7 @@ namespace IhildaWallet
 			this.DefaultWidth = 804;
 			this.DefaultHeight = 420;
 			this.button171.Hide();
+			this.checkbutton2.Hide();
 			this.Show();
 		}
 	}

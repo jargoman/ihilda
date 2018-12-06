@@ -92,6 +92,7 @@ namespace IhildaWallet
 			}
 			this.DefaultWidth = 773;
 			this.DefaultHeight = 446;
+			this.label11.Hide();
 			this.buttonOk.HasDefault = true;
 			this.Show();
 		}

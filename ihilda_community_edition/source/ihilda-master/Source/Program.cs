@@ -176,6 +176,15 @@ namespace IhildaWallet
 		public static void DoConsoleMode (string [] args)
 		{
 
+#if DEBUG
+
+			string method_sig = clsstr + nameof (DoConsoleMode) + DebugRippleLibSharp.both_parentheses;
+			if (DebugIhildaWallet.Program) {
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
+			}
+
+#endif
+
 			System.Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e) {
 				e.Cancel = true;
 				keepRunning = false;
@@ -213,8 +222,22 @@ namespace IhildaWallet
 			OrderSubmitter orderSubmitter = new OrderSubmitter ();
 
 			orderSubmitter.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
+				if (e.State == FeeSleepState.Begin) {
+					Logging.WriteLog ("Fee " + e.FeeAndLastLedger.Item1.ToString () + " is too high, waiting on lower fee");
+					return;
+				}
 
-				Logging.WriteLog ("Fee " + e.FeeAndLastLedger.Item1.ToString () + " is too high, waiting on lower fee\n");
+				if (e.State == FeeSleepState.PumpUI) {
+					Logging.WriteLog (".");
+					return;
+				}
+
+				if (e.State == FeeSleepState.Wake) {
+					Logging.WriteLog ("\n");
+					return;
+				}
+
+
 
 			};
 
@@ -375,20 +398,34 @@ namespace IhildaWallet
 				if (orders == null || !orders.Any ()) {
 					int seconds = 60;
 
-					string infoMessage = "Sleeping for " + seconds + " seconds \n";
+					string infoMessage = "Sleeping for " + seconds + " seconds";
 
-					Logging.WriteLog (infoMessage);
-					for (int sec = 0; sec < seconds; sec++) {
+					try {
+						Logging.WriteLog (infoMessage);
+						for (int sec = 0; sec < seconds; sec++) {
 
-						if (token.IsCancellationRequested) {
-							return;
+							if (token.IsCancellationRequested || !keepRunning) {
+								return;
+							}
+
+							if (sec % 5 == 0) {
+								Logging.WriteLog (".");
+							}
+							token.WaitHandle.WaitOne (1000);
+
+
+
 						}
+					} catch (Exception e) when (e is TaskCanceledException || e is OperationCanceledException) {
+#if DEBUG
+						if (DebugIhildaWallet.Program) {
+							Logging.ReportException (method_sig, e);
+						}
+#endif
 
-
-						token.WaitHandle.WaitOne (1000);
-
-
-
+						return;
+					} finally {
+						Logging.WriteLog ( "\n" );
 					}
 					continue;
 				}

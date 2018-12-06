@@ -253,7 +253,7 @@ namespace IhildaWallet
 			this.buybutton.CanFocus = true;
 			this.buybutton.Name = "buybutton";
 			this.buybutton.UseUnderline = true;
-			this.buybutton.Label = global::Mono.Unix.Catalog.GetString("Proceed to automaded (<span fgcolor=\"green\">_Buy</span>) wizard");
+			this.buybutton.Label = global::Mono.Unix.Catalog.GetString("Proceed to automated (<span fgcolor=\"green\">_Buy</span>) wizard");
 			this.hbox6.Add(this.buybutton);
 			global::Gtk.Box.BoxChild w19 = ((global::Gtk.Box.BoxChild)(this.hbox6[this.buybutton]));
 			w19.Position = 0;

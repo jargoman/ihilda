@@ -57,12 +57,24 @@ namespace IhildaWallet
 
 
 
-
 		}
+
+		public void SetInteractivty ()
+		{
+			this.treeview1.ButtonReleaseEvent += Treeview1_ButtonReleaseEvent;
+		}
+
+		void Treeview1_ButtonReleaseEvent (object o, ButtonReleaseEventArgs args)
+		{
+			//args.Event.Button;
+		}
+
+
+
 
 		private void Clear ()
 		{
-			//treeview1.Data.Clear ();
+
 			Application.Invoke (
 				delegate {
 				

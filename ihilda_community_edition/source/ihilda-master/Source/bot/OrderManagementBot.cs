@@ -41,7 +41,10 @@ namespace IhildaWallet
 			this.Wallet = rw;
 
 			this.token = token;
-			//this.orderDict = new ConcurrentDictionary< string, AutomatedOrder > ();
+
+			this._AccountSequnceCache = AccountSequenceCache.GetCacheForAccount (rw.GetStoredReceiveAddress ());
+
+		
 		}
 
 
@@ -179,9 +182,9 @@ namespace IhildaWallet
 		{
 			List<AutomatedOrder> list = new List<AutomatedOrder> ();
 
-			AccountSequenceCache accountSequnceCache = AccountSequenceCache.GetCacheForAccount (this.Wallet.GetStoredReceiveAddress ());
 
-			Dictionary<String, AutomatedOrder> cachedOffers = accountSequnceCache?.SequenceCache; //.Load (Wallet.GetStoredReceiveAddress ());
+
+			Dictionary<String, AutomatedOrder> cachedOffers = _AccountSequnceCache?.SequenceCache; //.Load (Wallet.GetStoredReceiveAddress ());
 
 			foreach (RippleNode node in nodes) {
 				AutomatedOrder order = null;
@@ -226,16 +229,20 @@ namespace IhildaWallet
 					throw new NullReferenceException (errmessg);
 				}
 
+				if (_AccountSequnceCache != null) {
+					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Updating orders cache : " + order.Bot_ID + "\n" });
+					_AccountSequnceCache.UpdateOrdersCache (order);
 
-				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Updating orders cache : " + order.Bot_ID + "\n" });
-				accountSequnceCache.UpdateOrdersCache (order);
+				}
+
 				list.Add (order);
 
 			}
 
-			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Saving orders cache to file\n" });
-			accountSequnceCache.Save ();
-
+			if (_AccountSequnceCache != null) {
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Saving orders cache to file\n" });
+				_AccountSequnceCache.Save ();
+			}
 			return list;
 		}
 
@@ -243,12 +250,14 @@ namespace IhildaWallet
 		public IEnumerable<AutomatedOrder> GetBuyBackOrders (IEnumerable<AutomatedOrder> orders)
 		{
 
+			string account = this.Wallet.GetStoredReceiveAddress ();
 
-
-			RuleManager rulemanager = new RuleManager (this.Wallet.GetStoredReceiveAddress ());
+			RuleManager rulemanager = new RuleManager (account);
 
 			rulemanager.LoadRules ();
 
+			SentimentManager sentimentManager = new SentimentManager (account);
+			sentimentManager.LoadSentiments ();
 
 			LinkedList<AutomatedOrder> backs = new LinkedList<AutomatedOrder> ();
 
@@ -263,7 +272,7 @@ namespace IhildaWallet
 
 
 					if (rule.DetermineMatch (o)) {
-						AutomatedOrder ao = Profiteer.GetBuyBack (o, rule.RefillMod);
+						AutomatedOrder ao = Profiteer.GetBuyBack (o, rule.RefillMod, sentimentManager);
 
 						string markNext = MarkAsCommand.DoNextMark (o.BotMarking, rule.MarkAs);
 						ao.BotMarking = markNext;
@@ -562,7 +571,10 @@ namespace IhildaWallet
 		}
 
 
-
+		private AccountSequenceCache _AccountSequnceCache {
+			get;
+			set;
+		}
 
 	}
 

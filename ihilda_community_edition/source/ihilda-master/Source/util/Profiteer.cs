@@ -59,7 +59,7 @@ namespace IhildaWallet
 			return lst.ToArray ();
 		}
 
-		public static AutomatedOrder GetBuyBack (AutomatedOrder off, ProfitStrategy strategy) {
+		public static AutomatedOrder GetBuyBack (AutomatedOrder off, ProfitStrategy strategy, SentimentManager sentimentManager) {
 
 			if (off == null) {
 				// TODO
@@ -70,8 +70,8 @@ namespace IhildaWallet
 			if (strategy.Speculate > Decimal.One) {
 
 
-				SentimentManager sentimentManager = new SentimentManager (off.Account);
-				sentimentManager.LoadSentiments ();
+			
+
 				string getsCur = off.taker_pays.currency; // opposite is intended
 				string paysCur = off.taker_gets.currency;
 

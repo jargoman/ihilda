@@ -2714,6 +2714,7 @@ drops</property>
             <child>
               <widget class="Gtk.Label" id="label11">
                 <property name="MemberName" />
+                <property name="Visible">False</property>
                 <property name="LabelProp" translatable="yes">&lt;big&gt;&lt;b&gt;&lt;u&gt;Notice&lt;/u&gt;&lt;/b&gt;&lt;/big&gt;</property>
                 <property name="UseMarkup">True</property>
               </widget>
@@ -12422,6 +12423,22 @@ example: USD/CAD</property>
               </packing>
             </child>
             <child>
+              <widget class="Gtk.Button" id="button209">
+                <property name="MemberName" />
+                <property name="Visible">False</property>
+                <property name="CanFocus">True</property>
+                <property name="Type">TextOnly</property>
+                <property name="Label" translatable="yes">Deselect Validated</property>
+                <property name="UseUnderline">True</property>
+              </widget>
+              <packing>
+                <property name="Position">5</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
               <widget class="Gtk.Button" id="analysisbutton">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
@@ -12430,7 +12447,7 @@ example: USD/CAD</property>
                 <property name="UseUnderline">True</property>
               </widget>
               <packing>
-                <property name="Position">5</property>
+                <property name="Position">6</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -12445,7 +12462,7 @@ example: USD/CAD</property>
                 <property name="UseUnderline">True</property>
               </widget>
               <packing>
-                <property name="Position">6</property>
+                <property name="Position">7</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -12460,7 +12477,7 @@ example: USD/CAD</property>
                 <property name="UseUnderline">True</property>
               </widget>
               <packing>
-                <property name="Position">7</property>
+                <property name="Position">8</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -12475,7 +12492,7 @@ example: USD/CAD</property>
                 <property name="UseUnderline">True</property>
               </widget>
               <packing>
-                <property name="Position">8</property>
+                <property name="Position">9</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -13783,6 +13800,7 @@ Bot output screen
                             <child>
                               <widget class="Gtk.CheckButton" id="checkbutton2">
                                 <property name="MemberName" />
+                                <property name="Visible">False</property>
                                 <property name="CanFocus">True</property>
                                 <property name="Label" translatable="yes">Stop When Convenient</property>
                                 <property name="DrawIndicator">True</property>
@@ -14688,7 +14706,7 @@ Note : Orders can be viewed and cancelled with the orders widget</property>
               <widget class="Gtk.Notebook" id="notebook2">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">2</property>
+                <property name="CurrentPage">0</property>
                 <child>
                   <widget class="Gtk.VBox" id="vbox5">
                     <property name="MemberName" />
@@ -14794,6 +14812,32 @@ Note : Orders can be viewed and cancelled with the orders widget</property>
               </widget>
               <packing>
                 <property name="Position">1</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.HBox" id="hbox2">
+                <property name="MemberName" />
+                <property name="Spacing">6</property>
+                <child>
+                  <widget class="Gtk.CheckButton" id="checkbutton1">
+                    <property name="MemberName" />
+                    <property name="CanFocus">True</property>
+                    <property name="Label" translatable="yes">Rememer password for this session</property>
+                    <property name="DrawIndicator">True</property>
+                    <property name="HasLabel">True</property>
+                    <property name="UseUnderline">True</property>
+                  </widget>
+                  <packing>
+                    <property name="Position">0</property>
+                    <property name="AutoSize">True</property>
+                  </packing>
+                </child>
+              </widget>
+              <packing>
+                <property name="Position">2</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -17057,7 +17101,7 @@ Note : Orders can be viewed and cancelled with the orders widget</property>
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
                 <property name="Type">TextOnly</property>
-                <property name="Label" translatable="yes">Proceed to automaded (&lt;span fgcolor="green"&gt;_Buy&lt;/span&gt;) wizard</property>
+                <property name="Label" translatable="yes">Proceed to automated (&lt;span fgcolor="green"&gt;_Buy&lt;/span&gt;) wizard</property>
                 <property name="UseUnderline">True</property>
               </widget>
               <packing>

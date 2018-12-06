@@ -21,6 +21,7 @@ namespace IhildaWallet
 		{
 			this.Account = account;
 			this.SequenceCache = Load (account);
+			this.actualSettingsFileName = account + settingsFileName;
 		}
 
 		public static AccountSequenceCache GetCacheForAccount (string account)
@@ -59,28 +60,30 @@ namespace IhildaWallet
 		public void UpdateOrdersCache (AutomatedOrder order /*, string account*/)
 		{
 
-			lock (lockobj) {
-				if (order == null) {
-					return;
+			Task.Run (delegate {
+				lock (lockobj) {
+					if (order == null) {
+						return;
+					}
+
+					string id = order.Bot_ID;
+					Logging.WriteLog ("Synccache : " + (id ?? "null"));
+
+					Dictionary<string, AutomatedOrder> dict = this.SequenceCache;
+					if (dict == null) {
+						//dict = new Dictionary<string, AutomatedOrder> (orders.Count ());
+						dict = new Dictionary<string, AutomatedOrder> ();
+					} else if (dict.ContainsKey (id)) {
+						return;
+					}
+
+
+					dict.Add (id, order);
+
+
+
 				}
-
-				string id = order.Bot_ID;
-				Logging.WriteLog ("Synccache : " + (id ?? "null"));
-
-				Dictionary<string, AutomatedOrder> dict = this.SequenceCache;
-				if (dict == null) {
-					//dict = new Dictionary<string, AutomatedOrder> (orders.Count ());
-					dict = new Dictionary<string, AutomatedOrder> ();
-				} else if (dict.ContainsKey (id)) {
-					return;
-				}
-
-
-				dict.Add (id, order);
-
-
-
-			}
+			});
 
 
 		}
@@ -120,7 +123,7 @@ namespace IhildaWallet
 
 				if (updated) {
 
-					var settingsPath = FileHelper.GetSettingsPath (Account + settingsFileName);
+					var settingsPath = FileHelper.GetSettingsPath (actualSettingsFileName);
 
 					//ConfStruct confstruct = new ConfStruct( orderDict.Values );
 					ConfStruct confstruct = new ConfStruct (dict.Values);
@@ -163,7 +166,7 @@ namespace IhildaWallet
 
 				IEnumerable<AutomatedOrder> offers = dict.Values;
 
-				var settingsPath = FileHelper.GetSettingsPath (Account + settingsFileName);
+				var settingsPath = FileHelper.GetSettingsPath (actualSettingsFileName);
 
 				//ConfStruct confstruct = new ConfStruct( orderDict.Values );
 				ConfStruct confstruct = new ConfStruct (offers);
@@ -268,79 +271,21 @@ namespace IhildaWallet
 								OnOrderCacheEvent.Invoke (this, cachedEventArgs);
 							}
 							continue;
-						} else {
-
-							Task<Response<string>> seqTask = tx.GetTxFromAccountAndSequenceDataAPI (o.Account, o.Sequence);
-							if (seqTask == null) {
-
-
-								if (OnOrderCacheEvent != null) {
-									string message = "Failed to retrive order with sequence " + o.Sequence.ToString () + " possible network issues\n";
-									OrderCachedEventArgs cachedEventArgs = new OrderCachedEventArgs {
-										GetOrder = o,
-										GetSuccess = false,
-										Message = message
-									};
-
-
-									OnOrderCacheEvent.Invoke (this, cachedEventArgs);
-								}
-
-
-								Thread.Sleep (5000);
-								continue;
-							}
-
-
-							seqTask.Wait (token);
-
-
-							Response<string> response = seqTask.Result;
-							if (response == null) {
-
-								if (OnOrderCacheEvent != null) {
-									string message = "Failed to retrive order with sequence " + o.Sequence.ToString () + " response is null\n";
-									OrderCachedEventArgs cachedEventArgs = new OrderCachedEventArgs {
-										GetOrder = o,
-										GetSuccess = false,
-										Message = message
-									};
-
-
-									OnOrderCacheEvent.Invoke (this, cachedEventArgs);
-								}
-
-
-								Thread.Sleep (5000);
-
-								continue;
-							}
-							string s = response.result;
-							var txstruct = response.transaction;
-							//txstruct.tx.
-							AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (txstruct.tx);
-
-							if (ao == null) {
-								if (OnOrderCacheEvent != null) {
-									string message = "Failed to retrive order with sequence " + o.Sequence.ToString () + " unable to reconstruct order from tx\n";
-									OrderCachedEventArgs cachedEventArgs = new OrderCachedEventArgs {
-										GetOrder = o,
-										GetSuccess = false,
-										Message = message
-									};
-
-
-									OnOrderCacheEvent.Invoke (this, cachedEventArgs);
-								}
-								continue;
-							}
+						}
+						Task<Response<string>> seqTask = tx.GetTxFromAccountAndSequenceDataAPI (o.Account, o.Sequence);
+						if (seqTask == null) {
 
 
 							if (OnOrderCacheEvent != null) {
-								string message = "Caching order with sequence " + o.Sequence.ToString () + "\n";
+								string message = 
+									"Failed to retrive order with sequence " + 
+									o.Sequence.ToString () + 
+									 " possible network issues\n";
+
+
 								OrderCachedEventArgs cachedEventArgs = new OrderCachedEventArgs {
 									GetOrder = o,
-									GetSuccess = true,
+									GetSuccess = false,
 									Message = message
 								};
 
@@ -348,8 +293,70 @@ namespace IhildaWallet
 								OnOrderCacheEvent.Invoke (this, cachedEventArgs);
 							}
 
-							UpdateOrdersCache (ao /*, account */);
+
+							//Thread.Sleep (5000);
+							token.WaitHandle.WaitOne (5000);
+							continue;
 						}
+
+
+						seqTask.Wait (token);
+
+
+						Response<string> response = seqTask.Result;
+						if (response == null) {
+
+							if (OnOrderCacheEvent != null) {
+								string message = "Failed to retrive order with sequence " + o.Sequence.ToString () + " response is null\n";
+								OrderCachedEventArgs cachedEventArgs = new OrderCachedEventArgs {
+									GetOrder = o,
+									GetSuccess = false,
+									Message = message
+								};
+
+
+								OnOrderCacheEvent.Invoke (this, cachedEventArgs);
+							}
+
+
+							Thread.Sleep (5000);
+
+							continue;
+						}
+						string s = response.result;
+						var txstruct = response.transaction;
+						//txstruct.tx.
+						AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (txstruct.tx);
+
+						if (ao == null) {
+							if (OnOrderCacheEvent != null) {
+								string message = "Failed to retrive order with sequence " + o.Sequence.ToString () + " unable to reconstruct order from tx\n";
+								OrderCachedEventArgs cachedEventArgs = new OrderCachedEventArgs {
+									GetOrder = o,
+									GetSuccess = false,
+									Message = message
+								};
+
+
+								OnOrderCacheEvent.Invoke (this, cachedEventArgs);
+							}
+							continue;
+						}
+
+
+						if (OnOrderCacheEvent != null) {
+							string message = "Caching order with sequence " + o.Sequence.ToString () + "\n";
+							OrderCachedEventArgs cachedEventArgs = new OrderCachedEventArgs {
+								GetOrder = o,
+								GetSuccess = true,
+								Message = message
+							};
+
+
+							OnOrderCacheEvent.Invoke (this, cachedEventArgs);
+						}
+
+						UpdateOrdersCache (ao /*, account */);
 
 						if (ordercount++ % 5 == 4) {
 							if (OnOrderCacheEvent != null) {
@@ -526,9 +533,8 @@ namespace IhildaWallet
 				if (offers == null) {
 					return;
 				}
-				var settingsPath = FileHelper.GetSettingsPath (Account + settingsFileName);
+				var settingsPath = FileHelper.GetSettingsPath (actualSettingsFileName);
 
-				//ConfStruct confstruct = new ConfStruct( orderDict.Values );
 				ConfStruct confstruct = new ConfStruct (offers);
 
 				string conf = DynamicJson.Serialize (confstruct);
@@ -542,7 +548,7 @@ namespace IhildaWallet
 		public event EventHandler<OrderCachedEventArgs> OnOrderCacheEvent;
 
 		public const string settingsFileName = "OrderManagementBot.jsn";
-
+		public string actualSettingsFileName = null;
 #if DEBUG
 		public const string clsstr = nameof (OrderManagementBot) + DebugRippleLibSharp.both_parentheses;
 #endif

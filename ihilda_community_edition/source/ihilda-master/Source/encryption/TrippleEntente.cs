@@ -227,7 +227,10 @@ namespace IhildaWallet
 			set;
 		}
 
-
+		public bool RememberPassword {
+			get;
+			set;
+		}
 
 
 

@@ -60,6 +60,8 @@ namespace IhildaWallet
 			te.Suit = v.Item6;
 
 			te.Password = passentry.Text;
+			te.RememberPassword = checkbutton1.Active;
+
 
 			return te;
 
