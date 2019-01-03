@@ -31,16 +31,25 @@ namespace RippleLibSharp.Binary
 
 		public ECDSASignature (byte[] signatureDEREncodedBytes, byte[] signingPubKey)
 		{
-			publicSigningKey = RippleDeterministicKeyGenerator.SECP256k1_PARAMS.Curve.DecodePoint(signingPubKey);
+			RippleDeterministicKeyGenerator generator = new RippleDeterministicKeyGenerator ();
+
+			publicSigningKey = generator.SECP256k1_PARAMS.Curve.DecodePoint(signingPubKey);
 
 
 			Asn1InputStream decoder = new Asn1InputStream(signatureDEREncodedBytes);
 			//LazyDerSequence seq = new LazyDerSequence();
 			//DERse
+
+			decoder.Flush ();
+
+			//var derS = decoder.ReadObject ().GetDerEncoded ();
+
+
+
 			DerSequence seq = (Org.BouncyCastle.Asn1.DerSequence)decoder.ReadObject();
 			//DerInteger r = (DerInteger)seq[0];
 			//DerInteger s = (DerInteger)seq[1]; // try seq[1].ToAsn1Object(); if cast fails
-
+	    		
 			DerInteger rr = (DerInteger)seq [0].ToAsn1Object ();
 			DerInteger ss = (DerInteger)seq [1].ToAsn1Object ();
 				
@@ -55,7 +64,7 @@ namespace RippleLibSharp.Binary
 				DerSequenceGenerator seq = new DerSequenceGenerator(ms);
 				seq.AddObject(new DerInteger(r));
 				seq.AddObject(new DerInteger(s));
-			
+				ms.Flush ();
 				seq.Close();
 
 				return ms.GetBuffer();

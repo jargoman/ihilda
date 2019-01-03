@@ -16,9 +16,6 @@ namespace IhildaWallet
 {
 	public class AutomatedOrder : Offer
 	{
-
-
-
 		public AutomatedOrder ()
 		{
 		}
@@ -37,18 +34,21 @@ namespace IhildaWallet
 		}
 		*/
 
-		public AutomatedOrder (AutomatedOrder o) {
+		public AutomatedOrder (AutomatedOrder o)
+		{
 			SetFromOffer (o);
 			this.Selected = o.Selected;
 			this.BotMarking = o.BotMarking;
 			//this.Bot_ID = o.Bot_ID;
 		}
 
-		public AutomatedOrder ( Offer o ) {
+		public AutomatedOrder (Offer o)
+		{
 			SetFromOffer (o);
 		}
 
-		private void SetFromOffer (Offer o) {
+		private void SetFromOffer (Offer o)
+		{
 
 			if (o == null) {
 				// TODO
@@ -57,8 +57,8 @@ namespace IhildaWallet
 			}
 			this.Account = o.Account;
 
-			this.taker_gets = o.taker_gets.DeepCopy();
-			this.taker_pays = o.taker_pays.DeepCopy();
+			this.taker_gets = o.taker_gets.DeepCopy ();
+			this.taker_pays = o.taker_pays.DeepCopy ();
 
 
 
@@ -83,15 +83,15 @@ namespace IhildaWallet
 			AddMemo (Program.GetClientMemo ());
 		}
 
-		public void AddMemo ( MemoIndice memoIndice)
+		public void AddMemo (MemoIndice memoIndice)
 		{
 
 			if (memoIndice == null) {
 				return;
 			}
 			List<MemoIndice> memos = new List<MemoIndice> ();
-			if ( this.Memos != null ) {
-				memos.AddRange(this.Memos);
+			if (this.Memos != null) {
+				memos.AddRange (this.Memos);
 			}
 
 
@@ -107,7 +107,7 @@ namespace IhildaWallet
 		}
 
 
-		public AutomatedOrder[] Split (int num)
+		public AutomatedOrder [] Split (int num)
 		{
 			if (num < 0) {
 				throw new ArgumentException ();
@@ -115,8 +115,8 @@ namespace IhildaWallet
 			}
 			AutomatedOrder [] orders = new AutomatedOrder [num];
 
-			for (int i = 0; i < num; i++ ) {
-				
+			for (int i = 0; i < num; i++) {
+
 				RippleCurrency gets = null;
 				RippleCurrency pays = null;
 
@@ -151,10 +151,7 @@ namespace IhildaWallet
 			set;
 		}
 
-		public bool Selected {
-			get;
-			set;
-		}
+		public bool Selected { get; set; }
 
 		public bool Filled {
 			get;
@@ -162,6 +159,11 @@ namespace IhildaWallet
 		}
 
 		public string BotMarking {
+			get;
+			set;
+		}
+
+		public OrderSubmittedEventArgs SubmittedEventArgs {
 			get;
 			set;
 		}
@@ -181,14 +183,12 @@ namespace IhildaWallet
 			set;
 		}
 
-		public bool IsValidated
+		//public bool IsValidated { get; set; }
+
+		public volatile bool IsValidated = false;
+
+		public static AutomatedOrder ReconstructFromNode (RippleNode node)
 		{
-			get;
-			set;
-		}
-
-
-		public static AutomatedOrder ReconstructFromNode (RippleNode node) {
 
 
 			/*
@@ -201,7 +201,7 @@ namespace IhildaWallet
 			}
 			*/
 
-			if ( node.nodeType == BinaryFieldType.CreatedNode) {
+			if (node.nodeType == BinaryFieldType.CreatedNode) {
 				return ReconstructFromCreatedNode (node);
 			}
 
@@ -218,7 +218,8 @@ namespace IhildaWallet
 		}
 
 
-		private static AutomatedOrder ReconsctructFromModifiedNode (RippleNode node) {
+		private static AutomatedOrder ReconsctructFromModifiedNode (RippleNode node)
+		{
 			AutomatedOrder o = new AutomatedOrder {
 				Account = node.FinalFields.Account,
 				TakerGets = node.FinalFields.TakerGets,
@@ -248,7 +249,8 @@ namespace IhildaWallet
 			return o;
 		}
 
-		private static AutomatedOrder ReconstructFromCreatedNode (RippleNode node) {
+		private static AutomatedOrder ReconstructFromCreatedNode (RippleNode node)
+		{
 			if (node == null) {
 				return null;
 			}
@@ -295,7 +297,8 @@ namespace IhildaWallet
 		}
 
 
-		public static AutomatedOrder ReconsctructFromTransaction ( RippleTransaction tx ) {
+		public static AutomatedOrder ReconsctructFromTransaction (RippleTransaction tx)
+		{
 
 			if (tx == null) {
 				return null;
@@ -304,7 +307,7 @@ namespace IhildaWallet
 
 			if (tx.Memos != null) {
 				mems = from MemoIndice memo in tx.Memos where memo.GetMemoTypeAscii () == "ihildamark" select memo;
-			}                    
+			}
 			MemoIndice memoIndice = mems?.FirstOrDefault ();
 
 			string mark = memoIndice?.GetMemoDataAscii ();
@@ -319,7 +322,7 @@ namespace IhildaWallet
 				LedgerEntryType = "OfferCreate", // TODO verify correct
 				Sequence = tx.Sequence,
 				//BotMarking = mark
-				             
+
 			};
 
 			if (mark != null) {
@@ -362,20 +365,22 @@ namespace IhildaWallet
 			return ao;
 		}
 
-		public static IEnumerable<AutomatedOrder> ConvertFromIEnumerableOrder ( IEnumerable<Offer> input ) {
+		public static IEnumerable<AutomatedOrder> ConvertFromIEnumerableOrder (IEnumerable<Offer> input)
+		{
 			if (input == null) {
 				return null;
 			}
-				
 
 
 
+			/*
 			List<AutomatedOrder> list = new List<AutomatedOrder> ();
 
 			foreach (Offer o in input) {
-				list.Add (new AutomatedOrder(o));
+				list.Add (new AutomatedOrder (o));
 			}
-
+	    		*/
+			var list = input.Select ((arg) => new AutomatedOrder (arg));
 			//IEnumerable<AutomatedOrder> ret = list;
 
 			return list;

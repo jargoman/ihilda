@@ -122,7 +122,7 @@ namespace IhildaWallet
 			if (pagerwidget1 == null) {
 				pagerwidget1 = new PagerWidget ();
 				pagerwidget1.Show ();
-				vbox3.PackEnd (pagerwidget1, false, false,1);
+				vbox3.PackEnd (pagerwidget1, false, false, 1);
 				//vbox3.Add (pagerwidget1);
 			}
 
@@ -288,12 +288,12 @@ namespace IhildaWallet
 				//this.spinwait.ShowAll();
 
 				SubscribeParam sp = new SubscribeParam (
-					ra.ToString (), 
+					ra.ToString (),
 					0,
 					token
 				);
 
-				ParameterizedThreadStart pst = 
+				ParameterizedThreadStart pst =
 					new ParameterizedThreadStart (Subscribe);
 
 				Thread thr = new Thread (pst);
@@ -305,7 +305,7 @@ namespace IhildaWallet
 
 
 			button3329.Clicked += (object sender, EventArgs e) => {
-				Cancel ();	
+				Cancel ();
 			};
 		}
 
@@ -395,6 +395,12 @@ namespace IhildaWallet
 
 				if (ni == null) {
 					NetworkController.DoNetworkingDialogNonGUIThread ();
+					Gtk.Application.Invoke (
+						delegate {
+							infoBarLabel.Text = "<span>Network Error</span>";
+							infoBarLabel.Show ();
+						}
+					);
 					return;
 				}
 
@@ -411,7 +417,7 @@ namespace IhildaWallet
 				int? limit = ledgerconstraintswidget3.GetLimit ();
 				bool? b = ledgerconstraintswidget3.GetForward ();
 
-				if (string.IsNullOrWhiteSpace(  min?.ToString() ) && string.IsNullOrWhiteSpace( max?.ToString() ) && string.IsNullOrWhiteSpace(limit?.ToString())) {
+				if (string.IsNullOrWhiteSpace (min?.ToString ()) && string.IsNullOrWhiteSpace (max?.ToString ()) && string.IsNullOrWhiteSpace (limit?.ToString ())) {
 
 
 					string question = "Without a ledger constraint your request will download full transaction history. This may take a very long time for accounts that have a long transaction history. Consider setting a limit.\n  example limit 100\n Are you sure you'd like to continue without a ledger constraint?";
@@ -426,7 +432,7 @@ namespace IhildaWallet
 					return;
 				}
 
-				if (string.IsNullOrWhiteSpace(min?.ToString())) {
+				if (string.IsNullOrWhiteSpace (min?.ToString ())) {
 					min = null;
 				}
 
@@ -434,25 +440,55 @@ namespace IhildaWallet
 					max = null;
 				}
 
-				if (string.IsNullOrWhiteSpace(limit?.ToString())) {
+				if (string.IsNullOrWhiteSpace (limit?.ToString ())) {
 					limit = null;
 				}
 
-				Task< IEnumerable <Response<AccountTxResult>>> tsk = null;
+				Task<IEnumerable<Response<AccountTxResult>>> tsk = null;
 
 
 
 				if (limit != null) {
 					int lim = (int)limit;
-					tsk = AccountTx.GetFullTxResult (
+
+					if (limit > 400) {
+						tsk = AccountTx.GetFullTxResult (
+								para.address,
+								min?.ToString () ?? (-1).ToString (),
+								max?.ToString () ?? (-1).ToString (),
+								lim,
+
+								ni,
+							token
+						);
+					} else {
+
+						Task<Response<AccountTxResult>> tas = AccountTx.GetResult (
 							para.address,
 							min?.ToString () ?? (-1).ToString (),
 							max?.ToString () ?? (-1).ToString (),
 							lim,
-							
+			    				b ?? false,
 							ni,
-						token
-					);
+							token
+			    			);
+
+						while (!token.IsCancellationRequested && !tas.IsCompleted && !tas.IsFaulted) {
+							tas.Wait (250, token);
+							Gtk.Application.Invoke (
+								delegate {
+									progressbar2.Pulse ();
+
+								}
+							);
+						}
+						var v = tas.Result.result.transactions;
+
+						if (v != null) {
+							SetTransactions (v, para.address);
+						}
+						return;
+					}
 				} else {
 					tsk = AccountTx.GetFullTxResult (
 						para.address,
@@ -464,7 +500,7 @@ namespace IhildaWallet
 					);
 				}
 
-				while (!token.IsCancellationRequested && !tsk.IsCompleted) {
+				while (!token.IsCancellationRequested && !tsk.IsCompleted && !tsk.IsFaulted) {
 					tsk.Wait (250, token);
 					Gtk.Application.Invoke (
 						delegate {
@@ -475,25 +511,48 @@ namespace IhildaWallet
 				}
 
 
-				IEnumerable <Response<AccountTxResult>> results = tsk.Result;
+				IEnumerable<Response<AccountTxResult>> results = tsk.Result;
 
 				if (results == null) {
+					Gtk.Application.Invoke (
+						delegate {
+							infoBarLabel.Text = "Failed to retrieve transactions for account " + para.address;
+							infoBarLabel.Visible = true;
+
+						}
+					);
 					return;
 				}
 
-
+				/*
 				List<RippleTxStructure> transactions = new List<RippleTxStructure> ();
 				foreach (Response<AccountTxResult> res in results) {
-					AccountTxResult txr = res.result;
+					AccountTxResult txr = res?.result;
 					if (txr == null || txr.transactions == null) {
-						return;
+						Gtk.Application.Invoke (
+							delegate {
+								infoBarLabel.Text = "Error retrieving transactions for account " + para.address + ". History may be incomplete";
+								infoBarLabel.Visible = true;
+							}
+						);
+						continue;
 					}
 
 					transactions.AddRange (txr.transactions);
 
+				} */
+
+
+				IEnumerable<RippleTxStructure> transactions = results
+					.Where((Response<AccountTxResult> arg) =>  (arg?.result?.transactions != null))
+					.SelectMany( (Response<AccountTxResult> arg) => { return arg.result.transactions; } );
+
+				if (b != true) {
+					transactions.Reverse ();
 				}
 
 				SetTransactions (transactions, para.address);
+
 			} catch (Exception e) {
 
 #if DEBUG
@@ -511,9 +570,9 @@ namespace IhildaWallet
 		private void DoFullSync (string account, NetworkInterface ni, CancellationToken token)
 		{
 #if DEBUG
-			string method_sig = 
-				clsstr + 
-				nameof (DoFullSync) + 
+			string method_sig =
+				clsstr +
+				nameof (DoFullSync) +
 				DebugRippleLibSharp.both_parentheses;
 #endif
 
@@ -561,8 +620,14 @@ namespace IhildaWallet
 					return;
 				}
 
-				IEnumerable<RippleTxStructure> ie = res.AsParallel ().AsOrdered ().SelectMany (x => x.result.transactions).AsSequential ();
+				IEnumerable<RippleTxStructure> ie = res
+				//.AsParallel ()
+				//.AsOrdered ()
+				.Where (x => x?.result?.transactions != null)
+				.SelectMany (x => x.result.transactions);
+				//.AsSequential ();
 				this.SetTransactions (ie, account);
+
 				/*
 				List <RippleTxStructure> list = new List<RippleTxStructure>();
 
@@ -579,6 +644,7 @@ namespace IhildaWallet
 
 				this.setTransactions(list.AsEnumerable(), account);
 				*/
+
 				Gtk.Application.Invoke (
 					delegate {
 						this.pagerwidget1.first.Activate (); // causes UI
@@ -632,7 +698,7 @@ namespace IhildaWallet
 
 				(object sender, EventArgs e) => {
 					SpinWaitObj.Hide ();
-
+					progressbar2.Fraction = 0;
 					this.ledgerconstraintswidget3.HideTopRow ();
 					button3329.Visible = false;
 				}
@@ -687,11 +753,73 @@ namespace IhildaWallet
 
 
 
-			LinkedList<TxSummary> reports = new LinkedList<TxSummary> ();
+			IEnumerable<TxSummary> reports = 
+			txstructureArray.Select((RippleTxStructure txresult, int arg2) => {
 
-			var list = from RippleTxStructure t in txstructureArray where t != null select t;
+				Tuple<string, string> rps = txresult.GetReport (account);
+
+
+
+				TxSummary txsummary = new TxSummary {
+					RawJSON = txresult?.RawJSON,
+
+					Tx_Type = txresult?.tx?.TransactionType?.ToString ()
+				};
+
+
+				AutomatedOrder automatedOrder = null;
+				string offercreatesummation = "";
+				if (txsummary.Tx_Type != null && txsummary.Tx_Type.Equals ("OfferCreate")) {
+
+					RippleNode node = txresult.meta.GetFilledImmediate (account);
+
+					if (node != null) {
+
+						automatedOrder = AutomatedOrder.ReconstructFromNode (node);
+					}
+
+					if (automatedOrder == null) {
+
+						offercreatesummation = "offer filled completely";
+					}
+
+
+
+				}
+
+				uint? dte = txresult?.tx.date;
+				txsummary.Time = dte == null ? 0 : (UInt32)dte;
+
+				txsummary.Tx_id = txresult?.tx?.hash;
+
+				if (rps != null) {
+					txsummary.Tx_Summary_Buy = rps?.Item1 ?? "";
+					txsummary.Tx_Summary_Sell = rps?.Item2 ?? "";
+				}
+
+				txsummary.Tx_Summary_Buy += offercreatesummation;
+				txsummary.Tx_Summary_Sell += offercreatesummation;
+
+
+				Tuple<string, string> orderDescriptionList = txresult.meta.GetChangeDescription (account);
+				Tuple<string, string> canceledDescriptionList = txresult.meta.GetCancelDescription (account);
+
+				txsummary.Meta_Summary_Buy += orderDescriptionList.Item1;
+				txsummary.Meta_Summary_Sell += orderDescriptionList.Item2;
+
+				txsummary.Meta_Summary_Buy += canceledDescriptionList.Item1;
+				txsummary.Meta_Summary_Sell += canceledDescriptionList.Item2;
+
+				IEnumerable<OrderChange> oc = txresult.meta.GetOrderChanges (account);
+				txsummary.Changes = oc.ToArray ();
+
+				//reports.AddLast (txsummary);
+				return txsummary;
+			});
 			//list = list.a
-			foreach (RippleTxStructure txresult in list) {
+
+			/*
+			foreach (RippleTxStructure txresult in txstructureArray) {
 
 				Tuple<string, string> rps = txresult.GetReport (account);
 
@@ -753,11 +881,11 @@ namespace IhildaWallet
 				reports.AddLast (txsummary);
 
 			}
-
+	    		*/
 			cache.Set (reports.ToArray ());
 			int x = cache.GetNumPages;
 			this.pagerwidget1.SetNumberOfPages (x);
-			Task.Run ((System.Action)FirstClicked);
+			Task.Run ( (System.Action)FirstClicked );
 
 
 		}
@@ -765,7 +893,7 @@ namespace IhildaWallet
 		public void SetRippleWallet (RippleWallet rippleWallet)
 		{
 
-			AccountEntry.Entry.Text = rippleWallet.GetStoredReceiveAddress()?.ToString () ?? "";
+			AccountEntry.Entry.Text = rippleWallet.GetStoredReceiveAddress ()?.ToString () ?? "";
 
 			this.ClearGui ();
 			//this.subscribe(ra, 10);
@@ -783,7 +911,7 @@ namespace IhildaWallet
 			}
 #endif
 			SetGui (cache.GetfirstCache ());
-			pagerwidget1.SetCurrentPage (cache.GetFirst());
+			pagerwidget1.SetCurrentPage (cache.GetFirst ());
 			cache.SetFirst ();
 
 			cache.Preload ();
@@ -806,7 +934,7 @@ namespace IhildaWallet
 		public void PreviousClicked ()
 		{
 #if DEBUG
-			string method_sig = clsstr + nameof(PreviousClicked) + DebugRippleLibSharp.both_parentheses;
+			string method_sig = clsstr + nameof (PreviousClicked) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.TxViewWidget) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
@@ -829,7 +957,7 @@ namespace IhildaWallet
 		public void NextClicked ()
 		{
 #if DEBUG
-			string method_sig = clsstr + nameof(NextClicked) + DebugRippleLibSharp.right_parentheses;
+			string method_sig = clsstr + nameof (NextClicked) + DebugRippleLibSharp.right_parentheses;
 			if (DebugIhildaWallet.TxViewWidget) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
@@ -883,14 +1011,14 @@ namespace IhildaWallet
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
 #endif
-		
+
 			ClearGui ();
 
 			if (txr == null) {
 				return;
 			}
 
-			Gtk.Application.Invoke ( (object sender, EventArgs e) => {
+			Gtk.Application.Invoke ((object sender, EventArgs e) => {
 
 
 

@@ -78,6 +78,18 @@ namespace IhildaWallet
 			}
 
 			RippleIdentifier rsa = rw.GetDecryptedSeed ();
+			while (rsa.GetHumanReadableIdentifier () == null) {
+				bool should = AreYouSure.AskQuestion (
+				"Invalid password",
+				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+				);
+
+				if (!should) {
+					return;
+				}
+
+				rsa = rw.GetDecryptedSeed ();
+			}
 
 
 			NetworkInterface ni = NetworkController.CurrentInterface;

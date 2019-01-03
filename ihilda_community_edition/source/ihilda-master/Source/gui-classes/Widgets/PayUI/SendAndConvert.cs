@@ -655,7 +655,7 @@ namespace IhildaWallet
 
 
 
-					List<String> lis = AccountLines.GetIssuersForCurrency (cur, address, ni, token);
+					IEnumerable<String> lis = AccountLines.GetIssuersForCurrency (cur, address, ni, token);
 
 					manualResetEvent.Reset ();
 					Application.Invoke ((object sender, EventArgs e) => {

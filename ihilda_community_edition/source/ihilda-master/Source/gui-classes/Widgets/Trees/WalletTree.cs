@@ -1,9 +1,7 @@
 using System;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Linq;
 using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 using Gtk;
 using RippleLibSharp.Util;
 
@@ -31,9 +29,9 @@ namespace IhildaWallet
 			}
 #endif
 
-			this.treeview2.HoverSelection = true;
+			this.treeview2.HoverSelection = false;
 
-
+			//this.treeview2.sel
 
 
 			store = new ListStore (
@@ -110,8 +108,11 @@ namespace IhildaWallet
 					}
 					*/
 					if (args.Event.Button == 3) {
-
-						RunNoWalletPopup ();
+						if (selectedRippleWallet != null) {
+							RunWalletSelectedPopup ();
+						} else {
+							RunNoWalletPopup ();
+						}
 					}
 
 					goto GUI;
@@ -129,34 +130,46 @@ namespace IhildaWallet
 					//return;
 				}
 				*/
-
+				/*
 				if (!hoveredRippleWallet.WalletName.Equals (selectedRippleWallet?.WalletName)) {
 					goto GUI;
 					//return;
 				}
+				*/
 
 				if (selectedRippleWallet != null) {
 					selectedRippleWallet.Notification = "";
+					WalletManagerWidget.currentInstance.SetQRandWalletAddress (selectedRippleWallet);
 
+
+					Logging.WriteConsole ("Selected Wallet " + (selectedRippleWallet?.GetStoredReceiveAddress () ?? "null") + " \n\n");
+				} else {
+					hoveredRippleWallet.Notification = "";
+					WalletManagerWidget.currentInstance.SetQRandWalletAddress (hoveredRippleWallet);
 				}
 
 				//WalletManager.SetRippleWallet( selectedRippleWallet );
-				WalletManagerWidget.currentInstance.SetQRandWalletAddress ( selectedRippleWallet );
-
-
-				Logging.WriteConsole ("Selected Wallet " + (selectedRippleWallet?.GetStoredReceiveAddress () ?? "null") + " \n\n");
+				
 
 				if (args.Event.Button == 3) {
-					Logging.WriteLog ("Right click \n");
 
+#if DEBUG
+					if (DebugIhildaWallet.WalletTree) {
+						Logging.WriteLog ("Right click \n");
+					}
+#endif
 					RunWalletSelectedPopup ();
 
 					//args.Event.
 				}
 
 				if (args.Event.Button == 1) {
-					Logging.WriteLog ("args.Event.Button == 1\n");
 
+#if DEBUG
+					if (DebugIhildaWallet.WalletTree) {
+						Logging.WriteLog ("args.Event.Button == 1\n");
+					}
+#endif
 				}
 
 
@@ -605,13 +618,15 @@ namespace IhildaWallet
 					string notification = rw?.Notification;
 					if (rw?.AccountType == RippleWalletTypeEnum.Master || rw?.AccountType == RippleWalletTypeEnum.MasterPrivateKey) {
 						sb.Append ("<span ");
+
+						/*
 						if (b) {
 							if (!Program.darkmode) {
 								sb.Append ("bgcolor=\"lavender\"");
 							} else {
 								sb.Append ("bgcolor=\"black\"");
 							}
-						}
+						} */
 
 						if (!Program.darkmode) {
 							sb.Append ("fgcolor=\"green\"><big>");
@@ -654,11 +669,14 @@ namespace IhildaWallet
 					if (rw?.AccountType == RippleWalletTypeEnum.Regular) {
 						sb.Append ("<span ");
 						if (b) {
+
+							/*
 							if (!Program.darkmode) {
 								sb.Append ("bgcolor=\"lavender\"");
 							} else {
 								sb.Append ("bgcolor=\"black\"");
 							}
+							*/		    
 						}
 
 						if (Program.darkmode) {
@@ -676,11 +694,14 @@ namespace IhildaWallet
 						sb.AppendLine ();
 						sb.Append ("<span ");
 						if (b) {
+
+							/*
 							if (!Program.darkmode) {
 								sb.Append ("bgcolor=\"antiquewhite\"");
 							} else {
 								sb.Append ("bgcolor=\"black\"");
 							}
+							*/		    
 						}
 
 						sb.Append ("fgcolor=\"grey\">");
@@ -714,14 +735,13 @@ namespace IhildaWallet
 					string name = rw?.WalletName ?? "";
 					if (b) {
 						if (Program.darkmode) {
-							name = "<span fgcolor=\"chartreuse\" bgcolor=\"black\"><b><u>" + name + "</u></b></span>";
+							name = "<span fgcolor=\"chartreuse\" ><b><u>" + name + "</u></b></span>";
 						} else {
-							name = "<span fgcolor=\"green\" bgcolor=\"lavender\"><b><u>" + name + "</u></b></span>";
+							name = "<span fgcolor=\"green\" ><b><u>" + name + "</u></b></span>";
 						}
 					}
 					store.AppendValues (
 						b,
-
 						name,
 						stringBuilder.ToString(),
 						sb?.ToString () ?? ""
@@ -748,7 +768,7 @@ namespace IhildaWallet
 
 		public void ClearValues ()
 		{
-			Application.Invoke ((sender, e) => store.Clear ()
+			Application.Invoke ((sender, e) => store?.Clear ()
 			);
 			//treeview2.Model = store;
 			//setValues(new RippleWallet[0]);  // an array of length zero
@@ -848,14 +868,20 @@ namespace IhildaWallet
 
 			int c = val.Length;
 
-			string sp1 = "<span fgcolor=\"green\" bgcolor=\"lavender\"><b><u>";
+			string sp1 = "<span fgcolor=\"green\" ><b><u>";
 			string sp2 = "</u></b></span>";
 
+			string sp3 ="<span fgcolor=\"chartreuse\" ><b><u>";
 
 			if (val.Contains(sp1)) {
 				val = val.Remove (c - sp2.Length);
 				val = val.Remove (0, sp1.Length);
 
+			}
+
+			if (val.Contains(sp3)) {
+				val = val.Remove (c - sp2.Length);
+				val = val.Remove (0, sp3.Length);
 			}
 
 			RippleWallet rw = WalletManager.currentInstance.LookUp (val);

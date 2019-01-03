@@ -47,7 +47,15 @@ namespace RippleLibSharp.Keys
 		public RipplePrivateKey GetPrivateKey (int accountNumber)
 		{
 #if DEBUG
-			string method_sig = clsstr + nameof (GetPrivateKey) + DebugRippleLibSharp.left_parentheses + nameof (accountNumber) + DebugRippleLibSharp.equals + DebugRippleLibSharp.AssertAllowInsecure (accountNumber) + DebugRippleLibSharp.right_parentheses;
+			string method_sig = 
+				clsstr + 
+				nameof (GetPrivateKey) + 
+				DebugRippleLibSharp.left_parentheses + 
+				nameof (accountNumber) + 
+				DebugRippleLibSharp.equals + 
+				DebugRippleLibSharp.AssertAllowInsecure (accountNumber) + 
+				DebugRippleLibSharp.right_parentheses;
+
 			if (DebugRippleLibSharp.RippleSeedAddress) {
 				Logging.WriteLog (  method_sig + DebugRippleLibSharp.beginn);
 			}
@@ -61,7 +69,7 @@ namespace RippleLibSharp.Keys
 				privateKeyCache = signingPrivateKey;
 			}
 
-			privateKeyCache.GetPublicKey ();
+			//privateKeyCache.GetPublicKey ();
 			return privateKeyCache;
 		}
 

@@ -81,8 +81,9 @@ namespace IhildaWallet
 		}
 		*/
 
+			/*
 		private Offer[] Condense ( Offer[] offers ) {
-			LinkedList<Offer> r = new LinkedList<Offer> ();
+			List<Offer> r = new List<Offer> ();
 
 			for (int i = 0; i < offers.Length; i++) {
 				Offer o = offers [i].Copy ();
@@ -98,7 +99,7 @@ namespace IhildaWallet
 						continue;
 					}
 
-					r.AddLast (o);
+					r.Add (o);
 				}
 
 			}
@@ -108,6 +109,8 @@ namespace IhildaWallet
 			return rr;
 
 		}
+		
+		*/
 
 	}
 }

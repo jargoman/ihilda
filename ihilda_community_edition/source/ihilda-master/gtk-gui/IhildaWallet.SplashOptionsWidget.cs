@@ -82,7 +82,7 @@ namespace IhildaWallet
 			// Container child table1.Gtk.Table+TableChild
 			this.label4 = new global::Gtk.Label();
 			this.label4.Name = "label4";
-			this.label4.LabelProp = global::Mono.Unix.Catalog.GetString("Splah image height");
+			this.label4.LabelProp = global::Mono.Unix.Catalog.GetString("Splash image height");
 			this.table1.Add(this.label4);
 			global::Gtk.Table.TableChild w5 = ((global::Gtk.Table.TableChild)(this.table1[this.label4]));
 			w5.TopAttach = ((uint)(2));

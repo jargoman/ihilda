@@ -36,7 +36,7 @@ namespace IhildaWallet
 
 			//this.textview2.Buffer.Text = message;
 
-			this.label1.Text = message;
+			this.label1.Markup = message;
 
 			//this.label1.Markup = message;
 			this.label1.UseMarkup = true;

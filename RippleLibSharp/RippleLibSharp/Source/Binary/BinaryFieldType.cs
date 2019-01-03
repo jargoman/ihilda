@@ -1,5 +1,6 @@
 
 using System;
+using System.Linq;
 using System.Collections;
 using RippleLibSharp.Util;
 
@@ -763,9 +764,13 @@ namespace RippleLibSharp.Binary
 
 		static BinaryFieldType ()
 		{
+			/*
 			foreach (BinaryFieldType f in GetValues()) {
 				MAXBYTEVALUE = Math.Max(MAXBYTEVALUE, f.value);
 			}
+			*/    
+
+	    		MAXBYTEVALUE = GetValues ().Max((arg) => arg.value);
 
 			MAXBYTEVALUE++;
 

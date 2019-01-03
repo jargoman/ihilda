@@ -30,9 +30,11 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 1;
+			this.notebook1.CurrentPage = 0;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.debugtreewidget1 = null;
+			this.debugtreewidget1 = new global::IhildaWallet.DebugTreeWidget();
+			this.debugtreewidget1.Events = ((global::Gdk.EventMask)(256));
+			this.debugtreewidget1.Name = "debugtreewidget1";
 			this.notebook1.Add(this.debugtreewidget1);
 			// Notebook tab
 			this.label1 = new global::Gtk.Label();
@@ -41,7 +43,9 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.debugtreewidget1, this.label1);
 			this.label1.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.debuglibrarywidget1 = null;
+			this.debuglibrarywidget1 = new global::IhildaWallet.DebugLibraryWidget();
+			this.debuglibrarywidget1.Events = ((global::Gdk.EventMask)(256));
+			this.debuglibrarywidget1.Name = "debuglibrarywidget1";
 			this.notebook1.Add(this.debuglibrarywidget1);
 			global::Gtk.Notebook.NotebookChild w3 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.debuglibrarywidget1]));
 			w3.Position = 1;

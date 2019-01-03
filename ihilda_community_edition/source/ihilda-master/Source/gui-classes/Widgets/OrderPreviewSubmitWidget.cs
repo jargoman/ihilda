@@ -119,7 +119,7 @@ namespace IhildaWallet
 			this.marketbutton.Clicked += Marketbutton_Clicked;
 			this.resetbutton.Clicked += Button197_Clicked;
 			this.selectbutton.Clicked += Selectbutton_Clicked;
-
+			this.button625.Clicked += Combine_Clicked;
 
 
 			this.treeview1.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
@@ -165,20 +165,126 @@ namespace IhildaWallet
 
 			button209.Clicked += (object sender, EventArgs e) => {
 
+				/*
 				foreach (AutomatedOrder offer in _offers) {
 					if (offer.IsValidated) {
 
 						offer.Selected = false;
 
 					}
-				}
+				} 
+				*/
+				
+				var offs = _offers.Select ((arg) => {
+					if (arg.IsValidated) {
 
-				SetOffers (_offers);
+						arg.Selected = false;
+
+					}
+					return arg; });
+				SetOffers (offs);
+
 			};
+
+			progressbar3.PulseStep = 0.5;
 
 		}
 
+		private void Combine_Clicked (object sender, EventArgs e)
+		{
 
+			List<AutomatedOrder> orders = new List<AutomatedOrder> ();
+
+			string getslastCur = null;
+			string getslastIssuer = null;
+			string payslastCur = null;
+			string payslastIssuer = null;
+
+			string lastMark = null;
+
+			Decimal getsAmount = Decimal.Zero;
+			Decimal paysAmount = Decimal.Zero;
+
+			bool allSame = true;
+			int numSelected = 0;
+			foreach (AutomatedOrder ao in _offers) {
+				if (ao.Selected) {
+					numSelected++;
+					if (getslastCur != null && !getslastCur.Equals (ao.taker_gets.currency)) {
+						allSame = false;
+						break;
+					}
+
+					if (getslastIssuer != null && !getslastIssuer.Equals (ao.taker_gets.issuer))  {
+						allSame = false;
+						break;
+					}
+
+					if (payslastCur != null && !payslastCur.Equals (ao.taker_pays.currency)) {
+						allSame = false;
+						break;
+					}
+
+					if (payslastIssuer != null && !payslastIssuer.Equals (ao.taker_pays.issuer)) {
+						allSame = false;
+						break;
+					}
+
+					if (lastMark != null && !lastMark.Equals (ao.BotMarking)) {
+						allSame = false;
+						break;
+					}
+					getslastCur = ao.taker_gets.currency;
+					getslastIssuer = ao.taker_gets.issuer;
+
+					payslastCur = ao.taker_pays.currency;
+					payslastIssuer = ao.taker_pays.issuer;
+
+					lastMark = ao.BotMarking;
+
+					getsAmount += ao.taker_gets.amount;
+					paysAmount += ao.taker_pays.amount;
+				} else {
+					orders.Add (new AutomatedOrder(ao));
+				}
+
+			}
+
+			if (numSelected < 2) {
+				MessageDialog.ShowMessage (
+				"Invalid selection",
+				"You must select two or more like orders to combine"	);
+				return;
+			}
+
+			if (!allSame) {
+				MessageDialog.ShowMessage (
+				"Non matching", 
+				"To combine two or more orders they must match.\nI.e Both counter and base must be the same currency and issuer. Same bot marking");
+				return;
+			}
+
+			RippleCurrency gets = 
+			(getslastCur == "XRP") 
+				? new RippleCurrency (getsAmount) 
+	    			: new RippleCurrency (getsAmount, getslastIssuer, getslastCur);
+
+			RippleCurrency pays =
+				(payslastCur == "XRP")
+				? new RippleCurrency (paysAmount)
+				: new RippleCurrency (paysAmount, payslastIssuer, payslastCur);
+
+			AutomatedOrder automatedOrder = new AutomatedOrder {
+				Account = walletswitchwidget1.GetRippleWallet ().GetStoredReceiveAddress(),
+				taker_gets = gets,
+				taker_pays = pays,
+				BotMarking = lastMark
+			};
+
+			orders.Add (automatedOrder);
+
+			this.SetOffers (orders);
+		}
 
 		void Selectbutton_Clicked (object sender, EventArgs e)
 		{
@@ -192,17 +298,29 @@ namespace IhildaWallet
 				}
 			}
 
+	    		/*
 			foreach (AutomatedOrder ao in _offers) {
 				ao.Selected = !allselected;
 			}
+			*/    
 
-			this.SetOffers (_offers);
+
+	    		var delayed = _offers.Select ((AutomatedOrder arg) => { arg.Selected = !allselected; return arg; });
+			this.SetOffers (delayed);
 
 		}
 
 		void Button197_Clicked (object sender, EventArgs e)
 		{
-			this.SetOffers (_default_offers);
+
+			List<AutomatedOrder> list = new List<AutomatedOrder> ();
+
+			foreach (AutomatedOrder order in _default_offers) {
+				list.Add (new AutomatedOrder (order));
+
+			}
+
+			this.SetOffers (list.ToArray());
 		}
 
 
@@ -272,6 +390,20 @@ namespace IhildaWallet
 
 
 			RippleIdentifier rsa = rw.GetDecryptedSeed ();
+			while (rsa.GetHumanReadableIdentifier () == null) {
+				bool should = AreYouSure.AskQuestion (
+				"Invalid password",
+				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+				);
+
+				if (!should) {
+					return;
+				}
+
+				rsa = rw.GetDecryptedSeed ();
+			}
+
+
 
 			SignOptions opts = LoadSignOptions (token);
 
@@ -298,7 +430,7 @@ namespace IhildaWallet
 #endif
 
 
-
+				
 
 
 			};
@@ -618,13 +750,19 @@ namespace IhildaWallet
 
 		void Removebutton_Clicked (object sender, EventArgs e)
 		{
-
+			/*
 			LinkedList<AutomatedOrder> orders = new LinkedList<AutomatedOrder> ();
 			foreach (AutomatedOrder ao in _offers) {
 				if (!ao.Selected) {
 					orders.AddLast (ao);
 				}
 			}
+	    		*/
+
+			if (_offers == null) {
+				return;
+			}
+			var orders = from off in _offers where !off.Selected select off;
 
 			this.SetOffers (orders.ToArray ());
 
@@ -720,29 +858,45 @@ namespace IhildaWallet
 					paysString.Append (o.TakerPays.issuer);
 				}
 
+
+				bool selected = o.Selected;
+				string num = (i + 1).ToString ();
+				string pay = paysString.ToString ();
+				string get = getsString.ToString ();
+				string priceStr = priceString.ToString ();
+				string marking = o.BotMarking?.ToString ();
+				
 				if (!o.IsValidated) {
-					Liststore.AppendValues (
-						o.Selected,
-						(i + 1).ToString (),
 
-						paysString.ToString (),
-						getsString.ToString (),
-						priceString.ToString (),
-						//cost.ToString (),
-						o.BotMarking?.ToString ()
+					Gtk.Application.Invoke ( delegate {
+
+						Liststore.AppendValues (
+							selected,
+							num,
+
+							pay,
+							get,
+							priceStr,
+							//cost.ToString (),
+							marking
 
 
-					);
+						);
+					});
+
 				} else {
-					Liststore.AppendValues (
-						o.Selected,
-						(i + 1).ToString (),
-						paysString.ToString (),
-						getsString.ToString (),
-						priceString.ToString (),
-						o.BotMarking?.ToString (), // ?? ""  // should we add the null check?
-						"Validated"
-					);
+
+					Gtk.Application.Invoke (delegate {
+						Liststore.AppendValues (
+							selected,
+							num,
+							pay,
+							get,
+							priceStr,
+							marking, // ?? ""  // should we add the null check?
+							"Validated"
+						);
+					});
 				}
 
 				//o.selected = true;
@@ -961,13 +1115,17 @@ namespace IhildaWallet
 			stringBuilder.Append ((index + 1).ToString ());
 			stringBuilder.Append ("</b>");
 
-			stringBuilder.Append (DebugRippleLibSharp.colon);
+			stringBuilder.Append (" : ");
 
 			string txAtIndexStr =  stringBuilder.ToString();
 
 			stringBuilder.Clear ();
+			if (Program.darkmode) {
+				stringBuilder.Append ("< span fgcolor = \"chartreuse\" > Submitting");
+			} else {
+				stringBuilder.Append ("<span fgcolor=\"green\">Submitting ");
+			}
 
-			stringBuilder.Append ("<span fgcolor=\"green\">Submitting ");
 			stringBuilder.Append (txAtIndexStr);
 			stringBuilder.Append ("</span>");
 
@@ -1005,13 +1163,17 @@ namespace IhildaWallet
 
 				string feeReq = "Requesting Fee";
 				stringBuilder.Clear ();
-				stringBuilder.Append ("<span fgcolor=\"green\">");
+				if (Program.darkmode) {
+					stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+				} else {
+					stringBuilder.Append ("<span fgcolor=\"green\">");
+				}
 				stringBuilder.Append (txAtIndexStr);
 				stringBuilder.Append (feeReq);
 				stringBuilder.Append ("</span>");
 
 				string ms3 = stringBuilder.ToString ();
-				this.SetStatus (index.ToString (), feeReq, TextHighlighter.GREEN);
+				this.SetStatus (index.ToString (), feeReq, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 				Application.Invoke (
 					delegate {
@@ -1133,22 +1295,26 @@ namespace IhildaWallet
 
 					feeDots++;
 
-					StringBuilder feeReq2 = new StringBuilder(feeReq);
+					StringBuilder feeReq2 = new StringBuilder (feeReq);
 					for (int i = 0; i < feeDots && !getFeeTask.IsCompleted && !getFeeTask.IsCanceled && !getFeeTask.IsFaulted; i++) {
 						feeReq2.Append (".");
 					}
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"green\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"green\">");
+					}
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (feeReq2);
 					stringBuilder.Append ("</span>");
 
 					string mssg = stringBuilder.ToString ();
 					this.SetStatus (
-						index.ToString (), 
-						feeReq2.ToString(), 
-						TextHighlighter.GREEN
+						index.ToString (),
+						feeReq2.ToString (),
+						Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN
 					);
 
 					Application.Invoke (
@@ -1208,9 +1374,9 @@ namespace IhildaWallet
 
 				tx.LastLedgerSequence = tupe.Item2 + lls;
 
-				if (tx.fee.amount == 0 || tx.Sequence == 0) {
+				if (tx.fee.amount == 0) {
 
-					string invstr = "Invalid Fee or Sequence";
+					string invstr = "Invalid Fee";
 					this.SetResult (index.ToString (), invstr, TextHighlighter.RED);
 
 					stringBuilder.Clear ();
@@ -1226,7 +1392,28 @@ namespace IhildaWallet
 
 						}
 					);
-					throw new Exception ();
+					goto retry;
+				}
+
+				if (tx.Sequence == 0) {
+
+					string invstr = "Invalid Sequence";
+					this.SetResult (index.ToString (), invstr, TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("<span fgcolor=\"red\">");
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (invstr);
+					stringBuilder.Append ("</span>");
+					string ms7 = stringBuilder.ToString ();
+					Application.Invoke (
+						delegate {
+							label2.Markup = ms7;
+							label2.Visible = true;
+
+						}
+					);
+					goto retry;
 				}
 
 
@@ -1234,11 +1421,16 @@ namespace IhildaWallet
 				if (opts.UseLocalRippledRPC) {
 
 					string rpsStr = "Signing using rpc";
-					this.SetStatus (index.ToString (), rpsStr, TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), rpsStr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 					stringBuilder.Clear ();
 
-					stringBuilder.Append ("<span fgcolor=\"green\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"green\">");
+
+					}
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (rpsStr);
 					stringBuilder.Append ("</span>");
@@ -1252,43 +1444,89 @@ namespace IhildaWallet
 						}
 					);
 
+					var signTask = Task.Run<bool> (delegate {
 
-					try {
-						tx.SignLocalRippled (rsa);
-					} catch (Exception ex) {
+						try {
+							tx.SignLocalRippled (rsa);
+							return true;
+						} catch (Exception ex) {
 #if DEBUG
-						if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
-							Logging.ReportException (method_sig, ex);
-						}
+							if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
+								Logging.ReportException (method_sig, ex);
+							}
 #endif
 
-						string rpcErr = "Error signing over rpc. Is rippled running?";
+							string rpcErr = "Error signing over rpc. Is rippled running?";
 
-						this.SetStatus (index.ToString (), rpcErr, TextHighlighter.RED);
+							this.SetStatus (index.ToString (), rpcErr, TextHighlighter.RED);
+
+							stringBuilder.Clear ();
+							stringBuilder.Append ("<span fgcolor=\"red\">");
+							stringBuilder.Append (txAtIndexStr);
+							stringBuilder.Append (rpcErr);
+							stringBuilder.Append ("</span>");
+							string ms9 = stringBuilder.ToString ();
+
+							Application.Invoke (
+								delegate {
+									label2.Markup = ms9;
+									label2.Visible = true;
+
+								}
+							);
+							return false;
+						}
+					});
+
+					StringBuilder stbuild = new StringBuilder ();
+					int x = 0;
+					while (!signTask.IsCompleted && !token.IsCancellationRequested && !signTask.IsFaulted) {
+						stbuild.Clear ();
+						stbuild.Append (rpsStr);
+						for (int i = 0; i < x; i++) {
+							stbuild.Append (".");
+						}
+						if (x++ > 7) {
+							x = 0;
+
+						}
+
+						token.WaitHandle.WaitOne (500);
+
+						this.SetStatus (index.ToString (), stbuild.ToString(), Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 						stringBuilder.Clear ();
-						stringBuilder.Append ("<span fgcolor=\"red\">");
+						if (Program.darkmode) {
+							stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+						} else {
+							stringBuilder.Append ("<span fgcolor=\"green\">");
+						}
 						stringBuilder.Append (txAtIndexStr);
-						stringBuilder.Append (rpcErr);
+						stringBuilder.Append (rpsStr);
 						stringBuilder.Append ("</span>");
-						string ms9 = stringBuilder.ToString ();
 
+						string signmessg = stringBuilder.ToString ();
 						Application.Invoke (
 							delegate {
-								label2.Markup = ms9;
+								label2.Markup = signmessg;
 								label2.Visible = true;
 
 							}
 						);
+					}
+
+					if (!signTask.Result) {
 						return false;
 					}
 
-
 					string rpcStr = "Signed rpc";
-					this.SetStatus (index.ToString (), rpsStr, TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), rpsStr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 					stringBuilder.Clear ();
-
-					stringBuilder.Append ("<span fgcolor=\"green\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"green\">");
+					}
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (rpcStr);
 					stringBuilder.Append ("</span>");
@@ -1307,10 +1545,15 @@ namespace IhildaWallet
 
 					string rlsstr = "Signing using RippleLibSharp";
 
-					this.SetStatus ( index.ToString (), rlsstr, TextHighlighter.GREEN );
+					this.SetStatus ( index.ToString (), rlsstr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN );
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ( "<span fgcolor=\"green\">" );
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"green\">");
+					}
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (rlsstr);
 					stringBuilder.Append ( "</span>" );
@@ -1357,10 +1600,14 @@ namespace IhildaWallet
 					}
 
 					string sgnstr = "Signed RippleLibSharp";
-					this.SetStatus (index.ToString (), sgnstr , TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), sgnstr , Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"green\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"green\">");
+					}
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (sgnstr);
 					stringBuilder.Append ("</span>");
@@ -1433,10 +1680,15 @@ namespace IhildaWallet
 					task = NetworkController.UiTxNetworkSubmit (tx, ni, token);
 
 					string subWit = "Submitted via websocket";
-					this.SetStatus (index.ToString (), subWit, TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), subWit, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"green\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"green\">");
+					}
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (subWit);
 					stringBuilder.Append ("</span>");
@@ -1469,10 +1721,15 @@ namespace IhildaWallet
 						}
 
 						string tmpstr = stringBuilder.ToString ();
-						this.SetResult (index.ToString (), tmpstr, TextHighlighter.GREEN);
+						this.SetResult (index.ToString (), tmpstr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 						stringBuilder.Clear ();
-						stringBuilder.Append ("<span fgcolor=\"green\">");
+
+						if (Program.darkmode) {
+							stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+						} else {
+							stringBuilder.Append ("<span fgcolor=\"green\">");
+						}
 						stringBuilder.Append (txAtIndexStr);
 						stringBuilder.Append (tmpstr);
 						stringBuilder.Append ("</span>");
@@ -1529,9 +1786,14 @@ namespace IhildaWallet
 				if (response == null) {
 
 					string warningMessage = "response == null";
-					this.SetResult (index.ToString (), warningMessage, TextHighlighter.GREEN);
+					this.SetResult (index.ToString (), warningMessage, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"green\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"green\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+					}
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (warningMessage);
 					stringBuilder.Append ("</span>");
@@ -1762,11 +2024,15 @@ namespace IhildaWallet
 				switch (ter) {
 
 				case Ter.tefALREADY:
-					this.SetStatus ( index.ToString (), res.engine_result, TextHighlighter.GREEN );
-					this.SetResult ( index.ToString (), res.engine_result_message, TextHighlighter.GREEN );
+					this.SetStatus ( index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN );
+					this.SetResult ( index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN );
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"green\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"green\">");
+					}
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string alstr = stringBuilder.ToString ();
@@ -1800,10 +2066,14 @@ namespace IhildaWallet
 					goto case Ter.tesSUCCESS;
 
 				case Ter.tesSUCCESS:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.GREEN);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.CHARTREUSE  : TextHighlighter.GREEN);
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"green\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"green\">");
+					}
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string sustr = stringBuilder.ToString ();
@@ -1812,7 +2082,7 @@ namespace IhildaWallet
 						delegate {
 							label2.Markup = sustr;
 							label2.Visible = true;
-
+							
 						}
 					);
 
@@ -2453,7 +2723,7 @@ namespace IhildaWallet
 					stringBuilder.Append (" in ");
 					stringBuilder.Append (i);
 
-					this.SetStatus (index.ToString (), stringBuilder.ToString (), TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), stringBuilder.ToString (), Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 					token.WaitHandle.WaitOne (1000);
 				}
 
@@ -2461,7 +2731,7 @@ namespace IhildaWallet
 				//Thread.Sleep (1000);
 
 
-				this.SetStatus (index.ToString (), valStr, TextHighlighter.GREEN);
+				this.SetStatus (index.ToString (), valStr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 
 				for (int i = 0; i < 100; i++) {
@@ -2489,7 +2759,7 @@ namespace IhildaWallet
 
 					if (transaction.validated != null && (bool)transaction.validated) {
 
-						this.SetResult (index.ToString (), "Validated", TextHighlighter.GREEN);
+						this.SetResult (index.ToString (), "Validated", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 						this._offers [index].IsValidated = true;
 
 						button209.Visible = true;
@@ -2513,12 +2783,20 @@ namespace IhildaWallet
 					stringBuilder.Append (str);
 					stringBuilder.Append (i.ToString ());
 
-					this.SetResult (index.ToString (), stringBuilder.ToString(), TextHighlighter.RED);
+					if (i < 2) {
+						this.SetResult (index.ToString (), stringBuilder.ToString (), TextHighlighter.ORANGE);
+					} else {
+						this.SetResult (index.ToString (), stringBuilder.ToString (), TextHighlighter.RED);
+					}
 					//Thread.Sleep (3000);
 					for (int ind = 0; ind < 1; ind++) {
 						token.WaitHandle.WaitOne (1000);
 						stringBuilder.Append (".");
-						this.SetResult (index.ToString (), stringBuilder.ToString (), TextHighlighter.RED);
+						if (i < 2) {
+							this.SetResult (index.ToString (), stringBuilder.ToString (), TextHighlighter.ORANGE);
+						} else {
+							this.SetResult (index.ToString (), stringBuilder.ToString (), TextHighlighter.RED);
+						}
 					}
 				
 
@@ -2540,9 +2818,19 @@ namespace IhildaWallet
 			}
 #endif
 
+			Gtk.Application.Invoke ( delegate {
+				if (Program.darkmode) {
+					label2.Markup = "<span fgcolor=\"chartreuse\">Submiting all</span>";
+				} else {
+					label2.Markup = "<span fgcolor=\"green\">Submiting all</span>";
+				}
+				label2.Visible = true;
+				progressbar3.Pulse ();
+			});
+
 			tokenSource?.Cancel ();
 			tokenSource = new CancellationTokenSource ();
-			CancellationToken token = new CancellationToken ();
+			CancellationToken token = tokenSource.Token;
 
 			AllSubmitted = false;
 
@@ -2561,6 +2849,8 @@ namespace IhildaWallet
 
 				Application.Invoke ( delegate {
 					this.label2.Markup = "<span fgcolor=\"red\">No wallet selected.</span>";
+					this.label2.Visible = true;
+					this.progressbar3.Fraction = 0;
 
 				});
 
@@ -2576,13 +2866,23 @@ namespace IhildaWallet
 				// TODO network interface
 				Application.Invoke (delegate {
 					this.label2.Markup = "<span fgcolor=\"red\">No network.</span>";
+					this.label2.Visible = true;
+					this.progressbar3.Fraction = 0;
 
 				});
 
 				return;
 			}
 
-
+			Application.Invoke (delegate {
+				if (Program.darkmode) {
+					this.label2.Markup = "<span fgcolor=\"chartreuse\">Verifying License</span>";
+				} else {
+					this.label2.Markup = "<span fgcolor=\"green\">Verifying License</span>";
+				}
+				//this.label2.Visible = true;
+				this.progressbar3.Fraction = 0.01;
+			});
 
 
 			bool ShouldContinue = false;
@@ -2593,6 +2893,9 @@ namespace IhildaWallet
 
 				}
 			);
+
+
+
 
 
 			uint sequence = 0;
@@ -2608,18 +2911,17 @@ namespace IhildaWallet
 
 			});
 
+			Task<SignOptions> signOptionsTask = Task<SignOptions>.Run (
+				delegate {
 
+					return LoadSignOptions (token);
+				}
+			);
 			//int? f = FeeSettings.getFeeFromSettings (ni);
 			//if (f == null) {
 			//	return;
 			//}
 
-
-
-
-
-
-			SignOptions signOptions = LoadSignOptions (token);
 
 			contTask.Wait (token);
 
@@ -2633,20 +2935,138 @@ namespace IhildaWallet
 						+ _licenseType.ToString ()
 						+ "</span>";
 
+					//this.label2.Visible = true;
+
 				});
 				return;
 			}
 
+			Application.Invoke (delegate {
+				if (Program.darkmode) {
+					this.label2.Markup = "<span fgcolor=\"chartreuse>\">Requesting password</span>";
+				} else {
+					this.label2.Markup = "<span fgcolor=\"green\">Requesting password</span>";
+				}
+				//this.label2.Visible = true;
+				this.progressbar3.Fraction = 0.02;
+
+			});
+
+			token.WaitHandle.WaitOne (10);
 
 			RippleIdentifier rsa = rw.GetDecryptedSeed ();
 
-			seqTask.Wait (token);
+			Application.Invoke (delegate {
+
+				progressbar3.Fraction = 0.03;
+			});
+
+
+			while (rsa.GetHumanReadableIdentifier () == null) {
+
+				Application.Invoke (delegate {
+					if (Program.darkmode) {
+						this.label2.Markup = "<span fgcolor=\"chartreuse\">Invalid password</span>";
+					} else {
+						this.label2.Markup = "<span fgcolor=\"green\">Invalid password</span>";
+					}
+					this.label2.Visible = true;
+					progressbar3.Pulse ();
+				});
+
+				bool should = AreYouSure.AskQuestionNonGuiThread (
+				"Invalid password",
+				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+				);
+
+
+
+				if (!should) {
+					Application.Invoke (delegate {
+
+						progressbar3.Fraction = 0.04;
+					});
+					return;
+				}
+
+				rsa = rw.GetDecryptedSeed ();
+			}
+
+			try {
+				StringBuilder stringBuilder = new StringBuilder ();
+
+				string frontspan = 
+					Program.darkmode 
+					? "<span fgcolor=\"chartreuse\">Preparing Payments" 
+					: "<span fgcolor=\"green\">Preparing Payments";
+
+				string backspan = "</span>";
+
+				stringBuilder.Append (frontspan);
+				//stringBuilder.Append (frontspan);
+				stringBuilder.Append (backspan);
+
+				string msg = stringBuilder.ToString ();
+
+				Application.Invoke (delegate {
+					this.label2.Markup = msg;
+
+					this.progressbar3.Fraction = 0.05;
+
+				});
+
+
+				for ( 
+					int i = 0;
+
+					 (!seqTask.IsCanceled && !seqTask.IsCompleted && !seqTask.IsFaulted) 
+		    			|| (!signOptionsTask.IsCanceled && !signOptionsTask.IsCompleted && !signOptionsTask.IsFaulted);
+		      
+		     			i++
+
+				) {
+					if (i == 10) {
+						i = 0;
+					}
+
+					Task.WaitAll (new [] { seqTask, signOptionsTask }, 1000, token);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append (frontspan);
+
+
+					stringBuilder.Append (new String ('.', i));
+
+					stringBuilder.Append (backspan);
+					Gtk.Application.Invoke (delegate {
+
+						this.label2.Markup = stringBuilder.ToString ();
+
+					});
+				}
+			} catch (Exception e) {
+
+
+			}
+			SignOptions signOptions = signOptionsTask.Result;
+
+
+			double progressStep = 0.9 / _offers.Length;
 
 			for (int index = 0; index < _offers.Length; index++) {
 
 				if (token.IsCancellationRequested) {
-				
+					Gtk.Application.Invoke (delegate {
+						label2.Markup = "<span fgcolor=\"red\">Submit all task has been cancelled</span>";
+						//progressbar3.Fraction = 0;
+
+					});
 					return;
+				} else {
+					Gtk.Application.Invoke ( delegate {
+
+						progressbar3.Fraction += progressStep;
+					});
 				}
 
 
@@ -2664,16 +3084,45 @@ namespace IhildaWallet
 
 			Gtk.Application.Invoke ( delegate {
 
-				this.label2.Markup = 
+				this.label2.Markup = Program.darkmode ?
+					"<span fgcolor=\"chartreuse\">All orders have been submitted successfully</span>" :
 					"<span fgcolor=\"green\">All orders have been submitted successfully</span>";
 
 				this.label2.Visible = true;
-
+				this.progressbar3.Fraction = 0.96;
 			});
 
 			AllSubmitted = true;
 
+			ConfirmValidationOfSelected (token);
+		}
 
+
+		public void ConfirmValidationOfSelected (CancellationToken token)
+		{
+
+
+
+			for (int i = 0; i < 60 * 20; i++) {
+
+				Task.Delay (1000).Wait (token);
+
+
+
+				var v = from off in _offers where off.Selected select off;
+				if (!v.Any(x => !x.IsValidated)) {
+					Gtk.Application.Invoke ( delegate {
+						if (Program.darkmode) {
+							this.label2.Markup = "<span fgcolor=\"chartreuse\">All selected orders have been validated</span>";
+						} else {
+							this.label2.Markup = "<span fgcolor=\"green\">All selected orders have been validated</span>";
+						}
+						this.progressbar3.Fraction = 1;
+					});
+					return;
+				}
+			}
+			
 		}
 
 		public bool AllSubmitted {
@@ -2692,7 +3141,7 @@ namespace IhildaWallet
 		}
 		*/
 
-		private AutomatedOrder [] _default_offers;
+		public AutomatedOrder [] _default_offers;
 
 		public void SetDefaultOrders (IEnumerable<AutomatedOrder> orders)
 		{

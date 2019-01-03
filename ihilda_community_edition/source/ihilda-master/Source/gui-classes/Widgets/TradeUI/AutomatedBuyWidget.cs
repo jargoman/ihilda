@@ -336,6 +336,19 @@ namespace IhildaWallet
 
 			RippleIdentifier seed = rw.GetDecryptedSeed ();
 
+			while (seed.GetHumanReadableIdentifier() == null) {
+				bool should = AreYouSure.AskQuestion (
+				"Invalid password", 
+				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+				);
+
+				if (!should) {
+					return null;
+				}
+
+				seed = rw.GetDecryptedSeed ();
+			}
+
 #if DEBUG
 			if (DebugIhildaWallet.AutomatedBuyWidget) {
 				Logging.WriteLog (method_sig + nameof (rw) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString (rw));

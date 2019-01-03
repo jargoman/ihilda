@@ -66,10 +66,21 @@ namespace RippleLibSharp.Commands.Accounts
 				IEnumerable <Offer> offers = response?.result?.offers;
 
 				if (offers != null && account != null) {
-					offers = offers.Select ((Offer arg) => {
-						arg.Account = account;
-						return arg;
-					});
+
+					string acc = account;
+					if (Configuration.Config.PreferLinq) {
+						response.result.offers = offers.Select ((Offer arg) => {
+							arg.Account = acc;
+							return arg;
+						});
+					} else {
+
+						foreach (Offer offer in offers) {
+							offer.Account = account;
+
+						}
+						
+					}    
 				}
 
 				//IEnumerable<Offer> offers = response?.result?.offers;
@@ -108,11 +119,21 @@ namespace RippleLibSharp.Commands.Accounts
 					offers = response?.result?.offers;
 
 					if (offers != null && account != null) {
+						// linq never worked ??
 
-						offers = offers.Select ((Offer arg) => {
-							arg.Account = account;
-							return arg;
-						});
+						if (Configuration.Config.PreferLinq) {
+							response.result.offers = offers.Select ((Offer arg) => {
+								arg.Account = account;
+								return arg;
+							});
+						} else {
+
+
+							foreach (Offer offer in offers) {
+								offer.Account = account;
+
+							}
+						}
 					}
 
 					list.Add (response);

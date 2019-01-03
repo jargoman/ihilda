@@ -3,6 +3,8 @@ using RippleLibSharp.Util;
 using RippleLibSharp.Transactions;
 using IhildaWallet.Util;
 using Gtk;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace IhildaWallet
 {
@@ -122,7 +124,7 @@ namespace IhildaWallet
 				this.Tx_Text = value?.Tx_Summary_Buy ?? "";
 				this.txidlabel.Text = value?.Tx_id ?? "";
 
-				DateTime dt = TimeHeler.ConvertRippleTimeToUnix (value.Time);
+				DateTime dt = TimeHelper.ConvertRippleTimeToUnix (value.Time);
 
 				this.dateLabel.Text = dt.ToLongDateString () + " " + dt.ToLongTimeString ();
 				__Summary = value;
@@ -171,9 +173,9 @@ namespace IhildaWallet
 
 
 			var ch = this.__Summary.Changes;
-			AutomatedOrder [] offs = Profiteer.GetBuyBacks (ch);
-
-			if (offs != null && offs.Length != 0) {
+			IEnumerable <AutomatedOrder> offs = Profiteer.GetBuyBacks (ch);
+			AutomatedOrder first = offs?.FirstOrDefault ();
+			if (first != null) {
 
 				string r = flipped ? "Repurchase" : "Resell";
 				Gtk.MenuItem repurchase = new Gtk.MenuItem (r);
@@ -183,7 +185,7 @@ namespace IhildaWallet
 				repurchase.Activated += (object sender, EventArgs e) => {
 
 					LicenseType licenseT = Util.LicenseType.SEMIAUTOMATED;
-					if (LeIceSense.IsLicenseExempt (offs [0].taker_gets) || LeIceSense.IsLicenseExempt (offs [0].taker_pays)) {
+					if (LeIceSense.IsLicenseExempt (first.taker_gets) || LeIceSense.IsLicenseExempt (first.taker_pays)) {
 						licenseT = LicenseType.NONE;
 					}
 					OrderSubmitWindow win = new OrderSubmitWindow (_rippleWallet, licenseT);

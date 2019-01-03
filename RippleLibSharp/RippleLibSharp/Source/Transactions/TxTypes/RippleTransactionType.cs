@@ -28,7 +28,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 		static RippleTransactionType ()
 		{
-
+			LoadTransactionTypes ();
 		}
 
 

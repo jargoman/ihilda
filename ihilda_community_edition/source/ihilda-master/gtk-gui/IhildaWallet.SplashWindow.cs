@@ -51,7 +51,7 @@ namespace IhildaWallet
 			this.image56.Name = "image56";
 			this.image56.Xpad = 5;
 			this.image56.Ypad = 5;
-			this.image56.Pixbuf = global::Gdk.Pixbuf.LoadFromResource("IhildaWallet.ihildaplain-100-wide.png");
+			this.image56.Pixbuf = global::Gdk.Pixbuf.LoadFromResource("IhildaWallet.Images.ihildaplain-100-wide.png");
 			this.eventbox2.Add(this.image56);
 			this.hbox3.Add(this.eventbox2);
 			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.eventbox2]));
@@ -82,7 +82,7 @@ namespace IhildaWallet
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.image87 = new global::Gtk.Image();
 			this.image87.Name = "image87";
-			this.image87.Pixbuf = global::Gdk.Pixbuf.LoadFromResource("IhildaWallet.coolio-medium.png");
+			this.image87.Pixbuf = global::Gdk.Pixbuf.LoadFromResource("IhildaWallet.Images.coolio-medium.png");
 			this.vbox2.Add(this.image87);
 			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.image87]));
 			w6.Position = 1;

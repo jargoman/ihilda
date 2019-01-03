@@ -16,19 +16,22 @@ namespace IhildaWallet
 		public RuleManager (RippleAddress account)
 		{
 			settingsPath = FileHelper.GetSettingsPath (account.ToString () + settingsFileName);
-			RulesList = new LinkedList<OrderFilledRule> ();
+			RulesList = new List<OrderFilledRule> ();
+			Account = account;
 		}
 
+		public string Account {
+			get;
+		}
 
-
-		public LinkedList<OrderFilledRule> RulesList {
+		public List<OrderFilledRule> RulesList {
 			get;
 			set;
 		}
 
 		public void AddRule (OrderFilledRule val)
 		{
-			RulesList.AddLast (val);
+			RulesList.Add (val);
 		}
 
 		public bool RemoveRule (OrderFilledRule val)
@@ -63,7 +66,7 @@ namespace IhildaWallet
 			RulesList.Clear ();
 
 			foreach (OrderFilledRule or in rls) {
-				RulesList.AddLast (or);
+				RulesList.Add (or);
 			}
 
 		}

@@ -162,7 +162,12 @@ namespace IhildaWallet
 
 							Gtk.Menu menu = new Menu ();
 
-							MenuItem mainBuyMenu = new MenuItem ("<span fgcolor=\"green\" font_size=\"xx-large\"><b>Buy</b></span>");
+							MenuItem mainBuyMenu = new MenuItem (
+								Program.darkmode ?
+								"<span fgcolor=\"chartreuse\" font_size=\"xx - large\"><b>Buy</b></span>":
+								"<span fgcolor=\"green\" font_size=\"xx-large\"><b>Buy</b></span>"
+								);
+
 							Label label = (Label)mainBuyMenu.Child;
 							label.UseMarkup = true;
 
@@ -220,7 +225,11 @@ namespace IhildaWallet
 							#endregion
 
 							#region buy
-							Gtk.MenuItem buy = new MenuItem ("<b>Prepare a <span fgcolor=\"green\">buy</span> order at this price</b>");
+							Gtk.MenuItem buy = new MenuItem (
+								Program.darkmode ?
+								"<b>Prepare a <span fgcolor=\"chartreuse\">buy</span> order at this price</b>" :
+								"<b>Prepare a <span fgcolor=\"green\">buy</span> order at this price</b>"
+								);
 							buy.Show ();
 							buyMenu.Add (buy);
 
@@ -253,7 +262,12 @@ namespace IhildaWallet
 
 							#region cassbuy
 
-							Gtk.MenuItem cassbuy = new MenuItem ("<b>Cascade <span fgcolor=\"green\">buy</span> orders beginning at this price</b>");
+							Gtk.MenuItem cassbuy = new MenuItem (
+								Program.darkmode ?
+								"<b>Cascade <span fgcolor=\"chartreuse\">buy</span> orders beginning at this price</b>" :
+								"<b>Cascade <span fgcolor=\"green\">buy</span> orders beginning at this price</b>"
+								);
+
 							cassbuy.Show ();
 							buyMenu.Add (cassbuy);
 
@@ -291,7 +305,11 @@ namespace IhildaWallet
 
 							#region autobuy
 
-							Gtk.MenuItem autobuy = new MenuItem ("<b>Prepare an automated <span fgcolor=\"green\">buy</span> order at this price</b>");
+							Gtk.MenuItem autobuy = new MenuItem (
+								Program.darkmode ?
+								"<b>Prepare an automated <span fgcolor=\"chartreuse\">buy</span> order at this price</b>" :
+								"<b>Prepare an automated <span fgcolor=\"green\">buy</span> order at this price</b>"
+								);
 							autobuy.Show ();
 							buyMenu.Add (autobuy);
 

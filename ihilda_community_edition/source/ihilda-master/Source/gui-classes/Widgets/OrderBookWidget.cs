@@ -20,7 +20,12 @@ namespace IhildaWallet
 	{
 		public OrderBookWidget ()
 		{
+
+#if DEBUG
 			string method_sig = clsstr + nameof (OrderBookWidget) + DebugRippleLibSharp.both_parentheses;
+#endif
+
+
 			this.Build ();
 
 			if (orderbooktablewidget1 == null) {
@@ -144,18 +149,18 @@ namespace IhildaWallet
 
 		public void ResyncNetwork ( CancellationToken token )
 		{
-			#if DEBUG
+#if DEBUG
 			String method_sig = clsstr + nameof (ResyncNetwork) + DebugRippleLibSharp.both_parentheses;
 #endif
 
 			TradePair tp = _tradePair;
 
 			if (tp == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.OrderBookWidget) {
 					Logging.WriteLog(method_sig + "tp == null");
 				}
-				#endif
+#endif
 				// todo the lines below
 				//if (this.buyorderbooktablewidget != null) {
 				//	this.buyorderbooktablewidget.clearTable();
@@ -169,21 +174,21 @@ namespace IhildaWallet
 
 			RippleCurrency cur_base = tp.Currency_Base;
 			if (cur_base == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.OrderBookWidget) {
 					Logging.WriteLog(method_sig + "cur_base == null, returning");
 				}
-				#endif
+#endif
 				return;
 			}
 
 			RippleCurrency counter_currency = tp.Currency_Counter;
 			if (counter_currency == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.OrderBookWidget) {
 					Logging.WriteLog(method_sig + "counter_currency == null, returning");
 				}
-				#endif
+#endif
 				return;
 			}
 				
@@ -215,13 +220,13 @@ namespace IhildaWallet
 			//buyTask.Wait ();
 			//sellTask.Wait ();
 
-			#if DEBUG
+#if DEBUG
 
 			if (DebugIhildaWallet.OrderBookWidget) {
 				Logging.WriteLog(method_sig + "done waiting");
 				//Logging.writeLog(method_sig + "e.Message = " + Debug.toAssertString(e.Message));
 			}
-			#endif
+#endif
 				
 			Offer[] buys = buyTask?.Result?.result?.offers;
 			Offer[] sells = sellTask?.Result?.result?.offers;
@@ -234,13 +239,13 @@ namespace IhildaWallet
 				//d.result.offers;
 			//System.Double id = d.id.handle_bar;
 
-			#if DEBUG
+#if DEBUG
 			if (DebugIhildaWallet.OrderBookWidget) {
 				Logging.WriteLog(method_sig + "end for");
 				//Logging.writeLog("id type =" + id.GetType().ToString());
 				//Logging.writeLog("id = " + id.ToString());
 			}
-			#endif
+#endif
 
 
 
@@ -252,9 +257,9 @@ namespace IhildaWallet
 
 		}
 
-		#if DEBUG
+#if DEBUG
 		private static readonly string clsstr = nameof (OrderBookWidget) + DebugRippleLibSharp.colon;
-		#endif
+#endif
 
 	}
 }

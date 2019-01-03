@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Gtk;
+using RippleLibSharp.Util;
 
 namespace IhildaWallet
 {
@@ -93,6 +94,10 @@ namespace IhildaWallet
 
 		public Tuple<ColorCrypts, Animals, Elements, Planet, Cards, Suits> CollectPrisms () {
 
+#if DEBUG
+			string method_sig = clsstr + nameof (CollectPrisms) + DebugRippleLibSharp.both_parentheses;
+#endif
+
 			string cl = colorentry.Entry.Text;
 			string an = animalentry.Entry.Text;
 			string el = elemententry.Entry.Text;
@@ -108,6 +113,12 @@ namespace IhildaWallet
 			try {
 				color = (ColorCrypts)Enum.Parse (typeof (ColorCrypts), cl);
 			} catch (Exception e) {
+
+#if DEBUG
+				if (DebugIhildaWallet.PrismWidget) {
+					Logging.ReportException (method_sig, e);
+				}
+#endif
 				hasError = true;
 				stringBuilder.Append ("Invalid Color ");
 				stringBuilder.AppendLine (cl);
@@ -120,6 +131,16 @@ namespace IhildaWallet
 			try {
 				animal = (Animals)Enum.Parse (typeof (Animals), an);
 			} catch (Exception e) {
+
+
+#if DEBUG
+				if (DebugIhildaWallet.PrismWidget) {
+					Logging.ReportException (method_sig, e);
+				}
+#endif
+
+
+
 				hasError = true;
 				stringBuilder.Append ("Invalid Animal ");
 				stringBuilder.AppendLine (an);
@@ -132,6 +153,14 @@ namespace IhildaWallet
 			try {
 				elements = (Elements)Enum.Parse (typeof (Elements), el);
 			} catch (Exception e) {
+
+#if DEBUG
+				if (DebugIhildaWallet.PrismWidget) {
+					Logging.ReportException (method_sig, e);
+				}
+#endif
+
+
 				hasError = true;
 				stringBuilder.Append ("Invalid Element ");
 				stringBuilder.AppendLine (el);
@@ -144,6 +173,14 @@ namespace IhildaWallet
 			try {
 				planet = (Planet)Enum.Parse (typeof (Planet), pl);
 			} catch (Exception e) {
+
+#if DEBUG
+				if (DebugIhildaWallet.PrismWidget) {
+					Logging.ReportException (method_sig, e);
+				}
+#endif
+
+
 				hasError = true;
 				stringBuilder.Append ("Invalid Planet ");
 				stringBuilder.AppendLine (pl);
@@ -155,6 +192,14 @@ namespace IhildaWallet
 			try {
 				card = (Cards)Enum.Parse (typeof (Cards), cr);
 			} catch (Exception e) {
+
+#if DEBUG
+				if (DebugIhildaWallet.PrismWidget) {
+					Logging.ReportException (method_sig, e);
+				}
+#endif
+
+
 				hasError = true;
 				stringBuilder.Append ("Invalid Card Rank ");
 				stringBuilder.AppendLine (cr);
@@ -166,6 +211,12 @@ namespace IhildaWallet
 			try {
 				suit = (Suits)Enum.Parse (typeof (Suits), su);
 			} catch (Exception e) {
+
+#if DEBUG
+				if (DebugIhildaWallet.PrismWidget) {
+					Logging.ReportException (method_sig, e);
+				}
+#endif
 				hasError = true;
 				stringBuilder.Append ("Invalid Card Suit ");
 				stringBuilder.AppendLine (su);
@@ -192,6 +243,10 @@ namespace IhildaWallet
 			return v;
 		}
 
+
+#if DEBUG
+		private const string clsstr = nameof (PrismWidget) + DebugRippleLibSharp.colon;
+#endif
 	}
 }
 

@@ -12,6 +12,9 @@ namespace IhildaWallet
 		{
 			this.Build ();
 
+
+
+
 			this.basecurrencycombobox.Changed += (object sender, EventArgs e) => {
 				basecurrencycombobox.ModifyBase (Gtk.StateType.Normal);
 

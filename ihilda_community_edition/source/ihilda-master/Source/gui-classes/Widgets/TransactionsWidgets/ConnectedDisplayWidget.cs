@@ -21,7 +21,7 @@ namespace IhildaWallet
 		public void SetConnected (string serverUrl)
 		{
 
-			#if DEBUG
+#if DEBUG
 			string method_sig =  clsstr + nameof (SetConnected) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.NetworkSettings) {
 				Logging.WriteLog( method_sig + DebugRippleLibSharp.beginn );
@@ -34,7 +34,8 @@ namespace IhildaWallet
 			}
 
 			Gtk.Application.Invoke ( delegate {
-				#if DEBUG
+
+#if DEBUG
 				if (DebugIhildaWallet.ConnectedDisplayWidget) {
 					Logging.WriteLog (clsstr + DebugIhildaWallet.gtkInvoke);
 				}
@@ -60,20 +61,29 @@ namespace IhildaWallet
 			if (DebugIhildaWallet.ConnectedDisplayWidget) {
 				Logging.WriteLog(method_sig + DebugRippleLibSharp.beginn);
 			}
-			#endif
+
+#endif
 			Gtk.Application.Invoke ( delegate {
-				#if DEBUG
+
+#if DEBUG
 				if (DebugIhildaWallet.NetworkSettings) {
 					Logging.WriteLog (method_sig + DebugIhildaWallet.gtkInvoke);
 				}
 #endif
 
 				if (!Program.network) {
-					this.connectStatusLabel.Markup = "<span foreground=\"red\">Networking Disabled</span>";
+
+					this.connectStatusLabel.Markup = Program.darkmode
+						? "<span foreground=\"#FFAABB\">Networking Disabled</span>"
+						: "<span foreground=\"red\">Networking Disabled</span>";
 					return;
 				}
 
-				this.connectStatusLabel.Markup = "<span foreground=\"red\">Disconnected</span>";
+				this.connectStatusLabel.Markup = 
+					Program.darkmode 
+					? "<span foreground=\"#FFAABB\">Disconnected</span>" 
+		    			: "<span foreground=\"red\">Disconnected</span>";
+
 				this.TooltipMarkup = "";
 
 			});

@@ -22,11 +22,13 @@ namespace IhildaWallet
 			//this.NoShowAll = true;
 
 			this.Build ();
+
 			if (this.walletswitchwidget2 == null) {
 				this.walletswitchwidget2 = new WalletSwitchWidget ();
 				this.walletswitchwidget2.Show ();
 				vbox2.Add (walletswitchwidget2);
 			}
+
 			if (this.currencywidget1 == null) {
 				this.currencywidget1 = new CurrencyWidget ();
 				this.currencywidget1.Show ();
@@ -173,6 +175,11 @@ namespace IhildaWallet
 
 			walletswitchwidget2.SetRippleWallet (rippleWallet);
 
+
+			if (Program.darkmode) {
+				label73.Markup = "<span fgcolor=\"chartreuse\"size=\"x-large\"><b>Buy</b></span>";
+				label77.Markup = "<span fgcolor = \"red\" size = \"x-large\"><b>Sell</b></span>";
+			}
 
 		}
 

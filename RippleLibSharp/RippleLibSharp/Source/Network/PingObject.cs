@@ -1,5 +1,4 @@
-﻿using System;
-using Codeplex.Data;
+﻿using Codeplex.Data;
 using RippleLibSharp.Network;
 using RippleLibSharp.Transactions;
 using RippleLibSharp.Transactions.TxTypes;
@@ -73,8 +72,11 @@ namespace RippleLibSharp.Result
 
 			if (jsonResp.result != null) {
 				Json_Response resp = jsonResp.result;
-
-				result = DynamicJson.Parse (resp.json_text, System.Text.Encoding.Default);
+				if (resp.json_text != null) {
+					if (DynamicJson.CanParse (resp.json_text)) {
+						result = DynamicJson.Parse (resp.json_text, System.Text.Encoding.Default);
+					}
+				}
 			}
 
 			return this;
@@ -101,6 +103,13 @@ namespace RippleLibSharp.Result
 		}
 
 		public Json_Response (string s) {
+			if (s == null) {
+				return;
+			}
+
+			if (s == "{}") {
+				return;
+			}
 			json_text = s;
 		}
 

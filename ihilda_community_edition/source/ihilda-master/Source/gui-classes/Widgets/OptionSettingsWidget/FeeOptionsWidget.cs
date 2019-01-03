@@ -4,6 +4,8 @@ using RippleLibSharp.Util;
 using RippleLibSharp.Network;
 using RippleLibSharp.Transactions;
 using Codeplex.Data;
+using RippleLibSharp.Commands.Subscriptions;
+using System.Threading.Tasks;
 
 namespace IhildaWallet
 {
@@ -218,7 +220,15 @@ namespace IhildaWallet
 			CancellationToken token
 		) {
 
-			Tuple< string, UInt32 > tupe = RippleLibSharp.Commands.Server.ServerInfo.GetFeeAndLedgerSequence (ni, token);
+			Tuple<string, UInt32> tupe = null;
+
+			// try to retrieve from last server state subscribe response
+			tupe = LedgerTracker.GetFeeAndLastLedger (token);
+
+			if (tupe == null) {
+				// explicitly poll the server if subscribe is not working
+				tupe = RippleLibSharp.Commands.Server.ServerInfo.GetFeeAndLedgerSequence (ni, token);
+			}
 
 			if (tupe == null) {
 				return null;
@@ -342,7 +352,7 @@ namespace IhildaWallet
 
 			Wait:
 			if (this.Wait != null) {
-				
+
 				if ( fs.Item1 > this.Wait ) {
 					if (feeRetry++ == MAX_FEE_RETRY_ATTEMPTS) {
 						return null;
@@ -356,16 +366,40 @@ namespace IhildaWallet
 					feeSleepEventArgs.State = FeeSleepState.Begin;
 
 					OnFeeSleep?.Invoke (this, feeSleepEventArgs);
-					//Thread.Sleep (3000);
 
-					feeSleepEventArgs.State = FeeSleepState.PumpUI;
 
-					for (int i = 0; i < 3; i++) {
-						OnFeeSleep?.Invoke (this, feeSleepEventArgs);
-						token.WaitHandle.WaitOne (1000);
-					}
+					
+					Task threeseconds = Task.Run ( delegate {
 
-					feeSleepEventArgs.State = FeeSleepState.Wake;
+
+
+
+						//Thread.Sleep (3000);
+
+						feeSleepEventArgs.State = FeeSleepState.PumpUI;
+
+						for (int i = 0; i < 3; i++) {
+							OnFeeSleep?.Invoke (this, feeSleepEventArgs);
+							token.WaitHandle.WaitOne (1000);
+
+							//LedgerTracker.ServerStateEv
+
+
+						}
+						return;
+					});
+
+					Task ledgerTask = Task.Run ( delegate {
+
+						WaitHandle.WaitAny (new WaitHandle [] { LedgerTracker.LedgerResetEvent, LedgerTracker.ServerStateEvent });
+					});
+
+					Task.WaitAny ( new Task [] { threeseconds, ledgerTask });
+					
+
+					
+
+				       feeSleepEventArgs.State = FeeSleepState.Wake;
 					OnFeeSleep?.Invoke (this, feeSleepEventArgs);
 
 					goto START;

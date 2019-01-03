@@ -123,7 +123,7 @@ namespace IhildaWallet
 					try {
 						RippleWallet rw = new RippleWallet (s, RippleWalletTypeEnum.Master);
 						string address = rw.GetStoredReceiveAddress ();
-						TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
+						TextHighlighter.Highlightcolor = Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 						this.label2.Markup = TextHighlighter.Highlight (address);
 
 					}
@@ -146,7 +146,7 @@ namespace IhildaWallet
 					try {
 						RipplePrivateKey privateKey = new RipplePrivateKey (s);
 						string address = privateKey.GetPublicKey ().GetAddress ();
-						TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
+						TextHighlighter.Highlightcolor = Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 						this.label2.Markup = TextHighlighter.Highlight (address);
 
 					} catch (Exception ex) {
@@ -248,7 +248,8 @@ namespace IhildaWallet
 
 			try {
 				RippleSeedAddress seed = new RippleSeedAddress (secret);
-				address = seed.GetPublicRippleAddress ().ToString ();
+				RippleAddress add = seed.GetPublicRippleAddress ();
+				address = add.ToString ();
 			} catch (Exception exception) {
 
 #if DEBUG
@@ -290,7 +291,7 @@ namespace IhildaWallet
 				return;
 			}
 
-			TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
+			TextHighlighter.Highlightcolor = Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 			label3.Markup = TextHighlighter.Highlight (address2);
 		}
 
@@ -418,6 +419,21 @@ namespace IhildaWallet
 			*/
 
 			RippleIdentifier seed = rippleWallet.GetDecryptedSeed ();
+			while (seed.GetHumanReadableIdentifier () == null) {
+				bool should = AreYouSure.AskQuestion (
+				"Invalid password",
+				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+				);
+
+				if (!should) {
+					return;
+				}
+
+				seed = rippleWallet.GetDecryptedSeed ();
+			}
+
+
+
 			this.secretentry.Text = seed.ToString ();
 
 			//if (PluginController.currentInstance!=null) {

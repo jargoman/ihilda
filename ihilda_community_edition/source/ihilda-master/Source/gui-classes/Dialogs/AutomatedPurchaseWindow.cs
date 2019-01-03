@@ -48,6 +48,20 @@ namespace IhildaWallet
 				}
 
 				RippleIdentifier rippleSeedAddress = rw.GetDecryptedSeed ();
+				while (rippleSeedAddress.GetHumanReadableIdentifier () == null) {
+					bool should = AreYouSure.AskQuestion (
+					"Invalid password",
+					"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+					);
+
+					if (!should) {
+						return;
+					}
+
+					rippleSeedAddress = rw.GetDecryptedSeed ();
+				}
+
+
 
 				Decimal targetPrice = automatedOrder.TakerPays.GetNativeAdjustedCostAt (automatedOrder.TakerGets);
 				//Decimal targetPrice = automatedOrder.TakerGets.GetNativeAdjustedPriceAt (automatedOrder.TakerPays);

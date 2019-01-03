@@ -790,6 +790,8 @@ namespace RippleLibSharp.Network
 #pragma warning disable 0168
 			} catch (Exception e) {
 #pragma warning restore 0168
+
+
 #if DEBUG
 				Logging.WriteLog (method_sig + "Exception thrown : \n" + e.Message + "\n");
 #endif
@@ -825,6 +827,8 @@ namespace RippleLibSharp.Network
 #endif
 
 
+			//websocket.ReceiveBufferSize = 128000;
+
 			websocket.Opened += Websocket_Opened;
 
 
@@ -832,7 +836,12 @@ namespace RippleLibSharp.Network
 			websocket.Closed += Websocket_Closed;
 
 			websocket.MessageReceived += (object sender, WebSocket4Net.MessageReceivedEventArgs e) =>
+
+			Task.Run ( delegate {
+
 				this.ProcessIncomingJson (e);
+			});
+				
 
 			/*
 			websocket.MessageReceived += delegate(object sender, MessageReceivedEventArgs e) {
@@ -852,9 +861,53 @@ namespace RippleLibSharp.Network
 
 
 
-			websocket.Error += ErrorFunction;
+			//websocket.Error += ErrorFunction;
+
+            websocket.Error += (sender, ev) => {
+                if (ev.Exception.Message.Equals("RemoteCertificateNotAvailable"))
+                {
+
+                    //if (e.Exception.Message.Equals ("RemoteCertificateNotAvailable")) {
+
+                    String message = "Unable to establish an ssl connection, you need to install the servers ssl security certificate\n" +
+                        "Example # certmgr --ssl " +
+                    ///* url + 
+                    "  ( using the command line of your local operating system terminal/cmd.exe ect )\n\n" +
+                        "if that doesn't work try importing mozilla's certificate store" +
+                        "Example# mozroots --import --sync \n";
+
+                    //MainWindow.currentInstance
+
+#if DEBUG
+                    if (DebugRippleLibSharp.NetworkInterface)
+                    {
+                        Logging.WriteLog(message);
+                        //Logging.WriteLog ("should print" + e.Exception.Message);
+                        Logging.WriteLog("should print" + ev.Exception.Message);
+                    }
+#endif
 
 
+
+
+
+
+
+                    return;
+                }
+
+
+#if DEBUG
+
+                if (DebugRippleLibSharp.NetworkInterface)
+                {
+                    Logging.WriteLog("Error Occured\n" + ev.Exception.Message + "\n");
+                }
+
+#endif
+                //stopConnect = true;
+                return;
+            };
 
 
 			//};
@@ -865,51 +918,16 @@ namespace RippleLibSharp.Network
 
 
 
-
-		private void ErrorFunction (object sender, SuperSocket.ClientEngine.ErrorEventArgs e)
+        /*
+		private void ErrorFunction (object sender, System.IO.ErrorEventArgs e)
 		{
-			//websocket.Error += delegate(object sender, ErrorEventArgs e) {
+            //websocket.Error += delegate(object sender, ErrorEventArgs e) {
 
-			//stopConnect = true;
-
-			if (e.Exception.Message.Equals ("RemoteCertificateNotAvailable")) {
-
-				String message = "Unable to establish an ssl connection, you need to install the servers ssl security certificate\n" +
-					"Example # certmgr --ssl " +
-					///* url + 
-					"  ( using the command line of your local operating system terminal/cmd.exe ect )\n\n" +
-					"if that doesn't work try importing mozilla's certificate store" +
-					"Example# mozroots --import --sync \n";
-
-				//MainWindow.currentInstance
-
-#if DEBUG
-				if (DebugRippleLibSharp.NetworkInterface) {
-					Logging.WriteLog (message);
-					Logging.WriteLog ("should print" + e.Exception.Message);
-				}
-#endif
-
-
-
-
-
-
-
-				return;
-			}
-
-
-#if DEBUG
-			if (DebugRippleLibSharp.NetworkInterface) {
-				Logging.WriteLog ("Error Occured\n" + e.Exception.Message + "\n");
-			}
-#endif
-			//stopConnect = true;
-			return;
+            //stopConnect = true;
+           
 		}
 
-
+        */
 
 
 

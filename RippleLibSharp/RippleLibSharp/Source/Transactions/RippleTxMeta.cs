@@ -35,19 +35,36 @@ namespace RippleLibSharp.Transactions
 #pragma warning restore IDE1006 // Naming Styles
 
 		public RippleNode GetFilledImmediate ( RippleAddress account ) {
-			
-			IEnumerable< RippleNode > nodes = from RippleNodeGroup rng in this.AffectedNodes
-			        where rng.CreatedNode != null 
-				&& rng.CreatedNode.NewFields != null
-				&& rng.CreatedNode.NewFields.Account != null
-			        && rng.CreatedNode.NewFields.Account.Equals (account)
-				&& rng.CreatedNode.LedgerEntryType != null
-				&& rng.CreatedNode.LedgerEntryType.Equals("Offer")
-			        select rng.GetNode ();
+
+			if (Configuration.Config.PreferLinq) {
+				IEnumerable<RippleNode> nodes = from RippleNodeGroup rng in this.AffectedNodes
+								where rng.CreatedNode != null
+								&& rng.CreatedNode.NewFields != null
+								&& rng.CreatedNode.NewFields.Account != null
+								&& rng.CreatedNode.NewFields.Account.Equals (account)
+								&& rng.CreatedNode.LedgerEntryType != null
+								&& rng.CreatedNode.LedgerEntryType.Equals ("Offer")
+								select rng.GetNode ();
 
 
 
-			return nodes.FirstOrDefault ();
+				return nodes.FirstOrDefault ();
+			} else {
+				foreach (RippleNodeGroup rng in AffectedNodes) {
+					if (
+						rng.CreatedNode != null
+						&& rng.CreatedNode.NewFields != null
+						&& rng.CreatedNode.NewFields.Account != null
+						&& rng.CreatedNode.NewFields.Account.Equals (account)
+						&& rng.CreatedNode.LedgerEntryType != null
+						&& rng.CreatedNode.LedgerEntryType.Equals ("Offer")
+					) {
+						return rng.GetNode ();
+					}
+				}
+			}
+
+			return null;
 		}
 
 		public Tuple<string,string> GetCancelDescription ( RippleAddress account) {
@@ -55,7 +72,7 @@ namespace RippleLibSharp.Transactions
 			StringBuilder s = new StringBuilder ();
 
 
-			LinkedList <OrderChange> oc = GetCanceledTx (account);
+			IEnumerable <OrderChange> oc = GetCanceledTx (account);
 
 			foreach ( OrderChange d in oc) {
 				b.AppendLine ( d.BuyOrderChange );
@@ -72,7 +89,7 @@ namespace RippleLibSharp.Transactions
 			StringBuilder b = new StringBuilder ();
 			StringBuilder s = new StringBuilder ();
 
-			LinkedList<OrderChange> cl = GetOrderChanges ( account );
+			IEnumerable<OrderChange> cl = GetOrderChanges ( account );
 
 			foreach (OrderChange d in cl) {
 				
@@ -85,38 +102,70 @@ namespace RippleLibSharp.Transactions
 		}
 
 
-		public LinkedList<OrderChange> GetOrderChanges ( RippleAddress account ) {
-			
+		public IEnumerable<OrderChange> GetOrderChanges ( RippleAddress account ) {
 
-			LinkedList<OrderChange> lis = new LinkedList<OrderChange> ();
+			IEnumerable<OrderChange> lis = null;
+			if (Configuration.Config.PreferLinq) {
+					lis = AffectedNodes.Select((RippleNodeGroup rng) => {
+					RippleNode rn = rng.GetNode ();
 
-			foreach (RippleNodeGroup rng in AffectedNodes) {
-				RippleNode rn = rng.GetNode ();
+					OrderChange res = rn.GetOfferChange (account);
 
-				OrderChange res = rn.GetOfferChange(account);
+					//if (res != null) {
+					//	lis.Add (res);
+					//}
+					return res;
+				});
 
-				if (res != null) {
-					lis.AddLast (res);
+
+				lis = lis.Where ((OrderChange arg) => arg != null);
+
+			} else {
+
+				List<OrderChange> list = new List<OrderChange> ();
+
+				foreach (RippleNodeGroup rng in AffectedNodes) {
+					RippleNode rn = rng.GetNode ();
+
+					OrderChange res = rn.GetOfferChange(account);
+
+					if (res != null) {
+						list.Add (res);
+					}
 				}
+
+				lis = list;
+				
 			}
 			return lis;
+			    
 		}
 
 
-		public LinkedList<OrderChange> GetCanceledTx (RippleAddress account) {
-			LinkedList<OrderChange> lis = new LinkedList < OrderChange > ();
-			foreach (RippleNodeGroup rng in AffectedNodes) {
-				RippleNode rn = rng.GetNode ();
+		public IEnumerable<OrderChange> GetCanceledTx (RippleAddress account) {
+			IEnumerable<OrderChange> cancel = null;
+			if (Configuration.Config.PreferLinq) {
+				LinkedList<OrderChange> lis = new LinkedList<OrderChange> ();
+				foreach (RippleNodeGroup rng in AffectedNodes) {
+					RippleNode rn = rng.GetNode ();
 
-				OrderChange res = rn.GetCanceledTx (account);
+					OrderChange res = rn.GetCanceledTx (account);
 
-				if (res != null) {
-					lis.AddLast (res);
+					if (res != null) {
+						lis.AddLast (res);
+					}
 				}
+				cancel = lis;
+
+			} else {
+				var v = from rng in AffectedNodes select rng.GetNode ().GetCanceledTx (account);
+				v = v.Where ((OrderChange arg) => arg != null);
+
+				cancel = v;
+				//cancel = v.ToList ();
 			}
-			return lis;
-		
-		
+
+			return cancel;
 		}
 
 

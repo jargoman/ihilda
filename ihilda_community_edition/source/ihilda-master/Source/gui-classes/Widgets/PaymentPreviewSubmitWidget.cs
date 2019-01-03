@@ -126,10 +126,25 @@ namespace IhildaWallet
 
 
 			RippleIdentifier rsa = rw.GetDecryptedSeed ();
+
+			while (rsa.GetHumanReadableIdentifier () == null) {
+				bool should = AreYouSure.AskQuestion (
+				"Invalid password",
+				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+				);
+
+				if (!should) {
+					return;
+				}
+
+				rsa = rw.GetDecryptedSeed ();
+			}
+
+
 			for (int index = 0; index < this.paymentstree1._payments_tuple.Item1.Length; index++) {
 
 
-				if (this.paymentstree1.tokenSource.IsCancellationRequested) {
+				if (token.IsCancellationRequested) {
 					//this.paymentstree1.stop = false;
 					return;
 				}

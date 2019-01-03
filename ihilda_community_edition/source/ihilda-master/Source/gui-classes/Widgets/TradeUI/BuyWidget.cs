@@ -1,17 +1,8 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Gtk;
-using RippleLibSharp.Transactions.TxTypes;
-using RippleLibSharp.Keys;
-using RippleLibSharp.Transactions;
-using RippleLibSharp.Network;
-using RippleLibSharp.Commands;
-using RippleLibSharp.Result;
-
-using IhildaWallet.Networking;
-using RippleLibSharp.Util;
 using IhildaWallet.Util;
+using RippleLibSharp.Transactions;
+using RippleLibSharp.Util;
 
 namespace IhildaWallet
 {
@@ -337,6 +328,9 @@ namespace IhildaWallet
 				return;
 			}
 
+			string mark = comboboxentry1.ActiveText;
+
+			off.BotMarking = mark;
 
 			off.taker_pays.amount = off.taker_pays.IsNative ? (Decimal)payamount * 1000000 : (Decimal)payamount;
 			off.taker_gets.amount = off.taker_gets.IsNative ? (Decimal)getamount * 1000000 : (Decimal)getamount;

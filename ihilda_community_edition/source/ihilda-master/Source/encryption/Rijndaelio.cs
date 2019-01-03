@@ -3,12 +3,10 @@
  */
 
 using System;
-using System.Threading;
-using System.Text;
 using System.IO;
 using System.Security.Cryptography;
+using System.Threading;
 using Gtk;
-
 using RippleLibSharp.Keys;
 using RippleLibSharp.Util;
 
@@ -22,6 +20,9 @@ namespace IhildaWallet
 			//this.Name = default_name;
 		}
 		*/
+
+
+
 
 		public static readonly string default_name = nameof (Rijndaelio);
 
@@ -42,7 +43,10 @@ namespace IhildaWallet
 		};  // Note : although this is a randomly derived array changing it's contents may break compatibility with decrypting existing wallets.
 
 		*/
-
+	 	public bool RememberPassword {
+			get;
+			set;
+		}
 
 		//public byte[] encrypt (byte[] message, String password) 
 		public byte[] Encrypt ( RippleSeedAddress seed, byte[] salt )
@@ -85,7 +89,7 @@ namespace IhildaWallet
 								byte[] encode = seed.GetBytes();
 									cryptostream.Write(encode,0,encode.Length);
 									cryptostream.Close();
-
+									memorystream.Flush ();
 									return memorystream.ToArray();
 								}
 							}
@@ -118,7 +122,10 @@ namespace IhildaWallet
 
 		public byte[] Decrypt ( byte [] cipher, byte[] salt, RippleAddress ra) {
 
-			string password = Program.botMode == null ? GetPasswordInput () : Program.GetPassword ();
+
+
+			string password = Password;
+
 
 			if (password == null) {
 				// TODO
@@ -179,8 +186,23 @@ namespace IhildaWallet
 
 		}
 
-		public string GetPasswordInput () {
+		public string Password { get; set; }
 
+		public static Rijndaelio GetPasswordInput () {
+
+			ManualResetEventSlim mre = new ManualResetEventSlim ();
+			mre.Reset ();
+			Rijndaelio rijndaelio = null;
+			Application.Invoke ( (object sender, EventArgs e) => {
+
+				rijndaelio = Rijndaelio.DoRijndaelioDialog ();
+				mre.Set();
+			});
+			mre.Wait ();
+			return rijndaelio;
+		}
+
+		public string GetPasswordCreateInput () {
 			ManualResetEventSlim mre = new ManualResetEventSlim ();
 			mre.Reset ();
 			string pass = null;
@@ -192,19 +214,32 @@ namespace IhildaWallet
 			return pass;
 		}
 
-		public string GetPasswordCreateInput () {
-			ManualResetEventSlim mre = new ManualResetEventSlim ();
-			mre.Reset ();
-			string pass = null;
-			Application.Invoke ( (object sender, EventArgs e) => {
-				pass = PasswordDialog.DoDialog ();
-				mre.Set();
-			});
-			mre.Wait ();
-			return pass;
+		public static Rijndaelio DoRijndaelioDialog ()
+		{
+
+			using (PasswordDialog pd = new PasswordDialog ("Please enter your password")) {
+
+				ResponseType rt = (ResponseType)pd.Run ();
+				pd.Hide ();
+
+				if (rt != ResponseType.Ok) {
+					return null;
+				}
+
+
+				string pass = pd.GetPassword ();
+
+				Rijndaelio rijndaelio = new Rijndaelio {
+					Password = pass,
+					RememberPassword = pd.RememberPassword
+
+				};
+
+				pd.Destroy ();
+
+				return rijndaelio;
+			}
 		}
-
-
 
 	} // class
 }  // namespace

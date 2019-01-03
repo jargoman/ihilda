@@ -69,6 +69,8 @@ namespace IhildaWallet
 
 			int lim = limit ?? 0;
 
+			RETRY:
+
 			Task<IEnumerable <Response<AccountTxResult>>> task = null;
 
 			try {
@@ -98,10 +100,14 @@ namespace IhildaWallet
 					throw new NullReferenceException ();
 				}
 
-				while (!task.IsCompleted && !cancelationToken.IsCancellationRequested) {
+
+				int minutes = 4;
+				int maxSeconds = 60 * minutes; // 
+				int seconds;
+				for (seconds = 0;  !task.IsCompleted && !task.IsFaulted && !task.IsCanceled && !cancelationToken.IsCancellationRequested && seconds < maxSeconds;  ) {
 					try {
-						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Waiting on network" });
-						for (int i = 0; i < 10 && !task.IsCompleted && !cancelationToken.IsCancellationRequested; i++) {
+						OnMessage?.Invoke (this, new MessageEventArgs { Message = "Waiting on network" });
+						for (int i = 0; i < 10 && !task.IsCompleted && !cancelationToken.IsCancellationRequested; i++, seconds++) {  // seconds are incremented where a second actually occurs and not in it's own loop. It's going to be ok. 
 							OnMessage?.Invoke (this, new MessageEventArgs () { Message = "." });
 							task.Wait (1000, cancelationToken);
 						}
@@ -112,7 +118,7 @@ namespace IhildaWallet
 							Logging.ReportException (method_sig, e);
 						}
 #endif
-
+						throw e;
 
 
 					} finally {
@@ -120,10 +126,32 @@ namespace IhildaWallet
 
 					}
 
+					if (seconds > 60) {
+						if (Program.botMode == null) {
+							OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Retrieving tx list is taking longer than usual. \"Stop when convient\" will exit loop gracefully\n" });
+						} else {
+							OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Retrieving tx list is taking longer than usual.\n" });
+						}
+					}
 
 				}
 
-				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Received response from network\n" });
+				if (task.IsCanceled || cancelationToken.IsCancellationRequested) {
+
+					return null;
+				}
+
+				if (task.IsFaulted) {
+					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Network task faulted Retrying\n" });
+					goto RETRY;
+				}
+
+				if (!(seconds < maxSeconds)) {
+					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "No response after " + minutes + " minutes elapsed. Retrying \n" });
+					goto RETRY;
+				}
+
+
 			} catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException) {
 #if DEBUG
 				if (DebugIhildaWallet.Robotics) {
@@ -163,57 +191,98 @@ namespace IhildaWallet
 				return null;
 			}
 
-			IEnumerable <Response<AccountTxResult>> results = task.Result;
+			IEnumerable<Response<AccountTxResult>> responses = task?.Result;  
 
-			if (results == null) {
+
+
+			if (responses == null) {
 				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Null response\n" });
 				return null;
 			}
 
+			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Received response from network\n" });
+
+
+
 			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Received response from server\n" });
 
-			List<RippleTxStructure> txStructures = new List<RippleTxStructure> ();
 
+			IEnumerable<RippleTxStructure> structures = null;
 
 			int lastledger = 0;
-			foreach (Response<AccountTxResult> res in results) {
+			if (!Program.preferLinq) {
 
-				AccountTxResult accTxResult = res.result;
+				List<RippleTxStructure> txStructures = new List<RippleTxStructure> ();
 
-				if (accTxResult == null) {
-					return null;
-				}
+
+
+				foreach (Response<AccountTxResult> res in responses) {
+
+					AccountTxResult accTxResult = res.result;
+
+					if (accTxResult == null) {
+						return null;
+					}
 
 
 #if DEBUG
 
-				string debug =
-					"ledgermax" +
-					accTxResult.ledger_index_max.ToString ()  +
+					string debug =
+						"ledgermax" +
+						accTxResult.ledger_index_max.ToString () +
 
-					"ledgermin" +
-					accTxResult.ledger_index_min.ToString ();
+						"ledgermin" +
+						accTxResult.ledger_index_min.ToString ();
 
-				Logging.WriteLog (debug);
+					Logging.WriteLog (debug);
 
 #endif
 
-				RippleTxStructure [] txs = accTxResult.transactions;
+					RippleTxStructure [] txs = accTxResult.transactions;
 
-				txStructures.AddRange (txs);
+					txStructures.AddRange (txs);
 
-				lastledger = accTxResult.ledger_index_max;
+					lastledger = Math.Max (accTxResult.ledger_index_max, lastledger);
+
+					structures = txStructures;
+				}
+
+
+			} else {
+
+				var results = from x in responses where x?.result != null select x.result;
+
+				lastledger = results.Max (arg => arg.ledger_index_max);
+
+				var txStructuresLinq = results
+				.Where (result => result.transactions != null)
+			    	.SelectMany (result =>
+				     result.transactions
+			    	);
+
+				structures = txStructuresLinq;
 			}
+
 			if (!ombTask.IsCompleted && !ombTask.IsCanceled && !ombTask.IsFaulted) {
 				try {
-					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Waiting on order management bot to load" });
+
+					OnMessage?.Invoke (
+						this, 
+						new MessageEventArgs () { 
+							Message = "Waiting on order management bot to load" });
+
+
 					cancelationToken.WaitHandle.WaitOne (1000);
 					while (!ombTask.IsCompleted && !ombTask.IsCanceled && !ombTask.IsFaulted) {
 						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "." });
 						cancelationToken.WaitHandle.WaitOne (1000);
 					}
 				} catch (Exception e) {
-
+#if DEBUG
+					if (DebugIhildaWallet.Robotics) {
+						Logging.ReportException (method_sig, e);
+					}
+#endif
 				} finally {
 					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "\n" });
 				}
@@ -229,7 +298,7 @@ namespace IhildaWallet
 			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Processing transactions\n" });
 			try {
 
-				total = omb.UpdateTx (txStructures);
+				total = omb.UpdateTx (structures);
 			}
 
 #pragma warning disable 0168
@@ -259,9 +328,19 @@ namespace IhildaWallet
 
 
 			if (total.Any()) {
-				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Generating buy back orders\n" });
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Generating buy back orders" });
 				try {
-					orders = omb.GetBuyBackOrders (total);
+
+					var genTask = Task.Run (delegate {
+						orders = omb.GetBuyBackOrders (total);
+
+					});
+
+					while ( genTask != null && !genTask.IsCanceled && !genTask.IsCompleted && !genTask.IsFaulted) {
+						genTask.Wait (500);
+						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "." });
+					}
+
 
 #pragma warning disable 0168
 				} catch (Exception e) {
@@ -274,7 +353,7 @@ namespace IhildaWallet
 #endif
 
 					StringBuilder message = new StringBuilder ();
-					message.Append ("Exception calculating buyorders...\nMessage : \n");
+					message.Append ("\nException calculating buyorders...\nMessage : \n");
 					message.Append (e.Message);
 					message.Append ("\n");
 					message.Append ("Stakctrace : \n");
@@ -282,10 +361,17 @@ namespace IhildaWallet
 					MessageDialog.ShowMessage (message.ToString ());
 					OnMessage?.Invoke (this, new MessageEventArgs () { Message = message.ToString () });
 					return null;
+				} finally {
+
+					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "\n"});
 				}
+
+				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Generated " + orders.Count() + " Orders\n" });
 
 			}
 
+
+			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Saving lastledger to rule list\n" });
 			RuleManagerObj.LastKnownLedger = lastledger;
 			RuleManagerObj.SaveRules ();
 

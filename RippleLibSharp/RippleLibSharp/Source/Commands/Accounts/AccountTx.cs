@@ -222,6 +222,7 @@ namespace RippleLibSharp.Commands.Accounts
 
 					if (task == null) {
 						//TODO
+						return null;
 					}
 
 					task.Wait(token);

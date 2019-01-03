@@ -129,6 +129,7 @@ namespace IhildaWallet
 						}
 						#endif
 						wmw = new WalletManagerWindow ();
+						wmw.Hide ();
 						//wmw.ShowAll();
 						#if DEBUG
 						if (DebugIhildaWallet.WalletManagerWindow) {

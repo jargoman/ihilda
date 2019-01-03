@@ -60,6 +60,7 @@ namespace RippleLibSharp.Commands.Server
 
 				native_base_fee = serverInfoResult.info.validated_ledger.base_fee_xrp; /*new decimal (serverinfo.info.validated_ledger.base_fee_xrp);*/
 
+				// INSANE. different convention for the fee... 0.00001 XRP vs 10 drops 
 				ulong transaction_fee = (ulong)((native_base_fee * 1000000) * serverInfoResult.info.load_factor);
 
 				Tuple<string, UInt32> ret = new Tuple<string, UInt32> (transaction_fee.ToString (), serverInfoResult.info.validated_ledger.seq);

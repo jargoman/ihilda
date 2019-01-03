@@ -2,6 +2,7 @@
 using RippleLibSharp.Keys;
 using System.Collections.Generic;
 using RippleLibSharp.Transactions;
+using System.Linq;
 
 namespace IhildaWallet
 {
@@ -17,46 +18,73 @@ namespace IhildaWallet
 
 
 
-		public static AutomatedOrder[] GetBuyBacks (OrderChange[] ords) {
+		public static IEnumerable<AutomatedOrder> GetBuyBacks (IEnumerable<OrderChange> ords) {
+			if (!Program.preferLinq) {
 
+				List<AutomatedOrder> lst = new List<AutomatedOrder> ();
+				foreach ( OrderChange o in ords) {
 
-			List<AutomatedOrder> lst = new List<AutomatedOrder> ();
-			foreach ( OrderChange o in ords) {
+					AutomatedOrder off = new AutomatedOrder {
 
-				AutomatedOrder off = new AutomatedOrder {
+						//Decimal price = off.TakerGets.getPriceAt (off.TakerPays);
 
-					//Decimal price = off.TakerGets.getPriceAt (off.TakerPays);
+						Account = o.Account,
 
-					Account = o.Account,
+						TakerGets = o.TakerPays / 1.007m,
+						TakerPays = o.TakerGets * 1.007m
+					};
 
-					TakerGets = o.TakerPays / 1.007m,
-					TakerPays = o.TakerGets * 1.007m
-				};
+					lst.Add (off);
+				}
 
-				lst.Add (off);
+				return lst.ToArray ();
+
+			} else {
+				var list = ords.Select (arg =>
+					new AutomatedOrder {
+						Account = arg.Account,
+
+						TakerGets = arg.TakerPays / 1.007m,
+						TakerPays = arg.TakerGets * 1.007m
+					}
+				);
+
+				return list;
 			}
-
-			return lst.ToArray ();
 		}
 
-		public static AutomatedOrder[] GetBuyBacks ( IEnumerable<AutomatedOrder> ords) {
-			List<AutomatedOrder> lst = new List<AutomatedOrder> ();
-			foreach ( AutomatedOrder o in ords) {
+		public static IEnumerable<AutomatedOrder> GetBuyBacks ( IEnumerable<AutomatedOrder> ords) {
+			if (!Program.preferLinq) {
+				List<AutomatedOrder> lst = new List<AutomatedOrder> ();
+				foreach (AutomatedOrder o in ords) {
 
-				AutomatedOrder off = new AutomatedOrder {
+					AutomatedOrder off = new AutomatedOrder {
 
-					//Decimal price = off.TakerGets.getPriceAt (off.TakerPays);
+						//Decimal price = off.TakerGets.getPriceAt (off.TakerPays);
 
-					Account = o.Account,
+						Account = o.Account,
 
-					TakerGets = o.TakerPays / 1.007m,
-					TakerPays = o.TakerGets * 1.007m
-				};
+						TakerGets = o.TakerPays / 1.007m,
+						TakerPays = o.TakerGets * 1.007m
+					};
 
-				lst.Add (off);
+					lst.Add (off);
+				}
+
+				return lst.ToArray ();
+			} else {
+				var list = ords.Select (arg =>
+					new AutomatedOrder {
+						Account = arg.Account,
+
+						TakerGets = arg.TakerPays / 1.007m,
+						TakerPays = arg.TakerGets * 1.007m
+					}
+				);
+
+				return list;
 			}
-
-			return lst.ToArray ();
+			//return list;
 		}
 
 		public static AutomatedOrder GetBuyBack (AutomatedOrder off, ProfitStrategy strategy, SentimentManager sentimentManager) {

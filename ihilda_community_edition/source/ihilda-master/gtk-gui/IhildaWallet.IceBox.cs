@@ -44,9 +44,7 @@ namespace IhildaWallet
 			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.GtkScrolledWindow]));
 			w2.Position = 0;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.pathstree1 = new global::IhildaWallet.PathsTree();
-			this.pathstree1.Events = ((global::Gdk.EventMask)(256));
-			this.pathstree1.Name = "pathstree1";
+			this.pathstree1 = null;
 			this.vbox2.Add(this.pathstree1);
 			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.pathstree1]));
 			w3.Position = 1;

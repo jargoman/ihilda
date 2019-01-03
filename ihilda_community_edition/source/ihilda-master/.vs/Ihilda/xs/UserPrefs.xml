@@ -1,21 +1,59 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../../RippleLibSharp/RippleLibSharp/Source/Commands/Server/ServerInfo.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/bot/OrderSubmitter.cs">
     <Files>
-      <File FileName="Source/encryption/TrippleEntente.cs" Line="220" Column="26" />
-      <File FileName="Source/gui-classes/Dialogs/TrippleEntenteDialog.cs" Line="63" Column="46" />
-      <File FileName="Source/WalletClasses/RippleWallet.cs" Line="1116" Column="1" />
-      <File FileName="Source/gui-classes/Widgets/PayUI/BalanceTab.cs" Line="284" Column="1" />
-      <File FileName="Source/gui-classes/Widgets/Trees/WalletTree.cs" Line="813" Column="5" />
-      <File FileName="Source/gui-classes/Widgets/OrderPreviewSubmitWidget.cs" Line="1060" Column="43" />
-      <File FileName="Source/bot/AccountSequenceCache.cs" Line="282" Column="35" />
-      <File FileName="Source/bot/Robotics.cs" Line="216" Column="6" />
-      <File FileName="Source/bot/OrderManagementBot.cs" Line="45" Column="66" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Keys/RipplePrivateKey.cs" Line="23" Column="10" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Binary/Base58.cs" Line="133" Column="25" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Keys/RippleIdentifier.cs" Line="86" Column="4" />
-      <File FileName="Source/gui-classes/Widgets/OptionSettingsWidget/FeeOptionsWidget.cs" Line="217" Column="25" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Commands/Server/ServerInfo.cs" Line="33" Column="39" />
+      <File FileName="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs" Line="1055" Column="59" />
+      <File FileName="Source/bot/OrderSubmitter.cs" Line="1012" Column="3" />
+      <File FileName="Source/gui-classes/Dialogs/AreYouSure.cs" Line="47" Column="22" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Ihilda" expanded="True">
+            <Node name="IhildaWallet" expanded="True">
+              <Node name="Source" expanded="True">
+                <Node name="bot" expanded="True">
+                  <Node name="OrderSubmitter.cs" selected="True" />
+                </Node>
+                <Node name="gui-classes" expanded="True">
+                  <Node name="Dialogs" expanded="True" />
+                  <Node name="Widgets" expanded="True">
+                    <Node name="OptionSettingsWidget" expanded="True" />
+                    <Node name="RuleWidgets" expanded="True" />
+                    <Node name="Trees" expanded="True" />
+                    <Node name="Views" expanded="True" />
+                    <Node name="WalletUI" expanded="True" />
+                  </Node>
+                  <Node name="Windows" expanded="True" />
+                </Node>
+                <Node name="util" expanded="True" />
+              </Node>
+            </Node>
+            <Node name="RippleLibSharp" expanded="True">
+              <Node name="Source" expanded="True">
+                <Node name="Commands" expanded="True">
+                  <Node name="Accounts" expanded="True" />
+                  <Node name="Server" expanded="True" />
+                  <Node name="Stipulate" expanded="True" />
+                  <Node name="Subscriptions" expanded="True" />
+                  <Node name="Tx" expanded="True" />
+                </Node>
+                <Node name="Configuration" expanded="True" />
+                <Node name="Keys" expanded="True" />
+                <Node name="Network" expanded="True" />
+                <Node name="Nodes" expanded="True" />
+                <Node name="Paths" expanded="True" />
+                <Node name="Result" expanded="True" />
+                <Node name="Third-Party" expanded="True" />
+                <Node name="Transactions" expanded="True" />
+                <Node name="Trust" expanded="True" />
+                <Node name="Unit-Testing" expanded="True" />
+                <Node name="Util" expanded="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />

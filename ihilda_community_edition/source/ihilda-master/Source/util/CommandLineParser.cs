@@ -244,7 +244,7 @@ namespace IhildaWallet
 			usage.Clear ();
 			usage.Append (Program.appname);
 			usage.AppendLine (" darkmode={true,false}");
-			usage.AppendLine ("enable or disable darkmode");
+			usage.AppendLine ("Enable or disable darkmode");
 			usage.AppendLine ("Defaults to false"); 
 			usage.AppendLine ("Note to achive a dark look you must edit your gtk2 and/or gtk3 theme");
 			usage.AppendLine ("gtk themes are applied system wide");
@@ -254,10 +254,48 @@ namespace IhildaWallet
 
 			dark.launch += (string param) => {
 
-				if (StringRepresentsTrue(param)) {
-					Program.darkmode = true;
-				}
+				Program.darkmode |= StringRepresentsTrue (param);
 
+			};
+
+			IEnumerable<string> linqs = new String [] { "linq" };
+			Command linq = new Command (linqs);
+			commands.Add (linq);
+
+			usage.Clear ();
+			usage.Append (Program.appname);
+			usage.AppendLine (" linq={true,false}");
+			usage.AppendLine ("Enable or disable linq as the preferred algorithm.");
+			usage.AppendLine ("Defaults to false");
+
+
+			linq.UsageText = usage.ToString ();
+
+
+			linq.launch += (string param) => {
+
+				Program.preferLinq |= StringRepresentsTrue (param);
+				RippleLibSharp.Configuration.Config.PreferLinq = Program.preferLinq;
+
+			};
+
+			string parallelStr = "parallelOrderSubmit";
+			IEnumerable<string> parallels = new String [] { parallelStr };
+			Command parallel = new Command (parallels);
+			commands.Add (parallel);
+
+			usage.Clear ();
+			usage.Append (" ");
+			usage.Append (parallelStr);
+			usage.Append ("={true,false}");
+			usage.Append ("Enable or disable parallel order verification");
+			usage.Append ("Uses multithreading to speed up automation");
+			usage.Append ("Defaults to false");
+
+			parallel.UsageText = usage.ToString ();
+
+			parallel.launch += (string param) => {
+				Program.parallelVerify |= StringRepresentsTrue (param);
 			};
 
 			IEnumerable<string> bots = new String [] { "bot", "marketbot", "automate"};
@@ -694,8 +732,9 @@ namespace IhildaWallet
 
 			public string UsageText = "";
 
+#if DEBUG
 			private const string cls_str = nameof (CommandLineParser) + "." + nameof (Command) +  DebugRippleLibSharp.both_parentheses;
-
+#endif
 			public IEnumerable<string> modifiers = null;
 
 			public Del launch = null;

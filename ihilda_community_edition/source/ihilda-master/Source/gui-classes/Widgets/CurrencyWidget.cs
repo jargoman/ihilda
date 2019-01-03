@@ -214,7 +214,7 @@ namespace IhildaWallet
 
 			AccountLinesResult alr = resp.result;
 
-			List<RippleCurrency> rc = alr.GetBalanceAsCurrency (currency);
+			IEnumerable<RippleCurrency> rc = alr.GetBalanceAsCurrency (currency);
 			if (rc == null) {
 				this.SetAsUnSynced ();
 				return;

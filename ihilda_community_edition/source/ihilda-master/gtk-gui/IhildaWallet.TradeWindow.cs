@@ -82,7 +82,9 @@ namespace IhildaWallet
 			this.vbox2.Name = "vbox2";
 			this.vbox2.Spacing = 6;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.walletswitchwidget2 = null;
+			this.walletswitchwidget2 = new global::IhildaWallet.WalletSwitchWidget();
+			this.walletswitchwidget2.Events = ((global::Gdk.EventMask)(256));
+			this.walletswitchwidget2.Name = "walletswitchwidget2";
 			this.vbox2.Add(this.walletswitchwidget2);
 			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.walletswitchwidget2]));
 			w2.Position = 0;
@@ -97,13 +99,17 @@ namespace IhildaWallet
 			this.table8.RowSpacing = ((uint)(6));
 			this.table8.ColumnSpacing = ((uint)(6));
 			// Container child table8.Gtk.Table+TableChild
-			this.currencywidget1 = null;
+			this.currencywidget1 = new global::IhildaWallet.CurrencyWidget();
+			this.currencywidget1.Events = ((global::Gdk.EventMask)(256));
+			this.currencywidget1.Name = "currencywidget1";
 			this.table8.Add(this.currencywidget1);
 			global::Gtk.Table.TableChild w3 = ((global::Gtk.Table.TableChild)(this.table8[this.currencywidget1]));
 			w3.XOptions = ((global::Gtk.AttachOptions)(4));
 			w3.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table8.Gtk.Table+TableChild
-			this.currencywidget2 = null;
+			this.currencywidget2 = new global::IhildaWallet.CurrencyWidget();
+			this.currencywidget2.Events = ((global::Gdk.EventMask)(256));
+			this.currencywidget2.Name = "currencywidget2";
 			this.table8.Add(this.currencywidget2);
 			global::Gtk.Table.TableChild w4 = ((global::Gtk.Table.TableChild)(this.table8[this.currencywidget2]));
 			w4.TopAttach = ((uint)(1));
@@ -116,7 +122,9 @@ namespace IhildaWallet
 			w5.Expand = false;
 			w5.Fill = false;
 			// Container child hbox3.Gtk.Box+BoxChild
-			this.spreadwidget1 = null;
+			this.spreadwidget1 = new global::IhildaWallet.SpreadWidget();
+			this.spreadwidget1.Events = ((global::Gdk.EventMask)(256));
+			this.spreadwidget1.Name = "spreadwidget1";
 			this.hbox3.Add(this.spreadwidget1);
 			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.spreadwidget1]));
 			w6.PackType = ((global::Gtk.PackType)(1));
@@ -131,7 +139,7 @@ namespace IhildaWallet
 			this.masternotebook = new global::Gtk.Notebook();
 			this.masternotebook.CanFocus = true;
 			this.masternotebook.Name = "masternotebook";
-			this.masternotebook.CurrentPage = 0;
+			this.masternotebook.CurrentPage = 1;
 			this.masternotebook.TabPos = ((global::Gtk.PositionType)(0));
 			// Container child masternotebook.Gtk.Notebook+NotebookChild
 			this.buynotebook = new global::Gtk.Notebook();
@@ -139,7 +147,9 @@ namespace IhildaWallet
 			this.buynotebook.Name = "buynotebook";
 			this.buynotebook.CurrentPage = 0;
 			// Container child buynotebook.Gtk.Notebook+NotebookChild
-			this.buywidget1 = null;
+			this.buywidget1 = new global::IhildaWallet.BuyWidget();
+			this.buywidget1.Events = ((global::Gdk.EventMask)(256));
+			this.buywidget1.Name = "buywidget1";
 			this.buynotebook.Add(this.buywidget1);
 			// Notebook tab
 			this.label29 = new global::Gtk.Label();
@@ -149,7 +159,9 @@ namespace IhildaWallet
 			this.buynotebook.SetTabLabel(this.buywidget1, this.label29);
 			this.label29.ShowAll();
 			// Container child buynotebook.Gtk.Notebook+NotebookChild
-			this.cascadedbuywidget1 = null;
+			this.cascadedbuywidget1 = new global::IhildaWallet.CascadedBuyWidget();
+			this.cascadedbuywidget1.Events = ((global::Gdk.EventMask)(256));
+			this.cascadedbuywidget1.Name = "cascadedbuywidget1";
 			this.buynotebook.Add(this.cascadedbuywidget1);
 			global::Gtk.Notebook.NotebookChild w9 = ((global::Gtk.Notebook.NotebookChild)(this.buynotebook[this.cascadedbuywidget1]));
 			w9.Position = 1;
@@ -161,7 +173,9 @@ namespace IhildaWallet
 			this.buynotebook.SetTabLabel(this.cascadedbuywidget1, this.label36);
 			this.label36.ShowAll();
 			// Container child buynotebook.Gtk.Notebook+NotebookChild
-			this.automatedbuywidget1 = null;
+			this.automatedbuywidget1 = new global::IhildaWallet.AutomatedBuyWidget();
+			this.automatedbuywidget1.Events = ((global::Gdk.EventMask)(256));
+			this.automatedbuywidget1.Name = "automatedbuywidget1";
 			this.buynotebook.Add(this.automatedbuywidget1);
 			global::Gtk.Notebook.NotebookChild w10 = ((global::Gtk.Notebook.NotebookChild)(this.buynotebook[this.automatedbuywidget1]));
 			w10.Position = 2;
@@ -185,7 +199,9 @@ namespace IhildaWallet
 			this.sellnotebook.Name = "sellnotebook";
 			this.sellnotebook.CurrentPage = 0;
 			// Container child sellnotebook.Gtk.Notebook+NotebookChild
-			this.sellwidget1 = null;
+			this.sellwidget1 = new global::IhildaWallet.SellWidget();
+			this.sellwidget1.Events = ((global::Gdk.EventMask)(256));
+			this.sellwidget1.Name = "sellwidget1";
 			this.sellnotebook.Add(this.sellwidget1);
 			// Notebook tab
 			this.label74 = new global::Gtk.Label();
@@ -194,7 +210,9 @@ namespace IhildaWallet
 			this.sellnotebook.SetTabLabel(this.sellwidget1, this.label74);
 			this.label74.ShowAll();
 			// Container child sellnotebook.Gtk.Notebook+NotebookChild
-			this.cascadedsellwidget1 = null;
+			this.cascadedsellwidget1 = new global::IhildaWallet.CascadedSellWidget();
+			this.cascadedsellwidget1.Events = ((global::Gdk.EventMask)(256));
+			this.cascadedsellwidget1.Name = "cascadedsellwidget1";
 			this.sellnotebook.Add(this.cascadedsellwidget1);
 			global::Gtk.Notebook.NotebookChild w13 = ((global::Gtk.Notebook.NotebookChild)(this.sellnotebook[this.cascadedsellwidget1]));
 			w13.Position = 1;
@@ -206,7 +224,9 @@ namespace IhildaWallet
 			this.sellnotebook.SetTabLabel(this.cascadedsellwidget1, this.label75);
 			this.label75.ShowAll();
 			// Container child sellnotebook.Gtk.Notebook+NotebookChild
-			this.automatedsellwidget1 = null;
+			this.automatedsellwidget1 = new global::IhildaWallet.AutomatedSellWidget();
+			this.automatedsellwidget1.Events = ((global::Gdk.EventMask)(256));
+			this.automatedsellwidget1.Name = "automatedsellwidget1";
 			this.sellnotebook.Add(this.automatedsellwidget1);
 			global::Gtk.Notebook.NotebookChild w14 = ((global::Gtk.Notebook.NotebookChild)(this.sellnotebook[this.automatedsellwidget1]));
 			w14.Position = 2;

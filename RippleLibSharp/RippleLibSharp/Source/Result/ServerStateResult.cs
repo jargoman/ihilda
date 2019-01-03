@@ -40,6 +40,8 @@ namespace RippleLibSharp.Result
 	}
 
 
+
+
 	public class ValidatedLedgerState
 	{
 		public int base_fee { get; set; }

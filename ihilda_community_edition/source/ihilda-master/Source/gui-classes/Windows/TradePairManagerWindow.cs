@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using RippleLibSharp.Network;
-using IhildaWallet.Networking;
 using Gtk;
 
 using IhildaWallet.Splashes;
@@ -89,20 +87,36 @@ namespace IhildaWallet
 				return;
 			}
 
+			DepthChartWidget dcw = null;
+			DepthChartWindow dcwin = null;
+
+			ManualResetEvent manualResetEvent = new ManualResetEvent (false);
+			manualResetEvent.Reset ();
 			Application.Invoke (
 				delegate {
-					DepthChartWindow dcwin = new DepthChartWindow (rippleWallet, tp);
-					DepthChartWidget dcw = dcwin.GetWidget ();
+					dcwin = new DepthChartWindow (rippleWallet, tp);
+					dcwin.Show ();
 
-					if (dcw == null) {
-						return;
-					}
+					dcw = dcwin.GetWidget ();
 
-					dcw.UpdateBooks (new CancellationToken());
-					dcw.Show ();
+					manualResetEvent.Set ();
+		    			
+					
 
 				}
 			);
+			manualResetEvent.WaitOne ();
+
+			if (dcw == null) {
+				return;
+			}
+			dcw.UpdateBooks (new CancellationToken ());
+
+			Gtk.Application.Invoke ( delegate {
+				dcwin.Show ();
+				dcw.Show ();
+
+			});
 
 		}
 

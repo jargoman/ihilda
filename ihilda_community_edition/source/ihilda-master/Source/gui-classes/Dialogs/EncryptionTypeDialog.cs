@@ -13,13 +13,18 @@ namespace IhildaWallet
 
 			ClearInfoBar ();
 
+			this.label1.Markup = "<span>Please choose an encryption type</span>";
+			this.label1.Show ();
+
 		}
 
 		public void ClearInfoBar ()
 		{
-			this.label1.UseMarkup = true;
-			this.label1.Markup = "";
-			this.label1.Hide ();
+			//this.label1.UseMarkup = true;
+			//this.label1.Markup = "";
+			this.label1.Markup = "<span>Please choose an encryption type</span>";
+			this.label1.Show ();
+			//this.label1.Hide ();
 		}
 
 		public void Setcombo () {
@@ -40,14 +45,14 @@ namespace IhildaWallet
 
 		public EncryptionType GetComboBoxChoice () {
 			string boxtext = this.comboboxentry1.Entry.Text;
-			if (string.IsNullOrWhiteSpace (boxtext)) {
+			if (string.IsNullOrWhiteSpace (boxtext) || boxtext == nameof ( EncryptionType.Plaintext )) {
 
 				this.label1.Markup = "<span fgcolor=\"red\">Please choose an encryption type</span>";
 				this.label1.Show ();
 				return EncryptionType.None;
 
 			}
-			EncryptionType et = (EncryptionType)Enum.Parse (typeof(EncryptionType), boxtext);
+			EncryptionType et = (EncryptionType) Enum.Parse ( typeof(EncryptionType), boxtext );
 			return et;
 		}
 	}

@@ -41,6 +41,7 @@ namespace IhildaWallet
 			this.label1 = new global::Gtk.Label();
 			this.label1.Name = "label1";
 			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString("label1");
+			this.label1.UseMarkup = true;
 			this.vbox3.Add(this.label1);
 			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.label1]));
 			w3.Position = 1;

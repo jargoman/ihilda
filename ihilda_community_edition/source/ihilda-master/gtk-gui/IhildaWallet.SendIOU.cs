@@ -162,8 +162,6 @@ namespace IhildaWallet
 			this.hbox5.Add(this.currencycomboboxentry);
 			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.hbox5[this.currencycomboboxentry]));
 			w9.Position = 0;
-			w9.Expand = false;
-			w9.Fill = false;
 			// Container child hbox5.Gtk.Box+BoxChild
 			this.balancelabel = new global::Gtk.Label();
 			this.balancelabel.Name = "balancelabel";

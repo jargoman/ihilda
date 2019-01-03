@@ -2,12 +2,13 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Gtk;
-
+using RippleLibSharp.Transactions;
+using RippleLibSharp.Trust;
 using RippleLibSharp.Util;
 
 namespace IhildaWallet
 {
-	public partial class TrustManagementWindow : Gtk.Window
+	public partial class TrustManagementWindow : Window
 	{
 		public TrustManagementWindow (RippleWallet rippleWallet) :
 				base (Gtk.WindowType.Toplevel)
@@ -76,9 +77,9 @@ namespace IhildaWallet
 		private void SetRippleWallet (RippleWallet rw)
 		{
 #if DEBUG
-			String method_sig = clsstr +  nameof (SetRippleWallet) + DebugRippleLibSharp.left_parentheses + nameof (RippleWallet) + DebugRippleLibSharp.space_char + nameof(rw) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString(rw) + DebugRippleLibSharp.right_parentheses;
+			String method_sig = clsstr + nameof (SetRippleWallet) + DebugRippleLibSharp.left_parentheses + nameof (RippleWallet) + DebugRippleLibSharp.space_char + nameof (rw) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString (rw) + DebugRippleLibSharp.right_parentheses;
 			if (DebugIhildaWallet.TrustManagementWindow) {
-				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin );
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
 #endif
 
@@ -87,7 +88,7 @@ namespace IhildaWallet
 			if (this.walletswitchwidget3 != null) {
 #if DEBUG
 				if (DebugIhildaWallet.TrustManagementWindow) {
-					
+
 					Logging.WriteLog (method_sig + "walletswitchwidget3 != null");
 				}
 #endif
@@ -124,6 +125,19 @@ namespace IhildaWallet
 
 		}
 
+
+		public void EditTrustLine (TrustLine rippleTrustLine)
+		{
+
+			this.trustsetter2.SetTrustLine (rippleTrustLine);
+		}
+
+		/*
+		public void EditTrustLine ( RippleCurrency currency )
+		{
+			this.trustsetter2
+		}
+		*/
 
 		protected void OnDeleteEvent (object sender, DeleteEventArgs a)
 		{

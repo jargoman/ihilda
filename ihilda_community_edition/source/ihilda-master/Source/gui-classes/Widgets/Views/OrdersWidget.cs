@@ -89,7 +89,8 @@ namespace IhildaWallet
 			if (pagerwidget1 == null) {
 				pagerwidget1 = new PagerWidget ();
 				pagerwidget1.Show ();
-				vbox1.Add (pagerwidget1);
+				hbox11.Add (pagerwidget1);
+				
 			}
 
 			this.infoBarLabel.UseMarkup = true;
@@ -602,8 +603,9 @@ namespace IhildaWallet
 			        select res.result?.offers;
 
 
+			IEnumerable<Offer> offerss = offerslist.SelectMany ((IEnumerable<Offer> arg) => arg);
 
-			
+			/*
 			List<Offer> offers = new List<Offer> ();
 
 			foreach (var offs in offerslist) {
@@ -614,7 +616,7 @@ namespace IhildaWallet
 				return;
 			}
 
-
+			*/
 
 			//AccountOffersResult aor = task?.Result?.result;
 
@@ -627,7 +629,7 @@ namespace IhildaWallet
 
 
 			//this.setOffers( aor.offers);
-			this.SetOffers (offers);
+			this.SetOffers (offerss);
 
 		}
 

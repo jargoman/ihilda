@@ -71,8 +71,9 @@ namespace RippleLibSharp.Util
 		public static string GREEN = "\"green\"";
 		public static string YELLOW = "\"yellow\"";
 		public static string PURPLE = "\"purple\"";
-		public string ORANGE = "\"orange\"";
-
+		//public static string ORANGE = "\"orange\"";
+		public static string ORANGE = "\"orange\"";
+		public static string CHARTREUSE = "\"chartreuse\"";
 
 		private static object lockObj = new object ();
 		private static StringBuilder _stringBuilder = new StringBuilder();

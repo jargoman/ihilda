@@ -197,7 +197,9 @@ namespace IhildaWallet.Util
 						&& LeIceSense.LICENSE_CURRENCY.Equals (t.currency)
 						&& LeIceSense.LICENSE_ISSUER.Equals (t.account)
 						select t;
+			var ice = trust.FirstOrDefault ();
 
+			/*
 			foreach (TrustLine t in trust) {
 				if (t == null)
 					continue;
@@ -205,8 +207,9 @@ namespace IhildaWallet.Util
 				return t.GetBalanceAsDecimal ();
 
 			}
+			*/    
 
-			return 0m;
+			return ice == null ? 0m : ice.GetBalanceAsDecimal();
 
 		}
 

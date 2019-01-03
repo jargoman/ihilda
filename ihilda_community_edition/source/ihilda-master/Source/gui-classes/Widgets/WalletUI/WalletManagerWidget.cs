@@ -15,6 +15,8 @@ using System.Drawing;
 using System.IO;
 using System.Drawing.Imaging;
 using Pango;
+using System.Text;
+using RippleLibSharp.Commands.Subscriptions;
 
 namespace IhildaWallet
 {
@@ -39,7 +41,7 @@ namespace IhildaWallet
 				vbox4.Add (this.wallettree1);
 			}
 
-
+	    		
 
 			this.SetActions ();
 
@@ -50,7 +52,22 @@ namespace IhildaWallet
 			}
 #endif
 
+			ledgerlabel.UseMarkup = true;
+
 			currentInstance = this;
+
+			LedgerTracker.OnLedgerClosed += (object sender, LedgerClosed e) => {
+				Gtk.Application.Invoke (delegate {
+					string str = e.ledger_index.ToString ();
+					ledgerlabel.Markup = 
+						(string)(Program.darkmode ? "<span fgcolor=\"chartreuse\">" : "<span fgcolor=\"green\">") + 
+						 str + 
+						"</span>";
+				});
+
+			};
+
+
 
 			this.button91.Clicked += (object sender, EventArgs e) => {
 				DebuggingOptionsDialogWindow debuggingWindow = new DebuggingOptionsDialogWindow {
@@ -224,37 +241,8 @@ namespace IhildaWallet
 				//window.SetRippleWallet (rippleWallet);
 			};
 
-			this.button135.Clicked += (object sender, EventArgs e) => {
+			this.paperWalletButton.Clicked += PaperWalletButton_Clicked;
 
-				RippleWallet rippleWallet = WalletManager.GetRippleWallet ();
-				if (rippleWallet == null) {
-					MessageDialog.ShowMessage ("No wallet selected", "You must select a wallet first");
-					return;
-				}
-				RippleIdentifier secretIdentifier = rippleWallet.GetDecryptedSeed ();
-				if (secretIdentifier == null) {
-					// TODO 
-					//MessageDialog.ShowMessage ("invalid seed");
-					return;
-				}
-
-				string secret = secretIdentifier.ToString ();
-
-				PaperWalletWindow paperWalletWindow = new PaperWalletWindow {
-					Parent = this,
-					Modal = true
-				};
-
-				paperWalletWindow.Show ();
-
-				if (rippleWallet.AccountType == RippleWalletTypeEnum.Master || rippleWallet.AccountType == RippleWalletTypeEnum.Regular) {
-					paperWalletWindow.SetSecret (secret);
-				}
-
-				if (rippleWallet.AccountType == RippleWalletTypeEnum.MasterPrivateKey) {
-					paperWalletWindow.SetPrivateKey (secret);
-				}
-			};
 
 			this.button134.Clicked += (object sender, EventArgs e) => {
 
@@ -350,6 +338,7 @@ namespace IhildaWallet
 				DarkMode ();
 			}
 
+			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
 			eventbox6.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
 			eventbox6.ModifyBase (StateType.Normal, new Gdk.Color (0, 0, 0));
 
@@ -381,6 +370,17 @@ namespace IhildaWallet
 	*/
 
 
+
+			eventbox8.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
+
+				RippleWallet rippleWallet = WalletSelectDialog.DoDialog ();
+
+				if (rippleWallet != null) {
+					walletswitchwidget1.SetRippleWallet (rippleWallet);
+				}
+				
+			};
+
 		}
 
 
@@ -393,13 +393,35 @@ namespace IhildaWallet
 			label6.UseMarkup = true;
 			label9.UseMarkup = true;
 
-			label4.Markup = "<span fgcolor=\"orchid\" bgcolor=\"black\" size=\"x-large\"><b> Transact </b></span>";
-			label5.Markup = "<span fgcolor=\"orchid\" bgcolor=\"black\" size=\"x-large\"><b> Keys </b></span>";
-			label6.Markup = "<span fgcolor=\"orchid\" bgcolor = \"black\" size =\"x-large\" ><b> Restore </b></span>";
-			label9.Markup = "<span size=\"x-large\" fgcolor=\"orchid\" bgcolor=\"black\"><b> Options </b></span>";
+			StringBuilder stringBuilder = new StringBuilder ();
 
+			stringBuilder.Append ("<span fgcolor=\"orchid\" ");
+			//stringBuilder.Append ("bgcolor =\"black\" ");
+			stringBuilder.Append ("size =\"x-large\"><b> Transact </b></span>");
+			label4.Markup = stringBuilder.ToString();
+			stringBuilder.Clear ();
+
+			
+			stringBuilder.Append ("<span fgcolor=\"orchid\" ");
+			//stringBuilder.Append ("bgcolor=\"black\" ");
+			stringBuilder.Append ("size =\"x-large\"><b> Keys </b></span>");
+			label5.Markup = stringBuilder.ToString ();
+			stringBuilder.Clear ();
+
+
+			stringBuilder.Append ("<span fgcolor=\"orchid\" ");
+			//stringBuilder.Append ("bgcolor = \"black\" ");
+			stringBuilder.Append ("size =\"x-large\"><b> Restore </b></span> ");
+			label6.Markup = stringBuilder.ToString ();
+			stringBuilder.Clear ();
+
+			stringBuilder.Append ("<span size=\"x-large\" fgcolor=\"orchid\"");
+			//stringBuilder.Append ("bgcolor=\"black\"");
+			stringBuilder.Append ("><b> Options </b></span>");
+			label9.Markup = stringBuilder.ToString();
+			stringBuilder.Clear ();
 			//this.eventbox5.ModifyBg (StateType.Normal, new Gdk.Color (218, 112, 214));
-			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
+			
 
 			eventbox3.ModifyBase (StateType.Normal, new Gdk.Color (55, 55, 55));
 			eventbox3.ModifyBg (StateType.Normal, new Gdk.Color (55, 55, 55));
@@ -412,6 +434,63 @@ namespace IhildaWallet
 
 
 		}
+
+		void PaperWalletButton_Clicked (object sender, EventArgs e)
+		{
+
+			Task.Run (  delegate {
+			
+				RippleWallet rippleWallet = WalletManager.GetRippleWallet ();
+				if (rippleWallet == null) {
+					MessageDialog.ShowMessage ("No wallet selected", "You must select a wallet first");
+					return;
+				}
+				RippleIdentifier secretIdentifier = rippleWallet.GetDecryptedSeed ();
+				if (secretIdentifier == null) {
+					// TODO 
+					//MessageDialog.ShowMessage ("invalid seed");
+					return;
+				}
+
+
+				while ( secretIdentifier.GetHumanReadableIdentifier () == null ) {
+					bool should = AreYouSure.AskQuestionNonGuiThread (
+						"Invalid password",
+						"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+					);
+
+					if (!should) {
+						return;
+					}
+
+					secretIdentifier = rippleWallet.GetDecryptedSeed ();
+				}
+
+
+				string secret = secretIdentifier.ToString ();
+
+
+				Gtk.Application.Invoke ( delegate {
+					PaperWalletWindow paperWalletWindow = new PaperWalletWindow {
+						Parent = this,
+						Modal = true
+					};
+
+					paperWalletWindow.Show ();
+
+					if (rippleWallet.AccountType == RippleWalletTypeEnum.Master || rippleWallet.AccountType == RippleWalletTypeEnum.Regular) {
+						paperWalletWindow.SetSecret (secret);
+					}
+
+					if (rippleWallet.AccountType == RippleWalletTypeEnum.MasterPrivateKey) {
+						paperWalletWindow.SetPrivateKey (secret);
+					}
+
+				});
+
+			});
+		}
+
 
 		public void SetHelpPopups ()
 		{
@@ -435,16 +514,15 @@ namespace IhildaWallet
 			upgradebutton.TooltipMarkup = "";
 			importButton.TooltipMarkup = "Import wallet to .ice file";
 			exportButton.TooltipMarkup = "Export wallet to .ice file";
-			button135.TooltipMarkup = "Prepare a printable document for offline wallet storage";
+			paperWalletButton.TooltipMarkup = "Prepare a printable document for offline wallet storage";
 			button134.TooltipMarkup = "Remove automatically generated wallet backupfiles\nDeleting a wallet does not remove it's backup";
-
 			networkbutton1.TooltipMarkup = "Change network settings\nConnect to network\nView Server information";
 			rclAccountButton.TooltipMarkup = "Administer wallet account settings\n<span fgcolor=\"red\">Advanced users only</span>";
 			optionsbutton1.TooltipMarkup = "Wallet Options and Settings";
 			consolebutton1.TooltipMarkup = "Open command line interface";
 			button91.TooltipMarkup = "Manaage debbugger output";
 
-			image2.TooltipMarkup = "Select a wallet to view it's balances";
+			image1.TooltipMarkup = "Select a wallet to view it's balances";
 
 			quitButton.TooltipMarkup = "Exit application";
 
@@ -492,6 +570,20 @@ namespace IhildaWallet
 				return;
 			}
 
+			if (rw.IsEncrypted()) {
+				string enc = rw.GetStoredEncryptionType ();
+
+				StringBuilder stringBuilder = new StringBuilder ();
+
+
+				stringBuilder.Append ("Wallet ");
+				stringBuilder.Append (rw.WalletName);
+				stringBuilder.Append (" is already encrypted with type ");
+				stringBuilder.Append (enc);
+
+				MessageDialog.ShowMessage ("Already encrypted", stringBuilder.ToString ());
+				return;
+			}
 
 
 			rw.EncryptWithSideEffects ();
@@ -509,7 +601,17 @@ namespace IhildaWallet
 				return;
 			}
 
+			if (!rw.IsEncrypted()) {
+				StringBuilder stringBuilder = new StringBuilder ();
 
+
+				stringBuilder.Append ("Wallet ");
+				stringBuilder.Append (rw.WalletName);
+				stringBuilder.Append (" is already dencrypted");
+
+				MessageDialog.ShowMessage ("Decrypted", stringBuilder.ToString ());
+				return;
+			}
 
 			//IEncrypt ie = new Rijndaelio ();
 
@@ -913,14 +1015,15 @@ namespace IhildaWallet
 		{
 
 			label3.Visible = true;
-			//Gtk.Application.Invoke (
-			//	delegate {
-			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (255, 255, 255));
-			this.image1.Pixbuf = rippleWallet.GetQrCode ();
-			this.balancetab1.SetAddress (rippleWallet.GetStoredReceiveAddress ());
 
-			//	}
-			//);
+			this.eventbox1.ModifyBg ( StateType.Normal, new Gdk.Color ( 255, 255, 255 ) );
+			this.image1.Pixbuf = rippleWallet.GetQrCode ();
+			this.balancetab1.SetAddress ( rippleWallet.GetStoredReceiveAddress () );
+
+
+			this.button67.Visible = !rippleWallet.IsEncrypted ();
+
+			this.button66.Visible = rippleWallet.IsEncrypted ();
 
 			if (Program.network) {
 				this.scrolledwindow1.Visible = false;
@@ -1074,7 +1177,7 @@ namespace IhildaWallet
 			}
 
 			//lock (WalletManager.walletLock) {
-			if (walletManager.wallets == null || walletManager.wallets.Values == null) {
+			if (walletManager?.wallets?.Values == null) {
 #if DEBUG
 				if (DebugIhildaWallet.WalletManagerWidget) {
 					Logging.WriteLog (method_sig + "null value in walletmanager setting values to zero");
@@ -1082,7 +1185,7 @@ namespace IhildaWallet
 #endif
 
 				//Application.Invoke( delegate {
-				wallettree1.ClearValues ();
+				wallettree1?.ClearValues ();
 				//});
 
 				return;
@@ -1099,7 +1202,7 @@ namespace IhildaWallet
 #endif
 
 
-				wallettree1.SetValues (walletManager.wallets.Values);
+				wallettree1?.SetValues (walletManager.wallets.Values);
 
 
 
@@ -1111,7 +1214,7 @@ namespace IhildaWallet
 #endif
 
 
-				wallettree1.ClearValues ();
+				wallettree1?.ClearValues ();
 
 
 			}
@@ -1712,7 +1815,7 @@ namespace IhildaWallet
 			}
 
 			if (!networkInterface.IsConnected ()) {
-				return null;
+				return SetConnected ( null);
 			}
 			return SetConnected (networkInterface.GetConnectAttemptInfo ().ServerUrl);
 		}

@@ -222,17 +222,13 @@ namespace IhildaWallet
 			set;
 		}
 
-		public string Password {
-			get;
-			set;
-		}
+
 
 		public bool RememberPassword {
 			get;
 			set;
 		}
-
-
+		public string Password { get; set; }
 
 		private string GetFirstPassword () {
 			StringBuilder sb = new StringBuilder ();

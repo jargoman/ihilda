@@ -590,7 +590,7 @@ namespace IhildaWallet
 
 			}
 
-			return null;
+			//return null;
 
 		}
 	}

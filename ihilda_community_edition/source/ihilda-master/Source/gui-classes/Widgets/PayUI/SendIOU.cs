@@ -17,6 +17,7 @@ using RippleLibSharp.Result;
 using RippleLibSharp.Commands.Accounts;
 using RippleLibSharp.Util;
 using IhildaWallet.Util;
+using System.Linq;
 
 namespace IhildaWallet
 {
@@ -586,12 +587,12 @@ namespace IhildaWallet
 
 			}
 
-			List<String> lis = AccountLines.GetIssuersForCurrency (cur, address, ni, token);
+			IEnumerable<String> lis = AccountLines.GetIssuersForCurrency (cur, address, ni, token);
 			if (lis == null) {
 				return;
 			}
 
-			if (lis.Count < 1) {
+			if (!lis.Any()) {
 				// TODO infobar
 				return;
 			}

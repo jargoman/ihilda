@@ -102,7 +102,6 @@ namespace IhildaWallet
 			this.notebook1.CurrentPage = 0;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.table1 = new global::Gtk.Table(((uint)(4)), ((uint)(2)), false);
-			this.table1.Name = "table1";
 			this.table1.RowSpacing = ((uint)(6));
 			this.table1.ColumnSpacing = ((uint)(6));
 			// Container child table1.Gtk.Table+TableChild
@@ -156,7 +155,9 @@ namespace IhildaWallet
 			w7.XOptions = ((global::Gtk.AttachOptions)(4));
 			w7.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
-			this.tradepairentrywidget1 = null;
+			this.tradepairentrywidget1 = new global::IhildaWallet.TradePairEntryWidget();
+			this.tradepairentrywidget1.Events = ((global::Gdk.EventMask)(256));
+			this.tradepairentrywidget1.Name = "tradepairentrywidget1";
 			this.table1.Add(this.tradepairentrywidget1);
 			global::Gtk.Table.TableChild w8 = ((global::Gtk.Table.TableChild)(this.table1[this.tradepairentrywidget1]));
 			w8.BottomAttach = ((uint)(3));
@@ -422,7 +423,7 @@ namespace IhildaWallet
 				this.Child.ShowAll();
 			}
 			this.DefaultWidth = 660;
-			this.DefaultHeight = 303;
+			this.DefaultHeight = 304;
 			this.infobar.Hide();
 			this.Show();
 		}

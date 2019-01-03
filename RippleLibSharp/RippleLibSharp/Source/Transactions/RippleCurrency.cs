@@ -73,6 +73,17 @@ namespace RippleLibSharp.Transactions
 			}
 
 		}
+
+
+
+		/* for use only with "get balance as currencies */
+		public string SelfLimit {
+			get;
+			set;
+
+		}
+
+
 #pragma warning restore IDE1006 // Naming Styles
 		public static readonly int MIN_SCALE = -96;
 		public static readonly int MAX_SCALE = 80;

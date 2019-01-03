@@ -159,7 +159,7 @@ namespace IhildaWallet
 			Application.Invoke ((object sender, EventArgs e) => {
 				using (TrippleEntenteDialog dialog = new TrippleEntenteDialog ()) {
 					dialog.HideInfoBarLabels ();
-					while (true) {
+					while (tripple == null) {
 
 						//dialog.HideInfoBarLabels ();
 						ResponseType rt = (ResponseType)dialog.Run ();
@@ -171,9 +171,11 @@ namespace IhildaWallet
 
 						tripple = dialog.GetEntente ();
 
+						/*
 						if (tripple != null) {
 							break;
 						}
+						*/
 
 					}
 

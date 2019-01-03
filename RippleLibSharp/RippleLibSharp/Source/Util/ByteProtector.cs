@@ -17,10 +17,12 @@ namespace RippleLibSharp.Util
 		{
 			try
 			{
-				// Encrypt the data using DataProtectionScope.CurrentUser. The result can be decrypted
-				//  only by the same current user.
-				//return ProtectedData.Protect( data, s_aditionalEntropy, DataProtectionScope.CurrentUser );
-				ProtectedMemory.Protect( data, MemoryProtectionScope.SameProcess );
+                // Encrypt the data using DataProtectionScope.CurrentUser. The result can be decrypted
+                //  only by the same current user.
+                //return ProtectedData.Protect( data, s_aditionalEntropy, DataProtectionScope.CurrentUser );
+                //ProtectedMemory.Protect( data, MemoryProtectionScope.SameProcess );
+
+                throw new NotImplementedException("Byte protection (enrypting byte arrays) is not supported");
 			} 
 			catch (CryptographicException e)
 			{
@@ -39,10 +41,12 @@ namespace RippleLibSharp.Util
 		{
 			try
 			{
-				//Decrypt the data using DataProtectionScope.CurrentUser.
-				//return ProtectedData.Unprotect( data, s_aditionalEntropy, DataProtectionScope.CurrentUser );
+                //Decrypt the data using DataProtectionScope.CurrentUser.
+                //return ProtectedData.Unprotect( data, s_aditionalEntropy, DataProtectionScope.CurrentUser );
 
-				ProtectedMemory.Protect( data, MemoryProtectionScope.SameProcess );
+                //ProtectedMemory.Protect( data, MemoryProtectionScope.SameProcess );
+
+                throw new NotImplementedException("Byte protection (decrypting byte arrays) is not supported");
 			} 
 			catch (CryptographicException e)
 			{

@@ -4,7 +4,7 @@ namespace IhildaWallet
 {
 	public class AssemblyDebug
 	{
-		public void debugAssembly ()
+		public void DebugAssembly ()
 		{
 			
 			var v = this.GetType ().Assembly.GetManifestResourceNames ();

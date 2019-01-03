@@ -84,17 +84,21 @@ namespace IhildaWallet
 
 
 		public static string DoDialog ( string message ) {
-			 
-			PasswordCreateDialog pcd = new PasswordCreateDialog ( message );
 
-			ResponseType rt = (ResponseType)pcd.Run ();
-			if (rt != ResponseType.Ok) {
-				return null;
+			using (PasswordCreateDialog pcd = new PasswordCreateDialog (message)) {
+
+				ResponseType rt = (ResponseType)pcd.Run ();
+				pcd.Hide ();
+
+				if (rt != ResponseType.Ok) {
+
+					return null;
+				}
+
+				string p = pcd.GetPassword ();
+
+				return p;
 			}
-
-			string p = pcd.GetPassword ();
-
-			return p;
 		}
 	}
 }

@@ -5,8 +5,8 @@ using Codeplex.Data;
 using RippleLibSharp.Result;
 using RippleLibSharp.Util;
 
-using System.Security.Cryptography.X509Certificates;
-using System.Net.Security;
+//using System.Security.Cryptography.X509Certificates;
+//using System.Net.Security;
 using System.Threading;
 
 namespace RippleLibSharp.Network
@@ -16,7 +16,7 @@ namespace RippleLibSharp.Network
 		
 	
 
-		public static T GetResponseObject <T> ( string request) {
+		public static T GetResponseObject <T> ( string request, CancellationToken token) {
 			#if DEBUG
 			string typeName = typeof (T)?.ToString () ?? DebugRippleLibSharp.null_str;
 			string method_sig = nameof(GetResponseObject) + " <" + typeName + ">" + DebugRippleLibSharp.left_parentheses + (request ?? DebugRippleLibSharp.null_str) + DebugRippleLibSharp.right_parentheses;
@@ -26,7 +26,7 @@ namespace RippleLibSharp.Network
 			#endif
 
 
-			string jsonResponse = Get (request);
+			string jsonResponse = Get (request, token);
 
 			T d = default(T);
 			try {
@@ -81,10 +81,10 @@ namespace RippleLibSharp.Network
 		}
 		*/
 
-		public static string Get(string uri)
+		public static string Get(string uri, CancellationToken token)
 		{
 
-			DoThrottlingWait ();
+			DoThrottlingWait (token);
 
 			//System.Security.Cryptography.AesCryptoServiceProvider b = new System.Security.Cryptography.AesCryptoServiceProvider(); 
 			try {
@@ -118,14 +118,15 @@ namespace RippleLibSharp.Network
 		}
 
 		private static DateTime last_call_time = default (DateTime);
-		private static void DoThrottlingWait ()
+		private static void DoThrottlingWait (CancellationToken token)
 		{
 			if (last_call_time == default (DateTime)) {
 				last_call_time = DateTime.Now;
 			} else {
 
-				while ((((TimeSpan)(DateTime.Now - last_call_time)).TotalMilliseconds) < 2500) {
-					Thread.Sleep (125);
+				while (((DateTime.Now - last_call_time).TotalMilliseconds) < 2500 && !token.IsCancellationRequested) {
+					//Thread.Sleep (125);
+					token.WaitHandle.WaitOne (125);
 				}
 			}
 

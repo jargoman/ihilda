@@ -52,49 +52,69 @@ namespace IhildaWallet
 		public IEnumerable<RippleNode> GetNodesFilledOrderBook (IEnumerable<RippleTxStructure> off)
 		{
 
-			#region modified
-			LinkedList<RippleNode> nodes = new LinkedList<RippleNode> ();
-
-			IEnumerable<RippleNodeGroup []> aff = from RippleTxStructure st in off
-							      select st.meta.AffectedNodes;
-
 			string acct = this.Wallet.GetStoredReceiveAddress ();
-			foreach (RippleNodeGroup [] arng in aff) {
-
-				IEnumerable<RippleNode> ar =
-					from RippleNodeGroup rng in arng where
-										 "Offer" == rng?.DeletedNode?.LedgerEntryType
 
 
-											 && acct == rng?.DeletedNode?.FinalFields?.Account
+			if (!Program.preferLinq) {
 
-										 && rng.DeletedNode.FinalFields.TakerGets != null
-										
-										 && rng.DeletedNode.PreviousFields?.TakerGets != null
-										 && rng.DeletedNode.FinalFields.TakerGets.amount < rng.DeletedNode.PreviousFields.TakerGets.amount
+				#region modified
+				List<RippleNode> nodes = new List<RippleNode> ();
 
-					select rng.GetNode ();
+				IEnumerable<RippleNodeGroup []> aff = from RippleTxStructure st in off
+								      select st.meta.AffectedNodes;
 
-				foreach (RippleNode nd in ar) {
-					if (nd != null) {
 
-						nodes.AddLast (nd);
+				foreach (RippleNodeGroup [] arng in aff) {
+
+					IEnumerable<RippleNode> ar =
+						from RippleNodeGroup rng in arng where
+							"Offer" == rng?.DeletedNode?.LedgerEntryType
+			    				&& acct == rng?.DeletedNode?.FinalFields?.Account
+
+							&& rng.DeletedNode.FinalFields.TakerGets != null
+
+							&& rng.DeletedNode.PreviousFields?.TakerGets != null
+							&& rng.DeletedNode.FinalFields.TakerGets.amount < rng.DeletedNode.PreviousFields.TakerGets.amount
+
+						select rng.GetNode ();
+
+					foreach (RippleNode nd in ar) {
+						if (nd != null) {
+
+							nodes.Add (nd);
+						}
 					}
+
+
+
+
 				}
+				#endregion
 
+				return nodes;
 
+			} else {
+				var nodes = off
+				    .Where ((RippleTxStructure arg) => arg.meta.AffectedNodes != null)
+				.SelectMany ((RippleTxStructure arg) => arg.meta.AffectedNodes)
+				    .Where ((RippleNodeGroup rng) =>
+					     "Offer" == rng?.DeletedNode?.LedgerEntryType &&
+						acct == rng?.DeletedNode?.FinalFields?.Account &&
+						     rng.DeletedNode.FinalFields.TakerGets != null &&
+						    rng.DeletedNode.PreviousFields?.TakerGets != null &&
+						rng.DeletedNode.FinalFields.TakerGets.amount < rng.DeletedNode.PreviousFields.TakerGets.amount
+				)
+				    .Select ((RippleNodeGroup arg) => arg.GetNode ());
 
-
+				return nodes;
 			}
-			#endregion
-
-			return nodes;
+			//return nodes;
 		}
 
 
-		public List<AutomatedOrder> GetOrdersFilledImmediately (IEnumerable<RippleTxStructure> off)
+		public IEnumerable<AutomatedOrder> GetOrdersFilledImmediately (IEnumerable<RippleTxStructure> off)
 		{
-			List<AutomatedOrder> ords = new List<AutomatedOrder> ();
+			//List<AutomatedOrder> ords = new List<AutomatedOrder> ();
 
 			string account = Wallet?.GetStoredReceiveAddress ();
 			if (account == null) {
@@ -102,30 +122,52 @@ namespace IhildaWallet
 				throw new NullReferenceException ();
 			}
 
-			#region created
-			IEnumerable<RippleTxStructure> offernews = from RippleTxStructure st in off
-					where st?.tx?.Account == account && st.tx.TransactionType == "OfferCreate"
-					select st;
+
+			if (!Program.preferLinq) {
+
+				#region created
+
+				List<AutomatedOrder> ords = new List<AutomatedOrder> (); 
+
+				IEnumerable<RippleTxStructure> offernews = from RippleTxStructure st in off
+									   where st?.tx?.Account == account && st.tx.TransactionType == "OfferCreate"
+									   select st;
 
 
-			foreach (RippleTxStructure strc in offernews) {
+				foreach (RippleTxStructure strc in offernews) {
 
-				IEnumerable<RippleNode> cr = 
-					from RippleNodeGroup rng in strc.meta.AffectedNodes where 
-					                                rng?.CreatedNode?.NewFields?.Account == account && rng.CreatedNode.LedgerEntryType == "Offer"
-							     select rng.GetNode ();
+					IEnumerable<RippleNode> cr =
+						from RippleNodeGroup rng in strc.meta.AffectedNodes where
+							rng?.CreatedNode?.NewFields?.Account == account && rng.CreatedNode.LedgerEntryType == "Offer"
+						select rng.GetNode ();
 
 
-				if (!cr.Any ()) {
-					AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (strc.tx);
-					ords.Add (ao);
+					if (!cr.Any ()) {
+						AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (strc.tx);
+						ords.Add (ao);
+					}
+
 				}
+				return ords;
+				#endregion
 
+			} else {
+
+				var ords = off
+				.Where ((RippleTxStructure arg) => arg?.tx?.Account == account && arg.tx.TransactionType == "OfferCreate")
+				.Where ((RippleTxStructure arg) => {
+					IEnumerable<RippleNode> cr =
+					       from RippleNodeGroup rng in arg.meta.AffectedNodes where
+						       rng?.CreatedNode?.NewFields?.Account == account
+							       && rng.CreatedNode.LedgerEntryType == "Offer"
+					       select rng.GetNode ();
+					return !cr.Any ();
+				})
+				.Select ((RippleTxStructure arg) => AutomatedOrder.ReconsctructFromTransaction (arg.tx));
+
+				return ords;
 			}
-
-			#endregion
-
-			return ords;
+			//return ords;
 		}
 
 		public IEnumerable<AutomatedOrder> UpdateTx (IEnumerable<RippleTxStructure> off)
@@ -255,38 +297,60 @@ namespace IhildaWallet
 			RuleManager rulemanager = new RuleManager (account);
 
 			rulemanager.LoadRules ();
+			var lis = rulemanager.RulesList;
 
 			SentimentManager sentimentManager = new SentimentManager (account);
 			sentimentManager.LoadSentiments ();
 
-			LinkedList<AutomatedOrder> backs = new LinkedList<AutomatedOrder> ();
+			if (!Program.preferLinq) {
 
-			foreach (OrderFilledRule rule in rulemanager.RulesList) {
+				List<AutomatedOrder> backs = new List<AutomatedOrder> ();
 
-				if (!rule.IsActive) {
-					continue;
-				}
+				foreach (OrderFilledRule rule in lis) {
 
-				foreach (AutomatedOrder o in orders) {
-
-
-
-					if (rule.DetermineMatch (o)) {
-						AutomatedOrder ao = Profiteer.GetBuyBack (o, rule.RefillMod, sentimentManager);
-
-						string markNext = MarkAsCommand.DoNextMark (o.BotMarking, rule.MarkAs);
-						ao.BotMarking = markNext;
-
-						ao.Previous_Bot_ID = o.Bot_ID;
-
-						backs.AddLast (ao);
+					if (!rule.IsActive) {
+						continue;
 					}
+
+					foreach (AutomatedOrder o in orders) {
+
+
+
+						if (rule.DetermineMatch (o)) {
+							AutomatedOrder ao = Profiteer.GetBuyBack (o, rule.RefillMod, sentimentManager);
+
+							string markNext = MarkAsCommand.DoNextMark (o.BotMarking, rule.MarkAs);
+							ao.BotMarking = markNext;
+
+							ao.Previous_Bot_ID = o.Bot_ID;
+
+							backs.Add (ao);
+						}
+					}
+
 				}
 
+				return backs;
+
+			} else {
+
+				var backs = lis.Where ((OrderFilledRule arg) => arg.IsActive).SelectMany ((arg) =>
+						 orders.Where (arg.DetermineMatch).Select ((arg2) => {
+							 AutomatedOrder ao = Profiteer.GetBuyBack (arg2, arg.RefillMod, sentimentManager);
+
+						//string markNext = );
+						ao.BotMarking = MarkAsCommand.DoNextMark (arg2.BotMarking, arg.MarkAs);
+
+							 ao.Previous_Bot_ID = arg2.Bot_ID;
+
+							 return ao;
+						 })
+					);
+
+				return backs;
 			}
 
-
-			return backs;
+			
 
 
 
@@ -338,7 +402,7 @@ namespace IhildaWallet
 
 		public AutomatedOrder LookUpSequenceDataApi (string account, uint seq)
 		{
-			Task<Response<string>> seqTask = tx.GetTxFromAccountAndSequenceDataAPI (account, seq);
+			Task<Response<string>> seqTask = tx.GetTxFromAccountAndSequenceDataAPI (account, seq, token);
 			if (seqTask == null) {
 				// don't sweat it, we can try other ways to look up the order. 
 				return null;
@@ -435,7 +499,7 @@ namespace IhildaWallet
 				// instead of giving up we are going to try the data api instead. 
 				// response<string is correct>
 				//Thread.Sleep (5000);
-				Task<Response<string>> dataTask = tx.GetRequestDataApi (PreviousTxnID);
+				Task<Response<string>> dataTask = tx.GetRequestDataApi (PreviousTxnID, token);
 				if (dataTask == null) {
 					return null;
 				}
@@ -449,7 +513,11 @@ namespace IhildaWallet
 							dataTask.Wait (1000, token);
 						}
 					} catch (Exception e) {
+
+#if DEBUG
 						Logging.ReportException (method_sig, e);
+#endif
+
 					} finally {
 						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "\n" });
 					}

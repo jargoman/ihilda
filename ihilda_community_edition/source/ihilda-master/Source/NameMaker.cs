@@ -11,7 +11,7 @@ namespace IhildaWallet
 		public static String RequestName (String request, PluginType pluginType)
 		{
 			#if DEBUG
-			String method_sig = clsstr + "requestName ( request = " + (String)(request ?? "null") + ", pluginType = " + pluginType.ToString () + " ) : ";
+			String method_sig = clsstr + "requestName ( request = " + (request ?? "null") + ", pluginType = " + pluginType.ToString () + " ) : ";
 			if (DebugIhildaWallet.NameMaker) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
@@ -268,6 +268,9 @@ namespace IhildaWallet
 
 			case PluginType.ENCRYPTION:
 				// todo, determine if encryption name exists
+				break;
+
+			default:
 				break;
 			}
 

@@ -12,6 +12,8 @@ using RippleLibSharp.Util;
 using RippleLibSharp.Commands.Accounts;
 using RippleLibSharp.Result;
 
+using RippleLibSharp.Commands.Subscriptions;
+
 using RippleLibSharp.Keys;
 
 using RippleLibSharp.Transactions;
@@ -48,12 +50,18 @@ namespace Source.UnitTesting
 
 			RLSTest rlst = new RLSTest (ni);
 
+			//RippleDeterministicKeyGenerator.TestVectors ();
+
 			//rlst.testTrustLines ();
 			//rlst.testOfferSignatures();
 
 			//rlst.TestKeyGen ();
 
-			rlst.SignConsistencyTest();
+			//rlst.SignConsistencyTest();
+			//rlst.
+			//rlst.AccountSubscribeTest ();
+
+			rlst.LedgerSubscribeTest ();
 		}
 
 
@@ -108,11 +116,13 @@ namespace Source.UnitTesting
 		}
 
 		public void TestKeyGen () {
-			
+
+			int count = 0;
+
 			Random rnd = new Random();
 			Byte[] b = new Byte[16];
 			int x = 0;
-			int max = 25000;
+			int max = 100;
 			while (x++ < max) {
 				rnd.NextBytes(b);
 
@@ -127,12 +137,22 @@ namespace Source.UnitTesting
 				string account2 = res.result.account_id;
 				string account1 = rsa.GetPublicRippleAddress ();
 
-				if (!account1.Equals(account2)) {
-					throw new ArithmeticException ("propsed wallet does not match generated seed");
+				if (!account1.Equals (account2)) {
+					string messg = "propsed wallet does not match generated seed\n";
+
+					//throw new ArithmeticException (messg);
+
+					Logging.WriteLog (messg);
+				} else {
+
+					string messg = "propsed wallet matches generated seed\n";
+					Logging.WriteLog (messg);
+					count++;
 				}
 			}
 
-			Logging.WriteLog (x.ToString() + " wallets tested");
+			Logging.WriteLog (x.ToString() + " wallets tested\n");
+			Logging.WriteLog (count.ToString() + " wallets succeeded\n");
 
 
 		}
@@ -248,8 +268,88 @@ namespace Source.UnitTesting
 
 		}
 
-		//RippleAddress test_address = RippleAddress.RIPPLE_ADDRESS_JARGOMAN;
-		RippleAddress test_address = "rBuDDpdVBt57JbyfXbs8gjWvp4ScKssHzx";
+		public void LedgerSubscribeTest ()
+		{
+			Thread thread = new Thread ((object obj) => {
+
+				String [] accounts = new String [] {
+					//test_address.ToString(),
+					//test_address2.ToString(),
+					//test_address3.ToString()
+		    			"rBuDDpdVBt57JbyfXbs8gjWvp4ScKssHzx"
+				 };
+
+				SubscribeResponsesConsumer responsesConsumer = new SubscribeResponsesConsumer ();
+				responsesConsumer.OnMessageReceived += (object sender, SubscribeEventArgs e) => {
+					Logging.WriteLog ("Subscribe message recieved\n");
+
+					Response<object> response = new Response<object> ();
+					//response = response.SetFromJsonResp (e.Response);
+
+				};
+
+
+
+				Task<Response<SubscribeServerResult>> task = Subscribe.LedgerSubscribe (NetworkInterfaceObj, new CancellationToken (), responsesConsumer);
+
+				task.Wait ();
+
+				Response<SubscribeServerResult> res = task.Result;
+
+			});
+
+			thread.Start ();
+
+			//NetworkInterfaceObj.SendToServer (new byte [] { });
+
+			Task.Delay (1000 * 60 * 30).Wait ();
+		}
+
+		public void AccountSubscribeTest ()
+		{
+
+			Thread thread = new Thread((object obj) => {
+
+				String [] accounts = new String [] {
+					//test_address.ToString(),
+					//test_address2.ToString(),
+					//test_address3.ToString()
+		    			"rBuDDpdVBt57JbyfXbs8gjWvp4ScKssHzx"
+				 };
+
+				SubscribeResponsesConsumer responsesConsumer = new SubscribeResponsesConsumer ();
+				responsesConsumer.OnMessageReceived += (object sender, SubscribeEventArgs e) => {
+					Logging.WriteLog ("Subscribe message recieved\n");
+
+					Response<AccountTxResult> response = new Response<AccountTxResult> ();
+					//response = response.SetFromJsonResp (e.Response);
+
+				};
+
+
+
+				Task<Response<AccountTxResult>> task = Subscribe.AccountSubscribe (accounts, NetworkInterfaceObj, new CancellationToken (), responsesConsumer);
+
+				task.Wait ();
+
+				Response<AccountTxResult> res = task.Result;
+
+			});
+
+			thread.Start ();
+
+			//NetworkInterfaceObj.SendToServer (new byte [] { });
+
+			Task.Delay (1000 * 60 * 30).Wait ();
+		}
+
+
+
+		RippleAddress test_address = RippleAddress.RIPPLE_ADDRESS_JARGOMAN;
+		RippleAddress test_address2 = RippleAddress.RIPPLE_ADDRESS_BITSTAMP;
+		RippleAddress test_address3 = "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq";
+
+		//RippleAddress test_address = "rBuDDpdVBt57JbyfXbs8gjWvp4ScKssHzx";
 	}
 }
 

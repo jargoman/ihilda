@@ -12,6 +12,10 @@ namespace IhildaWallet
 
 		private global::Gtk.Label label1;
 
+		private global::Gtk.ProgressBar progressbar1;
+
+		private global::Gtk.CheckButton darkmodecheckbox;
+
 		private global::Gtk.HBox hbox1;
 
 		private global::Gtk.HBox hbox3;
@@ -25,8 +29,6 @@ namespace IhildaWallet
 		private global::Gtk.Label label3;
 
 		private global::Gtk.HScale hscale2;
-
-		private global::Gtk.CheckButton darkmodecheckbox;
 
 		private global::Gtk.DrawingArea drawingarea1;
 
@@ -60,7 +62,7 @@ namespace IhildaWallet
 			this.label1.Name = "label1";
 			this.label1.Xpad = 4;
 			this.label1.Ypad = 4;
-			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString("<b>XRP:ICE</b>");
+			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString("<b><span font-size=\"large\">XRP:ICE</span></b>");
 			this.label1.UseMarkup = true;
 			this.hbox2.Add(this.label1);
 			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.label1]));
@@ -68,6 +70,30 @@ namespace IhildaWallet
 			w1.Expand = false;
 			w1.Fill = false;
 			// Container child hbox2.Gtk.Box+BoxChild
+			this.progressbar1 = new global::Gtk.ProgressBar();
+			this.progressbar1.Name = "progressbar1";
+			this.hbox2.Add(this.progressbar1);
+			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.progressbar1]));
+			w2.Position = 1;
+			// Container child hbox2.Gtk.Box+BoxChild
+			this.darkmodecheckbox = new global::Gtk.CheckButton();
+			this.darkmodecheckbox.CanFocus = true;
+			this.darkmodecheckbox.Name = "darkmodecheckbox";
+			this.darkmodecheckbox.Label = global::Mono.Unix.Catalog.GetString("Dark Mode");
+			this.darkmodecheckbox.DrawIndicator = true;
+			this.darkmodecheckbox.UseUnderline = true;
+			this.hbox2.Add(this.darkmodecheckbox);
+			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.darkmodecheckbox]));
+			w3.PackType = ((global::Gtk.PackType)(1));
+			w3.Position = 2;
+			w3.Expand = false;
+			w3.Fill = false;
+			this.vbox2.Add(this.hbox2);
+			global::Gtk.Box.BoxChild w4 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hbox2]));
+			w4.Position = 0;
+			w4.Expand = false;
+			w4.Fill = false;
+			// Container child vbox2.Gtk.Box+BoxChild
 			this.hbox1 = new global::Gtk.HBox();
 			this.hbox1.Name = "hbox1";
 			this.hbox1.Homogeneous = true;
@@ -81,10 +107,10 @@ namespace IhildaWallet
 			this.label2.Name = "label2";
 			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString("Bids");
 			this.hbox3.Add(this.label2);
-			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.label2]));
-			w2.Position = 0;
-			w2.Expand = false;
-			w2.Fill = false;
+			global::Gtk.Box.BoxChild w5 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.label2]));
+			w5.Position = 0;
+			w5.Expand = false;
+			w5.Fill = false;
 			// Container child hbox3.Gtk.Box+BoxChild
 			this.hscale1 = new global::Gtk.HScale(null);
 			this.hscale1.CanFocus = true;
@@ -99,11 +125,11 @@ namespace IhildaWallet
 			this.hscale1.Digits = 0;
 			this.hscale1.ValuePos = ((global::Gtk.PositionType)(0));
 			this.hbox3.Add(this.hscale1);
-			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.hscale1]));
-			w3.Position = 1;
+			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.hscale1]));
+			w6.Position = 1;
 			this.hbox1.Add(this.hbox3);
-			global::Gtk.Box.BoxChild w4 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.hbox3]));
-			w4.Position = 0;
+			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.hbox3]));
+			w7.Position = 0;
 			// Container child hbox1.Gtk.Box+BoxChild
 			this.hbox4 = new global::Gtk.HBox();
 			this.hbox4.Name = "hbox4";
@@ -113,10 +139,10 @@ namespace IhildaWallet
 			this.label3.Name = "label3";
 			this.label3.LabelProp = global::Mono.Unix.Catalog.GetString("Asks");
 			this.hbox4.Add(this.label3);
-			global::Gtk.Box.BoxChild w5 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.label3]));
-			w5.Position = 0;
-			w5.Expand = false;
-			w5.Fill = false;
+			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.label3]));
+			w8.Position = 0;
+			w8.Expand = false;
+			w8.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.hscale2 = new global::Gtk.HScale(null);
 			this.hscale2.CanFocus = true;
@@ -130,38 +156,22 @@ namespace IhildaWallet
 			this.hscale2.Digits = 0;
 			this.hscale2.ValuePos = ((global::Gtk.PositionType)(0));
 			this.hbox4.Add(this.hscale2);
-			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.hscale2]));
-			w6.Position = 1;
+			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.hscale2]));
+			w9.Position = 1;
 			this.hbox1.Add(this.hbox4);
-			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.hbox4]));
-			w7.Position = 1;
-			this.hbox2.Add(this.hbox1);
-			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.hbox1]));
-			w8.Position = 1;
-			// Container child hbox2.Gtk.Box+BoxChild
-			this.darkmodecheckbox = new global::Gtk.CheckButton();
-			this.darkmodecheckbox.CanFocus = true;
-			this.darkmodecheckbox.Name = "darkmodecheckbox";
-			this.darkmodecheckbox.Label = global::Mono.Unix.Catalog.GetString("Dark Mode");
-			this.darkmodecheckbox.DrawIndicator = true;
-			this.darkmodecheckbox.UseUnderline = true;
-			this.hbox2.Add(this.darkmodecheckbox);
-			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.darkmodecheckbox]));
-			w9.PackType = ((global::Gtk.PackType)(1));
-			w9.Position = 2;
-			w9.Expand = false;
-			w9.Fill = false;
-			this.vbox2.Add(this.hbox2);
-			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hbox2]));
-			w10.Position = 0;
-			w10.Expand = false;
-			w10.Fill = false;
+			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.hbox4]));
+			w10.Position = 1;
+			this.vbox2.Add(this.hbox1);
+			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hbox1]));
+			w11.Position = 1;
+			w11.Expand = false;
+			w11.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.drawingarea1 = new global::Gtk.DrawingArea();
 			this.drawingarea1.Name = "drawingarea1";
 			this.vbox2.Add(this.drawingarea1);
-			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.drawingarea1]));
-			w11.Position = 1;
+			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.drawingarea1]));
+			w12.Position = 2;
 			this.notebook1.Add(this.vbox2);
 			// Notebook tab
 			this.label5 = new global::Gtk.Label();
@@ -174,8 +184,8 @@ namespace IhildaWallet
 			this.orderclusterwidget1.Events = ((global::Gdk.EventMask)(256));
 			this.orderclusterwidget1.Name = "orderclusterwidget1";
 			this.notebook1.Add(this.orderclusterwidget1);
-			global::Gtk.Notebook.NotebookChild w13 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.orderclusterwidget1]));
-			w13.Position = 1;
+			global::Gtk.Notebook.NotebookChild w14 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.orderclusterwidget1]));
+			w14.Position = 1;
 			// Notebook tab
 			this.label6 = new global::Gtk.Label();
 			this.label6.Name = "label6";

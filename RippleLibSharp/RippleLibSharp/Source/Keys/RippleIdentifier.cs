@@ -141,7 +141,7 @@ namespace RippleLibSharp.Keys
 
 				string s = GetHumanReadableIdentifier ();
 				try {
-					RippleAddress rip = new RippleAddress (s);
+					RippleIdentifier rip = new RippleIdentifier (s);
 
 					if (!s.Equals (rip.GetHumanReadableIdentifier ())) {
 						throw new CryptographicException ();
@@ -267,7 +267,7 @@ namespace RippleLibSharp.Keys
 				return true;
 			}
 
-			if ((object)left == null || (object)right == null) {
+			if (left is null || right is null) {
 				return false;
 			}
 
@@ -278,6 +278,7 @@ namespace RippleLibSharp.Keys
 
 		public static bool operator != (RippleIdentifier left, RippleIdentifier right)
 		{
+			// Do not change to (left != right) 
 			return !(left == right);
 		}
 

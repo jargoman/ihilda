@@ -1,27 +1,19 @@
 ﻿using System;
-using System.IO;
-using System.Media;
-using System.Reflection;
-using System.Threading;
-using System.Timers;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
+using System.Media;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Timers;
+using Gtk;
 using IhildaWallet.Networking;
+using RippleLibSharp.Commands.Accounts;
 using RippleLibSharp.Commands.Server;
 using RippleLibSharp.Network;
-using RippleLibSharp.Commands.Accounts;
 using RippleLibSharp.Result;
-using RippleLibSharp.Nodes;
 using RippleLibSharp.Transactions;
-using Gtk;
-
-
-
-using IhildaWallet.Util;
-using System.Diagnostics.Contracts;
 using RippleLibSharp.Util;
-using System.Text;
 
 namespace IhildaWallet
 {
@@ -56,7 +48,8 @@ namespace IhildaWallet
 
 			try {
 				NetworkInterface ni = NetworkController.CurrentInterface;
-				if (ni == null) {
+				if (ni == null || !ni.IsConnected()) {
+					NetworkController.AutoConnect ();
 					return;
 				}
 
@@ -120,8 +113,8 @@ namespace IhildaWallet
 
 
 
-				rw.Notification = "Updating balance...";
-				WalletManager.currentInstance?.UpdateUI ();
+				//rw.Notification = "Updating balance...";
+				//WalletManager.currentInstance?.UpdateUI ();
 
 				try {
 
@@ -133,11 +126,18 @@ namespace IhildaWallet
 					if (rippleCurrency != null) {
 						rw.LastKnownNativeBalance = rippleCurrency;
 						rw.Notification = "balance updated as of " + dateTime.ToShortTimeString ();
+						WalletManager.currentInstance?.UpdateUI ();
 					} else {
-						rw.Notification = "<span fgcolor=\"salmon\">Could not update balance</span>";
+						string mess = "<span fgcolor=\"salmon\">Could not update balance</span>";
+
+						if (rw.Notification != mess) {
+							rw.Notification = mess;
+							WalletManager.currentInstance?.UpdateUI ();
+						}
+						
 					}
 
-					WalletManager.currentInstance?.UpdateUI ();
+					
 
 					if (rw?.LastKnownLedger == null || rw.LastKnownLedger == 0) {
 
@@ -165,11 +165,17 @@ namespace IhildaWallet
 
 					IEnumerable<AutomatedOrder> totalFilled = tuple.Item2;
 
-
+					if (totalFilled == null) {
+						rw.LastKnownLedger = tuple.Item1;
+						rw.Save ();
+						continue;
+					}
 
 					int c = totalFilled.Count ();
 
 					if (c == 0) {
+						rw.LastKnownLedger = tuple.Item1;
+						rw.Save ();
 						continue;
 					}
 
@@ -292,12 +298,18 @@ namespace IhildaWallet
 					}
 
 					IEnumerable<AutomatedOrder> totalFilled = tuple.Item2;
-
+					if (totalFilled == null) {
+						rw.LastKnownLedger = tuple.Item1;
+						rw.Save ();
+						continue;
+					}
 
 
 					int c = totalFilled.Count ();
 
 					if (c == 0) {
+						rw.LastKnownLedger = tuple.Item1;
+						rw.Save ();
 						continue;
 					}
 
@@ -543,6 +555,7 @@ namespace IhildaWallet
 
 			try {
 				SystemSounds.Asterisk.Play ();
+				
 			} catch (Exception e) {
 
 #if DEBUG
@@ -620,12 +633,12 @@ namespace IhildaWallet
 				return null;
 			}
 
-			var results =
+			IEnumerable<AccountTxResult> results =
 				from Response<AccountTxResult> r in res
 				where r != null
-				where r.result != null
+				&& r.result != null
 				select r.result;
-
+			
 			if (
 				results == null
 				//|| results.Count() == 0
@@ -634,17 +647,31 @@ namespace IhildaWallet
 				return null;
 			}
 
-			List<RippleTxStructure> list = new List<RippleTxStructure> ();
+			//List<RippleTxStructure> list = new List<RippleTxStructure> ();
 
+			/*
 			foreach (AccountTxResult re in results) {
 
-				lastKnownLedger = (uint)re.ledger_index_max;
+
 				IEnumerable<RippleTxStructure> txs = re.transactions;
 
 				list.AddRange (txs);
 			}
+	    		*/
+
+			uint max_ledger = results.Max (x => (uint)x.ledger_index_max);
+			lastKnownLedger = max_ledger;
+			IEnumerable<RippleTxStructure> txList = results.SelectMany(a => a.transactions);
 
 
+			IEnumerable<RippleTxStructure> payments =
+				from RippleTxStructure tx in txList
+				where tx.tx.TransactionType == "Payment"
+				&& tx.tx.Account != wallet.Account // Not payments made from this wallet. I'd hope the user already knows they sent a payment 
+				&& tx.tx.Destination == wallet.Account
+				select tx;
+
+			NotifyPayments (payments, wallet);
 
 			OrderManagementBot omb = new OrderManagementBot (wallet, networkInterface, _token);
 
@@ -652,7 +679,7 @@ namespace IhildaWallet
 
 			try {
 
-				total = omb.UpdateTx (list);
+				total = omb.UpdateTx (txList);
 			}
 
 #pragma warning disable 0168
@@ -669,7 +696,40 @@ namespace IhildaWallet
 			}
 
 
-			return total == null ? null : new Tuple<uint, IEnumerable<AutomatedOrder>> (lastKnownLedger, total);
+
+			return new Tuple<uint, IEnumerable<AutomatedOrder>> (lastKnownLedger, total); 
+				
+		}
+
+
+		public void NotifyPayments (IEnumerable<RippleTxStructure> paymentsStructures, RippleWallet rippleWallet)
+		{
+			int count = 0;
+			StringBuilder builder = new StringBuilder ();
+			foreach (RippleTxStructure txStructure in paymentsStructures) {
+
+				builder.Clear ();
+
+				RippleCurrency amount = txStructure.meta.delivered_amount;
+
+				builder.Append ("Received a payment of ");
+
+				if (amount.IsNative) {
+
+					builder.Append (amount.amount / 1000000);
+					builder.Append (" ");
+					builder.Append (RippleCurrency.NativeCurrency);
+				} else {
+					builder.Append (amount.amount);
+					builder.Append (" ");
+					builder.Append (amount.currency);
+				}
+
+				rippleWallet.Notification = builder.ToString ();
+
+				ShowNotification (builder.ToString(), count++);
+
+			}
 		}
 
 		public Task InitNotificationSystem () => Task.Run (
@@ -690,28 +750,37 @@ namespace IhildaWallet
 
 						};
 
-						WalletManagerWindow.currentInstance.ExposeEvent += delegate {
-							StatusTrayIcon.Blinking = false;
-						};
 
-						WalletManagerWindow.currentInstance.EnterNotifyEvent += delegate {
-							StatusTrayIcon.Blinking = false;
-						};
+						var cur = WalletManagerWindow.currentInstance;
+						if (cur != null) {
+							cur.ExposeEvent += delegate {
+								StatusTrayIcon.Blinking = false;
+							};
+
+							cur.EnterNotifyEvent += delegate {
+								StatusTrayIcon.Blinking = false;
+							};
+						}
+						
 
 						//StatusTrayIcon.Visible = true;
 
 						StatusTrayIcon.Activate += delegate {
+							var cu = WalletManagerWindow.currentInstance;
+							if (cu != null) {
+								if (cu.Visible) {
+									cu.Visible = false;
+								} else {
 
-							if (WalletManagerWindow.currentInstance.Visible) {
-								WalletManagerWindow.currentInstance.Visible = false;
-							} else {
-
-								Program.splash?.Hide ();
+									Program.splash?.Hide ();
 
 
-								WalletManagerWindow.currentInstance.Visible = true;
+									cu.Visible = true;
 
+								}
 							}
+							
+							
 						};
 
 						/*
@@ -767,13 +836,18 @@ namespace IhildaWallet
 			//Stopwatch watch = new stopwatch ()
 
 			while (!_token.IsCancellationRequested) {
+				try {
+					T_Elapsed (null, null);
+					int x = WalletManager.currentInstance.wallets.Count;
 
-				T_Elapsed (null, null);
-				int x = WalletManager.currentInstance.wallets.Count;
+					//Task.Delay (15000);
+					//Thread.Sleep (15000);
+					
+				} catch (Exception e) {
 
-				//Task.Delay (15000);
-				//Thread.Sleep (15000);
-				_token.WaitHandle.WaitOne (15000);
+				} finally {
+					_token.WaitHandle.WaitOne (15000);
+				}
 			}
 
 

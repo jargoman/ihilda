@@ -48,6 +48,8 @@ namespace IhildaWallet
 
 		private global::IhildaWallet.OrderWidget orderwidget10;
 
+		private global::Gtk.HBox hbox11;
+
 		private global::IhildaWallet.PagerWidget pagerwidget1;
 
 		protected virtual void Build()
@@ -267,15 +269,22 @@ namespace IhildaWallet
 			global::Gtk.Box.BoxChild w23 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.scrolledwindow1]));
 			w23.Position = 4;
 			// Container child vbox1.Gtk.Box+BoxChild
+			this.hbox11 = new global::Gtk.HBox();
+			this.hbox11.Name = "hbox11";
+			this.hbox11.Spacing = 6;
+			// Container child hbox11.Gtk.Box+BoxChild
 			this.pagerwidget1 = new global::IhildaWallet.PagerWidget();
 			this.pagerwidget1.Events = ((global::Gdk.EventMask)(256));
 			this.pagerwidget1.Name = "pagerwidget1";
-			this.vbox1.Add(this.pagerwidget1);
-			global::Gtk.Box.BoxChild w24 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.pagerwidget1]));
-			w24.PackType = ((global::Gtk.PackType)(1));
-			w24.Position = 5;
-			w24.Expand = false;
-			w24.Fill = false;
+			this.hbox11.Add(this.pagerwidget1);
+			global::Gtk.Box.BoxChild w24 = ((global::Gtk.Box.BoxChild)(this.hbox11[this.pagerwidget1]));
+			w24.Position = 0;
+			this.vbox1.Add(this.hbox11);
+			global::Gtk.Box.BoxChild w25 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hbox11]));
+			w25.PackType = ((global::Gtk.PackType)(1));
+			w25.Position = 5;
+			w25.Expand = false;
+			w25.Fill = false;
 			this.Add(this.vbox1);
 			if ((this.Child != null))
 			{

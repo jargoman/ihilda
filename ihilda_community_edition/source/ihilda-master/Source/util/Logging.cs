@@ -91,6 +91,7 @@ namespace IhildaWallet
 
 		public static void WriteLog (String message, IEnumerable<object> objects)
 		{
+			/*
 			String[] ar = null;
 			if (objects != null) {
 				ar = new string[objects.Count()];
@@ -98,13 +99,17 @@ namespace IhildaWallet
 				foreach (object o in objects) {
 					ar[x++] = o.ToString();
 				}
-			}
+			}*/
 
-			WriteLog(message, ar);
+	    		IEnumerable <string> strs = objects.Select((arg) => arg.ToString());
+
+			WriteLog(message, strs);
 		}
 
 		public static void WriteLog (String message, IEnumerable<byte> bytes)
 		{
+
+			/*
 			String[] ar = null;
 			if (bytes != null) {
 				ar = new string[bytes.Count()];
@@ -113,12 +118,19 @@ namespace IhildaWallet
 					ar[x++] = b.ToString();
 				}
 			}
+			WriteLog(message, ar);    
+	    		*/
 
-			WriteLog(message, ar);
+
+
+			IEnumerable<string> strs = bytes.Select ((arg) => arg.ToString ());
+
+			WriteLog (message, strs);
 		}
 
 		public static void WriteLog (String message, IEnumerable<RippleWallet> wallets)
 		{
+			/*
 			String[] ar = null;
 			if (wallets != null) {
 				ar = new string[wallets.Count()];
@@ -129,6 +141,12 @@ namespace IhildaWallet
 			}
 
 			WriteLog(message, ar);
+	    		*/
+
+
+			IEnumerable<string> strs = wallets.Select ((arg) => arg.ToString ());
+
+			WriteLog (message, strs);
 		}
 	
 		public static void WriteLog (String message, IEnumerable<String> strings)

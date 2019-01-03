@@ -94,7 +94,7 @@ namespace IhildaWallet
 			if (message == null)
 				message = "";
 
-			TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
+			TextHighlighter.Highlightcolor = Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 			string s = TextHighlighter.Highlight (/*"Success : " + */message);
 
 			Application.Invoke ((object sender, EventArgs e) => {
@@ -142,6 +142,19 @@ namespace IhildaWallet
 						uint se = Convert.ToUInt32 (AccountInfo.GetSequence (ao.Account, networkInterface, new CancellationToken ()));
 
 						RippleIdentifier rippleSeedAddress = _rippleWallet.GetDecryptedSeed ();
+						while (rippleSeedAddress.GetHumanReadableIdentifier () == null) {
+							bool should = AreYouSure.AskQuestion (
+							"Invalid password",
+							"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+							);
+
+							if (!should) {
+								return;
+							}
+
+							rippleSeedAddress = _rippleWallet.GetDecryptedSeed ();
+						}
+
 
 						//bool b = CancelOrderAtIndex ( _rippleWallet.GetStoredReceiveAddress(), se, networkInterface, rippleSeedAddress );
 						CancelOrderAtIndex (_rippleWallet.GetStoredReceiveAddress (), index, se, networkInterface, rippleSeedAddress);

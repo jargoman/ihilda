@@ -22,36 +22,41 @@ namespace IhildaWallet
 				}
 				notebook1.AppendPage (txviewwidget1, this.txtablabel);
 			}
-
-			if (orderswidget1 == null) {
-				orderswidget1 = new OrdersWidget ();
-				orderswidget1.Show ();
-				if (this.label50 == null) {
-					this.label50 = new Gtk.Label ("<b>Orders Pager</b>") {
-						UseMarkup = true
-					};
+			if (true) {
+				if (orderswidget1 == null) {
+					orderswidget1 = new OrdersWidget ();
+					orderswidget1.Show ();
+					if (this.label50 == null) {
+						this.label50 = new Gtk.Label ("<b>Orders Pager</b>") {
+							UseMarkup = true
+						};
+					}
+					notebook1.AppendPage (orderswidget1, this.label50);
 				}
-				notebook1.AppendPage ( orderswidget1, this.label50);
-			}
 
-			if (orderstreewidget1 == null) {
-				orderstreewidget1 = new OrdersTreeWidget ();
-				orderstreewidget1.Show ();
-				if (label52 == null) {
-					label52 = new Gtk.Label ("<b>Orders Tree</b>") {
-						UseMarkup = true
-					};
+				orderstreewidget1.Hide ();
+				label52.Hide ();
+			} else {
+
+				if (orderstreewidget1 == null) {
+					orderstreewidget1 = new OrdersTreeWidget ();
+					orderstreewidget1.Show ();
+					if (label52 == null) {
+						label52 = new Gtk.Label ("<b>Orders Tree</b>") {
+							UseMarkup = true
+						};
+					}
+					notebook1.AppendPage (orderstreewidget1, this.label52);
 				}
-				notebook1.AppendPage (orderstreewidget1, this.label52 );
 			}
 
 			if (canceltxwidget1 == null) {
 				canceltxwidget1 = new CancelTxWidget ();
 				canceltxwidget1.Show ();
-				if (label55 == null) {
-					label55 = new Gtk.Label ("<b>Cancel</b>");
+				if (label56 == null) {
+					label56 = new Gtk.Label ("<b>Cancel</b>");
 				}
-				notebook1.AppendPage (canceltxwidget1, this.label55);
+				notebook1.AppendPage (canceltxwidget1, this.label56);
 			}
 
 

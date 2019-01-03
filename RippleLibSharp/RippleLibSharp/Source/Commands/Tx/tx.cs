@@ -42,7 +42,7 @@ namespace RippleLibSharp.Commands.Tx
 		}
 
 
-		public static Task<Response<string>> GetTxFromAccountAndSequenceDataAPI (string account, uint sequence)
+		public static Task<Response<string>> GetTxFromAccountAndSequenceDataAPI (string account, uint sequence, CancellationToken token)
 		{
 			return Task.Run (
 				delegate {
@@ -50,7 +50,7 @@ namespace RippleLibSharp.Commands.Tx
 					//DoThrottlingWait ();
 
 					string req = baseapi + accountscommand + account + "/" + txcommand + sequence + options;
-					Response<string> resp = DataApi.GetResponseObject<Response<string>> (req);
+					Response<string> resp = DataApi.GetResponseObject<Response<string>> (req, token);
 
 					//if () {
 
@@ -58,13 +58,13 @@ namespace RippleLibSharp.Commands.Tx
 					//}
 					return resp;
 				}
-			);
+			, token);
 		}
 
 
 		// HAS to be string. Not RippleTxStructure. Or rather lets hope string is the only potential result
 		// result returns a string and if successful transction is populated with a txstructure. 
-		public static Task<Response<string>> GetRequestDataApi (string tx_id) {
+		public static Task<Response<string>> GetRequestDataApi (string tx_id, CancellationToken token) {
 			return Task.Run (
 				delegate {
 
@@ -75,7 +75,7 @@ namespace RippleLibSharp.Commands.Tx
 					//DoThrottlingWait ();
 
 					string req = baseapi + txcommand + tx_id + options;
-						Response<string> resp = DataApi.GetResponseObject<Response<string>> (req);
+						Response<string> resp = DataApi.GetResponseObject<Response<string>> (req, token);
 
 						//if () {
 
@@ -83,7 +83,7 @@ namespace RippleLibSharp.Commands.Tx
 					//}
 					return resp;
 				}
-			);
+			, token);
 
 		}
 

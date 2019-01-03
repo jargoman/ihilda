@@ -82,6 +82,22 @@ namespace IhildaWallet
 				SignOptions opts = SignOptions.LoadSignOptions ();
 
 				RippleIdentifier seed = rw.GetDecryptedSeed ();
+
+				while (seed.GetHumanReadableIdentifier () == null) {
+					bool should = AreYouSure.AskQuestion (
+					"Invalid password",
+					"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+					);
+
+					if (!should) {
+						return;
+					}
+
+					seed = rw.GetDecryptedSeed ();
+				}
+
+
+
 				if (opts == null || opts.UseLocalRippledRPC) {
 
 					tx.SignLocalRippled (seed);

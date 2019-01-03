@@ -140,7 +140,7 @@ namespace IhildaWallet
 
 
 
-			TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
+			TextHighlighter.Highlightcolor = Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 			add = TextHighlighter.Highlight ("<big>" + add + "</big>");
 
 			TextHighlighter.Highlightcolor = TextHighlighter.RED;
@@ -200,7 +200,7 @@ namespace IhildaWallet
 
 
 
-			TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
+			TextHighlighter.Highlightcolor = Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 			add = TextHighlighter.Highlight ("<big>" + add + "</big>");
 
 			TextHighlighter.Highlightcolor = TextHighlighter.RED;

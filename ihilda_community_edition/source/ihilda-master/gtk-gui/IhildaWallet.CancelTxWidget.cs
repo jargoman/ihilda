@@ -16,6 +16,8 @@ namespace IhildaWallet
 
 		private global::Gtk.Button button55;
 
+		private global::Gtk.Label label3;
+
 		protected virtual void Build()
 		{
 			global::Stetic.Gui.Initialize(this);
@@ -72,6 +74,17 @@ namespace IhildaWallet
 			w5.Position = 4;
 			w5.Expand = false;
 			w5.Fill = false;
+			// Container child vbox2.Gtk.Box+BoxChild
+			this.label3 = new global::Gtk.Label();
+			this.label3.Name = "label3";
+			this.label3.Xalign = 0.04F;
+			this.label3.Yalign = 0.1F;
+			this.label3.LabelProp = global::Mono.Unix.Catalog.GetString("Cancel a transaction using it\'s transaction hash\n\nNote : Orders can be viewed and" +
+					" cancelled with the orders widget");
+			this.label3.UseMarkup = true;
+			this.vbox2.Add(this.label3);
+			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.label3]));
+			w6.Position = 5;
 			this.Add(this.vbox2);
 			if ((this.Child != null))
 			{

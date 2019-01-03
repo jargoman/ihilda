@@ -128,6 +128,13 @@ namespace IhildaWallet
 					try {
 						tx.SignLocalRippled (rsa);
 					} catch (Exception e) {
+
+#if DEBUG
+						if (DebugIhildaWallet.PaymentTree) {
+							Logging.ReportException (method_sig, e);
+						}
+#endif
+
 						this.SetResult (index.ToString(), "Error Signing using rpc", TextHighlighter.RED);
 						return false;
 					}
@@ -141,6 +148,13 @@ namespace IhildaWallet
 					try {
 						tx.Sign (rsa);
 					} catch (Exception e) {
+
+#if DEBUG
+						if (DebugIhildaWallet.PaymentTree) {
+							Logging.ReportException (method_sig, e);
+						}
+#endif
+
 						this.SetResult (index.ToString(), "Signing using RippleLibSharp", TextHighlighter.RED);
 						return false;
 					}

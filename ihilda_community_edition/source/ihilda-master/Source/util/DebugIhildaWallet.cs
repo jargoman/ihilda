@@ -84,6 +84,8 @@ namespace IhildaWallet
 
 		public static bool DenominatedIssuedPopup = false;
 
+		public static bool DividendWidget = false;
+
 		public static bool DynamicJson = false;
 
 		public static bool FileHelper = false;
@@ -109,6 +111,8 @@ namespace IhildaWallet
 		public static bool NoHideWindows = false;
 
 		public static bool NotificationThread = false;
+
+		public static bool MassPaymentWidget = false;
 
 		public static bool OpenOrdersTree = false;
 
@@ -149,6 +153,8 @@ namespace IhildaWallet
 
 		public static bool PluginController = false;
 
+		public static bool PrismWidget = false;
+
 		public static bool ProcessSplash = false;
 
 		public static bool Program = false;
@@ -186,6 +192,8 @@ namespace IhildaWallet
 		public static bool Robotics = false;
 
 		public static bool RuleManager = false;
+
+		public static bool SeedFromHexDialog = false;
 
 		public static bool SellOffer = false;
 

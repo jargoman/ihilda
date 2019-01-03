@@ -1,5 +1,5 @@
 using System;
-
+using System.Threading.Tasks;
 using RippleLibSharp.Keys;
 using RippleLibSharp.Util;
 
@@ -101,13 +101,35 @@ namespace IhildaWallet
 			if (checkbutton.Active) {
 				bool sure = AreYouSure.AskQuestion ("Security", "Are you sure you want to display the secret for this account?");
 
-				if (sure) {
-					RippleIdentifier rsa = rw.GetDecryptedSeed ();
-					if (rsa != null) {
-						this.secretlabel.Text = rsa.ToString ();
-					}
-				}
+					if (sure) {
 
+						Task.Run (delegate {
+							RippleIdentifier rsa = rw.GetDecryptedSeed ();
+							while (rsa.GetHumanReadableIdentifier () == null) {
+								bool should = AreYouSure.AskQuestion (
+								"Invalid password",
+								"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+								);
+									
+								if (!should) {
+									return;
+								}
+
+								rsa = rw.GetDecryptedSeed ();
+							}
+
+
+							if (rsa != null) {
+
+								Gtk.Application.Invoke ( delegate {
+									this.secretlabel.Text = rsa.ToString ();
+
+								});
+
+							}
+
+						});
+					}
 			}
 
 			else {

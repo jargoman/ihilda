@@ -15,6 +15,7 @@ using RippleLibSharp.Result;
 using RippleLibSharp.Transactions;
 using RippleLibSharp.Transactions.TxTypes;
 using RippleLibSharp.Trust;
+using RippleLibSharp.Util;
 
 namespace IhildaWallet
 {
@@ -85,7 +86,7 @@ namespace IhildaWallet
 					if (account == null) {
 						return;
 					}
-					List<string> issuers = AccountLines.GetIssuersForCurrency (str, account, networkInterface, token);
+					IEnumerable<string> issuers = AccountLines.GetIssuersForCurrency (str, account, networkInterface, token);
 
 
 
@@ -122,7 +123,7 @@ namespace IhildaWallet
 					if (account == null) {
 						return;
 					}
-					List<string> issuers = AccountLines.GetIssuersForCurrency (str, account, networkInterface, token);
+					IEnumerable<string> issuers = AccountLines.GetIssuersForCurrency (str, account, networkInterface, token);
 
 
 
@@ -147,6 +148,15 @@ namespace IhildaWallet
 		void ShareIssuerComboboxentry_Changed (object sender, EventArgs e)
 		{
 
+#if DEBUG
+			string method_sig = clsstr + nameof (ShareIssuerComboboxentry_Changed) + DebugRippleLibSharp.both_parentheses;
+
+
+			if (DebugIhildaWallet.DividendWidget) {
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
+			}
+#endif
+
 			shareIssTokenSource?.Cancel ();
 			shareIssTokenSource = new CancellationTokenSource ();
 			var token = shareIssTokenSource.Token;
@@ -159,6 +169,12 @@ namespace IhildaWallet
 				account = new RippleAddress (str).ToString ();
 
 			} catch (Exception ex) {
+
+#if DEBUG
+				if (DebugIhildaWallet.DividendWidget) {
+					Logging.ReportException (method_sig, ex);
+				}
+#endif
 				// TODO
 
 				return;
@@ -211,6 +227,13 @@ namespace IhildaWallet
 		void DivIssuercomboboxentry_Changed (object sender, EventArgs e)
 		{
 
+#if DEBUG
+			string method_sig = clsstr + nameof (DivIssuercomboboxentry_Changed) + DebugRippleLibSharp.both_parentheses;
+			if (DebugIhildaWallet.DividendWidget) {
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
+			}
+#endif
+
 			divIssTokenSource?.Cancel ();
 			divIssTokenSource = new CancellationTokenSource ();
 			var token = divIssTokenSource.Token;
@@ -222,6 +245,12 @@ namespace IhildaWallet
 				account = new RippleAddress (str).ToString ();
 
 			} catch (Exception ex) {
+
+#if DEBUG
+				if (DebugIhildaWallet.DividendWidget) {
+					Logging.ReportException (method_sig, ex);
+				}
+#endif
 				// TODO
 
 				return;
@@ -374,14 +403,14 @@ namespace IhildaWallet
 		}
 
 
-		public void SetShareComboIssuers (List<string> issuers)
+		public void SetShareComboIssuers (IEnumerable<string> issuers)
 		{
 
 			if (issuers == null) {
 				return;
 			}
 
-			if (issuers.Count < 1) {
+			if (!issuers.Any()) {
 				// TODO infobar
 				return;
 			}
@@ -402,14 +431,14 @@ namespace IhildaWallet
 
 
 
-		public void SetDivComboIssuers (List<string> issuers)
+		public void SetDivComboIssuers (IEnumerable<string> issuers)
 		{
 
 			if (issuers == null) {
 				return;
 			}
 
-			if (issuers.Count < 1) {
+			if (!issuers.Any()) {
 				// TODO infobar
 				return;
 			}
@@ -430,7 +459,12 @@ namespace IhildaWallet
 
 		void Button217_Clicked (object sender, EventArgs eventArgs)
 		{
-
+#if DEBUG
+			string method_sig = clsstr + nameof (Button217_Clicked) + DebugRippleLibSharp.both_parentheses;
+			if (DebugIhildaWallet.DividendWidget) {
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
+			}
+#endif
 
 
 			bool reqInc = includecheckbox.Active;
@@ -486,6 +520,14 @@ namespace IhildaWallet
 			try {
 				issuerAddress = new RippleAddress (divIssuer);
 			} catch (Exception e) {
+
+#if DEBUG
+				if (DebugIhildaWallet.DividendWidget) {
+					Logging.ReportException (method_sig, e);
+				}
+#endif
+
+
 				return;
 			}
 
@@ -537,6 +579,14 @@ namespace IhildaWallet
 								RippleAddress rippleAddress = new RippleAddress (s);
 
 							} catch (Exception e) {
+
+#if DEBUG
+								if (DebugIhildaWallet.DividendWidget) {
+									Logging.ReportException (method_sig, e);
+								}
+#endif
+
+
 								// TODO
 								string title = "invalid address";
 								string message = "Invalid address in exclude list file";
@@ -562,6 +612,14 @@ namespace IhildaWallet
 							try {
 								RippleAddress rippleAddress = new RippleAddress (s);
 							} catch (Exception e) {
+
+#if DEBUG
+								if (DebugIhildaWallet.DividendWidget) {
+									Logging.ReportException (method_sig, e);
+								}
+#endif
+
+
 								// TODO 
 								string title = "invalid address";
 								string message = "Invalid address in include list file";
@@ -759,6 +817,10 @@ namespace IhildaWallet
 			get;
 			set;
 		}
+
+#if DEBUG
+		private const string clsstr = nameof (DividendWidget) + DebugRippleLibSharp.colon;
+#endif
 	}
 }
 

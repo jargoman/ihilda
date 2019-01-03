@@ -32,7 +32,10 @@ namespace IhildaWallet
 			Task.Factory.StartNew (async () => {
 
 				while (TokenSource?.IsCancellationRequested != true) {
-					await Task.Delay (30000, TokenSource.Token);
+					if (TokenSource == null) {
+						return;
+					}
+					await Task.Delay ( 30000, TokenSource.Token);
 					Sync ();
 				}
 			}
@@ -42,7 +45,7 @@ namespace IhildaWallet
 
 		~SendRipple ()
 		{
-			TokenSource.Cancel ();
+			TokenSource?.Cancel ();
 		}
 
 		private CancellationTokenSource TokenSource = null;

@@ -218,7 +218,17 @@ namespace IhildaWallet
 				}
 
 				try {
-					task.Wait (token);
+
+					do {
+						if (OnOrderCacheEvent != null) {
+							OrderCachedEventArgs cachedEventArgs = new OrderCachedEventArgs () {
+								UIpump = true
+							};
+							OnOrderCacheEvent.Invoke (this, cachedEventArgs);
+						}
+						task.Wait (1000, token);
+					} while (!task.IsCanceled && !task.IsCompleted && !task.IsFaulted && !token.IsCancellationRequested);
+
 				} catch (Exception e) when (e is TaskCanceledException || e is OperationCanceledException) {
 					return;
 				}
@@ -272,7 +282,10 @@ namespace IhildaWallet
 							}
 							continue;
 						}
-						Task<Response<string>> seqTask = tx.GetTxFromAccountAndSequenceDataAPI (o.Account, o.Sequence);
+
+						string acc = o.Account;
+						uint seq = o.Sequence;
+						Task<Response<string>> seqTask = tx.GetTxFromAccountAndSequenceDataAPI (acc, seq, token);
 						if (seqTask == null) {
 
 
@@ -294,7 +307,6 @@ namespace IhildaWallet
 							}
 
 
-							//Thread.Sleep (5000);
 							token.WaitHandle.WaitOne (5000);
 							continue;
 						}
@@ -319,8 +331,7 @@ namespace IhildaWallet
 							}
 
 
-							Thread.Sleep (5000);
-
+							token.WaitHandle.WaitOne (5000);
 							continue;
 						}
 						string s = response.result;
@@ -559,6 +570,11 @@ namespace IhildaWallet
 
 	public class OrderCachedEventArgs : EventArgs
 	{
+
+		public bool UIpump {
+			get;
+			set;
+		}
 
 		public bool GetSuccess {
 			get;

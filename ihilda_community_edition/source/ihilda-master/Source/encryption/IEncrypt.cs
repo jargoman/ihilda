@@ -14,6 +14,11 @@ namespace IhildaWallet
 
 		byte[] Decrypt ( byte [] cipher, byte[] salt, RippleAddress ra );
 
+		string Password {
+			get;
+			set;
+		}
+
 		String Name { get; /*set;*/}
 	}
 }

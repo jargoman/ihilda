@@ -14,13 +14,16 @@ namespace IhildaWallet
 			this.Title = global::Mono.Unix.Catalog.GetString("OrderSubmitWindow");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Container child IhildaWallet.OrderSubmitWindow.Gtk.Container+ContainerChild
-			this.orderpreviewsubmitwidget1 = null;
+			this.orderpreviewsubmitwidget1 = new global::IhildaWallet.OrderPreviewSubmitWidget();
+			this.orderpreviewsubmitwidget1.Events = ((global::Gdk.EventMask)(256));
+			this.orderpreviewsubmitwidget1.Name = "orderpreviewsubmitwidget1";
+			this.orderpreviewsubmitwidget1.AllSubmitted = false;
 			this.Add(this.orderpreviewsubmitwidget1);
 			if ((this.Child != null))
 			{
 				this.Child.ShowAll();
 			}
-			this.DefaultWidth = 1051;
+			this.DefaultWidth = 1084;
 			this.DefaultHeight = 386;
 			this.Show();
 		}

@@ -95,7 +95,8 @@ namespace RippleLibSharp.Keys
 				return publickey;
 			}
 
-			var domain = RippleDeterministicKeyGenerator.SECP256k1_PARAMS;
+			RippleDeterministicKeyGenerator generator = new RippleDeterministicKeyGenerator ();
+		    	var domain = generator.SECP256k1_PARAMS;
 			//BigInteger privateBI = new BigInteger( 1, this.PayloadBytes); 
 			//new BigInteger(BinarySerializer.prepareBigIntegerBytes(this.payloadBytes));
 				/*														  
@@ -118,12 +119,15 @@ namespace RippleLibSharp.Keys
 
 			publickey = new RipplePublicKey ( publicPoint.GetEncoded(false) );
 */
-			BigInteger d = new BigInteger (PayloadBytes);
+			BigInteger d = new BigInteger (1, PayloadBytes);
 			ECPoint q = domain.G.Multiply (d);
 
 			var publicParams = new ECPublicKeyParameters (q, domain);
-			var encoded = publicParams.Q.GetEncoded (true);
 
+
+			
+			byte[] encoded = publicParams.Q.GetEncoded (true);
+			
 			this.publickey = new RipplePublicKey (encoded);
 			//return encoded;
 
@@ -132,8 +136,20 @@ namespace RippleLibSharp.Keys
 
 		public ECPrivateKeyParameters GetECPrivateKey ()
 		{
-			BigInteger privateBI = new BigInteger(1, this.PayloadBytes);
-			ECPrivateKeyParameters privKey = new ECPrivateKeyParameters (privateBI, RippleDeterministicKeyGenerator.SECP256k1_PARAMS);
+			BigInteger privateBI = new BigInteger(
+				1, 
+				this.PayloadBytes
+			);
+
+			RippleDeterministicKeyGenerator generator = new RippleDeterministicKeyGenerator ();
+
+			ECPrivateKeyParameters privKey = 
+				new ECPrivateKeyParameters (
+					privateBI, 
+					generator.SECP256k1_PARAMS
+		    		);
+
+
 			return privKey;
 		}
 	}

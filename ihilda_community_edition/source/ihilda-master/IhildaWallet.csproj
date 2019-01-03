@@ -12,6 +12,8 @@
     <ReleaseVersion>0.9</ReleaseVersion>
     <SynchReleaseVersion>false</SynchReleaseVersion>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <AssemblyName>ihilda</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,9 +29,10 @@
         <Variable name="LIBOVERLAY_SCROLLBAR" value="0" />
       </EnvironmentVariables>
     </EnvironmentVariables>
-    <AssemblyName>ihilda</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <PlatformTarget>x86</PlatformTarget>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
@@ -38,27 +41,38 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <AssemblyName>ihilda</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
     <WarningLevel>4</WarningLevel>
-    <AssemblyName>Ripple-Client-Gtk</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>DEBUG;</DefineConstants>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <NoStdLib>true</NoStdLib>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
+    <StartAction>Project</StartAction>
+    <StartArguments>darkmode=true linq=true parallelOrderSubmit=true</StartArguments>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="Mono.Posix" />
+    <Reference Include="System">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Posix">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Numerics" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Dynamic" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Core">
+      <Private>True</Private>
     </Reference>
     <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <SpecificVersion>False</SpecificVersion>
@@ -66,7 +80,9 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Management" />
-    <Reference Include="Mono.CSharp" />
+    <Reference Include="Mono.CSharp">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Mono.Cairo" />
     <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Package>gtk-sharp-2.0</Package>
@@ -88,12 +104,8 @@
       <Package>gtk-sharp-2.0</Package>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="QRCoder">
-      <HintPath>packages\QRCoder.1.3.3\lib\net40\QRCoder.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>packages\QRCoder.1.3.3\lib\net40\UnityEngine.dll</HintPath>
+    <Reference Include="Microsoft.CSharp">
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="PdfSharp.Charting">
@@ -105,11 +117,18 @@
     <Reference Include="mscorlib">
       <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\mscorlib.dll</HintPath>
     </Reference>
-    <Reference Include="BouncyCastle.Crypto">
-      <HintPath>packages\BouncyCastle.1.8.3.1\lib\BouncyCastle.Crypto.dll</HintPath>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="SuperSocket.ClientEngine">
+      <HintPath>packages\SuperSocket.ClientEngine.Core.0.10.0\lib\net45\SuperSocket.ClientEngine.dll</HintPath>
     </Reference>
     <Reference Include="WebSocket4Net">
       <HintPath>packages\WebSocket4Net.0.14.1\lib\net45\WebSocket4Net.dll</HintPath>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>packages\BouncyCastle.1.8.4\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="QRCoder">
+      <HintPath>packages\QRCoder.1.3.5\lib\net40\QRCoder.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -156,12 +175,20 @@
     <EmbeddedResource Include="Images\cooltext119298857483375.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\..\..\ihildaplain.png" />
-    <EmbeddedResource Include="..\..\..\..\ihildaplain-100-wide.png" />
-    <EmbeddedResource Include="..\..\..\..\ihildabright.png" />
-    <EmbeddedResource Include="..\..\..\..\coolio-medium.png" />
     <EmbeddedResource Include="Images\xrp-symbol-black-25x25.png" />
-    <EmbeddedResource Include="..\..\..\..\earthfrommoonsided.png" />
+    <EmbeddedResource Include="Images\earthfrommoonsided.png" />
+    <EmbeddedResource Include="Images\ihildabright.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\ihildaplain.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\ihildaplain-100-wide.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\coolio-medium.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="gtk-gui\generated.cs" />
@@ -583,6 +610,7 @@
             </Rules>
           </NameConventionPolicy>
         </Policies>
+        <Deployment.LinuxDeployData generateScript="False" />
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>

@@ -133,7 +133,12 @@ namespace RippleLibSharp.Util
 
 		public static bool SetDebug (String value)
 		{
-			String method_sig = clsstr + nameof (SetDebug) + DebugRippleLibSharp.left_parentheses + (value ?? DebugRippleLibSharp.null_str)  + DebugRippleLibSharp.right_parentheses;
+			String method_sig = 
+                clsstr + 
+                nameof (SetDebug) + 
+                DebugRippleLibSharp.left_parentheses + 
+                (value ?? DebugRippleLibSharp.null_str)  + 
+                DebugRippleLibSharp.right_parentheses;
 
 			if (DebugRippleLibSharp.debug) {
 				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);

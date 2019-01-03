@@ -227,8 +227,8 @@ namespace RippleLibSharp.Transactions
 #if DEBUG
 			if (DebugRippleLibSharp.RippleTxStructure) {
 				Logging.WriteLog (builder.ToString ());
-				LinkedList<OrderChange> cl = this.meta.GetOrderChanges (queried_addr);
-				Logging.WriteLog ("cl.Count = " + cl.Count);
+				IEnumerable<OrderChange> cl = this.meta.GetOrderChanges (queried_addr);
+				Logging.WriteLog ("cl.Count = " + cl.Count());
 				foreach (OrderChange d in cl) {
 					Logging.WriteLog (d.BuyOrderChange);
 				}
@@ -262,29 +262,37 @@ namespace RippleLibSharp.Transactions
 				acnt = TextHighlighter.Highlight (acnt); //highlight (acnt);
 			}
 
+			RippleNode canceledOrderNode = null;
 
-			/*
-			foreach (RippleNodeGroup v in meta.AffectedNodes) {
+			if (!Configuration.Config.PreferLinq) {
 
-			}
-			*/
+				foreach (RippleNodeGroup rng in meta.AffectedNodes) {
+					if ("Offer".Equals (rng?.GetNode ()?.LedgerEntryType)) {
+						canceledOrderNode = rng.GetNode();
+						break;
 
-			var va = from RippleNodeGroup rng in meta.AffectedNodes
-					 where
-							 "Offer".Equals (rng?.GetNode ()?.LedgerEntryType)
+					}
+				}
+				
+			} else {
+
+				var va = from RippleNodeGroup rng in meta.AffectedNodes
+					where "Offer".Equals (rng?.GetNode ()?.LedgerEntryType)
 					 select rng.GetNode ();
 
+				try {
+					canceledOrderNode = va.First ();
 
-			RippleNode canceledOrderNode = null;
-			try {
-				canceledOrderNode = va.First ();
-
-			} catch (Exception e) {
+				} catch (Exception e) {
 #if DEBUG
-				if (DebugRippleLibSharp.RippleTxStructure) {
-					Logging.ReportException (method_sig, e);
-				}
+					if (DebugRippleLibSharp.RippleTxStructure) {
+						Logging.ReportException (method_sig, e);
+					}
 #endif
+
+				}
+
+
 
 			}
 
@@ -443,7 +451,7 @@ namespace RippleLibSharp.Transactions
 				Logging.WriteLog (buybuilder.ToString ());
 				Logging.WriteLog (sellbuilder.ToString ());
 
-				LinkedList<OrderChange> cl = this.meta.GetOrderChanges (queried_addr);
+				IEnumerable<OrderChange> cl = this.meta.GetOrderChanges (queried_addr);
 				foreach (OrderChange d in cl) {
 					Logging.WriteLog (d.BuyOrderChange);
 				}

@@ -58,11 +58,13 @@ namespace RippleLibSharp.Binary
 
 			ECDsaSigner signer = new ECDsaSigner();
 
-			Org.BouncyCastle.Crypto.Parameters.ECPrivateKeyParameters privKey = privateKey.GetECPrivateKey();
+			ECPrivateKeyParameters privKey = privateKey.GetECPrivateKey();
 			signer.Init(true,privKey);
 
 			BigInteger[] RandS = signer.GenerateSignature(hashOfBytes);
-			return new ECDSASignature ((BigInteger)RandS.GetValue(0), (BigInteger)RandS.GetValue(1), privateKey.GetPublicKey().GetPublicPoint());
+
+			return new ECDSASignature (RandS[0], RandS[1], privateKey.GetPublicKey ().GetPublicPoint ());
+			//return new ECDSASignature ((BigInteger)RandS.GetValue(0), (BigInteger)RandS.GetValue(1), privateKey.GetPublicKey().GetPublicPoint());
 		}
 
 		public Boolean IsSignatureVerified (RippleBinaryObject serObj)
@@ -85,12 +87,17 @@ namespace RippleLibSharp.Binary
 
 				ECDsaSigner signer = new ECDsaSigner();
 				ECDSASignature signature = new ECDSASignature(signatureBytes, signingPubKeyBytes);
+
+
+
 				if (signature.publicSigningKey==null) {
 					// shouldn't ever happen
 					throw new Exception("ECDSASignature publicSigningKey is null");
 				}
 				//Org.BouncyCastle.Crypto.Parameters.ECPublicKeyParameters
-				signer.Init(false, new Org.BouncyCastle.Crypto.Parameters.ECPublicKeyParameters(signature.publicSigningKey,RippleDeterministicKeyGenerator.SECP256k1_PARAMS));
+
+				RippleDeterministicKeyGenerator generator = new RippleDeterministicKeyGenerator (privateKey.GetBytes());
+				signer.Init(false, new ECPublicKeyParameters (signature.publicSigningKey, generator.SECP256k1_PARAMS));
 				
 				return signer.VerifySignature(hashToVeryfy,signature.r, signature.s);
 			} catch (Exception e) {

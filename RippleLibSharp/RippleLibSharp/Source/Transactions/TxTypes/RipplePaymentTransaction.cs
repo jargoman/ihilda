@@ -216,7 +216,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 
 
-		new public void Submit (NetworkInterface ni)
+		public void Submit (NetworkInterface ni)
 		{
 
 			if (this.SignedTransactionBlob == null) {

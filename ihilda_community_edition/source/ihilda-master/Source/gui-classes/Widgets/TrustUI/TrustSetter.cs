@@ -8,6 +8,7 @@ using RippleLibSharp.Result;
 using IhildaWallet.Networking;
 using RippleLibSharp.Util;
 using IhildaWallet.Util;
+using RippleLibSharp.Trust;
 
 namespace IhildaWallet
 {
@@ -345,6 +346,23 @@ namespace IhildaWallet
 				Logging.WriteLog(e.Message);
 				return null;
 			}
+
+		}
+
+		public void SetTrustLine (TrustLine trustLine)
+		{
+			RippleCurrency currency = new RippleCurrency {
+				amount = trustLine.GetBalanceAsDecimal (),
+				SelfLimit = trustLine.limit,
+				currency = trustLine.currency,
+				issuer = trustLine.account
+			};
+
+			comboboxentry1.Entry.Text = trustLine.currency;
+			comboboxentry2.Entry.Text = trustLine.account;
+			comboboxentry3.Entry.Text = trustLine.GetBalanceAsDecimal ().ToString();
+			comboboxentry4.Entry.Text = trustLine.quality_in.ToString();
+			comboboxentry5.Entry.Text = trustLine.quality_out.ToString ();
 
 		}
 

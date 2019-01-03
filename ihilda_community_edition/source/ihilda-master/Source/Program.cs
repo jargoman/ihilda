@@ -28,6 +28,8 @@ using RippleLibSharp.Transactions;
 using RippleLibSharp.Binary;
 using System.Collections.Generic;
 using System.Linq;
+using RippleLibSharp.Commands.Accounts;
+using RippleLibSharp.Commands.Subscriptions;
 
 namespace IhildaWallet
 {
@@ -40,13 +42,17 @@ namespace IhildaWallet
 		public static readonly string appname = "ihilda";
 		public static readonly string version = "0.10.4";
 		public static readonly string verboseName = appname + "_community_edition_" + version;
+
 		public static bool showPopUps = true;
 		public static bool network = true;
 		public static bool darkmode = false;
-
+		public static bool preferLinq = false;
+		public static bool parallelVerify = false;
 		public static string botMode = null;
 		internal static int ledger;
 		internal static int endledger;
+
+		//public static Task walletTask = null;
 
 		public static MemoIndice GetClientMemo ()
 		{
@@ -104,12 +110,15 @@ namespace IhildaWallet
 #if DEBUG
 			string method_sig = null;
 
+
+
+
 			if (DebugIhildaWallet.Program) { // one day we should remove the debug clutter. At the moment it's proving usefull for debugging a multithreaded app. 
 				method_sig = clsstr + nameof (Main) + DebugRippleLibSharp.both_parentheses;
 
 
 				AssemblyDebug ad = new AssemblyDebug ();
-				ad.debugAssembly ();
+				ad.DebugAssembly ();
 
 				if (args.Length < 1) {
 					Logging.WriteLog (method_sig + "No command line arguments");
@@ -284,7 +293,7 @@ namespace IhildaWallet
 					stringBuilder.Append (" Verified");
 
 
-					TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
+					TextHighlighter.Highlightcolor = Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 
 
 
@@ -326,6 +335,18 @@ namespace IhildaWallet
 			}
 
 			RippleIdentifier rippleSeedAddress = rippleWallet.GetDecryptedSeed ();
+
+			while (rippleSeedAddress.GetHumanReadableIdentifier () == null) {
+
+				Logging.WriteLog ("Unable to decrypt seed. Invalid password.\nWould you like to try again?");
+				
+
+				// TODO get user input
+
+				rippleSeedAddress = rippleWallet.GetDecryptedSeed ();
+			}
+
+
 			if (rippleSeedAddress == null) {
 				Environment.Exit (-1);
 			}
@@ -382,8 +403,9 @@ namespace IhildaWallet
 
 
 
-				Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = 
-					robot.DoLogic ( rippleWallet, ni, last, Program.endledger == 0 ? -1 : Program.endledger, null, token );
+				Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = null;
+
+				tuple = robot.DoLogic (rippleWallet, ni, last, Program.endledger == 0 ? -1 : Program.endledger, null, token);
 
 
 				if (tuple == null) {
@@ -434,8 +456,13 @@ namespace IhildaWallet
 				string submitMessage = "Submitting " + numb.ToString () + " orders\n";
 				Logging.WriteLog (submitMessage);
 
-				Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> tupleResp = 
-					orderSubmitter.SubmitOrders ( orders, rippleWallet, rippleSeedAddress, ni, token );
+				Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> tupleResp = null;
+
+				if (!Program.parallelVerify) {
+					orderSubmitter.SubmitOrders (orders, rippleWallet, rippleSeedAddress, ni, token);
+				} else {
+					orderSubmitter.SubmitOrdersParallel (orders, rippleWallet, rippleSeedAddress, ni, token);
+				}
 
 				if (tupleResp == null) {
 					// TODO. probably unreachable code
@@ -534,25 +561,47 @@ namespace IhildaWallet
 #endif
 
 
-			bool b = Compliance.DoUserAgreement ();
-			if (!b) {
-
-				Application.Quit ();
-				return;
-			}
-
-			Task t1 = InitSplash ();
-
-			t1.Wait ();
-			Thread.Sleep (1000);
-
-
 #if DEBUG
 			DebugIhildaWallet.InitExceptionCatching ();
 #endif
 
 			//Task<ConsoleWindow> consoleGuiTask = ConsoleWindow.InitGUI ();
+
 			Task t7 = NetworkController.AutoConnect ();
+
+			TokenSource = new CancellationTokenSource ();
+			CancellationToken token = TokenSource.Token;
+
+			bool b = Compliance.DoUserAgreement ();
+			if (!b) {
+				TokenSource?.Cancel ();
+				Application.Quit ();
+				return;
+			}
+
+			try {
+
+				Task t1 = InitSplash ();
+
+				t1.Wait (token);
+				
+
+				//Task.WaitAll (new Task [] { t1});
+				
+
+			} catch (Exception e) {
+
+#if DEBUG
+				if (DebugIhildaWallet.Program) {
+					Logging.ReportException (method_sig, e);
+				}
+#endif
+				KillSplash ();
+			}
+
+			Task delayTask = Task.Delay (1000, token);
+
+
 			//consoleGuiTask.Wait ();
 
 			//Logging.writeBoth ("booting up....\n");
@@ -572,7 +621,7 @@ namespace IhildaWallet
 
 							RippleDeterministicKeyGenerator.TestVectors ();
 						}
-				);
+				, token);
 				//);
 				//th.Start ();
 			}
@@ -597,6 +646,11 @@ namespace IhildaWallet
 			WalletManager wlm = null;
 			Task t3 = Task.Run (
 				delegate {
+
+					wlm = new WalletManager ();
+
+
+					/*
 					EventWaitHandle whand = new ManualResetEvent (true);
 					whand.Reset ();
 					Application.Invoke (delegate {
@@ -629,10 +683,11 @@ namespace IhildaWallet
 						}
 					});
 					whand?.WaitOne ();
-				}
+					*/	    
+				} 
 			);
 
-			//t3.Start ();	
+
 			/*
 			if (SplashWindow.delay == null) {
 				if (Debug.Program) {
@@ -651,7 +706,7 @@ namespace IhildaWallet
 			*/
 
 			Task [] tsks = {/*t1, t2,*/ t3 };
-			Task.WaitAll (tsks);
+			Task.WaitAll (tsks, token);
 #if DEBUG
 			if (DebugIhildaWallet.Program) {
 				Logging.WriteLog (method_sig + "stop waiting1");
@@ -659,7 +714,6 @@ namespace IhildaWallet
 #endif
 			//Task paymentUITaskT4 = PaymentWindow.InitGUI ();
 			//t4.Start ();
-
 
 
 
@@ -696,7 +750,7 @@ namespace IhildaWallet
 			*/
 
 
-		//	Task tradeUITaskT8 = TradeWindow.InitGUI ();
+			//	Task tradeUITaskT8 = TradeWindow.InitGUI ();
 
 
 
@@ -774,12 +828,12 @@ namespace IhildaWallet
 
 
 
-			Task t11 = Task.Run ((System.Action)RippleTransactionType.LoadTransactionTypes);
 
 
 
 
-			Task [] tasks = { t9, t11 };
+
+			Task [] tasks = { t9 };
 			Task.WaitAll (tasks);
 
 			wmw = t9.Result;
@@ -791,6 +845,52 @@ namespace IhildaWallet
 #endif
 
 
+			Task balanceTask = Task.Run (delegate {
+				t7.Wait (3000, token);
+
+				NetworkInterface ni = NetworkController.CurrentInterface;
+				if (ni == null || !ni.IsConnected ()) {
+					return;
+				}
+
+				var v = from x in wlm.wallets select x.Value;
+
+				//List<Task> minis = new List<Task> ();
+
+				foreach (RippleWallet rippleWallet in v) {
+					//var t = Task.Run (delegate {
+
+					RippleCurrency rippleCurrency =
+					AccountInfo.GetNativeBalance (
+						rippleWallet.GetStoredReceiveAddress (),
+						ni,
+						    token
+					    );
+
+					DateTime dateTime = DateTime.Now;
+
+
+					if (rippleCurrency != null) {
+						rippleWallet.LastKnownNativeBalance = rippleCurrency;
+					} else {
+						string mess = "<span fgcolor=\"salmon\">Could not update balance</span>";
+
+						if (rippleWallet.Notification != mess) {
+							rippleWallet.Notification = mess;
+
+						}
+					}
+					//});
+
+					//minis.Add (t);
+				}
+
+				//Task.WaitAll (minis.ToArray (), 5000);
+				//WalletManager.currentInstance?.UpdateUI ();
+			});
+
+			Task.WaitAll (new Task [] { delayTask, balanceTask });
+
 			Gtk.Application.Invoke (
 				delegate {
 					//win.Show();
@@ -798,6 +898,7 @@ namespace IhildaWallet
 
 					if (wmw != null) {
 						wmw.Show ();
+
 					} else {
 #if DEBUG
 						Logging.WriteLog (method_sig + "window manager missing ? :/");
@@ -809,6 +910,10 @@ namespace IhildaWallet
 
 			Logging.WriteBoth ("Welcome !!\n");
 
+
+
+
+			//delayTask.Wait (1000);
 			if (WalletManager.currentInstance != null) {
 
 				if (WalletManagerWidget.currentInstance != null) {
@@ -824,43 +929,27 @@ namespace IhildaWallet
 						bool res = AreYouSure.AskQuestion ("New Wallet Wizard", isawesome);
 
 						if (res) {
-							Program.KillSplash ();
+							//Program.KillSplash ();
 							WalletManagerWidget.currentInstance.New_Wallet_Wizard ();
 						}
 					});
 				}
 			}
 
-			//if (slp) Thread.Sleep(10);
-
-			/*
-			if (PluginController.currentInstance!=null) {
-				PluginController.currentInstance.postStartUp();
-			}
-			*/
-
-
-
-
-			/*
-			player = new SoundPlayer ("Sounds/cash_register_x.wav");
-			player.LoadAsync ();
-			player.LoadCompleted += delegate {
-				
-				player.Play ();
-				SystemSounds.Asterisk.Play();
-			};
-			//sp.PlaySync ();
-			*/
-
-
-
-
-
+			
 			t7.Wait (15000);
 
-			TokenSource = new CancellationTokenSource ();
-			CancellationToken token = TokenSource.Token;
+			Task.Run (delegate {
+
+				LedgerTracker.TokenSource = new CancellationTokenSource ();
+				//var token = LedgerTracker.TokenSource.Token;
+				NetworkInterface networkInterface = NetworkController.CurrentInterface;
+				Subscribe.LedgerSubscribe (networkInterface, token, null);
+				Subscribe.ServerSubscribe (networkInterface, token, null);
+			});
+
+
+
 
 			Notifications = new NotificationThread (token);
 			Notifications.InitNotificationSystem ();

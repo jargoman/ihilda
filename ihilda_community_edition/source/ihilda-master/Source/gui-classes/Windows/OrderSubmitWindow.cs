@@ -27,16 +27,12 @@ namespace IhildaWallet
 
 		public void SetOrders ( IEnumerable <AutomatedOrder> offers ) {
 
-			if (orderpreviewsubmitwidget1 == null) {
-				OrderPreviewSubmitWidget opsw = new OrderPreviewSubmitWidget ();
-				//this.Child = (Gtk.Widget)opsw;
 
-				Add (opsw);
-
-			}
 
 			this.orderpreviewsubmitwidget1.SetDefaultOrders (offers);
-			this.orderpreviewsubmitwidget1.SetOffers (offers);
+
+
+			this.orderpreviewsubmitwidget1.SetOffers (orderpreviewsubmitwidget1._default_offers);
 
 		}
 

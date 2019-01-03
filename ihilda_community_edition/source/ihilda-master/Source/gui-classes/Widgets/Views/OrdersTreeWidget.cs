@@ -188,6 +188,21 @@ namespace IhildaWallet
 			uint se = Convert.ToUInt32( AccountInfo.GetSequence ( rw.GetStoredReceiveAddress(), ni, token ));
 
 			RippleIdentifier rsa = rw.GetDecryptedSeed();
+
+			while (rsa.GetHumanReadableIdentifier () == null) {
+				bool should = AreYouSure.AskQuestion (
+				"Invalid password",
+				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+				);
+
+				if (!should) {
+					return;
+				}
+
+				rsa = rw.GetDecryptedSeed ();
+			}
+
+
 			for ( int index = 0; index < this.openorderstree1._offers.Length;  index++) {
 
 				/*

@@ -19,6 +19,10 @@ namespace IhildaWallet
 			//this.textview1.A
 
 			this.entry1.GrabFocus ();
+
+			checkbutton1.Clicked += (sender, e) => {
+				RememberPassword = checkbutton1.Active;
+			};
 		}
 
 		public string GetPassword () {
@@ -40,24 +44,14 @@ namespace IhildaWallet
 			this.buttonOk.Activate ();
 		}
 
-
-
-		public static string DoDialog () {
-
-			PasswordDialog pd = new PasswordDialog ("Please enter your password");
-
-			ResponseType rt = (ResponseType)pd.Run ();
-
-			if (rt != ResponseType.Ok) {
-				return null;
-			}
-
-			string pass = pd.GetPassword ();
-
-			pd.Destroy ();
-
-			return pass;
+		public bool RememberPassword {
+			get;
+			set;
 		}
+
+
+
+
 	}
 }
 

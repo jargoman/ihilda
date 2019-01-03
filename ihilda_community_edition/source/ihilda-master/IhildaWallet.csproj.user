@@ -3,8 +3,4 @@
   <PropertyGroup>
     <ReferencePath>C:\Program Files\Mono\bin\</ReferencePath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
-    <StartAction>Project</StartAction>
-    <StartArguments></StartArguments>
-  </PropertyGroup>
 </Project>

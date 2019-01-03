@@ -1,21 +1,9 @@
 ﻿<Properties StartupConfiguration="{E5AE1E9D-3996-42A3-9198-E3E86DEBA932}|Default">
   <MonoDevelop.Ide.ItemProperties.RippleLibSharp PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State name="__root__">
-          <Node name="RippleLibSharp" expanded="True" selected="True">
-            <Node name="RippleLibSharp" expanded="True">
-              <Node name="References" expanded="True" />
-              <Node name="Packages" expanded="True" />
-              <Node name="Source" expanded="True">
-                <Node name="Unit-Testing" expanded="True" />
-              </Node>
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
+  <MonoDevelop.Ide.Workbench ActiveDocument="RippleLibSharp/Source/Util/DebugRippleLibSharp.cs">
+    <Files>
+      <File FileName="RippleLibSharp/Source/Util/DebugRippleLibSharp.cs" Line="185" Column="5" />
+    </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
@@ -23,4 +11,5 @@
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MultiItemStartupConfigurations />
+  <AuthorInfo Name="Karim Jouar" Email="karim@live.ca" Copyright="karim" Company="" Trademark="" />
 </Properties>

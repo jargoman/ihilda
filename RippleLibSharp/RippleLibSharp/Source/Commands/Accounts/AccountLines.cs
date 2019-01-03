@@ -122,7 +122,7 @@ namespace RippleLibSharp.Commands.Accounts
 		}
 
 
-		public static List<RippleCurrency> GetCurrencyBalances (RippleAddress ra, String currency, NetworkInterface ni, CancellationToken token) {
+		public static IEnumerable<RippleCurrency> GetCurrencyBalances (RippleAddress ra, String currency, NetworkInterface ni, CancellationToken token) {
 			
 
 			Task<Response<AccountLinesResult>> task = AccountLines.GetResult (
@@ -145,41 +145,61 @@ namespace RippleLibSharp.Commands.Accounts
 
 			AccountLinesResult result = response.result;
 
-			List<RippleCurrency> list = result.GetBalanceAsCurrency (currency);
+			IEnumerable<RippleCurrency> list = result.GetBalanceAsCurrency (currency);
 
 			return list;
 		}
 
 		public static Decimal GetCurrencyAsSingleBalance (RippleAddress ra, String currency, NetworkInterface ni, CancellationToken token) {
 
-			List<RippleCurrency> balances = GetCurrencyBalances (ra, currency, ni, token);
-
+			IEnumerable<RippleCurrency> balances = GetCurrencyBalances (ra, currency, ni, token);
 			Decimal totalbalance = 0;
-			if (balances == null) {
-				return totalbalance;
-			}
+			if (!Configuration.Config.PreferLinq) {
 
-			foreach (RippleCurrency rc in balances) {
-				totalbalance += rc.amount;
-			}
+				if (balances == null) {
+					return totalbalance;
+				}
 
+				foreach (RippleCurrency rc in balances) {
+					totalbalance += rc.amount;
+				}
+			} else {
+
+				totalbalance = balances.Sum ((RippleCurrency arg) => arg.amount);
+			}
 			return totalbalance;
 
 		}
 
 
-		public static List<string> GetIssuersForCurrency( string cur, RippleAddress address, NetworkInterface ni, CancellationToken token) {
-			List<RippleCurrency> list = GetCurrencyBalances (address, cur, ni, token);
+		public static IEnumerable<string> GetIssuersForCurrency( string cur, RippleAddress address, NetworkInterface ni, CancellationToken token) {
+			IEnumerable<RippleCurrency> list = GetCurrencyBalances (address, cur, ni, token);
 			if (list == null) {
 				return null;
 			}
 
-			var v = from RippleCurrency rc in list
+			if (Configuration.Config.PreferLinq) {
+				var v = from RippleCurrency rc in list
 					where rc != null
 				&& rc.issuer != null
-				select rc.issuer;
+					select rc.issuer;
 
-			return v.ToList ();
+				return v;
+			} else {
+				var ret = new List<string> ();
+				foreach (RippleCurrency currency in list) {
+					if (currency == null) {
+						continue;
+					}
+
+					if (currency.issuer == null) {
+						continue;
+					}
+					ret.Add (currency.issuer);
+				}
+
+				return ret;
+			}
 		}
 
 		public static RippleCurrency GetBalanceForIssuer ( string cur, RippleAddress issuer, RippleAddress address, NetworkInterface ni, CancellationToken token ) {
@@ -190,16 +210,23 @@ namespace RippleLibSharp.Commands.Accounts
 				return null;
 			}
 
+			IEnumerable<RippleCurrency> balances = GetCurrencyBalances (address, cur, ni, token);
+			if (Configuration.Config.PreferLinq) {
 
-			List<RippleCurrency> balances = GetCurrencyBalances ( address, cur, ni, token);
-
-			foreach ( RippleCurrency currency in balances ) {
-				if (issuer.ToString().Equals(currency?.issuer)) {
-					return currency;
+				balances.Where ((RippleCurrency currency) => issuer.ToString ().Equals (currency?.issuer));
+				return balances.FirstOrDefault ();
+			} else {
+			
+				foreach ( RippleCurrency currency in balances ) {
+					if (issuer.ToString().Equals(currency?.issuer)) {
+						return currency;
+					}
 				}
+
+				return null;
 			}
 
-			return null;
+
 		}
 
 

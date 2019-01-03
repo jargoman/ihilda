@@ -149,6 +149,21 @@ namespace IhildaWallet
 
 
 			RippleIdentifier rsa = rw.GetDecryptedSeed ();
+
+			while (rsa.GetHumanReadableIdentifier () == null) {
+				bool should = AreYouSure.AskQuestion (
+				"Invalid password",
+				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+				);
+
+				if (!should) {
+					return;
+				}
+
+				rsa = rw.GetDecryptedSeed ();
+			}
+
+
 			for (int index = 0; index < this._tx_tuple.Item1.Length; index++) {
 
 
@@ -203,7 +218,7 @@ namespace IhildaWallet
 
 
 				//
-				this.SetStatus (index.ToString (), "Queued", TextHighlighter.GREEN);
+				this.SetStatus (index.ToString (), "Queued", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 				Tuple<RippleTransaction [], bool []> payTupe = _tx_tuple;
 
@@ -221,7 +236,7 @@ namespace IhildaWallet
 				SignOptions opts = SignOptions.LoadSignOptions ();
 				FeeSettings feeSettings = FeeSettings.LoadSettings ();
 
-				this.SetStatus (index.ToString (), "Requesting Fee", TextHighlighter.GREEN);
+				this.SetStatus (index.ToString (), "Requesting Fee", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 				Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, token);
 
@@ -264,18 +279,25 @@ namespace IhildaWallet
 
 				if (opts.UseLocalRippledRPC) {
 
-					this.SetStatus (index.ToString (), "Signing using rpc", TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), "Signing using rpc", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 					try {
 						tx.SignLocalRippled ( rsa );
 					} catch (Exception e) {
+
+#if DEBUG
+						if (DebugIhildaWallet.TransactionSubmitWidget) {
+							Logging.ReportException (method_sig, e);
+						}
+#endif
+
 						this.SetResult (index.ToString (), "Error Signing using rpc", TextHighlighter.RED);
 						return false;
 					}
 
-					this.SetStatus (index.ToString (), "Signed rpc", TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), "Signed rpc", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 				} else {
 
-					this.SetStatus (index.ToString (), "Signing using RippleLibSharp", TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), "Signing using RippleLibSharp", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 					try {
 						if (rsa is RippleSeedAddress) {
 							tx.Sign ((RippleSeedAddress)rsa);
@@ -286,10 +308,18 @@ namespace IhildaWallet
 						}
 
 					} catch (Exception e) {
+
+#if DEBUG
+						if (DebugIhildaWallet.TransactionSubmitWidget) {
+							Logging.ReportException (method_sig, e);
+						}
+#endif
+
+
 						this.SetResult ( index.ToString (), "Signing using RippleLibSharp", TextHighlighter.RED );
 						return false;
 					}
-					this.SetStatus (index.ToString (), "Signed RippleLibSharp", TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), "Signed RippleLibSharp", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 				}
 
@@ -308,7 +338,7 @@ namespace IhildaWallet
 
 				try {
 					task = NetworkController.UiTxNetworkSubmit (tx, ni, token);
-					this.SetStatus (index.ToString (), "Submitted via websocket", TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), "Submitted via websocket", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 					task.Wait (token);
 
 
@@ -398,11 +428,11 @@ namespace IhildaWallet
 
 				case "terQUEUED":
 					Thread.Sleep (1000);
-					this.SetResult (index.ToString (), res.engine_result, TextHighlighter.GREEN);
+					this.SetResult (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 					return true;
 
 				case "tesSUCCESS":
-					this.SetResult (index.ToString (), res.engine_result, TextHighlighter.GREEN);
+					this.SetResult (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 					return true;
 
 				case "terPRE_SEQ":
@@ -516,8 +546,6 @@ namespace IhildaWallet
 					//TODO
 				}
 
-
-
 				listStore.AppendValues (isSelectDefault, transaction.ToString ());
 
 				//o.selected = true;
@@ -548,7 +576,7 @@ namespace IhildaWallet
 			if (message == null)
 				message = "";
 
-			TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
+			TextHighlighter.Highlightcolor = Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 			string s = TextHighlighter.Highlight (/*"Success : " + */message);
 
 			Gtk.Application.Invoke ((object sender, EventArgs e) => {

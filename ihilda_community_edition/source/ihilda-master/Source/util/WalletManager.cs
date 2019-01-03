@@ -176,6 +176,8 @@ namespace IhildaWallet
 								continue;
 							}
 
+			    				
+
 							//lock (walletLock) {
 							wallets.Add (rw.WalletName, rw);
 							//}

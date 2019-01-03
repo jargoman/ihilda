@@ -34,7 +34,7 @@ namespace IhildaWallet
 
 		private global::IhildaWallet.PrismWidget prismwidget2;
 
-		private global::Gtk.Label label7;
+		private global::Gtk.Label label13;
 
 		private global::Gtk.Button buttonCancel;
 
@@ -67,7 +67,7 @@ namespace IhildaWallet
 			this.notebook2 = new global::Gtk.Notebook();
 			this.notebook2.CanFocus = true;
 			this.notebook2.Name = "notebook2";
-			this.notebook2.CurrentPage = 1;
+			this.notebook2.CurrentPage = 0;
 			// Container child notebook2.Gtk.Notebook+NotebookChild
 			this.vbox5 = new global::Gtk.VBox();
 			this.vbox5.Name = "vbox5";
@@ -138,7 +138,9 @@ namespace IhildaWallet
 			this.vbox3.Name = "vbox3";
 			this.vbox3.Spacing = 6;
 			// Container child vbox3.Gtk.Box+BoxChild
-			this.pincodewidget1 = null;
+			this.pincodewidget1 = new global::IhildaWallet.PinCodeWidget();
+			this.pincodewidget1.Events = ((global::Gdk.EventMask)(256));
+			this.pincodewidget1.Name = "pincodewidget1";
 			this.vbox3.Add(this.pincodewidget1);
 			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.pincodewidget1]));
 			w9.Position = 0;
@@ -158,7 +160,9 @@ namespace IhildaWallet
 			this.vbox7.Name = "vbox7";
 			this.vbox7.Spacing = 6;
 			// Container child vbox7.Gtk.Box+BoxChild
-			this.prismwidget2 = null;
+			this.prismwidget2 = new global::IhildaWallet.PrismWidget();
+			this.prismwidget2.Events = ((global::Gdk.EventMask)(256));
+			this.prismwidget2.Name = "prismwidget2";
 			this.vbox7.Add(this.prismwidget2);
 			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.vbox7[this.prismwidget2]));
 			w11.Position = 0;
@@ -166,11 +170,11 @@ namespace IhildaWallet
 			global::Gtk.Notebook.NotebookChild w12 = ((global::Gtk.Notebook.NotebookChild)(this.notebook2[this.vbox7]));
 			w12.Position = 2;
 			// Notebook tab
-			this.label7 = new global::Gtk.Label();
-			this.label7.Name = "label7";
-			this.label7.LabelProp = global::Mono.Unix.Catalog.GetString("prism");
-			this.notebook2.SetTabLabel(this.vbox7, this.label7);
-			this.label7.ShowAll();
+			this.label13 = new global::Gtk.Label();
+			this.label13.Name = "label13";
+			this.label13.LabelProp = global::Mono.Unix.Catalog.GetString("prism");
+			this.notebook2.SetTabLabel(this.vbox7, this.label13);
+			this.label13.ShowAll();
 			this.vbox2.Add(this.notebook2);
 			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.notebook2]));
 			w13.Position = 1;

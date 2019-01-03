@@ -261,9 +261,13 @@ namespace IhildaWallet
 		}
 
 		NetworkInterface.connectEventHandler onOpenEvent;
-		NetworkInterface.connectEventHandler onCloseEvent;
+
+#pragma warning disable 0649
+		private NetworkInterface.connectEventHandler onCloseEvent;
+		private NetworkInterface.OnMessageEventHandler onMessageEvent;
+#pragma warning restore 0649
 		NetworkInterface.errorEventHandler onErrorEvent;
-		NetworkInterface.OnMessageEventHandler onMessageEvent;
+
 
 
 		/*

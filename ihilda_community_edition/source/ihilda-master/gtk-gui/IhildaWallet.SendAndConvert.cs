@@ -50,8 +50,6 @@ namespace IhildaWallet
 
 		private global::Gtk.Button sendbutton;
 
-		private global::Gtk.Button button97;
-
 		private global::Gtk.HSeparator hseparator9;
 
 		protected virtual void Build()
@@ -112,8 +110,6 @@ namespace IhildaWallet
 			this.hbox5.Add(this.comboboxentry);
 			global::Gtk.Box.BoxChild w4 = ((global::Gtk.Box.BoxChild)(this.hbox5[this.comboboxentry]));
 			w4.Position = 0;
-			w4.Expand = false;
-			w4.Fill = false;
 			// Container child hbox5.Gtk.Box+BoxChild
 			this.label14 = new global::Gtk.Label();
 			this.label14.Name = "label14";
@@ -289,34 +285,25 @@ namespace IhildaWallet
 			this.sendbutton.CanFocus = true;
 			this.sendbutton.Name = "sendbutton";
 			this.sendbutton.UseUnderline = true;
-			this.sendbutton.Label = global::Mono.Unix.Catalog.GetString("_Sign and Submit (_Send)");
+			this.sendbutton.Label = global::Mono.Unix.Catalog.GetString("Proceed to Payment Manager ( Send and Convert)");
 			this.hbox8.Add(this.sendbutton);
 			global::Gtk.Box.BoxChild w21 = ((global::Gtk.Box.BoxChild)(this.hbox8[this.sendbutton]));
 			w21.Position = 0;
-			// Container child hbox8.Gtk.Box+BoxChild
-			this.button97 = new global::Gtk.Button();
-			this.button97.CanFocus = true;
-			this.button97.Name = "button97";
-			this.button97.UseUnderline = true;
-			this.button97.Label = global::Mono.Unix.Catalog.GetString("Sign _Offline");
-			this.hbox8.Add(this.button97);
-			global::Gtk.Box.BoxChild w22 = ((global::Gtk.Box.BoxChild)(this.hbox8[this.button97]));
-			w22.Position = 1;
 			this.vbox4.Add(this.hbox8);
-			global::Gtk.Box.BoxChild w23 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hbox8]));
-			w23.PackType = ((global::Gtk.PackType)(1));
-			w23.Position = 3;
-			w23.Expand = false;
-			w23.Fill = false;
+			global::Gtk.Box.BoxChild w22 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hbox8]));
+			w22.PackType = ((global::Gtk.PackType)(1));
+			w22.Position = 3;
+			w22.Expand = false;
+			w22.Fill = false;
 			// Container child vbox4.Gtk.Box+BoxChild
 			this.hseparator9 = new global::Gtk.HSeparator();
 			this.hseparator9.Name = "hseparator9";
 			this.vbox4.Add(this.hseparator9);
-			global::Gtk.Box.BoxChild w24 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hseparator9]));
-			w24.PackType = ((global::Gtk.PackType)(1));
-			w24.Position = 4;
-			w24.Expand = false;
-			w24.Fill = false;
+			global::Gtk.Box.BoxChild w23 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hseparator9]));
+			w23.PackType = ((global::Gtk.PackType)(1));
+			w23.Position = 4;
+			w23.Expand = false;
+			w23.Fill = false;
 			this.Add(this.vbox4);
 			if ((this.Child != null))
 			{

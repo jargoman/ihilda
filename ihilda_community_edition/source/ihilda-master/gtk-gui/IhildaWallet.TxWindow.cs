@@ -22,7 +22,7 @@ namespace IhildaWallet
 
 		private global::IhildaWallet.CancelTxWidget canceltxwidget1;
 
-		private global::Gtk.Label label55;
+		private global::Gtk.Label label56;
 
 		protected virtual void Build()
 		{
@@ -40,7 +40,7 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 1;
+			this.notebook1.CurrentPage = 3;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.txviewwidget1 = new global::IhildaWallet.TxViewWidget();
 			this.txviewwidget1.Events = ((global::Gdk.EventMask)(256));
@@ -86,11 +86,11 @@ namespace IhildaWallet
 			global::Gtk.Notebook.NotebookChild w4 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.canceltxwidget1]));
 			w4.Position = 3;
 			// Notebook tab
-			this.label55 = new global::Gtk.Label();
-			this.label55.Name = "label55";
-			this.label55.LabelProp = global::Mono.Unix.Catalog.GetString("Cancel");
-			this.notebook1.SetTabLabel(this.canceltxwidget1, this.label55);
-			this.label55.ShowAll();
+			this.label56 = new global::Gtk.Label();
+			this.label56.Name = "label56";
+			this.label56.LabelProp = global::Mono.Unix.Catalog.GetString("Cancel");
+			this.notebook1.SetTabLabel(this.canceltxwidget1, this.label56);
+			this.label56.ShowAll();
 			this.vbox3.Add(this.notebook1);
 			global::Gtk.Box.BoxChild w5 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.notebook1]));
 			w5.Position = 0;

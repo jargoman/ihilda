@@ -301,7 +301,7 @@ namespace IhildaWallet
 
 			NetworkInterface ni = NetworkController.CurrentInterface;
 
-			List<String> lis = AccountLines.GetIssuersForCurrency (cur, address, ni, new CancellationToken());
+			IEnumerable<String> lis = AccountLines.GetIssuersForCurrency (cur, address, ni, new CancellationToken());
 
 
 			if (lis == null) {

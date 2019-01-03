@@ -1,23 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using RippleLibSharp.Util;
-using RippleLibSharp.Transactions;
-using RippleLibSharp.Network;
-using IhildaWallet.Networking;
-using RippleLibSharp.Commands.Stipulate;
-using RippleLibSharp.Result;
-
-using Cairo;
-
-using Gtk;
 using Gdk;
+using Gtk;
+using IhildaWallet.Networking;
 using Pango;
-using System.Text;
-using System.Drawing;
-using System.ComponentModel;
+using RippleLibSharp.Commands.Stipulate;
+using RippleLibSharp.Network;
+using RippleLibSharp.Result;
+using RippleLibSharp.Transactions;
+using RippleLibSharp.Util;
 
 namespace IhildaWallet
 {
@@ -259,7 +256,7 @@ this.CopyBuffer ();
 
 			#region buy_menus
 			MenuItem buy = new MenuItem (
-				"Prepare a <span fgcolor=\"green\">buy</span>  order at "
+				Program.darkmode ? "Prepare a <span fgcolor=\"chartreuse\">buy</span>  order at" : "Prepare a <span fgcolor=\"green\">buy</span>  order at "
 				+ price.ToString ()
 				+ " "
 				+ tradePair.Currency_Counter.currency
@@ -303,13 +300,16 @@ this.CopyBuffer ();
 			};
 
 			Gtk.MenuItem cassbuy = new MenuItem (
-									   "Cascade <span fgcolor=\"green\">buy</span> orders from "
-									   + price.ToString ()
-									   + " "
-									   + tradePair.Currency_Counter.currency
-									   + " per "
-									   + tradePair.Currency_Base.currency
-								   );
+				Program.darkmode ? 
+					"Cascade <span fgcolor=\"chartreuse\">buy</span> orders from " : 
+				       	"Cascade <span fgcolor=\"green\">buy</span> orders from "
+					+ price.ToString ()
+					+ " "
+		    			+ tradePair.Currency_Counter.currency
+					+ " per "
+					+ tradePair.Currency_Base.currency
+		    	);
+
 			cassbuy.Show ();
 			menu.Add (cassbuy);
 
@@ -342,7 +342,10 @@ this.CopyBuffer ();
 				tradeWindow.InitiateCascade (buyOffer, OrderEnum.BID);
 			};
 
-			Gtk.MenuItem autobuy = new MenuItem ("Prepare an automated <span fgcolor=\"green\">buy</span> at "
+			Gtk.MenuItem autobuy = new MenuItem (
+				Program.darkmode ?
+				"Prepare an automated <span fgcolor=\"chartreuse\">buy</span> at " :
+				"Prepare an automated <span fgcolor=\"green\">buy</span> at "
 				+ price.ToString ()
 				+ " "
 				+ tradePair.Currency_Counter.currency
@@ -812,10 +815,10 @@ this.CopyBuffer ();
 
 			decimal amount = (pointFrame.height - y) * pointFrame.highestypoint / pointFrame.height;
 
-			Gdk.Image buff = chartBufferImage;
+			//Gdk.Image buff = chartBufferImage;
 
-			if (buff == null) {
-				DrawChartToPixMap (pointFrame);
+			if (chartBufferImage == null) {
+				chartBufferImage = DrawChartToPixMap (pointFrame);
 			}
 
 
@@ -919,6 +922,8 @@ this.CopyBuffer ();
 			String method_sig = clsstr + nameof (UpdateBooks) + DebugRippleLibSharp.both_parentheses;
 #endif
 
+			PumpUI (token);
+
 			TradePair tradePair = _tradePair;
 
 			if (tradePair == null) {
@@ -935,6 +940,7 @@ this.CopyBuffer ();
 				//if (this.sellorderbooktablewidget != null) {
 				//	this.sellorderbooktablewidget.clearTable();
 				//}
+				ResetProgressBar ();
 				return;
 			}
 
@@ -942,21 +948,26 @@ this.CopyBuffer ();
 
 
 
-
+			PumpUI (token);
 
 
 
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
 			if (ni == null) {
+
+				ResetProgressBar ();
 				return;
 			}
+			Task balTask = Task.Run ( delegate {
+				this._tradePair.UpdateBalances (_rippleWallet.GetStoredReceiveAddress (), ni);
+			}, token);
 
-			this._tradePair.UpdateBalances (_rippleWallet.GetStoredReceiveAddress (), ni);
+
 
 			Task<IEnumerable<AutomatedOrder>> bidsTask = 
 				Task.Run (
 					delegate { 
-						return UpdateBids (ni, tradePair); 
+						return UpdateBids (ni, tradePair, token); 
 					}
 					, token
 				);
@@ -964,12 +975,24 @@ this.CopyBuffer ();
 			Task<IEnumerable<AutomatedOrder>> askTask = 
 				Task.Run (
 					delegate { 
-						return UpdateAsks (ni, tradePair); 
+						return UpdateAsks (ni, tradePair, token); 
 					}, token
 				);
 
-			Task [] tasks = { bidsTask, askTask };
-			Task.WaitAll (tasks);
+			Task [] tasks = { bidsTask, askTask, balTask };
+
+			while (
+
+				(!bidsTask.IsCompleted && 
+				!bidsTask.IsCanceled && 
+				!bidsTask.IsFaulted) || 
+				!(askTask.IsCompleted && 
+				!askTask.IsCanceled && 
+				!askTask.IsFaulted)) 
+			{
+				Task.WaitAll (tasks, 250, token);
+				PumpUI (token);
+			}
 
 #if DEBUG
 			if (DebugIhildaWallet.DepthChartWidget) {
@@ -980,15 +1003,76 @@ this.CopyBuffer ();
 #endif
 
 
+	    		var task1 = Task.Run ( delegate {
+				asks = askTask?.Result?.ToArray ();
+			});
 
-			asks = askTask?.Result?.ToArray ();
-			bids = bidsTask?.Result?.ToArray ();
+			var task2 = Task.Run ( delegate {
+				bids = bidsTask?.Result?.ToArray ();
 
+			});
 
+			while (
+				((!task1.IsCanceled && !task1.IsCompleted && !task1.IsFaulted) || (!task2.IsFaulted && !task2.IsCanceled && !task2.IsCompleted)) && !token.IsCancellationRequested
+			) {
+				Task.WaitAll (new Task [] { task1, task2 }, 500, token);
+				PumpUI (token);
+			}
 
 			this.scaleChanged = true;
 
+			ResetProgressBar ();
 
+
+
+			Application.Invoke ( delegate {
+				if (drawingarea1 == null) {
+					return;
+				}
+
+				if (!this.drawingarea1.IsDrawable) {
+					return;
+				}
+
+
+
+				var pointFrame = _pointFrame;
+
+
+
+				if (chartBufferImage == null) {
+					chartBufferImage = DrawChartToPixMap (pointFrame);
+				}
+
+				CopyBuffer ();
+
+
+			});
+
+			
+
+
+
+		}
+
+		private void PumpUI (CancellationToken token)
+		{
+			Gtk.Application.Invoke ( delegate {
+				if (token.IsCancellationRequested) {
+					return;
+				}
+				progressbar1.Pulse ();
+			}
+			);
+		}
+
+		private void ResetProgressBar ()
+		{
+			Gtk.Application.Invoke (delegate {
+
+				progressbar1.Fraction = 0;
+			}
+			);
 		}
 
 		public PointFrame GetPointFrame ()
@@ -1029,7 +1113,7 @@ this.CopyBuffer ();
 			return pointFrame;
 		}
 
-		public IEnumerable<AutomatedOrder> UpdateBids (NetworkInterface ni, TradePair tp)
+		public IEnumerable<AutomatedOrder> UpdateBids (NetworkInterface ni, TradePair tp, CancellationToken token)
 		{
 
 
@@ -1061,8 +1145,8 @@ this.CopyBuffer ();
 				return null;
 			}
 
-			Task<Response<BookOfferResult>> buyTask = BookOffers.GetResult (counter_currency, cur_base, ni, TokenSource.Token);
-			buyTask.Wait (TokenSource.Token);
+			Task<Response<BookOfferResult>> buyTask = BookOffers.GetResult (counter_currency, cur_base, ni, token);
+			buyTask.Wait (token);
 #if DEBUG
 
 			if (DebugIhildaWallet.DepthChartWidget) {
@@ -1078,7 +1162,7 @@ this.CopyBuffer ();
 			return buyoffers;
 		}
 
-		public IEnumerable<AutomatedOrder> UpdateAsks (NetworkInterface ni, TradePair tp)
+		public IEnumerable<AutomatedOrder> UpdateAsks (NetworkInterface ni, TradePair tp, CancellationToken token)
 		{
 
 
@@ -1110,8 +1194,8 @@ this.CopyBuffer ();
 				return null;
 			}
 
-			Task<Response<BookOfferResult>> sellTask = BookOffers.GetResult (cur_base, counter_currency, ni, TokenSource.Token);
-			sellTask.Wait (TokenSource.Token);
+			Task<Response<BookOfferResult>> sellTask = BookOffers.GetResult (cur_base, counter_currency, ni, token);
+			sellTask.Wait (token);
 #if DEBUG
 
 			if (DebugIhildaWallet.DepthChartWidget) {
@@ -1257,7 +1341,7 @@ this.CopyBuffer ();
 
 
 			if (chartBufferImage == null) {
-				DrawChartToPixMap (pointFrame);
+				chartBufferImage = DrawChartToPixMap (pointFrame);
 			}
 
 			CopyBuffer (/*pointFrame*/);
@@ -1577,11 +1661,13 @@ this.CopyBuffer ();
 
 		}
 
-		Gdk.Image image = null;
-		private int lastWidth = 0;
-		private int lastHeight = 0;
-		private bool scaleChanged = false;
+		//Gdk.Image image = null;
+		//private int lastWidth = 0;
+		//private int lastHeight = 0;
 
+#pragma warning disable 0414
+		private bool scaleChanged = false;
+#pragma warning restore 0414
 
 
 

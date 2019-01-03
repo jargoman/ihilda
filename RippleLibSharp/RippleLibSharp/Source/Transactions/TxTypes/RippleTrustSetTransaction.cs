@@ -172,6 +172,20 @@ namespace RippleLibSharp.Transactions.TxTypes
 			return s;
 		}
 
+		public override string ToString ()
+		{
+
+			StringBuilder stringBuilder = new StringBuilder ();
+			stringBuilder.Append ("Trust ");
+			stringBuilder.Append (Account ?? "null");
+			stringBuilder.Append (" for ");
+			stringBuilder.Append (LimitAmount.amount);
+			stringBuilder.Append (" ");
+			stringBuilder.Append (LimitAmount.currency);
+
+			return stringBuilder.ToString ();
+		}
+
 
 
 #if DEBUG

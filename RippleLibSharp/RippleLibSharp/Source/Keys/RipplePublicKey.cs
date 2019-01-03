@@ -37,7 +37,8 @@ namespace RippleLibSharp.Keys
 		}
 
 		public ECPoint GetPublicPoint() {
-			return RippleDeterministicKeyGenerator.SECP256k1_PARAMS.Curve.DecodePoint(PayloadBytes);
+			RippleDeterministicKeyGenerator generator = new RippleDeterministicKeyGenerator ();
+			return generator.SECP256k1_PARAMS.Curve.DecodePoint(PayloadBytes);
 		}
 	}
 }

@@ -1,18 +1,17 @@
 using System;
-using System.Text;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Gtk;
-using RippleLibSharp.Keys;
-using RippleLibSharp.Binary;
-using Codeplex.Data;
-using RippleLibSharp.Util;
-using RippleLibSharp.Transactions;
-using QRCoder;
-using System.Drawing.Imaging;
-using System.Drawing;
 using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Text;
+using System.Threading;
+using Codeplex.Data;
+using Gtk;
+using QRCoder;
+using RippleLibSharp.Binary;
+using RippleLibSharp.Keys;
+using RippleLibSharp.Transactions;
+using RippleLibSharp.Util;
 
 namespace IhildaWallet
 {
@@ -320,7 +319,7 @@ namespace IhildaWallet
 					
 					resp = (ResponseType)etd.Run ();
 
-					if (resp == ResponseType.Cancel) {
+					if (resp != ResponseType.Ok) {
 						break;
 					}
 
@@ -532,12 +531,17 @@ namespace IhildaWallet
 
 				switch (enc) {
 				case EncryptionType.Rijndaelio:
-					ie = new Rijndaelio ();
+
+					Rijndaelio rijndaelio = RememberRijndaelio ?? Rijndaelio.GetPasswordInput();
+					if (rijndaelio.RememberPassword) {
+						RememberRijndaelio = rijndaelio;
+					}
+					ie = rijndaelio;
 					break;
 
 				case EncryptionType.TrippleEntente:
 
-					var tripple = RememberedEntente ?? TrippleEntenteDialog.DoDialog ();
+					TrippleEntente tripple = RememberedEntente ?? TrippleEntenteDialog.DoDialog ();
 					if (tripple.RememberPassword) {
 						RememberedEntente = tripple;
 					}
@@ -562,6 +566,10 @@ namespace IhildaWallet
 					salty, 
 					Account
 				);
+
+
+				
+
 
 				RippleSeedAddress decryptedSeed = null;
 				RipplePrivateKey decryptedPrivateKey = null;
@@ -620,6 +628,7 @@ namespace IhildaWallet
 			}
 		}
 
+		private Rijndaelio RememberRijndaelio = null;
 		private TrippleEntente RememberedEntente = null; 
 
 		public RippleIdentifier GetDecryptedSeed ()
