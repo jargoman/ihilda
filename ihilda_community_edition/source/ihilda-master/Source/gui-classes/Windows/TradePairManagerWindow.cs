@@ -140,9 +140,14 @@ namespace IhildaWallet
 
 			Application.Invoke (
 				delegate {
-					OrderBookWindow obw = new OrderBookWindow (rippleWallet);
 
-					obw.SetTradePair (tp);
+					OrderBookWindow obw = new OrderBookWindow (rippleWallet);
+					Task.Run ( delegate {
+
+						obw.SetTradePair (tp);
+
+					});
+
 
 				}
 			);

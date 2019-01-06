@@ -77,7 +77,9 @@ namespace IhildaWallet
 			this.vbox2.Name = "vbox2";
 			this.vbox2.Spacing = 6;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.console1 = null;
+			this.console1 = new global::IhildaWallet.Console();
+			this.console1.Events = ((global::Gdk.EventMask)(256));
+			this.console1.Name = "console1";
 			this.vbox2.Add(this.console1);
 			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.console1]));
 			w2.Position = 0;

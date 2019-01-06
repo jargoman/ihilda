@@ -496,6 +496,8 @@
     <Compile Include="Source\gui-classes\Dialogs\AggreementDialog.cs" />
     <Compile Include="gtk-gui\IhildaWallet.AggreementDialog.cs" />
     <Compile Include="gtk-gui\IhildaWallet.CancelTxWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\OptionSettingsWidget\OrderBookOptionsWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OrderBookOptionsWidget.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -9,6 +9,7 @@ using RippleLibSharp.Binary;
 using IhildaWallet.Networking;
 using RippleLibSharp.Commands.Server;
 using RippleLibSharp.Util;
+using RippleLibSharp.Commands.Subscriptions;
 
 namespace IhildaWallet
 {
@@ -29,7 +30,9 @@ namespace IhildaWallet
 			if (DebugIhildaWallet.ServerInfoWidget) {
 				Logging.WriteLog (clsstr + "build complete\n");
 			}
-			#endif
+#endif
+
+			Task.Run ((System.Action)DoServerStateLoop);
 
 		}
 
@@ -60,6 +63,57 @@ namespace IhildaWallet
 			//thr.Start();
 
 			Task.Run ((System.Action)Refresh);
+
+
+
+		}
+
+
+		public void DoServerStateLoop ()
+		{
+
+			// TODO two cansellation tokens
+
+			while (true) {
+
+				if (LedgerTracker.ServerStateEvent == null) {
+					Thread.Sleep (10000);
+
+				} else {
+					LedgerTracker.ServerStateEvent.WaitOne ();
+				}
+
+				var stateEvent = LedgerTracker.ServerStateEv;
+				if (stateEvent == null) {
+					continue;
+				}
+
+				var basefee = stateEvent.base_fee;
+				var loadfactor = stateEvent.load_factor;
+
+				var tupe = LedgerTracker.GetFeeAndLastLedger (new CancellationToken());
+				if (tupe == null) {
+					continue;
+				}
+				var fee = tupe.Item1;
+				if (fee == null) {
+#if DEBUG
+					fee = "null";
+#else
+					continue;
+
+#endif 
+				}
+				//var ledger = tupe.Item2;
+
+				Gtk.Application.Invoke ( delegate {
+					load_factor_label_var.Text = loadfactor.ToString ();
+					base_fee_label_var.Text = basefee.ToString ();
+					transaction_fee_label_var.Text = fee;
+
+				});
+			}
+
 		}
 
 		private CancellationTokenSource tokenSource = null;
@@ -109,11 +163,11 @@ namespace IhildaWallet
 
 		public void Refresh_blocking ()
 		{
-			#if DEBUG
+#if DEBUG
 			if (DebugIhildaWallet.ServerInfo) {
 				Logging.WriteLog("Server Info : refresh_blocking\n");
 			}
-			#endif
+#endif
 
 			_waitHandle.Reset();
 
@@ -121,13 +175,13 @@ namespace IhildaWallet
 
 			_waitHandle.WaitOne(); // race condition if network fires before method return?
 
-			#if DEBUG
+#if DEBUG
 			if (DebugIhildaWallet.ServerInfo) {
 
 				Logging.WriteLog("Server Info : refresh_continue\n");
 
 			}
-			#endif
+#endif
 		}
 
 		public void ClearUI () {
@@ -145,29 +199,29 @@ namespace IhildaWallet
 
 		public void SetServerInfo (Info serverInfo) {
 			
-			#if DEBUG
+#if DEBUG
 			string method_sig = clsstr + "setServerInfo : ";
 			//if (firstconnect) { // faster if we only set these values once per connect
 			if (DebugIhildaWallet.ServerInfo) {
 				Logging.WriteLog(method_sig + "firstconnect true");
 			}
-			#endif
+#endif
 
 			if (serverInfo == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.ServerInfo) {
 					Logging.WriteLog(method_sig + "serverInfo == null");
 				}
-				#endif
+#endif
 				this.ClearUI ();
 				return;
 			}
 
-			#if DEBUG
+#if DEBUG
 			if (DebugIhildaWallet.ServerInfo) {
 				Logging.WriteLog(method_sig + "Server Info not null");
 			}
-			#endif
+#endif
 
 
 			if (serverInfo.build_version!=null) {
@@ -235,9 +289,9 @@ namespace IhildaWallet
 		static EventWaitHandle _waitHandle = new ManualResetEvent( true );
 
 
-		#if DEBUG
+#if DEBUG
 		private static readonly string clsstr = nameof (ServerInfoWidget) + DebugRippleLibSharp.colon;
-		#endif 
+#endif
 
 	}
 }

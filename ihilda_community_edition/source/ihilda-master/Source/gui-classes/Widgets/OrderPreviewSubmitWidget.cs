@@ -1,33 +1,23 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
-using System.Linq;
-
-using System.Collections;
-using System.Collections.Generic;
-
 using Gtk;
-using RippleLibSharp.Transactions;
-using RippleLibSharp.Transactions.TxTypes;
-
-using RippleLibSharp.Network;
 using IhildaWallet.Networking;
-
-using RippleLibSharp.Keys;
-using RippleLibSharp.Result;
-
-using RippleLibSharp.Util;
-
-using RippleLibSharp.Nodes;
-using System.Text;
-
-using RippleLibSharp.Commands.Tx;
-using RippleLibSharp.Commands.Server;
-using RippleLibSharp.Commands.Accounts;
 using IhildaWallet.Util;
 using RippleLibSharp.Binary;
+using RippleLibSharp.Commands.Accounts;
+using RippleLibSharp.Commands.Server;
+using RippleLibSharp.Commands.Tx;
+using RippleLibSharp.Keys;
+using RippleLibSharp.Network;
+using RippleLibSharp.Result;
+using RippleLibSharp.Transactions;
+using RippleLibSharp.Transactions.TxTypes;
+using RippleLibSharp.Util;
 
 namespace IhildaWallet
 {
@@ -1099,9 +1089,9 @@ namespace IhildaWallet
 			return feeSettings;
 		}
 
-		public bool SubmitOrderAtIndex (int index, uint sequence, SignOptions opts, NetworkInterface ni, CancellationToken token, RippleIdentifier rsa)
+		public bool SubmitOrderAtIndex (int indexx, uint sequence, SignOptions opts, NetworkInterface ni, CancellationToken token, RippleIdentifier rsa)
 		{
-
+			int index = indexx;
 #if DEBUG
 			string method_sig = clsstr + nameof (SubmitOrderAtIndex) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
@@ -1111,7 +1101,7 @@ namespace IhildaWallet
 
 			StringBuilder stringBuilder = new StringBuilder ();
 
-			stringBuilder.Append ("Tx <b>");
+			stringBuilder.Append ("<b>Tx ");
 			stringBuilder.Append ((index + 1).ToString ());
 			stringBuilder.Append ("</b>");
 
@@ -1121,7 +1111,7 @@ namespace IhildaWallet
 
 			stringBuilder.Clear ();
 			if (Program.darkmode) {
-				stringBuilder.Append ("< span fgcolor = \"chartreuse\" > Submitting");
+				stringBuilder.Append ("<span fgcolor=\"chartreuse\">Submitting ");
 			} else {
 				stringBuilder.Append ("<span fgcolor=\"green\">Submitting ");
 			}
@@ -1173,7 +1163,11 @@ namespace IhildaWallet
 				stringBuilder.Append ("</span>");
 
 				string ms3 = stringBuilder.ToString ();
-				this.SetStatus (index.ToString (), feeReq, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+
+				this.SetStatus (
+					index.ToString (), 
+					feeReq, 
+		    			Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 				Application.Invoke (
 					delegate {
@@ -1186,12 +1180,27 @@ namespace IhildaWallet
 
 				Tuple<UInt32, UInt32> tupe = null;
 
+
+				
 				var getFeeTask = Task.Run (delegate {
 
 					FeeSettings feeSettings = LoadFeeSettings (token);
 
-
+					string indexStr = index.ToString ();
 					feeSettings.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
+
+						if (e == null) {
+#if DEBUG
+							if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
+								Logging.WriteLog (method_sig, nameof (FeeSleepEventArgs) + " is null");
+							}
+							return;
+#endif
+						}
+
+						if (e.State != FeeSleepState.Begin) {
+							return;
+						}
 
 						StringBuilder sb = new StringBuilder ();
 
@@ -1199,21 +1208,25 @@ namespace IhildaWallet
 						sb.Append (e.FeeAndLastLedger.Item1.ToString ());
 						sb.Append (" is too high, waiting on lower fee");
 
-						var feestr = sb.ToString ();
+						string feestr = sb.ToString ();
 
 
 						this.SetResult (
-							index.ToString (),
-							feestr, TextHighlighter.BLACK);
+							indexStr,
+							feestr, 
+			    				Program.darkmode ? TextHighlighter.YELLOW : TextHighlighter.BLACK);
 
 						sb.Clear ();
-						sb.Append (txAtIndexStr);
+						if (txAtIndexStr != null) {
+							sb.Append (txAtIndexStr ?? "");
+						}
 						sb.Append (feestr);
 
 						string ms4 = sb.ToString ();
+
 						Application.Invoke (delegate {
 							label2.Markup = ms4;
-							label2.Visible = true;
+							//label2.Visible = true;
 
 						});
 
@@ -1296,9 +1309,8 @@ namespace IhildaWallet
 					feeDots++;
 
 					StringBuilder feeReq2 = new StringBuilder (feeReq);
-					for (int i = 0; i < feeDots && !getFeeTask.IsCompleted && !getFeeTask.IsCanceled && !getFeeTask.IsFaulted; i++) {
-						feeReq2.Append (".");
-					}
+					feeReq2.Append ( new string('.',feeDots));
+
 
 					stringBuilder.Clear ();
 					if (Program.darkmode) {
@@ -1320,12 +1332,12 @@ namespace IhildaWallet
 					Application.Invoke (
 						delegate {
 							label2.Markup = mssg;
-							label2.Visible = true;
+							//label2.Visible = true;
 
 						}
 					);
 
-					getFeeTask.Wait (500, token);
+					getFeeTask.Wait (1000, token);
 
 					if (feeDots == 10) {
 						feeDots = 0;
@@ -1367,6 +1379,8 @@ namespace IhildaWallet
 					lls = opts.LastLedgerOffset;
 				}
 
+
+				// document that last ledger below 5 is not respected // TODO maybe change
 				if (lls < 5) {
 					lls = SignOptions.DEFAUL_LAST_LEDGER_SEQ;
 				}
@@ -1395,6 +1409,10 @@ namespace IhildaWallet
 					goto retry;
 				}
 
+				
+
+				
+
 				if (tx.Sequence == 0) {
 
 					string invstr = "Invalid Sequence";
@@ -1409,19 +1427,23 @@ namespace IhildaWallet
 					Application.Invoke (
 						delegate {
 							label2.Markup = ms7;
-							label2.Visible = true;
+							//label2.Visible = true;
 
 						}
 					);
 					goto retry;
 				}
 
-
+				string approvedFee = tx.fee.ToString ();
 
 				if (opts.UseLocalRippledRPC) {
+					stringBuilder.Clear ();
+					stringBuilder.Append ("Signing using rpc");
 
-					string rpsStr = "Signing using rpc";
-					this.SetStatus (index.ToString (), rpsStr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					
+					this.SetStatus (index.ToString (), stringBuilder.ToString (), Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+
+					string rpsStr = stringBuilder.ToString ();
 
 					stringBuilder.Clear ();
 
@@ -1432,14 +1454,14 @@ namespace IhildaWallet
 
 					}
 					stringBuilder.Append (txAtIndexStr);
-					stringBuilder.Append (rpsStr);
+					stringBuilder.Append (stringBuilder.ToString ());
 					stringBuilder.Append ("</span>");
 
 					string ms8 = stringBuilder.ToString ();
 					Application.Invoke (
 						delegate {
 							label2.Markup = ms8;
-							label2.Visible = true;
+							//label2.Visible = true;
 
 						}
 					);
@@ -1483,15 +1505,15 @@ namespace IhildaWallet
 					while (!signTask.IsCompleted && !token.IsCancellationRequested && !signTask.IsFaulted) {
 						stbuild.Clear ();
 						stbuild.Append (rpsStr);
-						for (int i = 0; i < x; i++) {
-							stbuild.Append (".");
-						}
+
+						stbuild.Append (new String ('.',x));
+
 						if (x++ > 7) {
 							x = 0;
 
 						}
 
-						token.WaitHandle.WaitOne (500);
+						token.WaitHandle.WaitOne (1000);
 
 						this.SetStatus (index.ToString (), stbuild.ToString(), Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
@@ -1716,9 +1738,8 @@ namespace IhildaWallet
 						int dots = x++ % MAXDOTS;
 
 						// the first time 0 dots then 1 then 2,3,4,5
-						for (int i = 0; i < dots; i++) {
-							stringBuilder.Append (".");
-						}
+						
+						stringBuilder.Append (new string ('.', x));
 
 						string tmpstr = stringBuilder.ToString ();
 						this.SetResult (index.ToString (), tmpstr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
@@ -1741,7 +1762,7 @@ namespace IhildaWallet
 
 						});
 
-						task.Wait (500, token);
+						task.Wait (1000, token);
 					}
 
 
@@ -3046,6 +3067,11 @@ namespace IhildaWallet
 				}
 			} catch (Exception e) {
 
+#if DEBUG
+				if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
+					Logging.ReportException (method_sig, e);
+				}
+#endif
 
 			}
 			SignOptions signOptions = signOptionsTask.Result;

@@ -60,6 +60,7 @@ namespace RippleLibSharp.Binary
 
 			ECPrivateKeyParameters privKey = privateKey.GetECPrivateKey();
 			signer.Init(true,privKey);
+			
 
 			BigInteger[] RandS = signer.GenerateSignature(hashOfBytes);
 

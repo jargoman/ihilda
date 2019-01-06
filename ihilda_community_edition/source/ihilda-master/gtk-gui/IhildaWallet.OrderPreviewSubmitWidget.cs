@@ -221,7 +221,6 @@ namespace IhildaWallet
 			{
 				this.Child.ShowAll();
 			}
-			this.label2.Hide();
 			this.button209.Hide();
 			this.Hide();
 		}

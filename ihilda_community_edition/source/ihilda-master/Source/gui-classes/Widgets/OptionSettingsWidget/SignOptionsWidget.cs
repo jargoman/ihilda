@@ -10,7 +10,7 @@ namespace IhildaWallet
 		public SignOptionsWidget ()
 		{
 			this.Build ();
-			SignOptions signOptions = SignOptions.LoadSignOptions ();
+			//SignOptions signOptions = SignOptions.LoadSignOptions ();
 			SetUI ();
 		}
 
@@ -128,7 +128,7 @@ namespace IhildaWallet
 		public const string settingsFileName = "SignatureOptions.jsn";
 
 #pragma warning disable RECS0122 // Initializing field with default value is redundant
-		static string settingsPath = null;
+		static readonly string settingsPath = null;
 #pragma warning restore RECS0122 // Initializing field with default value is redundant
 
 #if DEBUG

@@ -1208,10 +1208,11 @@ namespace IhildaWallet
 
 			if (this.tokenSource != null) {
 				WriteToInfoBox ("A rule script is already running\n");
+				this.SetIsRunningUI (false);
 				return;
 			}
 
-			this.tokenSource = new BotCancellTokenSource ();
+			this.tokenSource = new BotCancellTokenSource () { auto = true };
 
 			CancellationToken token = tokenSource.Token;
 

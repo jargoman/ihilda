@@ -28,6 +28,10 @@ namespace IhildaWallet
 
 		private global::Gtk.Label label6;
 
+		private global::IhildaWallet.OrderBookOptionsWidget orderbookoptionswidget1;
+
+		private global::Gtk.Label label7;
+
 		private global::Gtk.HSeparator hseparator2;
 
 		private global::Gtk.HSeparator hseparator5;
@@ -86,9 +90,11 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 2;
+			this.notebook1.CurrentPage = 3;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.splashoptionswidget1 = null;
+			this.splashoptionswidget1 = new global::IhildaWallet.SplashOptionsWidget();
+			this.splashoptionswidget1.Events = ((global::Gdk.EventMask)(256));
+			this.splashoptionswidget1.Name = "splashoptionswidget1";
 			this.notebook1.Add(this.splashoptionswidget1);
 			// Notebook tab
 			this.label16 = new global::Gtk.Label();
@@ -98,7 +104,9 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.splashoptionswidget1, this.label16);
 			this.label16.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.feeoptionswidget1 = null;
+			this.feeoptionswidget1 = new global::IhildaWallet.FeeOptionsWidget();
+			this.feeoptionswidget1.Events = ((global::Gdk.EventMask)(256));
+			this.feeoptionswidget1.Name = "feeoptionswidget1";
 			this.notebook1.Add(this.feeoptionswidget1);
 			global::Gtk.Notebook.NotebookChild w5 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.feeoptionswidget1]));
 			w5.Position = 1;
@@ -110,7 +118,9 @@ namespace IhildaWallet
 			this.notebook1.SetTabLabel(this.feeoptionswidget1, this.label2);
 			this.label2.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.signoptionswidget1 = null;
+			this.signoptionswidget1 = new global::IhildaWallet.SignOptionsWidget();
+			this.signoptionswidget1.Events = ((global::Gdk.EventMask)(256));
+			this.signoptionswidget1.Name = "signoptionswidget1";
 			this.notebook1.Add(this.signoptionswidget1);
 			global::Gtk.Notebook.NotebookChild w6 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.signoptionswidget1]));
 			w6.Position = 2;
@@ -122,40 +132,53 @@ namespace IhildaWallet
 			this.label6.UseUnderline = true;
 			this.notebook1.SetTabLabel(this.signoptionswidget1, this.label6);
 			this.label6.ShowAll();
+			// Container child notebook1.Gtk.Notebook+NotebookChild
+			this.orderbookoptionswidget1 = new global::IhildaWallet.OrderBookOptionsWidget();
+			this.orderbookoptionswidget1.Events = ((global::Gdk.EventMask)(256));
+			this.orderbookoptionswidget1.Name = "orderbookoptionswidget1";
+			this.notebook1.Add(this.orderbookoptionswidget1);
+			global::Gtk.Notebook.NotebookChild w7 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.orderbookoptionswidget1]));
+			w7.Position = 3;
+			// Notebook tab
+			this.label7 = new global::Gtk.Label();
+			this.label7.Name = "label7";
+			this.label7.LabelProp = global::Mono.Unix.Catalog.GetString("OrderBook Options");
+			this.notebook1.SetTabLabel(this.orderbookoptionswidget1, this.label7);
+			this.label7.ShowAll();
 			this.vbox3.Add(this.notebook1);
-			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.notebook1]));
-			w7.Position = 0;
-			w7.Expand = false;
-			w7.Fill = false;
+			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.notebook1]));
+			w8.Position = 0;
+			w8.Expand = false;
+			w8.Fill = false;
 			// Container child vbox3.Gtk.Box+BoxChild
 			this.hseparator2 = new global::Gtk.HSeparator();
 			this.hseparator2.Name = "hseparator2";
 			this.vbox3.Add(this.hseparator2);
-			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hseparator2]));
-			w8.Position = 1;
-			w8.Expand = false;
-			w8.Fill = false;
+			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hseparator2]));
+			w9.Position = 1;
+			w9.Expand = false;
+			w9.Fill = false;
 			// Container child vbox3.Gtk.Box+BoxChild
 			this.hseparator5 = new global::Gtk.HSeparator();
 			this.hseparator5.Name = "hseparator5";
 			this.vbox3.Add(this.hseparator5);
-			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hseparator5]));
-			w9.Position = 2;
-			w9.Expand = false;
-			w9.Fill = false;
+			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hseparator5]));
+			w10.Position = 2;
+			w10.Expand = false;
+			w10.Fill = false;
 			// Container child vbox3.Gtk.Box+BoxChild
 			this.hseparator4 = new global::Gtk.HSeparator();
 			this.hseparator4.Name = "hseparator4";
 			this.vbox3.Add(this.hseparator4);
-			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hseparator4]));
-			w10.Position = 3;
-			w10.Expand = false;
-			w10.Fill = false;
+			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hseparator4]));
+			w11.Position = 3;
+			w11.Expand = false;
+			w11.Fill = false;
 			w3.Add(this.vbox3);
 			this.scrolledwindow1.Add(w3);
 			this.vbox1.Add(this.scrolledwindow1);
-			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.scrolledwindow1]));
-			w13.Position = 2;
+			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.scrolledwindow1]));
+			w14.Position = 2;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.hbox1 = new global::Gtk.HBox();
 			this.hbox1.Name = "hbox1";
@@ -168,8 +191,8 @@ namespace IhildaWallet
 			this.button293.UseUnderline = true;
 			this.button293.Label = global::Mono.Unix.Catalog.GetString("Cancel");
 			this.hbox1.Add(this.button293);
-			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.button293]));
-			w14.Position = 0;
+			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.button293]));
+			w15.Position = 0;
 			// Container child hbox1.Gtk.Box+BoxChild
 			this.savebutton = new global::Gtk.Button();
 			this.savebutton.CanFocus = true;
@@ -177,13 +200,13 @@ namespace IhildaWallet
 			this.savebutton.UseUnderline = true;
 			this.savebutton.Label = global::Mono.Unix.Catalog.GetString("Save Settings");
 			this.hbox1.Add(this.savebutton);
-			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.savebutton]));
-			w15.Position = 1;
+			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.savebutton]));
+			w16.Position = 1;
 			this.vbox1.Add(this.hbox1);
-			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hbox1]));
-			w16.Position = 3;
-			w16.Expand = false;
-			w16.Fill = false;
+			global::Gtk.Box.BoxChild w17 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hbox1]));
+			w17.Position = 3;
+			w17.Expand = false;
+			w17.Fill = false;
 			this.Add(this.vbox1);
 			if ((this.Child != null))
 			{

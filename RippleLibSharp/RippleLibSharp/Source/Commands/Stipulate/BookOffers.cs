@@ -17,7 +17,7 @@ namespace RippleLibSharp.Commands.Stipulate
 			RippleCurrency taker_gets,
 			RippleCurrency taker_pays,
 			RippleAddress taker,
-			int?  limit,
+			uint?  limit,
 			NetworkInterface ni,
 			CancellationToken token,
 			IdentifierTag identifierTag = null
@@ -97,7 +97,7 @@ namespace RippleLibSharp.Commands.Stipulate
 		public static  Task<Response<BookOfferResult>> GetResult (
 			RippleCurrency taker_gets,
 			RippleCurrency taker_pays,
-			int? limit,
+			uint? limit,
 			NetworkInterface ni,
 			CancellationToken token,
 			IdentifierTag identifierTag = null

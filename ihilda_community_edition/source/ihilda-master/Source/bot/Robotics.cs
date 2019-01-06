@@ -54,6 +54,10 @@ namespace IhildaWallet
 				return null;
 			}
 
+			if (StopWhenConvenient) {
+				return null;
+			}
+
 			string ledgerMax = ledgerend?.ToString() ?? (-1).ToString ();
 			string ledgerMin = ledgerstart?.ToString();
 
@@ -104,7 +108,7 @@ namespace IhildaWallet
 				int minutes = 4;
 				int maxSeconds = 60 * minutes; // 
 				int seconds;
-				for (seconds = 0;  !task.IsCompleted && !task.IsFaulted && !task.IsCanceled && !cancelationToken.IsCancellationRequested && seconds < maxSeconds;  ) {
+				for (seconds = 0;  !task.IsCompleted && !task.IsFaulted && !task.IsCanceled && !cancelationToken.IsCancellationRequested && seconds < maxSeconds && !StopWhenConvenient;  ) {
 					try {
 						OnMessage?.Invoke (this, new MessageEventArgs { Message = "Waiting on network" });
 						for (int i = 0; i < 10 && !task.IsCompleted && !cancelationToken.IsCancellationRequested; i++, seconds++) {  // seconds are incremented where a second actually occurs and not in it's own loop. It's going to be ok. 
@@ -126,7 +130,7 @@ namespace IhildaWallet
 
 					}
 
-					if (seconds > 60) {
+					if (seconds > 60 && !StopWhenConvenient) {
 						if (Program.botMode == null) {
 							OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Retrieving tx list is taking longer than usual. \"Stop when convient\" will exit loop gracefully\n" });
 						} else {
@@ -134,6 +138,10 @@ namespace IhildaWallet
 						}
 					}
 
+				}
+
+				if (StopWhenConvenient) {
+					return null;
 				}
 
 				if (task.IsCanceled || cancelationToken.IsCancellationRequested) {
@@ -188,6 +196,10 @@ namespace IhildaWallet
 			}
 
 			if (cancelationToken.IsCancellationRequested) {
+				return null;
+			}
+
+			if (StopWhenConvenient) {
 				return null;
 			}
 
@@ -400,6 +412,11 @@ namespace IhildaWallet
 		*/
 
 		public RuleManager RuleManagerObj {
+			get;
+			set;
+		}
+
+		public bool StopWhenConvenient {
 			get;
 			set;
 		}

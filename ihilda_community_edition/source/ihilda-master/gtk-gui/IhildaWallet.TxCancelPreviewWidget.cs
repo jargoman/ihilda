@@ -31,7 +31,9 @@ namespace IhildaWallet
 			this.vbox2.Name = "vbox2";
 			this.vbox2.Spacing = 6;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.openorderstree1 = null;
+			this.openorderstree1 = new global::IhildaWallet.OpenOrdersTree();
+			this.openorderstree1.Events = ((global::Gdk.EventMask)(256));
+			this.openorderstree1.Name = "openorderstree1";
 			this.vbox2.Add(this.openorderstree1);
 			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.openorderstree1]));
 			w1.Position = 0;

@@ -129,6 +129,7 @@ namespace IhildaWallet
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
+			this.notebook1.Name = "notebook1";
 			this.notebook1.CurrentPage = 0;
 			this.notebook1.TabPos = ((global::Gtk.PositionType)(0));
 			this.notebook1.Scrollable = true;

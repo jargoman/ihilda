@@ -164,7 +164,7 @@ namespace IhildaWallet
 
 							MenuItem mainBuyMenu = new MenuItem (
 								Program.darkmode ?
-								"<span fgcolor=\"chartreuse\" font_size=\"xx - large\"><b>Buy</b></span>":
+								"<span fgcolor=\"chartreuse\" font_size=\"xx-large\"><b>Buy</b></span>":
 								"<span fgcolor=\"green\" font_size=\"xx-large\"><b>Buy</b></span>"
 								);
 
@@ -211,7 +211,9 @@ namespace IhildaWallet
 							Gtk.Label menulabel = (Label)take.Child;
 							menulabel.UseMarkup = true;
 
-							take.Activated += (object sender, EventArgs e) => {
+							take.ButtonPressEvent += (object sender, ButtonPressEventArgs e) => {
+
+
 #if DEBUG
 								if (DebugIhildaWallet.OrderBookTableWidget) {
 									Logging.WriteLog ("take selected");

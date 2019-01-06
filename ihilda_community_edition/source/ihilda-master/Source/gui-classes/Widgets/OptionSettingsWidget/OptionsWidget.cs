@@ -79,6 +79,8 @@ namespace IhildaWallet
 			this.feeoptionswidget1.ProcessFeeOptions();
 
 			this.signoptionswidget1.ProcessSignOptions ();
+
+			this.orderbookoptionswidget1.ProcessOrderBookOptions ();
 		}
 
 	//public static readonly string[] interpreters = new string[] { "JSON", "RIPPLED", CSHARPS"ICEJARGON"};

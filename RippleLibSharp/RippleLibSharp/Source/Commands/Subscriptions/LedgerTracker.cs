@@ -18,12 +18,15 @@ namespace RippleLibSharp.Commands.Subscriptions
 			});
 
 			LedgerResetEvent.Set ();
+			
 		}
 
+		/*
 		public static void SetServerState (SubscribeServerResult result)
 		{
 
 		}
+		*/
 
 		public static void SetServerState (ServerStateEventArgs serverState) {
 			ServerStateEv = serverState;
@@ -34,6 +37,7 @@ namespace RippleLibSharp.Commands.Subscriptions
 				}
 			});
 			ServerStateEvent.Set ();
+			
 		}
 
 		public static LedgerClosed LastLedgerClosed {

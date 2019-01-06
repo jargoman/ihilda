@@ -67,6 +67,39 @@ namespace IhildaWallet
 
 			};
 
+			LedgerTracker.OnServerStateChanged += (object sender, ServerStateEventArgs e) => {
+
+				string loadfactor = e.load_factor.ToString ();
+				string baseFee = e.base_fee.ToString ();
+
+				double native_base_fee;
+
+				native_base_fee = e.base_fee;
+
+				ulong transaction_fee = (ulong)((native_base_fee * e.load_factor) / e.load_base);
+
+
+				string fee = transaction_fee.ToString ();
+
+				StringBuilder stringBuilder = new StringBuilder ();
+				stringBuilder.Append ("Base Fee : ");
+				stringBuilder.AppendLine (baseFee);
+				stringBuilder.Append ("Load Factor : ");
+				stringBuilder.AppendLine (loadfactor);
+				stringBuilder.Append ("Fee : ");
+				stringBuilder.Append (fee);
+
+				string message = stringBuilder.ToString ();
+
+				Gtk.Application.Invoke ( delegate {
+
+
+					eventbox9.TooltipText = message;
+
+
+				});
+			};
+
 
 
 			this.button91.Clicked += (object sender, EventArgs e) => {
@@ -380,6 +413,8 @@ namespace IhildaWallet
 				}
 				
 			};
+
+			
 
 		}
 

@@ -215,6 +215,10 @@ namespace IhildaWallet
 #endif
 
 
+			// object used to collect the information regarding an order submit attempt
+	    		
+
+
 
 			OrderSubmittedEventArgs orderSubmittedEventArgs = new OrderSubmittedEventArgs {
 				Sequence =
@@ -1160,8 +1164,6 @@ namespace IhildaWallet
 					Logging.WriteLog ("Validated");
 					verifyEventArgs.Success = true;
 					return verifyEventArgs;
-
-
 
 				}
 

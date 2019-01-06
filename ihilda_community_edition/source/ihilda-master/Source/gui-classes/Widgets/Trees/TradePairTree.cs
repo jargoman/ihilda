@@ -85,7 +85,12 @@ namespace IhildaWallet
 							return;
 						}
 						OrderBookWindow obw = new OrderBookWindow (WalletManager.GetRippleWallet());
-						obw.SetTradePair (tp);
+
+						Task.Run ( delegate {
+							obw.SetTradePair (tp);
+
+
+						});
 
 
 					};

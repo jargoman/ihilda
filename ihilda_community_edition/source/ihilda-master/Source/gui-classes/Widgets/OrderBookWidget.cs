@@ -1,17 +1,14 @@
 using System;
-using System.Threading.Tasks;
-
 using System.Collections.Generic;
-using Codeplex.Data;
-using RippleLibSharp.Network;
-using RippleLibSharp.Transactions;
-using RippleLibSharp.Result;
-using RippleLibSharp.Commands.Accounts;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 //using RippleLibSharp.Network;
 using IhildaWallet.Networking;
-using System.Linq;
+using RippleLibSharp.Network;
+using RippleLibSharp.Result;
+using RippleLibSharp.Transactions;
 using RippleLibSharp.Util;
-using System.Threading;
 
 namespace IhildaWallet
 {
@@ -64,6 +61,10 @@ namespace IhildaWallet
 			}
 			);
 
+			if (Program.darkmode) {
+				label26.Markup = "<b><span fgcolor=\"chartreuse\" font_size=\"xx-large\">Buy Order Bids</span></b>";
+
+			}
 			
 		}
 
@@ -206,19 +207,42 @@ namespace IhildaWallet
 				id = jsid1
 			};
 			*/
+
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
 
-			Task< Response<BookOfferResult>> buyTask = RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (counter_currency, cur_base, ni, token);
-			Task< Response<BookOfferResult>> sellTask = RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (cur_base, counter_currency, ni, token);
+			Task<Response<BookOfferResult>> buyTask =
+			limit == null ?
+				RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (counter_currency, cur_base, ni, token)
+	   			: RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (counter_currency, cur_base, limit, ni, token);
+			;
+
+			var btask = buyTask.ContinueWith((arg) => {
+
+				Offer [] buys = arg.Result.result.offers; //buyTask?.Result?.result?.offers;
+				IEnumerable<AutomatedOrder> buyoffers = AutomatedOrder.ConvertFromIEnumerableOrder (buys);
+				this.orderbooktablewidget1.SetBids (buyoffers.ToArray ());  // .ToArray()
+
+			});
 
 
-			if (true) {
+			Task< Response<BookOfferResult>> sellTask = 
+			limit == null ?
+				RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (cur_base, counter_currency, ni, token)
+	   	 		: RippleLibSharp.Commands.Stipulate.BookOffers.GetResult(cur_base, counter_currency, limit, ni, token);
 
+			var stask = sellTask.ContinueWith ((arg) => {
+				Offer [] sells = arg?.Result?.result?.offers;
+				IEnumerable<AutomatedOrder> selloffers = AutomatedOrder.ConvertFromIEnumerableOrder (sells);
+				this.orderbooktablewidget2.SetAsk (selloffers.ToArray ());  // .ToArray()
+			});
+
+
+
+			if (autoRefresh) {
+				return;
 			}
-			Task.WaitAll ( new Task[] { buyTask, sellTask }, token );
 
-			//buyTask.Wait ();
-			//sellTask.Wait ();
+			Task.WaitAll ( new Task[] { btask, stask }, token );
 
 #if DEBUG
 
@@ -228,34 +252,29 @@ namespace IhildaWallet
 			}
 #endif
 				
-			Offer[] buys = buyTask?.Result?.result?.offers;
-			Offer[] sells = sellTask?.Result?.result?.offers;
+			
+			
 
-			//string account = WalletManager.selectedWallet.getStoredReceiveAddress ();
-
-			IEnumerable<AutomatedOrder> buyoffers = AutomatedOrder.ConvertFromIEnumerableOrder (  buys);
-			IEnumerable<AutomatedOrder> selloffers = AutomatedOrder.ConvertFromIEnumerableOrder ( sells);
-
-				//d.result.offers;
-			//System.Double id = d.id.handle_bar;
+			
 
 #if DEBUG
 			if (DebugIhildaWallet.OrderBookWidget) {
 				Logging.WriteLog(method_sig + "end for");
-				//Logging.writeLog("id type =" + id.GetType().ToString());
-				//Logging.writeLog("id = " + id.ToString());
+
 			}
 #endif
 
 
 
 
-
 			
-			this.orderbooktablewidget1.SetBids(buyoffers.ToArray());  // .ToArray()
-			this.orderbooktablewidget2.SetAsk(selloffers.ToArray());  // .ToArray()
+			
 
 		}
+
+		public uint? limit = null;
+		public uint? ledgerDelay = null;
+		public bool autoRefresh = false;
 
 #if DEBUG
 		private static readonly string clsstr = nameof (OrderBookWidget) + DebugRippleLibSharp.colon;

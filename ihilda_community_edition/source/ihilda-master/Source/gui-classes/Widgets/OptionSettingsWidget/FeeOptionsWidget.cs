@@ -391,7 +391,7 @@ namespace IhildaWallet
 
 					Task ledgerTask = Task.Run ( delegate {
 
-						WaitHandle.WaitAny (new WaitHandle [] { LedgerTracker.LedgerResetEvent, LedgerTracker.ServerStateEvent });
+						WaitHandle.WaitAny (new WaitHandle [] { LedgerTracker.LedgerResetEvent, LedgerTracker.ServerStateEvent, token.WaitHandle });
 					});
 
 					Task.WaitAny ( new Task [] { threeseconds, ledgerTask });

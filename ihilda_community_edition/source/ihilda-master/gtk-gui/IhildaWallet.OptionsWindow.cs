@@ -17,7 +17,9 @@ namespace IhildaWallet
 			this.BorderWidth = ((uint)(5));
 			this.DestroyWithParent = true;
 			// Container child IhildaWallet.OptionsWindow.Gtk.Container+ContainerChild
-			this.optionswidget2 = null;
+			this.optionswidget2 = new global::IhildaWallet.OptionsWidget();
+			this.optionswidget2.Events = ((global::Gdk.EventMask)(256));
+			this.optionswidget2.Name = "optionswidget2";
 			this.Add(this.optionswidget2);
 			if ((this.Child != null))
 			{
