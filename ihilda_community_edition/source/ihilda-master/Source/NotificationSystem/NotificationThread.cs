@@ -106,6 +106,8 @@ namespace IhildaWallet
 
 			int numberOfMenu = 0;
 
+			SoundSettings settings = SoundSettings.LoadSoundSettings ();
+
 			foreach (RippleWallet rw in wallets) {
 
 				string r = rw.GetStoredReceiveAddress ();
@@ -191,7 +193,24 @@ namespace IhildaWallet
 
 					rw.Notification = message2;
 					this.ShowNotification (message, numberOfMenu++);
-					this.PlayNotification ();
+
+
+					if (settings.HasOnOrderFilled && settings.OnOrderFilled != null) {
+
+						Task.Run (delegate {
+
+							SoundPlayer player =
+							new SoundPlayer (settings.OnOrderFilled);
+							player.Load ();
+							player.Play ();
+						});
+
+					} else if (settings.FallBack) {
+						this.PlayNotification ();
+					}
+
+		    
+
 					rw.LastKnownLedger = tuple.Item1;
 					rw.Save ();
 
@@ -380,7 +399,25 @@ namespace IhildaWallet
 			);
 
 			ShowNotification (message, 0);
-			PlayNotification ();
+
+
+			SoundSettings settings = SoundSettings.LoadSoundSettings ();
+			if (settings.HasOnOrderFilled && settings.OnOrderFilled != null) {
+
+				Task.Run (delegate {
+
+					SoundPlayer player =
+					new SoundPlayer (settings.OnOrderFilled);
+					player.Load ();
+					player.Play ();
+				});
+
+			} else if (settings.FallBack) {
+				this.PlayNotification ();
+			}
+
+
+			
 
 
 
@@ -704,6 +741,7 @@ namespace IhildaWallet
 
 		public void NotifyPayments (IEnumerable<RippleTxStructure> paymentsStructures, RippleWallet rippleWallet)
 		{
+			SoundSettings settings = SoundSettings.LoadSoundSettings ();
 			int count = 0;
 			StringBuilder builder = new StringBuilder ();
 			foreach (RippleTxStructure txStructure in paymentsStructures) {
@@ -728,6 +766,20 @@ namespace IhildaWallet
 				rippleWallet.Notification = builder.ToString ();
 
 				ShowNotification (builder.ToString(), count++);
+
+				if (settings.HasOnPaymentReceived && settings.OnPaymentReceived != null) {
+
+					Task.Run (delegate {
+
+						SoundPlayer player =
+						new SoundPlayer (settings.OnPaymentReceived);
+						player.Load ();
+						player.Play ();
+					});
+
+				} else if (settings.FallBack) {
+					this.PlayNotification ();
+				}
 
 			}
 		}

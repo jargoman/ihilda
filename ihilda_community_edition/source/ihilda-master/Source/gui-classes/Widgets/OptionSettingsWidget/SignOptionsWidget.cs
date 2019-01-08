@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Codeplex.Data;
 using RippleLibSharp.Util;
 
@@ -11,7 +12,8 @@ namespace IhildaWallet
 		{
 			this.Build ();
 			//SignOptions signOptions = SignOptions.LoadSignOptions ();
-			SetUI ();
+			Task.Run ((Action)SetUI);
+
 		}
 
 		private void SetUI ()
@@ -57,8 +59,11 @@ namespace IhildaWallet
 				so.LastLedgerOffset = l;
 			}
 
+			Task.Run ( delegate {
+				SignOptions.SaveSignOptions (so);
 
-			SignOptions.SaveSignOptions (so);
+			});
+
 		}
 
 

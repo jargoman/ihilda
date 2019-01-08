@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using IhildaWallet.Util;
 using System.Linq;
 using System.Threading;
+using System.Media;
 
 namespace IhildaWallet
 {
@@ -139,7 +140,7 @@ namespace IhildaWallet
 
 				rsa = rw.GetDecryptedSeed ();
 			}
-
+			SoundSettings settings = SoundSettings.LoadSoundSettings ();
 
 			for (int index = 0; index < this.paymentstree1._payments_tuple.Item1.Length; index++) {
 
@@ -158,7 +159,30 @@ namespace IhildaWallet
 
 				bool suceeded = this.paymentstree1.SubmitOrderAtIndex (index, se++, ni, token, rsa);
 				if (!suceeded) {
+
+					if (settings.HasOnTxFail && settings.OnTxFail != null) {
+
+						Task.Run (delegate {
+
+							SoundPlayer player = new SoundPlayer (settings.OnTxFail);
+							player.Load ();
+							player.Play ();
+						});
+
+					}
+
 					return;
+				} else {
+
+					if ( settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
+
+						Task.Run (delegate {
+							SoundPlayer player = new SoundPlayer (settings.OnTxSubmit);
+							player.Load ();
+							player.Play ();
+						});
+
+					}
 				}
 			}
 

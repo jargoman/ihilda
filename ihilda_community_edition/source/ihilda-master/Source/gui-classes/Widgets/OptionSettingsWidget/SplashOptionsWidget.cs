@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Codeplex.Data;
+using Gtk;
 using RippleLibSharp.Util;
 
 namespace IhildaWallet
@@ -11,7 +13,60 @@ namespace IhildaWallet
 		public SplashOptionsWidget ()
 		{
 			this.Build ();
+
+
+
+			pathbutton.Clicked += (sender, e) => {
+
+
+
+				FileChooserDialog fileChooser = new FileChooserDialog (
+						"Choose image",
+						null, //this.ParentWindow,
+						FileChooserAction.Open,
+						"Cancel", ResponseType.Cancel,
+						"Select Image", ResponseType.Accept
+					);
+
+				FileFilter fileFilter = new FileFilter ();
+				fileFilter.AddPattern ("*.jpg");
+				fileFilter.AddPattern ("*.png");
+				fileChooser.AddFilter (fileFilter);
+
+				Gtk.ResponseType resp = (ResponseType)fileChooser.Run ();
+
+				if (resp == ResponseType.Accept) {
+					pathlabel.Text = fileChooser.Filename;
+
+				}
+
+				fileChooser?.Destroy ();
+			};
+
+			Task.Run ( (System.Action)InitUI );
+
 		}
+
+		public void InitUI ()
+		{
+			SplashOptions opts = LoadSettings ();
+
+			Gtk.Application.Invoke ( delegate {
+
+				showsplashcheckbutton.Active = opts.Showsplash;
+
+				splashdelayentry.Text = opts.Splash_delay.ToString();
+
+				splashwidthentry.Text = opts.Splash_width.ToString ();
+
+				splashheightentry.Text = opts.Splash_height.ToString ();
+
+				pathlabel.Text = opts.Splash_path;
+
+			});
+		}
+
+
 
 		public void ProcessSplashSettings ()
 		{
@@ -21,7 +76,7 @@ namespace IhildaWallet
 				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
 			}
 			#endif
-			Gtk.Application.Invoke( delegate {
+			//Gtk.Application.Invoke( delegate {
 
 				#if DEBUG
 				if (DebugIhildaWallet.SplashOptionsWidget) {
@@ -124,9 +179,11 @@ namespace IhildaWallet
 						Warn("splash_height");
 					return;
 					}
-					
 
 
+					Task.Run (delegate {
+						SaveSettings (opts);
+					});
 
 				}
 
@@ -141,10 +198,36 @@ namespace IhildaWallet
 					}
 					#endif
 				}
-				}
+
+
+
+
+			//	}
 
 					
-			);
+			//);
+		}
+
+
+		public static SplashOptions LoadSettings ()
+		{
+			string path = FileHelper.GetSettingsPath (SplashWindow.configName);
+			string str = FileHelper.GetJsonConf (path);
+			if (str == null) {
+				return null;
+			}
+			SplashOptions opts = null;
+			try {
+				opts = DynamicJson.Parse (str);
+
+			} catch (Exception e) {
+				Logging.WriteLog (e.Message + e.StackTrace);
+				return null;
+			}
+
+			return opts;
+
+
 		}
 
 

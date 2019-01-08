@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Codeplex.Data;
 using RippleLibSharp.Network;
@@ -34,6 +33,8 @@ namespace RippleLibSharp.Commands.Subscriptions
 			};
 
 			string request = DynamicJson.Serialize (o);
+
+
 
 			Task<Response<SubscribeServerResult>> task = NetworkRequestTask.RequestResponse<SubscribeServerResult> (identifierTag, request, ni, token, responsesConsumer);
 

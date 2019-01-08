@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -454,10 +455,10 @@ namespace IhildaWallet
 				}
 
 				FileChooserDialog fcd = new FileChooserDialog ("Export Rules",
-									   this,
-									   FileChooserAction.Save,
-									   "Cancel", ResponseType.Cancel,
-									   "Save", ResponseType.Accept);
+							this,
+							FileChooserAction.Save,
+							"Cancel", ResponseType.Cancel,
+							"Save", ResponseType.Accept);
 
 
 				if (fcd?.Run () == (int)ResponseType.Accept) {
@@ -1606,8 +1607,24 @@ namespace IhildaWallet
 				}
 #endif
 				return;
+
 			} catch (Exception e) {
+
 				this.WriteToInfoBox (e.Message);
+
+				SoundSettings settings = SoundSettings.LoadSoundSettings ();
+				if (settings.HasOnAutomateFail && settings.OnAutomateFail != null) {
+
+					Task.Run (delegate {
+
+						SoundPlayer player =
+						new SoundPlayer (settings.OnAutomateFail);
+						player.Load ();
+						player.Play ();
+					});
+
+				}
+
 				return;
 
 			} finally {

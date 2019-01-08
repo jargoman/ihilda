@@ -939,14 +939,7 @@ namespace IhildaWallet
 			
 			t7.Wait (15000);
 
-			Task.Run (delegate {
 
-				LedgerTracker.TokenSource = new CancellationTokenSource ();
-				//var token = LedgerTracker.TokenSource.Token;
-				NetworkInterface networkInterface = NetworkController.CurrentInterface;
-				Subscribe.LedgerSubscribe (networkInterface, token, null);
-				Subscribe.ServerSubscribe (networkInterface, token, null);
-			});
 
 
 

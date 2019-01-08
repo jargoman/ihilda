@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -396,10 +397,34 @@ namespace IhildaWallet
 
 
 			SignOptions opts = LoadSignOptions (token);
-
+			SoundSettings settings = SoundSettings.LoadSoundSettings ();
 		
 
-			this.SubmitOrderAtIndex ((int)index, se, opts, ni, token, rsa);
+			bool succeed = this.SubmitOrderAtIndex ((int)index, se, opts, ni, token, rsa);
+
+			if (succeed) {
+				if (settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
+
+					Task.Run (delegate {
+
+						SoundPlayer player = new SoundPlayer (settings.OnTxSubmit);
+						player.Load ();
+						player.Play ();
+					});
+
+				}
+			} else {
+				if (settings.HasOnTxFail && settings.OnTxFail != null) {
+
+					Task.Run (delegate {
+
+						SoundPlayer player = new SoundPlayer (settings.OnTxFail);
+						player.Load ();
+						player.Play ();
+					});
+
+				}
+			}
 		}
 
 
@@ -3079,6 +3104,9 @@ namespace IhildaWallet
 
 			double progressStep = 0.9 / _offers.Length;
 
+
+			SoundSettings settings = SoundSettings.LoadSoundSettings ();
+
 			for (int index = 0; index < _offers.Length; index++) {
 
 				if (token.IsCancellationRequested) {
@@ -3104,7 +3132,28 @@ namespace IhildaWallet
 
 				bool suceeded = this.SubmitOrderAtIndex (index, sequence++, signOptions, ni, token, rsa);
 				if (!suceeded) {
+					if (settings.HasOnTxFail && settings.OnTxFail != null) {
+
+						Task.Run (delegate {
+
+							SoundPlayer player = new SoundPlayer (settings.OnTxFail);
+							player.Load ();
+							player.Play ();
+						});
+
+					}
 					return;
+				} else {
+					if (settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
+
+						Task.Run (delegate {
+
+							SoundPlayer player = new SoundPlayer (settings.OnTxSubmit);
+							player.Load ();
+							player.Play ();
+						});
+
+					}
 				}
 			}
 

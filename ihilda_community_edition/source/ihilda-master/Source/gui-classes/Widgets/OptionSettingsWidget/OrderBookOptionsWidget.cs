@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Codeplex.Data;
 
 namespace IhildaWallet
@@ -9,7 +10,9 @@ namespace IhildaWallet
 		public OrderBookOptionsWidget ()
 		{
 			this.Build ();
-			SetUI ();
+
+			Task.Run ((System.Action)SetUI); 
+
 		}
 
 		private void SetUI ()
@@ -55,7 +58,12 @@ namespace IhildaWallet
 				AutoRefresh = b
 			};
 
-			OrderBookOptions.SaveOrderBookOptions (bookOptions);
+
+			Task.Run ( delegate {
+
+				OrderBookOptions.SaveOrderBookOptions (bookOptions);
+			});
+
 		}
 
 

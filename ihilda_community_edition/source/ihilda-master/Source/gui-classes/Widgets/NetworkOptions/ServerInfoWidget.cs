@@ -83,33 +83,29 @@ namespace IhildaWallet
 					LedgerTracker.ServerStateEvent.WaitOne ();
 				}
 
-				var stateEvent = LedgerTracker.ServerStateEv;
-				if (stateEvent == null) {
+				var serverState = LedgerTracker.ServerStateEv;
+				if (serverState == null) {
 					continue;
 				}
 
-				var basefee = stateEvent.base_fee;
-				var loadfactor = stateEvent.load_factor;
+				var basefee = serverState.base_fee;
+				var loadfactor = serverState.load_factor;
 
-				var tupe = LedgerTracker.GetFeeAndLastLedger (new CancellationToken());
-				if (tupe == null) {
-					continue;
-				}
-				var fee = tupe.Item1;
-				if (fee == null) {
-#if DEBUG
-					fee = "null";
-#else
-					continue;
 
-#endif 
-				}
-				//var ledger = tupe.Item2;
+
+				double native_base_fee;
+				
+				native_base_fee = serverState.base_fee;
+
+				ulong transaction_fee = (ulong)((native_base_fee * serverState.load_factor) / serverState.load_base);
+
+
+
 
 				Gtk.Application.Invoke ( delegate {
 					load_factor_label_var.Text = loadfactor.ToString ();
 					base_fee_label_var.Text = basefee.ToString ();
-					transaction_fee_label_var.Text = fee;
+					transaction_fee_label_var.Text = transaction_fee.ToString();
 
 				});
 			}

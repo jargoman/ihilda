@@ -16,78 +16,85 @@ namespace IhildaWallet
 		{
 			this.Build ();
 
+			Task.Run ((Action)InitGUI);
 
-			InitGUI ();
 		}
 
 		public void InitGUI () {
+
 			FeeSettings settings = FeeSettings.LoadSettings ();
+
+
 
 			if (settings == null) {
 				return;
 			}
 
-			this.checkbutton1.Active = settings.Specify != null;
-			if (this.checkbutton1.Active) {
-				this.entry1.Text = settings.Specify.ToString ();
-				this.entry1.Sensitive = true;
-			} else {
-				this.entry1.Sensitive = false;
-			}
+			Gtk.Application.Invoke ( delegate {
+				this.checkbutton1.Active = settings.Specify != null;
+				if (this.checkbutton1.Active) {
+					this.entry1.Text = settings.Specify.ToString ();
+					this.entry1.Sensitive = true;
+				} else {
+					this.entry1.Sensitive = false;
+				}
 
-			this.checkbutton1.Clicked += (object sender, EventArgs e) => {
-				
-				this.entry1.Sensitive = this.checkbutton1.Active;
-			};
+				this.checkbutton1.Clicked += (object sender, EventArgs e) => {
 
-			this.checkbutton2.Active = settings.Multiplier != null;
-			if (this.checkbutton2.Active) {
-				this.entry2.Text = settings.Multiplier.ToString ();
-				this.entry2.Sensitive = true;
-			} else {
-				this.entry2.Sensitive = false;
-			}
+					this.entry1.Sensitive = this.checkbutton1.Active;
+				};
 
-			this.checkbutton2.Clicked += (object sender, EventArgs e) => {
-				this.entry2.Sensitive = this.checkbutton2.Active;
-			};
+				this.checkbutton2.Active = settings.Multiplier != null;
+				if (this.checkbutton2.Active) {
+					this.entry2.Text = settings.Multiplier.ToString ();
+					this.entry2.Sensitive = true;
+				} else {
+					this.entry2.Sensitive = false;
+				}
 
-			this.checkbutton5.Active = settings.RetryFactor != null;
-			if (this.checkbutton5.Active) {
-				this.entry5.Text = settings.RetryFactor.ToString ();
-				this.entry5.Sensitive = true;
-			} else {
-				this.entry5.Sensitive = false;
-			}
+				this.checkbutton2.Clicked += (object sender, EventArgs e) => {
+					this.entry2.Sensitive = this.checkbutton2.Active;
+				};
 
-			this.checkbutton5.Clicked += (object sender, EventArgs e) => {
-				this.entry5.Sensitive = this.checkbutton5.Active;
-			};
+				this.checkbutton5.Active = settings.RetryFactor != null;
+				if (this.checkbutton5.Active) {
+					this.entry5.Text = settings.RetryFactor.ToString ();
+					this.entry5.Sensitive = true;
+				} else {
+					this.entry5.Sensitive = false;
+				}
 
-			this.checkbutton3.Active = settings.Warn != null;
-			if (this.checkbutton3.Active) {
-				this.entry3.Text = settings.Warn.ToString ();
-				this.entry3.Sensitive = true;
-			} else {
-				this.entry3.Sensitive = false;
-			}
+				this.checkbutton5.Clicked += (object sender, EventArgs e) => {
+					this.entry5.Sensitive = this.checkbutton5.Active;
+				};
 
-			this.checkbutton3.Clicked += (object sender, EventArgs e) => {
-				this.entry3.Sensitive = this.checkbutton3.Active;
-			};
+				this.checkbutton3.Active = settings.Warn != null;
+				if (this.checkbutton3.Active) {
+					this.entry3.Text = settings.Warn.ToString ();
+					this.entry3.Sensitive = true;
+				} else {
+					this.entry3.Sensitive = false;
+				}
+
+				this.checkbutton3.Clicked += (object sender, EventArgs e) => {
+					this.entry3.Sensitive = this.checkbutton3.Active;
+				};
 
 
-			this.checkbutton4.Active = settings.Wait != null;
-			if (this.checkbutton4.Active) {
-				this.entry4.Text = settings.Wait.ToString ();
-				this.entry4.Sensitive = true;
-			} else {
-				this.entry4.Sensitive = false;
-			}
+				this.checkbutton4.Active = settings.Wait != null;
+				if (this.checkbutton4.Active) {
+					this.entry4.Text = settings.Wait.ToString ();
+					this.entry4.Sensitive = true;
+				} else {
+					this.entry4.Sensitive = false;
+				}
 
-			this.checkbutton4.Clicked += (object sender, EventArgs e) => {
-				this.entry4.Sensitive = this.checkbutton4.Active;
-			};
+				this.checkbutton4.Clicked += (object sender, EventArgs e) => {
+					this.entry4.Sensitive = this.checkbutton4.Active;
+				};
+
+
+			});
 
 
 		}
@@ -147,8 +154,12 @@ namespace IhildaWallet
 			}
 
 			//FeeSettings.Settings = fs;
+	    		Task.Run ( delegate {
 
-			FeeSettings.SaveSettings (fs);
+				FeeSettings.SaveSettings (fs);
+
+			});
+
 		}
 	}
 

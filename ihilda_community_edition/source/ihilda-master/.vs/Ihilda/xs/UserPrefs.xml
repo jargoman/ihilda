@@ -1,12 +1,18 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../../RippleLibSharp/RippleLibSharp/Source/Commands/Stipulate/BookOffers.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/Networking/NetworkController.cs">
     <Files>
-      <File FileName="Source/gui-classes/Windows/OptionsWindow.cs" Line="1" Column="1" />
-      <File FileName="Source/gui-classes/Widgets/OptionSettingsWidget/OptionsWidget.cs" Line="81" Column="36" />
-      <File FileName="Source/gui-classes/Widgets/OptionSettingsWidget/OrderBookOptionsWidget.cs" Line="28" Column="51" />
-      <File FileName="Source/gui-classes/Windows/OrderBookWindow.cs" Line="27" Column="23" />
-      <File FileName="Source/gui-classes/Widgets/OrderBookWidget.cs" Line="219" Column="59" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Commands/Stipulate/BookOffers.cs" Line="20" Column="5" />
+      <File FileName="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs" Line="1587" Column="7" />
+      <File FileName="Source/gui-classes/Widgets/OptionSettingsWidget/SplashOptionsWidget.cs" Line="34" Column="40" />
+      <File FileName="Source/NotificationSystem/NotificationThread.cs" Line="786" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/OptionSettingsWidget/OrderBookOptionsWidget.cs" Line="67" Column="4" />
+      <File FileName="Source/bot/OrderSubmitter.cs" Line="88" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/OrderPreviewSubmitWidget.cs" Line="1260" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/PaymentPreviewSubmitWidget.cs" Line="180" Column="3" />
+      <File FileName="Source/gui-classes/Widgets/OptionSettingsWidget/FeeOptionsWidget.cs" Line="237" Column="1" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Commands/Server/ServerInfo.cs" Line="13" Column="51" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Commands/Subscriptions/LedgerTracker.cs" Line="60" Column="41" />
+      <File FileName="Source/gui-classes/Widgets/OptionSettingsWidget/OptionsWidget.cs" Line="282" Column="13" />
+      <File FileName="Source/Networking/NetworkController.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

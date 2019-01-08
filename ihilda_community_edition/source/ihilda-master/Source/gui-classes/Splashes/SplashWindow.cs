@@ -142,9 +142,12 @@ namespace IhildaWallet
 #endif
 
 				try {
-					dynamic d = DynamicJson.Parse (jsonConfig);
-					if (d.isDefined ("enable_splash")) {
-						isSplash = d.enable_splash;
+					SplashOptions splashOptions = DynamicJson.Parse (jsonConfig);
+
+
+
+					if (   splashOptions.Showsplash /*d.isDefined ("enable_splash")*/) {
+						isSplash = splashOptions.Showsplash;
 #if DEBUG
 						if (DebugIhildaWallet.SplashWindow) {
 							Logging.WriteLog (method_sig + "enable_splash defined, equals " + isSplash.ToString ());
@@ -162,14 +165,14 @@ namespace IhildaWallet
 						return;
 					}
 
-					if (d.isDefined ("splash_path")) {
+					if (splashOptions.Splash_path != null) {
 #if DEBUG
 						if (DebugIhildaWallet.SplashWindow) {
 							Logging.WriteLog (method_sig + "splash_path");
 						}
 #endif
 
-						path = d.splash_path;
+						path = splashOptions.Splash_path;
 
 
 					} else {
@@ -185,20 +188,20 @@ namespace IhildaWallet
 					}
 
 
-					if (d.isDefined ("splash_width")) {
-						width = d.splash_width as Int32?;
+					if (splashOptions.Splash_width != null) {
+						width = splashOptions.Splash_width as Int32?;
 					} else {
 						width = null;
 					}
 
-					if (d.isDefined ("splash_height")) {
-						height = d.splash_height as Int32?;
+					if (splashOptions.Splash_height != null ) {
+						height = splashOptions.Splash_height as Int32?;
 					} else {
 						height = null;
 					}
 
-					if (d.isDefined ("splash_delay")) {
-						delay = d.splash_delay as Int32?;
+					if (splashOptions.Splash_delay != null) {
+						delay = splashOptions.Splash_delay as Int32?;
 					}
 
 				} catch (Exception e) {

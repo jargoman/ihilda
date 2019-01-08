@@ -6,6 +6,7 @@ using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using RippleLibSharp.Commands.Subscriptions;
 //using SuperSocket.ClientEngine;
 //using WebSocket4Net;
 
@@ -563,6 +564,8 @@ namespace RippleLibSharp.Network
 				Logging.WriteLog ("NetworkInterface : Error: onOpen == null\n");
 			}
 
+
+			
 
 			Thread.Sleep (5);
 			onOpenWaitHandler.Set ();

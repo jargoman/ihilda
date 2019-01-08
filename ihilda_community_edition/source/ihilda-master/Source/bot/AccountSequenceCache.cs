@@ -26,30 +26,31 @@ namespace IhildaWallet
 
 		public static AccountSequenceCache GetCacheForAccount (string account)
 		{
-
-			if (account == null) {
-				throw new NullReferenceException ();
-			}
-
-			if (CacheManager == null) {
-				return null;
-			}
-
-			if (CacheManager.ContainsKey (account)) {
-				bool success = CacheManager.TryGetValue (account, out AccountSequenceCache accountSequenceCache);
-				if (success) {
-					return accountSequenceCache;
+			AccountSequenceCache accountSequence = null;
+			lock (lockobj) {
+				if (account == null) {
+					throw new NullReferenceException ();
 				}
-			}
 
-			AccountSequenceCache accountSequence = new AccountSequenceCache (account);
-			if (accountSequence != null) {
+				if (CacheManager == null) {
+					return null;
+				}
+
 				if (CacheManager.ContainsKey (account)) {
-					CacheManager.Add (account, accountSequence);
+					bool success = CacheManager.TryGetValue (account, out AccountSequenceCache accountSequenceCache);
+					if (success) {
+						return accountSequenceCache;
+					}
 				}
 
-			}
+				accountSequence = new AccountSequenceCache (account);
+				if (accountSequence != null) {
+					if (CacheManager.ContainsKey (account)) {
+						CacheManager.Add (account, accountSequence);
+					}
 
+				}
+			}
 			return accountSequence;
 
 		}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -58,6 +59,8 @@ namespace IhildaWallet
 
 					taskList.Clear ();
 
+					SoundSettings settings = SoundSettings.LoadSoundSettings ();
+
 					foreach (AutomatedOrder order in ords) {
 
 						order.SubmittedEventArgs = _SubmitOrder (order, rw, networkInterface, token, identifier, true);
@@ -71,12 +74,33 @@ namespace IhildaWallet
 						if (order.SubmittedEventArgs.Unrecoverable) {
 							// todo
 							//OnOrderSubmitted?.Invoke (this, o
+							if (settings.HasOnTxFail && settings.OnTxFail != null) {
+
+								Task.Run (delegate {
+
+									SoundPlayer player = new SoundPlayer (settings.OnTxFail);
+									player.Load ();
+									player.Play ();
+								});
+
+							}
+
+
 							return null;
 						}
 
+						if (settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
+
+							Task.Run (delegate {
+
+								SoundPlayer player = new SoundPlayer (settings.OnTxSubmit);
+								player.Load ();
+								player.Play ();
+							});
+
+						}
 
 
-						
 						Task task = Task.Run (
 						delegate {
 							AutomatedOrder automated = order;
@@ -168,7 +192,7 @@ namespace IhildaWallet
 
 
 
-
+				SoundSettings settings = SoundSettings.LoadSoundSettings ();
 
 
 				foreach (AutomatedOrder order in orders) {
@@ -187,6 +211,17 @@ namespace IhildaWallet
 
 					if (!submitEvent.Success) {
 						return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (false, events);
+					}
+					
+					if (settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
+
+						Task.Run ( delegate {
+
+							SoundPlayer player = new SoundPlayer (settings.OnTxSubmit);
+							player.Load ();
+							player.Play ();
+						});
+
 					}
 				}
 

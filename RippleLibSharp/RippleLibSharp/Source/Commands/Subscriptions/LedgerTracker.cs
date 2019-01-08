@@ -1,12 +1,22 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using RippleLibSharp.Result;
 
 namespace RippleLibSharp.Commands.Subscriptions
 {
 	public static class LedgerTracker
 	{
+
+		/*
+		static LedgerTracker ()
+		{
+			Task.Run ( delegate {
+
+				WaitForLedgerExpire ();
+			});
+		}
+		*/
+
 		public static void SetLedger ( LedgerClosed ledger )
 		{
 			LastLedgerClosed = ledger;
@@ -14,19 +24,19 @@ namespace RippleLibSharp.Commands.Subscriptions
 				if (OnLedgerClosed != null) {
 					OnLedgerClosed.Invoke (null, ledger);
 				}
+
+				
 				
 			});
 
 			LedgerResetEvent.Set ();
+
+
 			
 		}
 
-		/*
-		public static void SetServerState (SubscribeServerResult result)
-		{
 
-		}
-		*/
+
 
 		public static void SetServerState (ServerStateEventArgs serverState) {
 			ServerStateEv = serverState;
@@ -41,9 +51,30 @@ namespace RippleLibSharp.Commands.Subscriptions
 		}
 
 		public static LedgerClosed LastLedgerClosed {
-			get;
-			set;
+			get {
+				if (_LastLedgerClosed == null) {
+					return null;
+				}
+
+
+				TimeSpan timeSpan = DateTime.Now - _LastLedgerClosed.ReceivedTime;
+				if ( timeSpan.TotalMinutes > 1) {
+					return null;
+				}
+
+				return _LastLedgerClosed; 
+			}
+			set {
+				if (value != null) {
+					_last_index = value.ledger_index;
+					value.ReceivedTime = DateTime.Now;
+					
+				}
+				_LastLedgerClosed = value;
+			}
 		}
+		private static uint _last_index = default (uint);
+		private static LedgerClosed _LastLedgerClosed = null;
 
 		public static ServerStateEventArgs ServerStateEv {
 			get;
@@ -56,6 +87,7 @@ namespace RippleLibSharp.Commands.Subscriptions
 		}
 
 
+		//private static uint? lastRetrieved = null;
 		public static Tuple<string, UInt32> GetFeeAndLastLedger (CancellationToken token) {
 
 			LedgerClosed ledger = LastLedgerClosed;
@@ -69,6 +101,14 @@ namespace RippleLibSharp.Commands.Subscriptions
 			if (serverState == null) {
 				return null;
 			}
+
+
+			//if (ledger.ledger_index == lastRetrieved) {
+				
+
+			//}
+
+			//lastRetrieved = ledger.ledger_index;
 
 			double native_base_fee;
 
@@ -108,7 +148,10 @@ namespace RippleLibSharp.Commands.Subscriptions
 #pragma warning restore IDE1006 // Naming Styles
 
 
-
+		public DateTime ReceivedTime {
+			get;
+			set;
+		}
 
 
 	}

@@ -10,6 +10,8 @@ using RippleLibSharp.Transactions;
 
 using RippleLibSharp.Result;
 using RippleLibSharp.Util;
+using RippleLibSharp.Commands.Subscriptions;
+using System.Media;
 
 namespace IhildaWallet.Networking
 {
@@ -84,6 +86,16 @@ namespace IhildaWallet.Networking
 
 				Logging.WriteBoth (stringBuilder.ToString());
 
+
+				Task.Run (delegate {
+					LedgerTracker.TokenSource?.Cancel ();
+					LedgerTracker.TokenSource = new CancellationTokenSource ();
+					var token = LedgerTracker.TokenSource.Token;
+					NetworkInterface networkInterface = NetworkController.CurrentInterface;
+					Subscribe.LedgerSubscribe (networkInterface, token, null);
+					Subscribe.ServerSubscribe (networkInterface, token, null);
+				});
+
 			};
 
 			CurrentInterface.onClose += delegate {
@@ -137,13 +149,34 @@ namespace IhildaWallet.Networking
 			return CurrentInterface;
 		}
 
+		public static void PlayNoNetSound ()
+		{
+
+			Task.Run (delegate {
+
+				SoundSettings settings = SoundSettings.LoadSoundSettings ();
+
+				if (settings.HasOnNetWorkFail && settings.OnNetWorkFail != null) {
+
+
+					SoundPlayer player = new SoundPlayer (settings.OnNetWorkFail);
+					player.Load ();
+					player.Play ();
+
+
+				}
+
+
+			});
+		}
+
 
 		public static NetworkInterface GetNetworkInterfaceGuiThread () {
 			if (!Program.network) { return null; }
 			if (CurrentInterface != null) {
 				return CurrentInterface;
 			}
-
+			PlayNoNetSound ();
 			DoNetworkingDialog ();
 
 			return CurrentInterface;
@@ -154,7 +187,7 @@ namespace IhildaWallet.Networking
 			if (CurrentInterface != null) {
 				return CurrentInterface;
 			}
-
+			PlayNoNetSound ();
 			DoNetworkingDialogNonGUIThread ();
 
 			return CurrentInterface;
