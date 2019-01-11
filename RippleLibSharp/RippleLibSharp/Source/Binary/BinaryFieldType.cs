@@ -1,8 +1,6 @@
 
 using System;
 using System.Linq;
-using System.Collections;
-using RippleLibSharp.Util;
 
 namespace RippleLibSharp.Binary
 {

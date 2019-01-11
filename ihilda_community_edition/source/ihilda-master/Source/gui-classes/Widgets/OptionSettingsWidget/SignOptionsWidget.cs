@@ -28,12 +28,23 @@ namespace IhildaWallet
 
 			Gtk.Application.Invoke ( delegate {
 				comboboxentry1.Entry.Text = signOptions.LastLedgerOffset.ToString ();
-				if (signOptions.UseLocalRippledRPC) {
-					radiobutton2.Active = true;
-				} else {
-					radiobutton1.Active = true;
+
+				string signwith = signOptions.SigningLibrary;
+				if (signwith == null) {
+					signwith = "RippleDotNet";
 				}
 
+				switch (signwith) {
+				case "RippleLibSharp":
+					radiobutton1.Active = true;
+					break;
+				case "Rippled":
+					radiobutton2.Active = true;
+					break;
+				case "RippleDotNet":
+					radiobutton3.Active = true;
+					break;
+				}
 			});
 
 
@@ -46,13 +57,27 @@ namespace IhildaWallet
 
 
 			string ledger = comboboxentry1.Entry.Text;
-			bool b = this.radiobutton1.Active;
 
+			string lib = null;
+			bool b = this.radiobutton1.Active;
+			if (b) {
+				lib = "RippleLibSharp";
+			}
+
+			bool b2 = this.radiobutton2.Active;
+			if (b2) {
+				lib = "Rippled";
+			}
+
+			bool b3 = this.radiobutton3.Active;
+			if (b3) {
+				lib = "RippleDotNet";
+			}
 			//so.lastLedgerOffset = ledger;
 			bool valid = uint.TryParse (ledger, out uint l);
 
 			SignOptions so = new SignOptions {
-				UseLocalRippledRPC = !b
+				SigningLibrary = lib
 			};
 
 			if (valid) {
@@ -82,10 +107,10 @@ namespace IhildaWallet
 
 		}
 		*/
+		
 
 
-
-		public bool UseLocalRippledRPC {
+		public string SigningLibrary {
 			get;
 			set;
 		}

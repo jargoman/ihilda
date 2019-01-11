@@ -16,6 +16,8 @@ namespace IhildaWallet
 
 		private global::Gtk.RadioButton radiobutton2;
 
+		private global::Gtk.RadioButton radiobutton3;
+
 		protected virtual void Build()
 		{
 			global::Stetic.Gui.Initialize(this);
@@ -27,7 +29,7 @@ namespace IhildaWallet
 			this.vbox2.Name = "vbox2";
 			this.vbox2.Spacing = 6;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.table1 = new global::Gtk.Table(((uint)(3)), ((uint)(2)), false);
+			this.table1 = new global::Gtk.Table(((uint)(4)), ((uint)(2)), false);
 			this.table1.Name = "table1";
 			this.table1.RowSpacing = ((uint)(6));
 			this.table1.ColumnSpacing = ((uint)(6));
@@ -75,11 +77,24 @@ namespace IhildaWallet
 			w4.BottomAttach = ((uint)(3));
 			w4.RightAttach = ((uint)(2));
 			w4.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table1.Gtk.Table+TableChild
+			this.radiobutton3 = new global::Gtk.RadioButton(global::Mono.Unix.Catalog.GetString("Sign with RippleDotNet"));
+			this.radiobutton3.CanFocus = true;
+			this.radiobutton3.Name = "radiobutton3";
+			this.radiobutton3.DrawIndicator = true;
+			this.radiobutton3.UseUnderline = true;
+			this.radiobutton3.Group = this.radiobutton1.Group;
+			this.table1.Add(this.radiobutton3);
+			global::Gtk.Table.TableChild w5 = ((global::Gtk.Table.TableChild)(this.table1[this.radiobutton3]));
+			w5.TopAttach = ((uint)(3));
+			w5.BottomAttach = ((uint)(4));
+			w5.RightAttach = ((uint)(2));
+			w5.YOptions = ((global::Gtk.AttachOptions)(4));
 			this.vbox2.Add(this.table1);
-			global::Gtk.Box.BoxChild w5 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.table1]));
-			w5.Position = 0;
-			w5.Expand = false;
-			w5.Fill = false;
+			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.table1]));
+			w6.Position = 0;
+			w6.Expand = false;
+			w6.Fill = false;
 			this.Add(this.vbox2);
 			if ((this.Child != null))
 			{

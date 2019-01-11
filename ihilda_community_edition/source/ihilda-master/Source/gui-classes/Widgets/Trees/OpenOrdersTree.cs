@@ -368,19 +368,25 @@ namespace IhildaWallet
 					// TODO get user to choose and save choice
 				}
 
-
-				if (opts.UseLocalRippledRPC) {
+				switch (opts.SigningLibrary) {
+				case "Rippled":
 					this.SetIsSubmitted (index.ToString (), "Signing using rpc");
 					tx.SignLocalRippled (rsa);
 					this.SetIsSubmitted (index.ToString (), "Signed rpc");
-				} else {
+					break;
+				case "RippleLibSharp":
 					this.SetIsSubmitted (index.ToString (), "Signing using RippleLibSharp");
 					tx.Sign (rsa);
 					this.SetIsSubmitted (index.ToString (), "Signed RippleLibSharp");
-
+					break;
+				case "RippleDotNet":
+					this.SetIsSubmitted (index.ToString (), "Signing using RippleDotNet");
+					tx.SignRippleDotNet (rsa);
+					this.SetIsSubmitted (index.ToString (), "Signed RippleDotNet");
+					break;
+				default:
+					throw new NotSupportedException ("Invalid sign option " + opts.SigningLibrary);
 				}
-
-
 
 				if (tokenSource?.IsCancellationRequested == true) {
 					this.SetFailed (index.ToString (), "Aborted");

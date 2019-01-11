@@ -1,17 +1,8 @@
 using System;
-using System.IO;
 //using System.Security;
 using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Asn1.X9;
-using Org.BouncyCastle.Asn1.Sec;
-
-using Org.BouncyCastle.Asn1;
-using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Math;
-
-using Org.BouncyCastle.Security;
-using Org.BouncyCastle.Crypto.Generators;
 
 using RippleLibSharp.Keys;
 
@@ -46,6 +37,10 @@ namespace RippleLibSharp.Binary
 			byte[] hashOfRBOBytes = signedRBO.GenerateHashFromBinaryObject();
 			ECDSASignature signature = SignHash(hashOfRBOBytes);
 
+			var derEncoded = signature.EncodeToDER ();
+
+			
+
 			signedRBO.PutField(BinaryFieldType.TxnSignature, signature.EncodeToDER());
 			return signedRBO;
 		}
@@ -61,7 +56,7 @@ namespace RippleLibSharp.Binary
 			ECPrivateKeyParameters privKey = privateKey.GetECPrivateKey();
 			signer.Init(true,privKey);
 			
-
+			
 			BigInteger[] RandS = signer.GenerateSignature(hashOfBytes);
 
 			return new ECDSASignature (RandS[0], RandS[1], privateKey.GetPublicKey ().GetPublicPoint ());

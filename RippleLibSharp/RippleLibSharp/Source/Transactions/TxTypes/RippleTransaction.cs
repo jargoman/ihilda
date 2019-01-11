@@ -14,6 +14,10 @@ using RippleLibSharp.LocalRippled;
 
 using RippleLibSharp.Commands.Accounts;
 
+using Ripple.TxSigning;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+
 namespace RippleLibSharp.Transactions.TxTypes
 {
 	public class RippleTransaction
@@ -362,10 +366,12 @@ namespace RippleLibSharp.Transactions.TxTypes
 			}
 
 			Response<RippleSubmitTxResult> response = DynamicJson.Parse (output);
+			if (response == null) {
+				return null;
+			}
+			if (response.HasError ()) {
 
-			if (response.error != null) {
-
-				Logging.WriteLog (response.error_message);
+				Logging.WriteLog (response?.error_message ?? "error");
 				return null;
 			}
 
@@ -379,10 +385,39 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 		}
 
+		public string SignRippleDotNet (RippleIdentifier seed)
+		{
+
+
+			string jsn =  GetJsonTxDotNet ();
+
+			if (seed == null) {
+				throw new ArgumentNullException ();
+			}
+
+
+			//string test = "{\"test\":\"test\"}";
+			var o  = JObject.Parse (jsn);
+			
+			SignedTx signedtx = TxSigner.SignJson (o, seed.GetHumanReadableIdentifier ());
+
+			this.SignedTransactionBlob = signedtx.TxBlob;
+
+			
+			return this.SignedTransactionBlob;
+		}
+
+
 		public virtual string GetJsonTx ()
 		{
 			return null;
 		}
+	
+
+		public virtual string GetJsonTxDotNet () {
+			return null;
+		}
+
 
 
 

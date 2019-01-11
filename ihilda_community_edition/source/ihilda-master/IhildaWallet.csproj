@@ -546,6 +546,7 @@
     <Folder Include="Source\NotificationSystem\" />
     <Folder Include="Sounds\" />
     <Folder Include="Source\WalletClasses\" />
+    <Folder Include="Source\ThirdParty\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\RippleLibSharp\RippleLibSharp\RippleLibSharp.csproj">

@@ -156,6 +156,21 @@ namespace RippleLibSharp.Transactions.TxTypes
 			return rbo;
 		}
 
+		public override string GetJsonTxDotNet ()
+		{
+			string s = "{\"TransactionType\": \"TrustSet\"," +
+				"\"Account\": \"" + Account + "\"," +
+				"\"Fee\": " + fee.ToJsonString () + "," +
+				"\"Flags\": " + flags.ToString () + "," +
+				"\"LastLedgerSequence\": " + this.LastLedgerSequence.ToString () + "," +
+				"\"Sequence\": " + Sequence.ToString () + "," +
+				"\"LimitAmount\": " + LimitAmount.ToJsonString () + /*"," +*/
+										    /*"\"Destination\": \"" + this.Destination + "\"" +*/
+				"}";
+
+			return s;
+		}
+
 
 		public override string GetJsonTx ()
 		{

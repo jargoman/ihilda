@@ -127,7 +127,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 
 			rbo.PutField(BinaryFieldType.TransactionType, RippleTransactionType.PAYMENT.value.Item1);
-			//rbo.putField(BinaryFieldType.Flags, this.flags);
+			rbo.PutField(BinaryFieldType.Flags, this.flags);
 			rbo.PutField(BinaryFieldType.Sequence, this.Sequence);
 			rbo.PutField (BinaryFieldType.LastLedgerSequence, this.LastLedgerSequence);
 
@@ -154,21 +154,36 @@ namespace RippleLibSharp.Transactions.TxTypes
 			return rbo;
 		}
 
-		/*
-		public override string GetJsonTx () {
-			string s = "'{\"TransactionType\": \"Payment\"," + 
-				"\"Account\": \"" + Account + "\"," + 
-				"\"Fee\": " + fee.ToJsonString() + "," + 
-				"\"Flags\": " + flags.ToString() + "," + 
-				"\"LastLedgerSequence\": " + this.LastLedgerSequence.ToString() + "," +
-				"\"Sequence\": " + Sequence.ToString() + "," + 
-				"\"Amount\": " + Amount.ToJsonString() + "," + 
-				"\"Destination\": \"" + this.Destination + "\"" +
-				"}'";
+
+		public override string GetJsonTxDotNet () {
+			StringBuilder stringBuilder = new StringBuilder ();
+
+			stringBuilder.Append ("{\"TransactionType\": \"Payment\",");
+			stringBuilder.Append ("\"Account\": \"" + Account + "\",");
+			stringBuilder.Append ("\"Fee\": " + fee.ToJsonString () + ",");
+			if (flags != 0) {
+				stringBuilder.Append ("\"Flags\": " + flags.ToString () + ",");
+			}
+			stringBuilder.Append ("\"LastLedgerSequence\": " + this.LastLedgerSequence.ToString () + ",");
+			stringBuilder.Append ("\"Sequence\": " + Sequence.ToString () + ",");
+			stringBuilder.Append ("\"Amount\": " + Amount.ToJsonString () + ",");
+			if (SendMax != null) {
+				stringBuilder.Append ("\"SendMax\": " + SendMax.ToJsonString () + ",");
+			}
+
+			if (Paths != null) {
+
+				var pth = DynamicJson.Serialize (Paths);
+				stringBuilder.Append ("\"Paths\": " + pth + ",");
+			}
+			stringBuilder.Append ("\"Destination\": \"" + this.Destination + "\"");
+			stringBuilder.Append ("}");
+
+			string s = stringBuilder.ToString ();
 
 			return s;
 		}
-		*/
+
 
 		public override string GetJsonTx ()
 		{

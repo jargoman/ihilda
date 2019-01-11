@@ -167,24 +167,32 @@ namespace RippleLibSharp.Binary
 
 			using (BigEndianReader reader = new BigEndianReader (ms)) {
 
-				for (int i = 0; i < ms.Length; i++) {
-					byte firstByte = reader.ReadByte ();
-					int type = (0xF0 & firstByte) >> 4; // The & (AND) is redundant with unsigned bytes but I'll leave it incase I switch to sbyte
-					if (type == 0) {
-						type = reader.ReadByte (); // if the type is zero, the next byte is the type
+				try {
+					for (int i = 0; i < ms.Length; i++) {
+						byte firstByte = reader.ReadByte ();
+						var orred = 0xF0 & firstByte;
+						int type = (orred) >> 4; // The & (AND) is redundant with unsigned bytes but I'll leave it incase I switch to sbyte
+
+						byte final = (byte)type;
+
+						if (type == 0) {
+							type = reader.ReadByte (); // if the type is zero, the next byte is the type
+						}
+
+						int field = 0x0f & firstByte; // zero out first four bits of byte. 
+						if (field == 0) {
+							field = reader.ReadByte ();
+							//firstByte=(byte)field; // I commented this out because it's never used
+						}
+
+						BinaryFieldType serializedField = BinaryFieldType.Lookup (type, field);
+						Object value = ReadPrimitive (reader, serializedField.type);
+						serializedObject.fields.Add (serializedField, value);
+
+
+
 					}
-
-					int field = 0x0f & firstByte; // zero out first four bits of byte. 
-					if (field == 0) {
-						field = reader.ReadByte ();
-						//firstByte=(byte)field; // I commented this out because it's never used
-					}
-
-					BinaryFieldType serializedField = BinaryFieldType.Lookup (type, field);
-					Object value = ReadPrimitive (reader, serializedField.type);
-					serializedObject.fields.Add (serializedField, value);
-
-
+				} catch (Exception e) {
 
 				}
 			}
@@ -250,16 +258,16 @@ namespace RippleLibSharp.Binary
 			int byteLen = 0;
 			byte firstByte = input.ReadByte ();
 			byte secondByte = 0;
-			if (firstByte < 192) {  // why 192?
+			if (firstByte <= 192) {  // why 192?
 				byteLen = firstByte;
-			} else if (firstByte < 240) {
+			} else if (firstByte <= 240) {
 				secondByte = input.ReadByte ();
-				byteLen = 193 + (firstByte - 193) * 256 + secondByte; // TODO come back to this ported code and make sense of this lol
+				byteLen = 193 + ((firstByte - 193) * 256) + secondByte; // TODO come back to this ported code and make sense of this lol
 
 			} else if (firstByte < 254) {
 				secondByte = input.ReadByte ();
 				byte thirdByte = input.ReadByte ();
-				byteLen = 12481 + (firstByte - 241) * 65536 + secondByte * 256 + thirdByte; // one of the bytes obviously marks the length?
+				byteLen = 12481 + ((firstByte - 241) * 65536) + (secondByte * 256) + thirdByte; // one of the bytes obviously marks the length?
 			} else {
 				// TODO Error checking
 				throw new Exception ("firstByte=" + firstByte + ", value reserved");
@@ -329,7 +337,7 @@ namespace RippleLibSharp.Binary
 				//BigInteger biMagnitude = longMagnitude;
 
 
-				Decimal fractionalValue = new decimal (longMagnitude) * new decimal (Math.Pow (10, decimalPosition));  // veryfy this is correct
+				Decimal fractionalValue = new decimal (longMagnitude) * new decimal (Math.Pow (10, -decimalPosition));  // veryfy this is correct
 				if (sign < 0) {
 					fractionalValue *= -1m;
 				}
@@ -350,11 +358,11 @@ namespace RippleLibSharp.Binary
 
 		protected String ReadCurrency (BigEndianReader input)
 		{
-			//char[] unknown = input.ReadChars(12);
+			char[] unknown = input.ReadChars(20);
 
-			char [] currency = input.ReadChars (8);
+			//char [] currency = input.ReadChars (8);
 
-			return new String (currency, 0, 3);
+			return new String (unknown, 12, 3);
 
 			//TODO See https://ripple.com/wiki/Currency_Format for format
 		}
@@ -847,24 +855,36 @@ namespace RippleLibSharp.Binary
 		// TODO Unit test this function
 		protected void WriteVariableLength (BigEndianWriter output, byte [] value)
 		{
+			int len = value.Length;
 			if (value.Length < 192) {
-				output.Write ((byte)value.Length);
+				output.Write ((byte)len);
 			} else if (value.Length < 12480) { //193 + (b1-193)*256 + b2
 
-				// TODO figure out what Pmarches meant by this is not right
-				//FIXME This is not right...
-				int firstByte = (value.Length / 256) + 193;
+				len -= 193;
+				int firstByte = (len >> 8) + 193;
+				int secondByte = (len & 0xff);
 				output.Write ((byte)firstByte);
-				//FIXME What about arrays of length 193?
-				int secondByte = value.Length - firstByte - 193;
 				output.Write ((byte)secondByte);
+
+
 			} else if (value.Length < 918744) {
+
+				len -= 12481;
+				int first = (241 + (len >> 16));
+				int second = (len >> 8) & 0xff;
+				int third = len & 0xff;
+				output.Write ((byte)first);
+				output.Write ((byte) second);
+				output.Write ((byte) third);
+
+				/*
 				int firstByte = (value.Length / 65536) + 241;
 				output.Write ((byte)firstByte);
 				int secondByte = (value.Length - firstByte) / 256;
 				output.Write ((byte)secondByte);
 				int thirdByte = value.Length - firstByte - secondByte - 12481;
 				output.Write ((byte)thirdByte);
+				*/	
 			}
 			output.Write (value);
 		}

@@ -8,6 +8,8 @@ using IhildaWallet.Networking;
 
 using RippleLibSharp.Keys;
 using System.Threading;
+using System.Threading.Tasks;
+using RippleLibSharp.Result;
 
 namespace IhildaWallet
 {
@@ -25,96 +27,215 @@ namespace IhildaWallet
 				tokenSource = new CancellationTokenSource ();
 				CancellationToken token = tokenSource.Token;
 
+				label3.Text = "";
+
 				// TODO lookup tx, verify matches signing account, are you sure?? ect
 
 
 
-				string sq = this.comboboxentry1.Entry.Text;
+				string tx_hash = this.comboboxentry1?.Entry?.Text;
+				if (string.IsNullOrWhiteSpace (tx_hash)) {
+					WriteToInfoBox ("Please specify a transaction hash\n");
+					return;
+				}
 
+				
 				RippleCancelTransaction tx = new RippleCancelTransaction ();
 
 				RippleWallet rw = _rippleWallet;
 				if (rw == null) {
-					/*
-					#if DEBUG
-					if (Debug.BuyWidget) {
-						Logging.writeLog (method_sig + "w == null, returning\n");
-					}
-					#endif
-					*/
+
+
+					WriteToInfoBox ("Please specify a wallet using the wallet manager\n");
 
 					return;
 				}
 
 
-
+				string acc = rw.GetStoredReceiveAddress ();
 
 				NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
 				if (ni == null) {
-					MessageDialog.ShowMessage ("Network Error", "Unable to connect to network");
-					return;
-				}
-				uint se = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence (rw.GetStoredReceiveAddress (), ni, token));
-				if (se == 0) {
-					return;
-				}
-
-				FeeSettings feeSettings = FeeSettings.LoadSettings ();
-				if (feeSettings == null) {
-					// TODO
+					string messg = "Unable to connect to network";
+					MessageDialog.ShowMessage ("Network Error", messg);
+					WriteToInfoBox (messg + "\n");
 					return;
 				}
 
-				Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, token);
-				if (tupe == null) {
-					return;
-				}
 
-				tx.fee = (tupe.Item1 * 2).ToString ();
+				bool isSeq = UInt32.TryParse (tx_hash, out uint offerseq);
+				if (!isSeq) {
 
-				tx.Sequence = se; // 
-				tx.LastLedgerSequence = tupe.Item2 + 6;
-
-				tx.Account = rw.GetStoredReceiveAddress ();
-
-				tx.OfferSequence = UInt32.Parse (sq);
-
-				SignOptions opts = SignOptions.LoadSignOptions ();
-
-				RippleIdentifier seed = rw.GetDecryptedSeed ();
-
-				while (seed.GetHumanReadableIdentifier () == null) {
-					bool should = AreYouSure.AskQuestion (
-					"Invalid password",
-					"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
-					);
-
-					if (!should) {
+					//var tx_task = RippleLibSharp.Commands.Tx.tx.GetRequestDataApi (tx_hash, token);
+					var tx_task = RippleLibSharp.Commands.Tx.tx.GetRequest (tx_hash, ni, token);
+					if (tx_task == null) {
 						return;
 					}
 
-					seed = rw.GetDecryptedSeed ();
+					tx_task.Wait ();
+
+
+
+					if (tx_task == null) {
+						return;
+					}
+
+					var response = tx_task.Result;
+
+					if (response == null) {
+						return;
+					}
+
+					if (response.HasError()) {
+						return;
+					}
+
+					var res = response.result;
+
+					if (res == null) {
+						return;
+					}
+
+					offerseq = res.Sequence;
+
 				}
 
 
+				Task.Run (delegate {
 
-				if (opts == null || opts.UseLocalRippledRPC) {
+					//WriteToInfoBox ("");
 
-					tx.SignLocalRippled (seed);
-				} else {
+					uint se = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence (acc, ni, token));
+					if (se == 0) {
+						WriteToInfoBox ("Unable to determine sequence number for account " + acc + "\n");
+						return;
+					}
 
-					tx.Sign (seed);
+					FeeSettings feeSettings = FeeSettings.LoadSettings ();
+					if (feeSettings == null) {
+						// TODO
+						WriteToInfoBox ("Failed to load fee settings\n");
+						return;
+					}
 
-				}
+					Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, token);
+					if (tupe == null) {
+						WriteToInfoBox ("Failed to retrieve fee and last ledger");
+						return;
+					}
 
 
-				//Task< Response <RippleSubmitTxResult>> task = null;
-				/*task =*/
-				NetworkController.UiTxNetworkSubmit (tx, ni, token);
-				/*task.Wait ();*/
+					SignOptions opts = SignOptions.LoadSignOptions ();
+
+					tx.fee = (tupe.Item1 * 2).ToString ();
+
+					tx.Sequence = se; // 
+					tx.LastLedgerSequence = tupe.Item2 + (opts?.LastLedgerOffset ?? SignOptions.DEFAUL_LAST_LEDGER_SEQ);
+
+					tx.Account = rw.GetStoredReceiveAddress ();
+
+
+
+					tx.OfferSequence = offerseq;
+
+
+
+					if (opts == null) {
+						WriteToInfoBox ("Failed to load sign options\n");
+						return;
+					}
+
+					RippleIdentifier seed = rw.GetDecryptedSeed ();
+
+
+
+					while (seed?.GetHumanReadableIdentifier () == null) {
+						bool should = AreYouSure.AskQuestion (
+						"Invalid password",
+						"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+						);
+
+						if (!should) {
+							return;
+						}
+
+						seed = rw.GetDecryptedSeed ();
+					}
+
+					switch (opts.SigningLibrary) {
+					case "RippleDotNet":
+						WriteToInfoBox ("RippleDotNet\n");
+
+						var signature = tx.SignRippleDotNet (seed);
+						if (signature == null) {
+							WriteToInfoBox ("Error signing with RippleDotNet.");
+						}
+
+						break;
+					case "Rippled":
+						WriteToInfoBox ("Signing with rippled\n");
+
+						var signature2 = tx.SignLocalRippled (seed);
+						if (signature2 == null) {
+							WriteToInfoBox ("Error signing with rippled. Is rippled running?");
+							return;
+						}
+
+						break;
+					case "RippleLibSharp":
+						WriteToInfoBox ("Signing with ripple-lib-sharp\n");
+
+						var signature3 = tx.Sign (seed);
+						if (signature3 == null) {
+							WriteToInfoBox ("Error signing with ripple-lib-sharp.");
+						}
+
+						break;
+					default:
+						throw new NotSupportedException ("Invalid sign option " + opts.SigningLibrary);
+					}
+
+					Task<Response<RippleSubmitTxResult>> task =
+						NetworkController.UiTxNetworkSubmit (tx, ni, token);
+
+					if (task == null) {
+						WriteToInfoBox ("task == null\n");
+						return;
+					}
+
+					task.Wait (1000 * 60 * 2);
+
+					Response<RippleSubmitTxResult> res = task.Result;
+
+					if (res == null) {
+						WriteToInfoBox ("Invalid response\n");
+						return;
+					}
+
+					if (res.HasError ()) {
+						WriteToInfoBox ("Error : " + res?.error_message ?? "{Error message null}");
+						return;
+					};
+
+					WriteToInfoBox ((res.status ?? "Unknown status") + "\n");
+
+					WriteToInfoBox ((res.result.engine_result ?? "") + "\n");
+					WriteToInfoBox ((res.result.engine_result_message ?? "") + "\n");
+				});
+
+
 
 
 			};
+			
+		}
+
+		public void WriteToInfoBox ( string message )
+		{
+			Gtk.Application.Invoke ( delegate {
+				label3.Text += message;
+
+			} );
 
 		}
 

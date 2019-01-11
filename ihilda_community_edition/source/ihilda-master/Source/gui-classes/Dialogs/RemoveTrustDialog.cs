@@ -144,17 +144,18 @@ namespace IhildaWallet
 				// TODO get user to choose and save choice
 			}
 
-
-			if (opts.UseLocalRippledRPC) {
-
+			switch (opts.SigningLibrary) {
+			case "Rippled":
 				rts.SignLocalRippled (rsa);
-
-			} else {
-
-
+				break;
+			case "RippleLibSharp":
 				rts.Sign (rsa);
-
-
+				break;
+			case "RippleDotNet":
+				rts.SignRippleDotNet (rsa);
+				break;
+			default:
+				throw new NotSupportedException ("Invalid sign option " + opts.SigningLibrary);
 			}
 
 			Task<Response<RippleSubmitTxResult>> task = null;

@@ -15,6 +15,7 @@ using RippleLibSharp.Commands.Accounts;
 using RippleLibSharp.Transactions;
 using RippleLibSharp.Util;
 using System.Threading;
+using System.Media;
 
 namespace IhildaWallet
 {
@@ -36,6 +37,7 @@ namespace IhildaWallet
 			CancellationToken cancelationToken
 		)
 		{
+			SoundSettings settings = SoundSettings.LoadSoundSettings ();
 
 #if DEBUG
 			string method_sig = clsstr + nameof (DoLogic) + DebugRippleLibSharp.both_parentheses;
@@ -43,7 +45,7 @@ namespace IhildaWallet
 			OrderManagementBot omb = null;
 
 			var ombTask = Task.Run (delegate {
-				 omb = new OrderManagementBot (wallet, ni, cancelationToken);
+				omb = new OrderManagementBot (wallet, ni, cancelationToken);
 
 				omb.OnMessage += (object sender, MessageEventArgs e) => {
 					OnMessage?.Invoke (this, new MessageEventArgs () { Message = e.Message });
@@ -58,22 +60,26 @@ namespace IhildaWallet
 				return null;
 			}
 
-			string ledgerMax = ledgerend?.ToString() ?? (-1).ToString ();
-			string ledgerMin = ledgerstart?.ToString();
+			string ledgerMax = ledgerend?.ToString () ?? (-1).ToString ();
+			string ledgerMin = ledgerstart?.ToString ();
 
 			if (ledgerMin == null) {
-				
+
 				if (RuleManagerObj?.LastKnownLedger == null) {
 					// TODO
 				}
 				int lastRuleLedger = ((int)(RuleManagerObj?.LastKnownLedger));
-				ledgerMin = lastRuleLedger.ToString();
+				ledgerMin = lastRuleLedger.ToString ();
 
 			}
 
 			int lim = limit ?? 0;
 
-			RETRY:
+			int retry_count = 0;
+		RETRY:
+			if (retry_count++ > 3) {
+				return null;
+			}
 
 			Task<IEnumerable <Response<AccountTxResult>>> task = null;
 
@@ -151,11 +157,39 @@ namespace IhildaWallet
 
 				if (task.IsFaulted) {
 					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Network task faulted Retrying\n" });
+					if (settings.HasOnNetWorkFail && settings.OnNetWorkFail != null) {
+
+						Task.Run (delegate {
+
+							SoundPlayer player =
+							new SoundPlayer (settings.OnNetWorkFail);
+							player.Load ();
+							player.Play ();
+						});
+
+					}
+
+		    			
 					goto RETRY;
 				}
 
 				if (!(seconds < maxSeconds)) {
 					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "No response after " + minutes + " minutes elapsed. Retrying \n" });
+
+					if (settings.HasOnNetWorkFail && settings.OnNetWorkFail != null) {
+
+						Task.Run (delegate {
+
+							SoundPlayer player =
+							new SoundPlayer (settings.OnNetWorkFail);
+							player.Load ();
+							player.Play ();
+						});
+
+					}
+
+
+
 					goto RETRY;
 				}
 
@@ -171,8 +205,21 @@ namespace IhildaWallet
 
 			catch (Exception e) {
 
+				if (settings.HasOnNetWorkFail && settings.OnNetWorkFail != null) {
 
-				
+					Task.Run (delegate {
+
+						SoundPlayer player =
+						new SoundPlayer (settings.OnNetWorkFail);
+						player.Load ();
+						player.Play ();
+					});
+
+				}
+
+
+
+
 				StringBuilder errorMessage = new StringBuilder ();
 
 				errorMessage.AppendLine ("Network exception : ");
@@ -209,10 +256,23 @@ namespace IhildaWallet
 
 			if (responses == null) {
 				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Null response\n" });
-				return null;
+				if (settings.HasOnNetWorkFail && settings.OnNetWorkFail != null) {
+
+					Task.Run (delegate {
+
+						SoundPlayer player =
+						new SoundPlayer (settings.OnNetWorkFail);
+						player.Load ();
+						player.Play ();
+					});
+
+				}
+
+				goto RETRY;
+				//return null;
 			}
 
-			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Received response from network\n" });
+	//		OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Received response from network\n" });
 
 
 

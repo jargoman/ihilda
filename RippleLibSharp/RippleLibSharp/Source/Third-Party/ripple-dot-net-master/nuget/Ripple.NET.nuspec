@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Ripple.Net</id>
+    <version>0.0.1</version>
+    <title>Ripple.Net</title>
+    <authors>ndudfield@gmail.com</authors>
+    <owners>ndudfield@gmail.com</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Transaction signing etc for ripple</description>
+    <releaseNotes>Initial release</releaseNotes>
+    <copyright>Copyright (c) 2015 Ripple Labs Inc.</copyright>
+    <dependencies>
+        <dependency id="Newtonsoft.Json" version="8.0.1"/>
+        <dependency id="CGenT.Bouncy" version="1.8.5717.43026"/>
+    </dependencies>
+  </metadata>
+</package>

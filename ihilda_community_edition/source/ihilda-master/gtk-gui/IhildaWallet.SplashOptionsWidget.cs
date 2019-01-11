@@ -109,7 +109,7 @@ namespace IhildaWallet
 			this.pathlabel = new global::Gtk.Label();
 			this.pathlabel.WidthRequest = 100;
 			this.pathlabel.Name = "pathlabel";
-			this.pathlabel.LabelProp = global::Mono.Unix.Catalog.GetString("C:/Programs/rippleClientGtk/splash.png");
+			this.pathlabel.LabelProp = global::Mono.Unix.Catalog.GetString("C:/Programs/ihilda/splash.png");
 			this.table1.Add(this.pathlabel);
 			global::Gtk.Table.TableChild w7 = ((global::Gtk.Table.TableChild)(this.table1[this.pathlabel]));
 			w7.TopAttach = ((uint)(1));

@@ -2,8 +2,10 @@
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/riplibsharp.exe
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/riplibsharp.pdb
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/BouncyCastle.Crypto.dll
+/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/log4net.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/Microsoft.CSharp.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/Mono.Posix.dll
+/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/Newtonsoft.Json.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/QRCoder.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/SuperSocket.ClientEngine.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/System.dll
@@ -11,7 +13,11 @@
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/System.Security.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/System.Xml.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/System.Xml.Linq.dll
+/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/websocket-sharp.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/WebSocket4Net.dll
+/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/Newtonsoft.Json.xml
+/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/log4net.xml
+/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Debug/websocket-sharp.xml
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Debug/riplibsharp.exe.config
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Debug/RippleLibSharp.csproj.CoreCompileInputs.cache
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Debug/RippleLibSharp.csproj.CopyComplete

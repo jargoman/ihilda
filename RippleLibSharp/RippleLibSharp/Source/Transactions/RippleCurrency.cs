@@ -23,7 +23,21 @@ namespace RippleLibSharp.Transactions
 					return /*_amount*/ Math.Round (_amount);
 				}
 
-				return /*_amount*/Math.Round (_amount, 15);
+				if (_amount == default (decimal)) {
+					return default (decimal);
+				}
+
+				string amt = _amount.ToString ();
+				if (amt.Contains (".") && amt.Length > 15) {
+					amt = amt.Substring (0, 15);
+					
+
+				}
+				decimal? deci = RippleCurrency.ParseDecimal (amt);
+				if (deci != null) {
+					_amount = (decimal)deci;
+				}
+				return _amount;//Math.Round (_amount, 15);
 
 				//return _amount; 
 			}
@@ -33,10 +47,7 @@ namespace RippleLibSharp.Transactions
 
 
 
-		private Decimal _amount {
-			get;
-			set;
-		}
+		private Decimal _amount = default (decimal);
 
 
 		//public RippleAddress issuer = null;

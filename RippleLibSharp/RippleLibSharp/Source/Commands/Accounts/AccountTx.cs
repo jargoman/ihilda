@@ -105,6 +105,7 @@ namespace RippleLibSharp.Commands.Accounts
 
 					if (task == null) {
 						//TODO
+						return null;
 					}
 
 					task.Wait (token);
@@ -150,7 +151,8 @@ namespace RippleLibSharp.Commands.Accounts
 						if (task == null) {
 							//TODO
 							Logging.WriteLog ("task == null");
-							break;
+							//break;
+							return null;
 						}
 
 						task.Wait (token);
@@ -162,7 +164,8 @@ namespace RippleLibSharp.Commands.Accounts
 						if (task.Result == null) {
 							// TODO
 							Logging.WriteLog ("task.result == null");
-							break;
+							//break;
+							return null;
 						}
 
 						list.Add (res);
@@ -267,7 +270,8 @@ namespace RippleLibSharp.Commands.Accounts
 						if (task == null) {
 							//TODO
 							Logging.WriteLog("task == null");
-							break;
+							return null; // all or nothing
+							//break;
 						}
 
 						task.Wait(token);
@@ -279,13 +283,14 @@ namespace RippleLibSharp.Commands.Accounts
 						if (task.Result == null) {
 							// TODO
 							Logging.WriteLog("task.result == null");
-							break;
+							return null;
+							//break;
 						}
 
 
 						list.Add(res);
 
-						accountTx = res.result;
+						accountTx = res.result; // not redundant, needed for while loop condition 
 
 
 

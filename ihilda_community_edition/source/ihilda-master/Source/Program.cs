@@ -48,6 +48,7 @@ namespace IhildaWallet
 		public static bool darkmode = false;
 		public static bool preferLinq = false;
 		public static bool parallelVerify = false;
+		public static bool usePager = false;
 		public static string botMode = null;
 		internal static int ledger;
 		internal static int endledger;

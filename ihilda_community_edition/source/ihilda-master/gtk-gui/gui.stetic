@@ -4470,7 +4470,7 @@ drops</property>
           <widget class="Gtk.Label" id="pathlabel">
             <property name="MemberName" />
             <property name="WidthRequest">100</property>
-            <property name="LabelProp" translatable="yes">C:/Programs/rippleClientGtk/splash.png</property>
+            <property name="LabelProp" translatable="yes">C:/Programs/ihilda/splash.png</property>
           </widget>
           <packing>
             <property name="TopAttach">1</property>
@@ -8517,7 +8517,7 @@ what ever widget controls chat functions</property>
                       <widget class="Gtk.Notebook" id="notebook1">
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
-                        <property name="CurrentPage">4</property>
+                        <property name="CurrentPage">0</property>
                         <child>
                           <widget class="IhildaWallet.SplashOptionsWidget" id="splashoptionswidget1">
                             <property name="MemberName" />
@@ -8527,7 +8527,7 @@ what ever widget controls chat functions</property>
                         <child>
                           <widget class="Gtk.Label" id="label16">
                             <property name="MemberName" />
-                            <property name="LabelProp" translatable="yes">&lt;u&gt;Splash Settings&lt;/u&gt;</property>
+                            <property name="LabelProp" translatable="yes">Splash</property>
                             <property name="UseMarkup">True</property>
                           </widget>
                           <packing>
@@ -8546,7 +8546,7 @@ what ever widget controls chat functions</property>
                         <child>
                           <widget class="Gtk.Label" id="label2">
                             <property name="MemberName" />
-                            <property name="LabelProp" translatable="yes">&lt;u&gt;Xrp Fee Options&lt;/u&gt;</property>
+                            <property name="LabelProp" translatable="yes">Xrp Fee</property>
                             <property name="UseMarkup">True</property>
                           </widget>
                           <packing>
@@ -8585,7 +8585,7 @@ what ever widget controls chat functions</property>
                         <child>
                           <widget class="Gtk.Label" id="label9">
                             <property name="MemberName" />
-                            <property name="LabelProp" translatable="yes">OrderBook Options</property>
+                            <property name="LabelProp" translatable="yes">OrderBook</property>
                           </widget>
                           <packing>
                             <property name="type">tab</property>
@@ -8599,7 +8599,7 @@ what ever widget controls chat functions</property>
                               <widget class="Gtk.CheckButton" id="checkbutton13">
                                 <property name="MemberName" />
                                 <property name="CanFocus">True</property>
-                                <property name="Label" translatable="yes">Play default fallback sounds</property>
+                                <property name="Label" translatable="yes">Play fallback notification where none specified</property>
                                 <property name="Active">True</property>
                                 <property name="DrawIndicator">True</property>
                                 <property name="HasLabel">True</property>
@@ -15360,7 +15360,7 @@ Bot output screen
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Bin" id="IhildaWallet.SignOptionsWidget" design-size="352 87">
+  <widget class="Gtk.Bin" id="IhildaWallet.SignOptionsWidget" design-size="369 116">
     <property name="MemberName" />
     <property name="Visible">False</property>
     <child>
@@ -15370,7 +15370,7 @@ Bot output screen
         <child>
           <widget class="Gtk.Table" id="table1">
             <property name="MemberName" />
-            <property name="NRows">3</property>
+            <property name="NRows">4</property>
             <property name="NColumns">2</property>
             <property name="RowSpacing">6</property>
             <property name="ColumnSpacing">6</property>
@@ -15449,6 +15449,30 @@ Bot output screen
               <packing>
                 <property name="TopAttach">2</property>
                 <property name="BottomAttach">3</property>
+                <property name="RightAttach">2</property>
+                <property name="AutoSize">False</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">True</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.RadioButton" id="radiobutton3">
+                <property name="MemberName" />
+                <property name="CanFocus">True</property>
+                <property name="Label" translatable="yes">Sign with RippleDotNet</property>
+                <property name="DrawIndicator">True</property>
+                <property name="HasLabel">True</property>
+                <property name="UseUnderline">True</property>
+                <property name="Group">group1</property>
+              </widget>
+              <packing>
+                <property name="TopAttach">3</property>
+                <property name="BottomAttach">4</property>
                 <property name="RightAttach">2</property>
                 <property name="AutoSize">False</property>
                 <property name="YOptions">Fill</property>

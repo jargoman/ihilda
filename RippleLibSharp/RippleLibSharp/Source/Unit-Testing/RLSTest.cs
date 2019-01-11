@@ -21,6 +21,8 @@ using RippleLibSharp.Transactions.TxTypes;
 
 using System.Linq;
 using System.Threading;
+using RippleLibSharp.Binary;
+using System.IO;
 
 namespace Source.UnitTesting
 {
@@ -53,7 +55,7 @@ namespace Source.UnitTesting
 			//RippleDeterministicKeyGenerator.TestVectors ();
 
 			//rlst.testTrustLines ();
-			//rlst.testOfferSignatures();
+			rlst.TestOfferSignatures();
 
 			//rlst.TestKeyGen ();
 
@@ -235,9 +237,28 @@ namespace Source.UnitTesting
 										Sequence = sequence
 									};
 
-
+									string dotnet = offtx.SignRippleDotNet (seed);
 									string rippled = offtx.SignLocalRippled (seed);
 									string libsharp = offtx.Sign (seed);
+
+									byte [] bytes = Base58.StringToByteArray (rippled);
+									byte [] bytes2 = Base58.StringToByteArray (libsharp);
+
+									BinarySerializer bs = new BinarySerializer ();
+									MemoryStream memoryStream = new MemoryStream (bytes);
+									MemoryStream memoryStream2 = new MemoryStream (bytes2);
+
+									var v = bs.ReadBinaryObject (memoryStream);
+									var v2 = bs.ReadBinaryObject (memoryStream2);
+
+									byte[] sig = (byte[])v.GetField (BinaryFieldType.TxnSignature);
+									byte[] sig2 = (byte[])v2.GetField (BinaryFieldType.TxnSignature);
+
+
+
+
+									bool sigsame = ArraysEqual (sig, sig2);
+									
 
 									bool m = rippled.Equals (libsharp);
 
@@ -266,6 +287,21 @@ namespace Source.UnitTesting
 
 
 
+		}
+
+		private bool ArraysEqual (byte[] one, byte[] two)
+		{
+			bool equal = true;
+			if (one.Length != two.Length) {
+				equal = false;
+			}
+			for (int i = 0; i < one.Length; i++) {
+				Logging.WriteLog ("bytes : " + one[i] + " " + two[i]);
+				if (one[i] != two[i]) {
+					equal = false;
+				}
+			}
+			return equal;
 		}
 
 		public void LedgerSubscribeTest ()

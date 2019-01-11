@@ -276,12 +276,11 @@ namespace IhildaWallet
 					// TODO get user to choose and save choice
 				}
 
-
-				if (opts.UseLocalRippledRPC) {
-
+				switch (opts.SigningLibrary) {
+				case "Rippled":
 					this.SetStatus (index.ToString (), "Signing using rpc", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 					try {
-						tx.SignLocalRippled ( rsa );
+						tx.SignLocalRippled (rsa);
 					} catch (Exception e) {
 
 #if DEBUG
@@ -295,8 +294,8 @@ namespace IhildaWallet
 					}
 
 					this.SetStatus (index.ToString (), "Signed rpc", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
-				} else {
-
+					break;
+				case "RippleLibSharp":
 					this.SetStatus (index.ToString (), "Signing using RippleLibSharp", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 					try {
 						if (rsa is RippleSeedAddress) {
@@ -316,14 +315,42 @@ namespace IhildaWallet
 #endif
 
 
-						this.SetResult ( index.ToString (), "Signing using RippleLibSharp", TextHighlighter.RED );
+						this.SetResult (index.ToString (), "Signing using RippleLibSharp", TextHighlighter.RED);
 						return false;
 					}
 					this.SetStatus (index.ToString (), "Signed RippleLibSharp", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					break;
+				case "RippleDotNet":
+					this.SetStatus (index.ToString (), "Signing using RippleDotNet", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					try {
+						if (rsa is RippleSeedAddress) {
+							tx.SignRippleDotNet ((RippleSeedAddress)rsa);
+						}
 
+						if (rsa is RipplePrivateKey) {
+							// TODO implement
+							throw new NotImplementedException ();
+							tx.SignRippleDotNet ((RipplePrivateKey)rsa);
+						}
+
+					} catch (Exception e) {
+
+#if DEBUG
+						if (DebugIhildaWallet.TransactionSubmitWidget) {
+							Logging.ReportException (method_sig, e);
+						}
+#endif
+
+
+						this.SetResult (index.ToString (), "Signing using RippleDotNet", TextHighlighter.RED);
+						return false;
+					}
+					this.SetStatus (index.ToString (), "Signed RippleDotNet", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					break;
+
+				default:
+					throw new NotSupportedException ("Invalid sign option " + opts.SigningLibrary);
 				}
-
-
 
 				if (token.IsCancellationRequested) {
 

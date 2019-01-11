@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Gtk;
 using IhildaWallet.Networking;
 using IhildaWallet.Util;
+using RippleLibSharp.Commands.Server;
 using RippleLibSharp.Keys;
 using RippleLibSharp.Network;
 using RippleLibSharp.Util;
@@ -1208,7 +1209,7 @@ namespace IhildaWallet
 			}
 
 			if (this.tokenSource != null) {
-				WriteToInfoBox ("A rule script is already running\n");
+				WriteToInfoBox ( "A rule script is already running\n" );
 				this.SetIsRunningUI (false);
 				return;
 			}
@@ -1216,6 +1217,8 @@ namespace IhildaWallet
 			this.tokenSource = new BotCancellTokenSource () { auto = true };
 
 			CancellationToken token = tokenSource.Token;
+
+			SoundSettings settings = SoundSettings.LoadSoundSettings ();
 
 			try {
 
@@ -1340,6 +1343,12 @@ namespace IhildaWallet
 					this.WriteToInfoBox (messg);
 				};
 
+				orderSubmitter.OnVerifyTxMessage += (object sender, VerifyEventArgs e) => {
+					//StringBuilder stringBuilder = new StringBuilder ();
+					//stringBuilder.Append ();
+
+					WriteToInfoBox (e.Message);
+				};
 
 
 				Application.Invoke (delegate {
@@ -1485,9 +1494,25 @@ namespace IhildaWallet
 
 					if (tuple == null) {
 
+
+						if (settings.HasOnAutomateFail && settings.OnAutomateFail != null) {
+
+							Task.Run (delegate {
+
+								SoundPlayer player =
+								new SoundPlayer (settings.OnAutomateFail);
+								player.Load ();
+								player.Play ();
+							});
+
+						}
+
+
 #if DEBUG
 						MessageDialog.ShowMessage ("Automate : DoLogic tuple == null");
 #endif
+
+
 
 						break;
 					}
@@ -1513,7 +1538,10 @@ namespace IhildaWallet
 						if (DebugIhildaWallet.FilledRuleManagementWindow) {
 							Logging.WriteLog (infoMessage);
 						}
+
 #endif
+
+						
 
 						this.WriteToInfoBox (infoMessage);
 
@@ -1573,6 +1601,18 @@ namespace IhildaWallet
 
 					if (tupleResp == null) {
 						// 
+
+						if (settings.HasOnAutomateFail && settings.OnAutomateFail != null) {
+
+							Task.Run (delegate {
+
+								SoundPlayer player =
+								new SoundPlayer (settings.OnAutomateFail);
+								player.Load ();
+								player.Play ();
+							});
+
+						}
 						MessageDialog.ShowMessage ("Scripting error", "Application behaved unexpectedly");
 						return;
 					}
@@ -1581,6 +1621,18 @@ namespace IhildaWallet
 						string errMess = "Error submitting orders\n";
 						this.WriteToInfoBox (errMess);
 						//shouldContinue = false;
+
+						if (settings.HasOnAutomateFail && settings.OnAutomateFail != null) {
+
+							Task.Run (delegate {
+
+								SoundPlayer player =
+								new SoundPlayer (settings.OnAutomateFail);
+								player.Load ();
+								player.Play ();
+							});
+
+						}
 						break;
 						//return;
 					}
@@ -1612,7 +1664,7 @@ namespace IhildaWallet
 
 				this.WriteToInfoBox (e.Message);
 
-				SoundSettings settings = SoundSettings.LoadSoundSettings ();
+				//SoundSettings settings = SoundSettings.LoadSoundSettings ();
 				if (settings.HasOnAutomateFail && settings.OnAutomateFail != null) {
 
 					Task.Run (delegate {

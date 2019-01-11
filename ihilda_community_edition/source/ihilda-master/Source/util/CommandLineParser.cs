@@ -160,6 +160,31 @@ namespace IhildaWallet
 
 			};
 
+
+			IEnumerable<String> usePagers = new String [] { "pager", "paging", "txpaging", "txpager" };
+			Command usePager = new Command (usePagers);
+			commands.Add (usePager);
+			usage.Clear ();
+			usage.Append (Program.appname);
+			usage.AppendLine (" pager={true,false}");
+			usage.AppendLine ("Enable pager for tranaction history");
+
+			usePager.UsageText = usage.ToString ();
+
+			usePager.launch += (string param) => {
+				if (param == null) {
+					param = "false";
+				}
+
+				param = param.ToLower ();
+
+
+				Program.usePager = StringRepresentsTrue (param);
+
+
+
+			};
+
 			IEnumerable<String> networks = new String [] { "network", "networking", "net", "websocket", "web", "websockets", "socket", "sockets"};
 			Command network = new Command (networks);
 			commands.Add (network);

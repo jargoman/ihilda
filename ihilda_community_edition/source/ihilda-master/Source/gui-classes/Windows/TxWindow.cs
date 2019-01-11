@@ -22,7 +22,7 @@ namespace IhildaWallet
 				}
 				notebook1.AppendPage (txviewwidget1, this.txtablabel);
 			}
-			if (true) {
+			if (Program.usePager) {
 				if (orderswidget1 == null) {
 					orderswidget1 = new OrdersWidget ();
 					orderswidget1.Show ();
@@ -47,7 +47,11 @@ namespace IhildaWallet
 						};
 					}
 					notebook1.AppendPage (orderstreewidget1, this.label52);
+
 				}
+
+				orderswidget1.Hide ();
+				label50.Hide ();
 			}
 
 			if (canceltxwidget1 == null) {
@@ -77,7 +81,7 @@ namespace IhildaWallet
 			if ( this.txviewwidget1 != null ) this.txviewwidget1.SetRippleWallet (rippleWallet);
 			if (this.orderswidget1 != null) this.orderswidget1.SetRippleWallet (rippleWallet);
 			if (this.orderstreewidget1 != null) this.orderstreewidget1.SetRippleWallet(rippleWallet);
-
+			if (this.canceltxwidget1 != null) this.canceltxwidget1.SetRippleWallet (rippleWallet); 
 			//this.orderstreewidget1.SetRipples ();
 		}
 	}

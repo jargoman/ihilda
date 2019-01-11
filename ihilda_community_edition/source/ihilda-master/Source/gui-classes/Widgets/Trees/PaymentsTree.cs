@@ -122,7 +122,7 @@ namespace IhildaWallet
 				}
 
 
-				if (opts.UseLocalRippledRPC) {
+				if (opts.SigningLibrary == "Rippled") {
 
 					this.SetStatus (index.ToString (), "Signing using rpc", TextHighlighter.GREEN);
 					try {
@@ -135,16 +135,14 @@ namespace IhildaWallet
 						}
 #endif
 
-						this.SetResult (index.ToString(), "Error Signing using rpc", TextHighlighter.RED);
+						this.SetResult (index.ToString (), "Error Signing using rpc", TextHighlighter.RED);
 						return false;
 					}
 
-					this.SetStatus (index.ToString(), "Signed rpc", TextHighlighter.GREEN);
-				}
+					this.SetStatus (index.ToString (), "Signed rpc", TextHighlighter.GREEN);
+				} else if (opts.SigningLibrary == "RippleLibSharp") {
 
-				else {
-					
-					this.SetStatus(index.ToString(), "Signing using RippleLibSharp", TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), "Signing using RippleLibSharp", TextHighlighter.GREEN);
 					try {
 						tx.Sign (rsa);
 					} catch (Exception e) {
@@ -155,10 +153,27 @@ namespace IhildaWallet
 						}
 #endif
 
-						this.SetResult (index.ToString(), "Signing using RippleLibSharp", TextHighlighter.RED);
+						this.SetResult (index.ToString (), "Signing using RippleLibSharp", TextHighlighter.RED);
 						return false;
 					}
-					this.SetStatus (index.ToString(), "Signed RippleLibSharp", TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), "Signed RippleLibSharp", TextHighlighter.GREEN);
+
+				} else if (opts.SigningLibrary == "RippleDotNet") {
+					this.SetStatus (index.ToString (), "Signing using RippleDotNet", TextHighlighter.GREEN);
+					try {
+						tx.SignRippleDotNet (rsa);
+					} catch (Exception e) {
+
+#if DEBUG
+						if (DebugIhildaWallet.PaymentTree) {
+							Logging.ReportException (method_sig, e);
+						}
+#endif
+
+						this.SetResult (index.ToString (), "Signing using RippleDotNet", TextHighlighter.RED);
+						return false;
+					}
+					this.SetStatus (index.ToString (), "Signed RippleDotNet", TextHighlighter.GREEN);
 
 				}
 

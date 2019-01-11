@@ -82,7 +82,10 @@ namespace IhildaWallet
 					dict.Add (id, order);
 
 
+					if (order.Previous_Bot_ID != null) {
 
+						dict.Remove (order.Previous_Bot_ID);
+					}
 				}
 			});
 
@@ -144,8 +147,6 @@ namespace IhildaWallet
 			}
 
 			lock (lockobj) {
-
-
 				string id = order.Bot_ID;
 				Logging.WriteLog ("Synccache : " + (id ?? "null"));
 
@@ -175,10 +176,7 @@ namespace IhildaWallet
 				string conf = DynamicJson.Serialize (confstruct);
 
 				FileHelper.SaveConfig (settingsPath, conf);
-
 			}
-
-
 		}
 
 

@@ -43,6 +43,27 @@ namespace IhildaWallet
 
 			//this.orders = orders.ToArray ();
 
+			SoundSettings settings = SoundSettings.LoadSoundSettings ();
+			SoundPlayer txSubmitPlayer = null;
+			SoundPlayer txFailPlayer = null;
+
+			if (settings.HasOnTxSubmit && settings.OnTxSubmit != null){
+				txSubmitPlayer = new SoundPlayer (settings.OnTxSubmit);
+
+				txSubmitPlayer.Load ();
+			}
+
+			if (settings.HasOnTxFail && settings.OnTxFail != null) {
+
+
+				txFailPlayer = new SoundPlayer (settings.OnTxFail);
+				txFailPlayer.Load ();
+
+
+
+			}
+
+
 			List<OrderSubmittedEventArgs> events = new List<OrderSubmittedEventArgs> ();
 
 			try {
@@ -59,7 +80,7 @@ namespace IhildaWallet
 
 					taskList.Clear ();
 
-					SoundSettings settings = SoundSettings.LoadSoundSettings ();
+
 
 					foreach (AutomatedOrder order in ords) {
 
@@ -78,9 +99,8 @@ namespace IhildaWallet
 
 								Task.Run (delegate {
 
-									SoundPlayer player = new SoundPlayer (settings.OnTxFail);
-									player.Load ();
-									player.Play ();
+
+									txFailPlayer?.Play ();
 								});
 
 							}
@@ -89,17 +109,7 @@ namespace IhildaWallet
 							return null;
 						}
 
-						if (settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
-
-							Task.Run (delegate {
-
-								SoundPlayer player = new SoundPlayer (settings.OnTxSubmit);
-								player.Load ();
-								player.Play ();
-							});
-
-						}
-
+						
 
 						Task task = Task.Run (
 						delegate {
@@ -124,12 +134,33 @@ namespace IhildaWallet
 
 
 						if (!order.SubmittedEventArgs.Success) {
+							if (settings.HasOnTxFail && settings.OnTxFail != null) {
+
+								Task.Run (delegate {
+
+
+									txFailPlayer?.Play ();
+								});
+
+							}
+
 							task.Wait ();
 
 							if (order.IsValidated) {
 								continue;
 							}
 							break;
+						} else {
+							if (settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
+
+								Task.Run (delegate {
+
+
+									txSubmitPlayer?.Play ();
+								});
+
+							}
+
 						}
 
 						//events.Add (submitEvent);
@@ -145,6 +176,14 @@ namespace IhildaWallet
 					ords = ords.Where ((AutomatedOrder arg) => !arg.IsValidated);
 
 				} while (ords.Any());
+
+				var acc = rw.GetStoredReceiveAddress ();
+				if (acc != null) {
+					AccountSequenceCache accountSequenceCache = AccountSequenceCache.GetCacheForAccount (acc);
+					accountSequenceCache?.Save ();
+				}
+
+			
 
 				return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (true, events);
 
@@ -193,7 +232,30 @@ namespace IhildaWallet
 
 
 				SoundSettings settings = SoundSettings.LoadSoundSettings ();
+				SoundPlayer OnTxSubmitPlayer = null;
+				SoundPlayer OnTxFailPlayer = null;
 
+				if (settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
+
+					Task.Run (delegate {
+
+						OnTxSubmitPlayer = new SoundPlayer (settings.OnTxSubmit);
+						OnTxSubmitPlayer.Load ();
+
+					});
+
+				}
+
+				if (settings.HasOnTxFail && settings.OnTxFail != null) {
+
+					Task.Run (delegate {
+
+						OnTxFailPlayer = new SoundPlayer (settings.OnTxFail);
+						OnTxFailPlayer.Load ();
+
+					});
+
+				}
 
 				foreach (AutomatedOrder order in orders) {
 
@@ -215,14 +277,14 @@ namespace IhildaWallet
 					
 					if (settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
 
-						Task.Run ( delegate {
-
-							SoundPlayer player = new SoundPlayer (settings.OnTxSubmit);
-							player.Load ();
-							player.Play ();
-						});
+						Task.Run ((System.Action)OnTxSubmitPlayer.Play);
 
 					}
+				}
+				var acc = rw.GetStoredReceiveAddress ();
+				if (acc != null) {
+					AccountSequenceCache accountSequenceCache = AccountSequenceCache.GetCacheForAccount (acc);
+					accountSequenceCache?.Save ();
 				}
 
 
@@ -329,10 +391,10 @@ namespace IhildaWallet
 				goto retry;
 			}
 
-			if (orderSubmittedEventArgs.signOptions.UseLocalRippledRPC) {
-
+			switch (orderSubmittedEventArgs.signOptions.SigningLibrary) {
+			case "Rippled":
 				string rpcmsg = "Signing using rpc";
-				
+
 #if DEBUG
 				if (DebugIhildaWallet.OrderSubmitter) {
 
@@ -341,7 +403,11 @@ namespace IhildaWallet
 				}
 #endif
 				try {
-					orderSubmittedEventArgs.RippleOfferTransaction.SignLocalRippled (rippleSeedAddress);
+					string signature = orderSubmittedEventArgs.RippleOfferTransaction.SignLocalRippled (rippleSeedAddress);
+					if (signature == null) {
+						orderSubmittedEventArgs.Unrecoverable = true;
+						orderSubmittedEventArgs.Success = false;
+					}
 				} catch (Exception ex) {
 #if DEBUG
 					if (DebugIhildaWallet.OrderSubmitter) {
@@ -367,7 +433,7 @@ namespace IhildaWallet
 #endif
 
 					Logging.WriteLog (stringBuilder.ToString ());
-					MessageDialog.ShowMessage ( tites, stringBuilder.ToString ());
+					MessageDialog.ShowMessage (tites, stringBuilder.ToString ());
 
 					orderSubmittedEventArgs.Success = false;
 					orderSubmittedEventArgs.Unrecoverable = true;
@@ -380,7 +446,9 @@ namespace IhildaWallet
 					Logging.WriteLog ("Signed rpc");
 				}
 #endif
-			} else {
+
+				break;
+			case "RippleLibSharp":
 
 #if DEBUG
 				if (DebugIhildaWallet.OrderSubmitter) {
@@ -391,7 +459,15 @@ namespace IhildaWallet
 
 				try {
 					orderSubmittedEventArgs.RippleOfferTransaction.Sign (rippleSeedAddress);
+
 				} catch (Exception e) {
+
+#if DEBUG
+					if (DebugIhildaWallet.OrderSubmitter) {
+						Logging.ReportException (method_sig, e);
+					}
+#endif
+
 
 					orderSubmittedEventArgs.Unrecoverable = true;
 					orderSubmittedEventArgs.Success = false;
@@ -403,6 +479,40 @@ namespace IhildaWallet
 				}
 #endif
 
+				break;
+			case "RippleDotNet":
+#if DEBUG
+				if (DebugIhildaWallet.OrderSubmitter) {
+					Logging.WriteLog ("Signing using RippleDotNet");
+				}
+
+#endif
+
+				try {
+					orderSubmittedEventArgs.RippleOfferTransaction.SignRippleDotNet (rippleSeedAddress);
+
+				} catch (Exception e) {
+
+#if DEBUG
+					if (DebugIhildaWallet.OrderSubmitter) {
+						Logging.ReportException (method_sig, e);
+					}
+#endif
+
+
+					orderSubmittedEventArgs.Unrecoverable = true;
+					orderSubmittedEventArgs.Success = false;
+					return orderSubmittedEventArgs;
+				}
+#if DEBUG
+				if (DebugIhildaWallet.OrderSubmitter) {
+					Logging.WriteLog ("Signed RippleDotNet");
+				}
+#endif
+
+				break;
+			default:
+				throw new NotSupportedException ("Invalid sign option " + orderSubmittedEventArgs.signOptions.SigningLibrary);
 			}
 
 			Task<Response<RippleSubmitTxResult>> task = null; // order submit task
@@ -1141,8 +1251,8 @@ namespace IhildaWallet
 
 			AutomatedOrder ao = AutomatedOrder.ReconsctructFromTransaction (offerTransaction);
 			AccountSequenceCache sequenceCache = AccountSequenceCache.GetCacheForAccount (offerTransaction.Account);
-			//sequenceCache.UpdateOrdersCache (ao);
-			sequenceCache.UpdateAndSave (ao);
+			sequenceCache.UpdateOrdersCache (ao);
+			//sequenceCache.UpdateAndSave (ao);
 			return verifyEventArgs;
 		}
 
@@ -1155,8 +1265,18 @@ namespace IhildaWallet
 				RippleOfferTransaction = offerTransaction
 			};
 
+			if (offerTransaction == null) {
+				verifyEventArgs.Message = "offerTransaction == null\n";
+				return verifyEventArgs;
+			}
+
+			if (offerTransaction.hash == null) {
+				return verifyEventArgs;
+			}
+
 			token.WaitHandle.WaitOne (1000);
 			//Thread.Sleep (1000);
+
 			Logging.WriteLog ("Validating Tx\n");
 			//Thread.Sleep (2000);
 			token.WaitHandle.WaitOne (2000);
@@ -1168,55 +1288,79 @@ namespace IhildaWallet
 				token.WaitHandle.WaitOne (3000);
 				//Thread.Sleep (3000);
 
-				Tuple<string, uint> tuple = ServerInfo.GetFeeAndLedgerSequence (networkInterface, token);
+
 
 				Task<Response<RippleTransaction>> task = tx.GetRequest (offerTransaction.hash, networkInterface, token);
+
+
+				Tuple<string, uint> tuple = ServerInfo.GetFeeAndLedgerSequence (networkInterface, token);
+
 				if (task == null) {
 					// TODO Debug
-					Logging.WriteLog ("Error : task == null");
-					MessageDialog.ShowMessage ("Error : task == null");
+					string msg = "Error : task == null\n";
+					Logging.WriteLog (msg);
+					MessageDialog.ShowMessage (msg);
+					verifyEventArgs.Message = msg;
+
+					OnVerifyTxMessage?.Invoke (this, verifyEventArgs);
 					//Thread.Sleep (3000);
-					continue;
+					goto End;
 				}
 
+				task.Wait (1000 * 60 * 1, token);
 
-				task.Wait (token);
+				//if () {
+
+				//}
 
 				Response<RippleTransaction> response = task.Result;
 				if (response == null) {
-					Logging.WriteLog ("Error : response == null");
-					continue;
+
+					verifyEventArgs.Message = "Error : response == null\n";
+					Logging.WriteLog (verifyEventArgs.Message);
+					OnVerifyTxMessage?.Invoke (this, verifyEventArgs);
+					goto End;
 				}
 				RippleTransaction transaction = response.result;
 
 				if (transaction == null) {
-					Logging.WriteLog ("Error : transaction == null");
-					continue;
+					verifyEventArgs.Message = "Error : transaction == null\n";
+					Logging.WriteLog (verifyEventArgs.Message);
+					OnVerifyTxMessage?.Invoke (this, verifyEventArgs);
+					goto End;
 				}
 
 				if (transaction.validated != null && (bool)transaction.validated) {
 
-					Logging.WriteLog ("Validated");
+
+					verifyEventArgs.Message = "Validated\n";
+					Logging.WriteLog (verifyEventArgs.Message);
 					verifyEventArgs.Success = true;
+					//OnVerifyTxMessage?.Invoke (this, verifyEventArgs);
 					return verifyEventArgs;
 
 				}
 
-				if (tuple.Item2 > offerTransaction.LastLedgerSequence) {
+				
+				End:
 
-					Logging.WriteLog ("failed to validate before LastLedgerSequence exceeded");
+				
+				if ( tuple != null && tuple.Item2 > offerTransaction.LastLedgerSequence) {
 
+					verifyEventArgs.Message = "failed to validate before LastLedgerSequence exceeded\n";
+					Logging.WriteLog (verifyEventArgs.Message);
+					OnVerifyTxMessage?.Invoke (this, verifyEventArgs);
 					return verifyEventArgs;
 				}
 
 
-
-				Logging.WriteLog ("Not validated yet ");
+				verifyEventArgs.Message = "Tx " + offerTransaction.hash + "Not validated yet\n";
+				Logging.WriteLog (verifyEventArgs.Message);
 
 			}
 
 
-			Logging.WriteLog ("Max validation attempts exceeded");
+			Logging.WriteLog ("Max validation attempts exceeded\n");
 			return verifyEventArgs;
 
 		}
@@ -1236,6 +1380,8 @@ namespace IhildaWallet
 		public event EventHandler<OrderSubmittedEventArgs> OnOrderSubmitted;
 
 		public event EventHandler<VerifyEventArgs> OnVerifyingTxBegin;
+
+		public event EventHandler<VerifyEventArgs> OnVerifyTxMessage;
 
 		public event EventHandler<VerifyEventArgs> OnVerifyingTxReturn;
 
@@ -1258,7 +1404,13 @@ namespace IhildaWallet
 			get;
 			set;
 		}
+
+		public string Message {
+			get;
+			set;
+		}
 	}
+
 
 	public class OrderSubmittedEventArgs : EventArgs
 	{

@@ -40,14 +40,34 @@ namespace RippleLibSharp.Transactions.TxTypes
 			return rbo;
 		}
 
+		public override string GetJsonTxDotNet ()
+		{
+			string s = "{\"TransactionType\": \"OfferCancel\"," +
+				"\"Account\": \"" + Account + "\"," +
+				"\"Fee\": " + fee.ToJsonString () + "," +
+				//"\"Flags\": " + flags.ToString() + "," + 
+				"\"LastLedgerSequence\": " + this.LastLedgerSequence.ToString () + "," +
+
+
+				"\"Sequence\": " + Sequence.ToString () + "," +
+				"\"OfferSequence\": " + OfferSequence.ToString () + "" +
+				//"\"OfferSequence\": " + hash.ToString () + "" +
+				"}";
+
+			return s;
+		}
+
 		public override string GetJsonTx () {
 			string s = "'{\"TransactionType\": \"OfferCancel\"," + 
 				"\"Account\": \"" + Account + "\"," + 
 				"\"Fee\": " + fee.ToJsonString() + "," + 
 				//"\"Flags\": " + flags.ToString() + "," + 
 				"\"LastLedgerSequence\": " + this.LastLedgerSequence.ToString() + "," +
+				
+				
 				"\"Sequence\": " + Sequence.ToString() + "," + 
-				"\"OfferSequence\": " + OfferSequence.ToString() + "" + 
+				"\"OfferSequence\": " + OfferSequence.ToString() + "" +
+				//"\"OfferSequence\": " + hash.ToString () + "" +
 				"}'";
 
 			return s;

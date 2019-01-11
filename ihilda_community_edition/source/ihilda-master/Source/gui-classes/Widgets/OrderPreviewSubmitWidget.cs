@@ -1461,7 +1461,7 @@ namespace IhildaWallet
 
 				string approvedFee = tx.fee.ToString ();
 
-				if (opts.UseLocalRippledRPC) {
+				if (opts.SigningLibrary == "Rippled") {
 					stringBuilder.Clear ();
 					stringBuilder.Append ("Signing using rpc");
 
@@ -1588,7 +1588,7 @@ namespace IhildaWallet
 					);
 
 
-				} else {
+				} else if (opts.SigningLibrary == "RippleLibSharp") {
 
 					string rlsstr = "Signing using RippleLibSharp";
 
@@ -1616,6 +1616,8 @@ namespace IhildaWallet
 					);
 
 					try {
+
+						//tx.SignRippleDotNet (rsa);
 						tx.Sign (rsa);
 					} catch (Exception exception) {
 
@@ -1648,6 +1650,87 @@ namespace IhildaWallet
 
 					string sgnstr = "Signed RippleLibSharp";
 					this.SetStatus (index.ToString (), sgnstr , Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					
+					stringBuilder.Clear ();
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"green\">");
+					}
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (sgnstr);
+					stringBuilder.Append ("</span>");
+
+					string ms13 = stringBuilder.ToString ();
+					Application.Invoke (
+						delegate {
+							label2.Markup = ms13;
+							label2.Visible = true;
+
+						}
+					);
+				} else if (opts.SigningLibrary == "RippleDotNet") {
+
+					string rlsstr = "Signing using RippleDotNet";
+
+					this.SetStatus (index.ToString (), rlsstr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+
+					stringBuilder.Clear ();
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"green\">");
+					}
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (rlsstr);
+					stringBuilder.Append ("</span>");
+
+					string ms11 = stringBuilder.ToString ();
+					Application.Invoke (
+						delegate {
+
+							label2.Markup = ms11;
+							label2.Visible = true;
+
+						}
+					);
+
+					try {
+
+						tx.SignRippleDotNet (rsa);
+						//tx.Sign (rsa);
+					} catch (Exception exception) {
+
+#if DEBUG
+						if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
+							Logging.ReportException (method_sig, exception);
+						}
+#endif
+
+						string errrls = "Error signing using RippleDotNet";
+						this.SetStatus (index.ToString (), errrls, TextHighlighter.RED);
+
+						stringBuilder.Clear ();
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+						stringBuilder.Append (txAtIndexStr);
+						stringBuilder.Append (errrls);
+						stringBuilder.Append ("</span>");
+
+						string ms12 = stringBuilder.ToString ();
+
+						Application.Invoke (
+							delegate {
+								label2.Markup = ms12;
+								label2.Visible = true;
+
+							}
+						);
+						return false;
+					}
+
+					string sgnstr = "Signed RippleDotNet";
+					this.SetStatus (index.ToString (), sgnstr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 					stringBuilder.Clear ();
 					if (Program.darkmode) {
@@ -2880,7 +2963,32 @@ namespace IhildaWallet
 
 			AllSubmitted = false;
 
+			SoundSettings settings = SoundSettings.LoadSoundSettings ();
+			SoundPlayer onTxFailPlayer = null;
+			SoundPlayer onSumitPlayer = null;
 
+			if (settings.HasOnTxFail && settings.OnTxFail != null) {
+
+				Task.Run (delegate {
+
+					onTxFailPlayer = new SoundPlayer (settings.OnTxFail);
+					onTxFailPlayer.Load ();
+
+				});
+
+			}
+			
+
+			if (settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
+
+				Task.Run (delegate {
+
+					onSumitPlayer = new SoundPlayer (settings.OnTxSubmit);
+					onSumitPlayer.Load ();
+					
+				});
+
+			}
 
 
 
@@ -3105,7 +3213,7 @@ namespace IhildaWallet
 			double progressStep = 0.9 / _offers.Length;
 
 
-			SoundSettings settings = SoundSettings.LoadSoundSettings ();
+
 
 			for (int index = 0; index < _offers.Length; index++) {
 
@@ -3134,24 +3242,14 @@ namespace IhildaWallet
 				if (!suceeded) {
 					if (settings.HasOnTxFail && settings.OnTxFail != null) {
 
-						Task.Run (delegate {
-
-							SoundPlayer player = new SoundPlayer (settings.OnTxFail);
-							player.Load ();
-							player.Play ();
-						});
+						Task.Run ((System.Action)onTxFailPlayer.Play);
 
 					}
 					return;
 				} else {
 					if (settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
 
-						Task.Run (delegate {
-
-							SoundPlayer player = new SoundPlayer (settings.OnTxSubmit);
-							player.Load ();
-							player.Play ();
-						});
+						Task.Run ((System.Action)onSumitPlayer.Play);
 
 					}
 				}

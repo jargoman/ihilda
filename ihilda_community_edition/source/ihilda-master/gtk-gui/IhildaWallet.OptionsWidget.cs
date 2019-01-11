@@ -158,7 +158,7 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 4;
+			this.notebook1.CurrentPage = 0;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.splashoptionswidget1 = new global::IhildaWallet.SplashOptionsWidget();
 			this.splashoptionswidget1.Events = ((global::Gdk.EventMask)(256));
@@ -167,7 +167,7 @@ namespace IhildaWallet
 			// Notebook tab
 			this.label16 = new global::Gtk.Label();
 			this.label16.Name = "label16";
-			this.label16.LabelProp = global::Mono.Unix.Catalog.GetString("<u>Splash Settings</u>");
+			this.label16.LabelProp = global::Mono.Unix.Catalog.GetString("Splash");
 			this.label16.UseMarkup = true;
 			this.notebook1.SetTabLabel(this.splashoptionswidget1, this.label16);
 			this.label16.ShowAll();
@@ -181,7 +181,7 @@ namespace IhildaWallet
 			// Notebook tab
 			this.label2 = new global::Gtk.Label();
 			this.label2.Name = "label2";
-			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString("<u>Xrp Fee Options</u>");
+			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString("Xrp Fee");
 			this.label2.UseMarkup = true;
 			this.notebook1.SetTabLabel(this.feeoptionswidget1, this.label2);
 			this.label2.ShowAll();
@@ -210,7 +210,7 @@ namespace IhildaWallet
 			// Notebook tab
 			this.label9 = new global::Gtk.Label();
 			this.label9.Name = "label9";
-			this.label9.LabelProp = global::Mono.Unix.Catalog.GetString("OrderBook Options");
+			this.label9.LabelProp = global::Mono.Unix.Catalog.GetString("OrderBook");
 			this.notebook1.SetTabLabel(this.orderbookoptionswidget1, this.label9);
 			this.label9.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
@@ -221,7 +221,7 @@ namespace IhildaWallet
 			this.checkbutton13 = new global::Gtk.CheckButton();
 			this.checkbutton13.CanFocus = true;
 			this.checkbutton13.Name = "checkbutton13";
-			this.checkbutton13.Label = global::Mono.Unix.Catalog.GetString("Play default fallback sounds");
+			this.checkbutton13.Label = global::Mono.Unix.Catalog.GetString("Play fallback notification where none specified");
 			this.checkbutton13.Active = true;
 			this.checkbutton13.DrawIndicator = true;
 			this.checkbutton13.UseUnderline = true;
