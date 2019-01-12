@@ -401,8 +401,8 @@ namespace RippleLibSharp.Transactions.TxTypes
 			
 			SignedTx signedtx = TxSigner.SignJson (o, seed.GetHumanReadableIdentifier ());
 
-			this.SignedTransactionBlob = signedtx.TxBlob;
-
+			this.SignedTransactionBlob = signedtx?.TxBlob;
+			this.hash = signedtx?.Hash;
 			
 			return this.SignedTransactionBlob;
 		}

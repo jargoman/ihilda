@@ -311,6 +311,9 @@ namespace IhildaWallet
 			string method_sig = clsstr + nameof (_SubmitOrder) + DebugRippleLibSharp.both_parentheses;
 #endif
 
+			if (order == null) {
+				throw new ArgumentNullException ();
+			}
 
 			// object used to collect the information regarding an order submit attempt
 	    		
@@ -407,6 +410,7 @@ namespace IhildaWallet
 					if (signature == null) {
 						orderSubmittedEventArgs.Unrecoverable = true;
 						orderSubmittedEventArgs.Success = false;
+						return orderSubmittedEventArgs;
 					}
 				} catch (Exception ex) {
 #if DEBUG
@@ -458,7 +462,12 @@ namespace IhildaWallet
 #endif
 
 				try {
-					orderSubmittedEventArgs.RippleOfferTransaction.Sign (rippleSeedAddress);
+					string signature = orderSubmittedEventArgs.RippleOfferTransaction.Sign (rippleSeedAddress);
+					if (signature == null) {
+						orderSubmittedEventArgs.Unrecoverable = true;
+						orderSubmittedEventArgs.Success = false;
+						return orderSubmittedEventArgs;
+					}
 
 				} catch (Exception e) {
 
@@ -489,7 +498,13 @@ namespace IhildaWallet
 #endif
 
 				try {
-					orderSubmittedEventArgs.RippleOfferTransaction.SignRippleDotNet (rippleSeedAddress);
+					string signature = orderSubmittedEventArgs.RippleOfferTransaction.SignRippleDotNet (rippleSeedAddress);
+					if (signature == null) {
+						orderSubmittedEventArgs.Unrecoverable = true;
+						orderSubmittedEventArgs.Success = false;
+						return orderSubmittedEventArgs;
+					}
+		    		
 
 				} catch (Exception e) {
 
@@ -502,6 +517,7 @@ namespace IhildaWallet
 
 					orderSubmittedEventArgs.Unrecoverable = true;
 					orderSubmittedEventArgs.Success = false;
+					
 					return orderSubmittedEventArgs;
 				}
 #if DEBUG
@@ -520,8 +536,8 @@ namespace IhildaWallet
 			try {
 				orderSubmittedEventArgs.submit_attempts++;
 				task = NetworkController.UiTxNetworkSubmit (
-					orderSubmittedEventArgs.RippleOfferTransaction, 
-					networkInterface, 
+					orderSubmittedEventArgs.RippleOfferTransaction,
+					networkInterface,
 					token
 				);
 
@@ -541,7 +557,7 @@ namespace IhildaWallet
 				int maxseconds = 60 * 3; // 3 minutes max wait
 
 				int faults = 0;
-				for (int seconds = 0;  !task.IsCanceled && !task.IsCompleted && !task.IsFaulted && !token.IsCancellationRequested && seconds < maxseconds; seconds++) {
+				for (int seconds = 0; !task.IsCanceled && !task.IsCompleted && !task.IsFaulted && !token.IsCancellationRequested && seconds < maxseconds; seconds++) {
 					task.Wait (1000, token);
 
 					if (seconds == 30) {  // after 30 seconds check to see what's going on by starting a verification task
@@ -560,7 +576,7 @@ namespace IhildaWallet
 							}
 
 							var v = verifyTask.Result;
-							orderSubmittedEventArgs.Success = v.Success; 
+							orderSubmittedEventArgs.Success = v.Success;
 							return orderSubmittedEventArgs;
 						}
 
@@ -585,9 +601,18 @@ namespace IhildaWallet
 
 					}
 
-					
+
 
 				}
+
+			} catch (NullReferenceException nullEx) {
+
+#if DEBUG
+				Logging.ReportException (method_sig, nullEx);
+#endif
+				orderSubmittedEventArgs.Unrecoverable = false;
+				orderSubmittedEventArgs.Success = false;
+				return orderSubmittedEventArgs;
 
 			} catch (Exception e) {
 
@@ -596,8 +621,7 @@ namespace IhildaWallet
 				Logging.WriteLog (e.Message);
 
 #endif
-				//orderSubmittedEventArgs.Success = false;
-				//return orderSubmittedEventArgs;
+
 
 				//this.SetResult (index.ToString (), "Network Error", TextHighlighter.RED);
 				if (!paralell) {
@@ -624,7 +648,7 @@ namespace IhildaWallet
 					orderSubmittedEventArgs.Unrecoverable = false;
 					return orderSubmittedEventArgs;
 				}
-					
+
 			}
 
 			orderSubmittedEventArgs.response = task?.Result;
@@ -1245,6 +1269,10 @@ namespace IhildaWallet
 
 		private VerifyEventArgs VerifyTx ( RippleOfferTransaction offerTransaction, NetworkInterface networkInterface, CancellationToken token )
 		{
+
+			if (offerTransaction == null) {
+				throw new ArgumentNullException (nameof (offerTransaction));
+			}
 			VerifyEventArgs verifyEventArgs = _VerifyTx (offerTransaction, networkInterface, token);
 
 			OnVerifyingTxReturn?.Invoke (this, verifyEventArgs);
@@ -1271,7 +1299,10 @@ namespace IhildaWallet
 			}
 
 			if (offerTransaction.hash == null) {
-				return verifyEventArgs;
+
+				throw new ArgumentNullException ("Hash MUST be set to sign transactions!!");
+
+				//return verifyEventArgs;
 			}
 
 			token.WaitHandle.WaitOne (1000);
