@@ -6804,6 +6804,7 @@ drops</property>
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
                         <property name="Label" translatable="yes">from secret</property>
+                        <property name="Active">True</property>
                         <property name="DrawIndicator">True</property>
                         <property name="HasLabel">True</property>
                         <property name="UseUnderline">True</property>
@@ -14241,7 +14242,7 @@ example: USD/CAD</property>
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Window" id="IhildaWallet.FilledRuleManagementWindow" design-size="804 420">
+  <widget class="Gtk.Window" id="IhildaWallet.FilledRuleManagementWindow" design-size="1081 534">
     <property name="MemberName" />
     <property name="Title" translatable="yes">Filled Rule Management </property>
     <property name="WindowPosition">CenterOnParent</property>
@@ -14323,7 +14324,7 @@ example: USD/CAD</property>
                   <widget class="Gtk.Notebook" id="notebook1">
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
-                    <property name="CurrentPage">2</property>
+                    <property name="CurrentPage">1</property>
                     <child>
                       <widget class="Gtk.VBox" id="vbox5">
                         <property name="MemberName" />
@@ -14693,7 +14694,7 @@ Bot output screen
                               </packing>
                             </child>
                             <child>
-                              <widget class="Gtk.CheckButton" id="checkbutton2">
+                              <widget class="Gtk.CheckButton" id="stopWhenConvenientCheckbutton">
                                 <property name="MemberName" />
                                 <property name="Visible">False</property>
                                 <property name="CanFocus">True</property>

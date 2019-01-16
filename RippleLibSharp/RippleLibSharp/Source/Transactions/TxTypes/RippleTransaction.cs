@@ -254,6 +254,16 @@ namespace RippleLibSharp.Transactions.TxTypes
 			set;
 		}
 
+		public bool? signed {
+			get;
+			set;
+		}
+
+		public bool? submitted {
+			get;
+			set;
+		}
+
 		/*
 		public string PreviousTxnId {
 
@@ -341,6 +351,8 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 			this.SignedTransactionBlob = blob;
 
+			signed = true;
+
 			return blob;
 		}
 
@@ -381,6 +393,8 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 			Logging.WriteLog ("blob = " + this.SignedTransactionBlob);
 
+			signed = true;
+
 			return this.SignedTransactionBlob;
 
 		}
@@ -403,7 +417,9 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 			this.SignedTransactionBlob = signedtx?.TxBlob;
 			this.hash = signedtx?.Hash;
-			
+
+			signed = true;
+
 			return this.SignedTransactionBlob;
 		}
 

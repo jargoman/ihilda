@@ -71,7 +71,7 @@ namespace IhildaWallet.Networking
 
 			//stringBuilder.Append (coninf.);
 
-			CurrentInterface.onOpen += delegate {
+			CurrentInterface.OnOpen += delegate {
 
 
 
@@ -98,7 +98,7 @@ namespace IhildaWallet.Networking
 
 			};
 
-			CurrentInterface.onClose += delegate {
+			CurrentInterface.OnClose += delegate {
 				
 				ConnectAttemptInfo conf = CurrentInterface.GetConnectAttemptInfo ();
 
@@ -111,7 +111,8 @@ namespace IhildaWallet.Networking
 				Logging.WriteBoth (stringBuilder.ToString ());
 			};
 
-			CurrentInterface.onError += delegate {
+
+			CurrentInterface.OnError += delegate {
 				ConnectAttemptInfo conf = CurrentInterface.GetConnectAttemptInfo ();
 				StringBuilder stringBuilder = new StringBuilder ();
 
@@ -126,7 +127,7 @@ namespace IhildaWallet.Networking
 
 
 
-			CurrentInterface.onMessage += ( object sender, WebSocket4Net.MessageReceivedEventArgs e ) => {
+			CurrentInterface.OnMessage += ( object sender, WebSocket4Net.MessageReceivedEventArgs e ) => {
 				ConnectAttemptInfo conf = CurrentInterface?.GetConnectAttemptInfo();
 				StringBuilder stringBuilder = new StringBuilder();
 

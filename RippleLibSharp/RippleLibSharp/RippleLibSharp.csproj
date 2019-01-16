@@ -575,6 +575,7 @@
     </Reference>
     <Reference Include="SuperSocket.ClientEngine">
       <HintPath>..\packages\SuperSocket.ClientEngine.Core.0.10.0\lib\net45\SuperSocket.ClientEngine.dll</HintPath>
+      <Aliases>SuperManSocket</Aliases>
     </Reference>
     <Reference Include="System.Configuration" />
     <Reference Include="WebSocket4Net">

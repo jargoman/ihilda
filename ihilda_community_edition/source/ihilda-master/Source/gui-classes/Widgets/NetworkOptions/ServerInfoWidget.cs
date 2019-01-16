@@ -45,7 +45,7 @@ namespace IhildaWallet
 
 			this.ClearUI ();
 			//ni.onOpen += new NetworkInterface.connectEventHandler (connectionOpened);
-			ni.onOpen += ConnectionOpened;
+			ni.OnOpen += ConnectionOpened;
 
 
 

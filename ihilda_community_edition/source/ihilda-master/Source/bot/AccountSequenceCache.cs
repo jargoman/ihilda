@@ -486,6 +486,10 @@ namespace IhildaWallet
 				if (ords == null) {
 					return;
 				}
+
+				this.Orders = ords.ToArray ();
+
+				/*
 				int count = ords.Count ();
 
 				var it = ords.GetEnumerator ();
@@ -499,6 +503,8 @@ namespace IhildaWallet
 					Orders [i] = it.Current;
 
 				}
+				
+				*/			
 
 			}
 

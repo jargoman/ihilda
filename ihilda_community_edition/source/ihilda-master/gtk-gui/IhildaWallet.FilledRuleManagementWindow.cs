@@ -84,7 +84,7 @@ namespace IhildaWallet
 
 		private global::Gtk.Button deleteordersbutton;
 
-		private global::Gtk.CheckButton checkbutton2;
+		private global::Gtk.CheckButton stopWhenConvenientCheckbutton;
 
 		private global::Gtk.Label label5;
 
@@ -159,7 +159,7 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 2;
+			this.notebook1.CurrentPage = 1;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.vbox5 = new global::Gtk.VBox();
 			this.vbox5.Name = "vbox5";
@@ -430,14 +430,14 @@ namespace IhildaWallet
 			w33.Expand = false;
 			w33.Fill = false;
 			// Container child hbox3.Gtk.Box+BoxChild
-			this.checkbutton2 = new global::Gtk.CheckButton();
-			this.checkbutton2.CanFocus = true;
-			this.checkbutton2.Name = "checkbutton2";
-			this.checkbutton2.Label = global::Mono.Unix.Catalog.GetString("Stop When Convenient");
-			this.checkbutton2.DrawIndicator = true;
-			this.checkbutton2.UseUnderline = true;
-			this.hbox3.Add(this.checkbutton2);
-			global::Gtk.Box.BoxChild w34 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.checkbutton2]));
+			this.stopWhenConvenientCheckbutton = new global::Gtk.CheckButton();
+			this.stopWhenConvenientCheckbutton.CanFocus = true;
+			this.stopWhenConvenientCheckbutton.Name = "stopWhenConvenientCheckbutton";
+			this.stopWhenConvenientCheckbutton.Label = global::Mono.Unix.Catalog.GetString("Stop When Convenient");
+			this.stopWhenConvenientCheckbutton.DrawIndicator = true;
+			this.stopWhenConvenientCheckbutton.UseUnderline = true;
+			this.hbox3.Add(this.stopWhenConvenientCheckbutton);
+			global::Gtk.Box.BoxChild w34 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.stopWhenConvenientCheckbutton]));
 			w34.Position = 5;
 			this.vbox4.Add(this.hbox3);
 			global::Gtk.Box.BoxChild w35 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hbox3]));
@@ -468,10 +468,10 @@ namespace IhildaWallet
 			{
 				this.Child.ShowAll();
 			}
-			this.DefaultWidth = 804;
-			this.DefaultHeight = 420;
+			this.DefaultWidth = 1081;
+			this.DefaultHeight = 534;
 			this.canselbutton.Hide();
-			this.checkbutton2.Hide();
+			this.stopWhenConvenientCheckbutton.Hide();
 			this.Show();
 		}
 	}

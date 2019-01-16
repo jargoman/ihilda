@@ -1,10 +1,12 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default" NuGet.AddPackagesDialog.IncludePrerelease="True">
   <MonoDevelop.Ide.ItemProperties.RippleLibSharp PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Source/bot/OrderSubmitter.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/bot/AccountSequenceCache.cs">
     <Files>
-      <File FileName="Source/bot/OrderSubmitter.cs" Line="27" Column="3" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Transactions/TxTypes/RippleTransaction.cs" Line="405" Column="15" />
-      <File FileName="Source/gui-classes/Widgets/OrderPreviewSubmitWidget.cs" Line="2219" Column="11" />
+      <File FileName="Source/bot/OrderSubmitter.cs" Line="149" Column="26" />
+      <File FileName="Source/bot/AccountSequenceCache.cs" Line="83" Column="6" />
+      <File FileName="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs" Line="1603" Column="34" />
+      <File FileName="Source/bot/OrderManagementBot.cs" Line="251" Column="6" />
+      <File FileName="Source/bot/AutomatedOrder.cs" Line="200" Column="37" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
@@ -12,6 +14,7 @@
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/Source/Unit-Testing/RLSTest.cs" line="263" column="1" />
+      <Breakpoint file="/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/Source/bot/AccountSequenceCache.cs" relfile="Source/bot/AccountSequenceCache.cs" line="145" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MultiItemStartupConfigurations />

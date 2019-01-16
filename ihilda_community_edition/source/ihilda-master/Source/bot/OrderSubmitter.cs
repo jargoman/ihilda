@@ -144,7 +144,7 @@ namespace IhildaWallet
 
 							}
 
-							task.Wait ();
+							task.Wait (6000);
 
 							if (order.IsValidated) {
 								continue;
@@ -171,17 +171,22 @@ namespace IhildaWallet
 					}
 
 					token.WaitHandle.WaitOne (20);
-					Task.WaitAll ( taskList.ToArray () ); // this is outside the for loop and waits on al 
+					Task.WaitAll ( taskList.ToArray () ); // this is outside the for loop and waits on all
 
 					ords = ords.Where ((AutomatedOrder arg) => !arg.IsValidated);
 
 				} while (ords.Any());
 
 				var acc = rw.GetStoredReceiveAddress ();
-				if (acc != null) {
-					AccountSequenceCache accountSequenceCache = AccountSequenceCache.GetCacheForAccount (acc);
-					accountSequenceCache?.Save ();
-				}
+
+				Task.Run ( delegate {
+					if (acc != null) {
+						AccountSequenceCache accountSequenceCache = AccountSequenceCache.GetCacheForAccount (acc);
+						accountSequenceCache?.Save ();
+					}
+
+				});
+
 
 			
 

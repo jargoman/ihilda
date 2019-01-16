@@ -868,7 +868,7 @@ namespace IhildaWallet
 
 			int c = val.Length;
 
-			string sp1 = "<span fgcolor=\"green\" ><b><u>";
+			string sp1 = "<span fgcolor=\"green\"><b><u>";
 			string sp2 = "</u></b></span>";
 
 			string sp3 ="<span fgcolor=\"chartreuse\" ><b><u>";

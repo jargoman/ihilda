@@ -58,11 +58,18 @@ namespace IhildaWallet
 
 			LedgerTracker.OnLedgerClosed += (object sender, LedgerClosed e) => {
 				Gtk.Application.Invoke (delegate {
-					string str = e.ledger_index.ToString ();
+
+					string str = e?.ledger_index.ToString ();
+
+					if (str == null) {
+						ledgerlabel.Markup = "<span fgcolor=\"red\">null</span>";
+					}
+
 					ledgerlabel.Markup = 
-						(string)(Program.darkmode ? "<span fgcolor=\"chartreuse\">" : "<span fgcolor=\"green\">") + 
-						 str + 
-						"</span>";
+						(string)
+						(Program.darkmode ? "<span fgcolor=\"chartreuse\">" : "<span fgcolor=\"green\">") 
+						+ str 
+	    					+ "</span>";
 				});
 
 			};

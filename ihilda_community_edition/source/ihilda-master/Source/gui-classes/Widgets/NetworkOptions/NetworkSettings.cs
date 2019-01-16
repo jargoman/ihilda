@@ -14,6 +14,7 @@ using IhildaWallet;
 using IhildaWallet.Networking;
 using RippleLibSharp.Util;
 
+
 namespace IhildaWallet
 {
 	[System.ComponentModel.ToolboxItem (true)]
@@ -192,13 +193,13 @@ namespace IhildaWallet
 
 			};
 
-			ni.onMessage += onMessageEvent;
+			ni.OnMessage += onMessageEvent;
 
 
-			ni.onOpen += onOpenEvent;
+			ni.OnOpen += onOpenEvent;
 
 
-			ni.onClose += (object sender, EventArgs e) => {
+			ni.OnClose += (object sender, EventArgs e) => {
 				// 
 #if DEBUG
 				if (DebugIhildaWallet.NetworkSettings) {
@@ -218,31 +219,55 @@ namespace IhildaWallet
 			//ni.onClose += this.onCloseEvent;
 
 
-			this.onErrorEvent += (object sender, EventArgs e) => {
+
+			this.onErrorEvent += (SuperSocket.ClientEngine.ErrorEventArgs e) => {
+				if (
+					e.Exception.Message.Equals ("RemoteCertificateChainErrors")
+					|| e.Exception.Message.Equals ("RemoteCertificateNotAvailable")) {
+
+					//if (e.Exception.Message.Equals ("RemoteCertificateNotAvailable")) {
+
+					String message = "\nUnable to establish an ssl connection, you need to install the servers ssl security certificate\n" +
+					    "Example # certmgr --ssl " +
+						 ///* url + 
+						"  ( using the command line of your local operating system terminal/cmd.exe ect )\n\n" +
+					    "if that doesn't work try importing mozilla's certificate store" +
+					    "Example# mozroots --import --sync \n";
+
+					//MainWindow.currentInstance
+
+#if DEBUG
+					if (DebugRippleLibSharp.NetworkInterface) {
+						Logging.WriteLog (message);
+						//Logging.WriteLog ("should print" + e.Exception.Message);
+						Logging.WriteLog ("should print" + e.Exception.Message);
+					}
+#endif
+
+
+					MessageDialog.ShowMessage (message);
+					//return;
+				}
+
+
+
 #if DEBUG
 				if (DebugIhildaWallet.NetworkSettings) {
-					Logging.WriteLog ( method_sig + DebugRippleLibSharp.colon + nameof (this.onErrorEvent) + DebugRippleLibSharp.colon + DebugRippleLibSharp.beginn);
+					Logging.WriteLog (method_sig + DebugRippleLibSharp.colon + nameof (this.onErrorEvent) + DebugRippleLibSharp.colon + DebugRippleLibSharp.beginn);
 				}
 #endif
 
 				this.connecteddisplaywidget1.SetDisConnected ();
 				this.serverinfowidget1.SetServerInfo (null);
-
 			};
 
-			//ni.onError += new EventHandler<ErrorEventArgs>(websocket_Error);
 
-
-
-			ni.onError += this.onErrorEvent;
-
-
-			//bool isconnected = ni != null && ni.isConnected () && this.connecteddisplaywidget1 != null;
-			//if (isconnected && this.serverinfowidget1 != null) { this.serverinfowidget1.setServer (ni); }
 			this.serverinfowidget1.SetServer (ni);
 
 
 		}
+
+
 
 		public void SetUIConnectStatus (string serverUrl)
 		{

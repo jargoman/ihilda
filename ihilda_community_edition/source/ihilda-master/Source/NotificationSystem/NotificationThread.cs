@@ -143,7 +143,7 @@ namespace IhildaWallet
 
 					if (rw?.LastKnownLedger == null || rw.LastKnownLedger == 0) {
 
-						rw.Notification = "<span fgcolor=\"blue\">Newly addes wallet</span>";
+						rw.Notification = "<span fgcolor=\"blue\">Newly added wallet</span>";
 						rw.LastKnownLedger = ledger;
 						rw.Save ();
 						WalletManager.currentInstance?.UpdateUI ();

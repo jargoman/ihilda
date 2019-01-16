@@ -176,10 +176,10 @@ namespace IhildaWallet
 			//this.sentimenttreeview.
 
 
-			this.checkbutton2.Clicked += (object sender, EventArgs e) => {
-				this.StopWhenConvenient = checkbutton2.Active;
+			this.stopWhenConvenientCheckbutton.Clicked += (object sender, EventArgs e) => {
+				this.StopWhenConvenient = stopWhenConvenientCheckbutton.Active;
 			};
-			this.StopWhenConvenient = checkbutton2.Active;
+			this.StopWhenConvenient = stopWhenConvenientCheckbutton.Active;
 
 			this.addbutton.Clicked += (object sender, EventArgs e) => {
 				OrderFilledRule rule = RuleCreateDialog.DoDialog ();
@@ -257,8 +257,8 @@ namespace IhildaWallet
 				}
 
 				StopWhenConvenient = false;
-				checkbutton2.Active = false;
-				checkbutton2.Visible = true;
+				stopWhenConvenientCheckbutton.Active = false;
+				stopWhenConvenientCheckbutton.Visible = true;
 
 				Task.Run ((System.Action)AutomateClicked);
 
@@ -548,9 +548,9 @@ namespace IhildaWallet
 			string message =
 			"<span font-size=\"large\"><b>Automation Status </b>: "
 				+
-				(String)(isRunning ?
+				(string)(isRunning ?
 				    (Program.darkmode ? "<span fgcolor=\"chartreuse\">Running</span>" : "<span fgcolor=\"green\">Running</span>") :
-				(Program.darkmode ? "<span fgcolor=\"#FFAABB\">Stopped</span>" : " < span fgcolor=\"red\">Stopped</span>"))
+					(Program.darkmode ? "<span fgcolor=\"#FFAABB\">Stopped</span>" : " < span fgcolor=\"red\">Stopped</span>"))
 		    		+
 		    		"</span>"
 			;
@@ -591,6 +591,7 @@ namespace IhildaWallet
 
 		}
 
+		StringBuilder infoBoxBuffer = new StringBuilder ();
 		public void WriteToInfoBox (string message)
 		{
 			if (message == null) {
@@ -598,10 +599,17 @@ namespace IhildaWallet
 			}
 
 			string msg = message;
+
+			infoBoxBuffer.Append (message);
+
+			if (infoBoxBuffer.Length > 10000) {
+				infoBoxBuffer.Remove (0, infoBoxBuffer.Length - 10000);
+			}
+
 			Application.Invoke (delegate {
 
 				if (label6 != null) {
-					label6.Markup = label6.Text + msg;
+					label6.Markup = infoBoxBuffer.ToString ();
 				}
 
 				if (scrolledwindow1 != null) {
@@ -1234,7 +1242,7 @@ namespace IhildaWallet
 						this.WriteToInfoBox (
 							"Fee " +
 							e?.FeeAndLastLedger?.Item1.ToString () ?? "null" +
-							    " is too high, waiting on lower fee<"
+							    " is too high, waiting on lower fee"
 			    			);
 						break;
 
@@ -1261,18 +1269,17 @@ namespace IhildaWallet
 
 					StringBuilder stringBuilder = new StringBuilder ();
 
+					stringBuilder.AppendLine ();
+					stringBuilder.AppendLine (e.Success ? "Submitted Order Successfully " : "Failed to submit order ");
 
-					if (e.Success) {
-						stringBuilder.Append ("Submitted Order Successfully ");
-						stringBuilder.AppendLine (e?.RippleOfferTransaction?.hash ?? "");
+					stringBuilder.Append ("Sequence : ");
+					stringBuilder.AppendLine (e?.RippleOfferTransaction?.Sequence.ToString() ?? "");
 
-					} else {
-						stringBuilder.Append ("Failed to submit order ");
-						stringBuilder.AppendLine (e?.RippleOfferTransaction?.hash ?? "");
+					stringBuilder.Append ("Hash : ");
+					stringBuilder.AppendLine (e?.RippleOfferTransaction?.hash ?? "");
+					
 
-					}
 
-					//stringBuilder.AppendLine ();
 
 					Application.Invoke (
 						delegate {
@@ -1288,8 +1295,12 @@ namespace IhildaWallet
 
 					StringBuilder stringBuilder = new StringBuilder ();
 
-					stringBuilder.Append ("Verifying transaction ");
-					stringBuilder.Append (e?.RippleOfferTransaction?.hash ?? "");
+					stringBuilder.AppendLine ("\nVerifying transaction ");
+					stringBuilder.Append ("Sequence : ");
+					stringBuilder.AppendLine (e?.RippleOfferTransaction?.Sequence.ToString () ?? "");
+
+					stringBuilder.Append ("Hash : ");
+					stringBuilder.AppendLine (e?.RippleOfferTransaction?.hash ?? "");
 					stringBuilder.AppendLine ();
 
 
@@ -1687,8 +1698,8 @@ namespace IhildaWallet
 
 				Application.Invoke (delegate {
 					progressbar1.Fraction = 0;
-					checkbutton2.Visible = false;
-					checkbutton2.Active = false;
+					stopWhenConvenientCheckbutton.Visible = false;
+					stopWhenConvenientCheckbutton.Active = false;
 					StopWhenConvenient = false;
 				});
 

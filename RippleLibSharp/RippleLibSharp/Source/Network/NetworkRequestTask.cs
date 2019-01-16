@@ -420,7 +420,7 @@ namespace RippleLibSharp.Network
 #endif
 
 #pragma warning disable RECS0154 // Parameter is never used
-			networkInterface.onMessage += delegate (object sender, MessageReceivedEventArgs e) {
+			networkInterface.OnMessage += delegate (object sender, MessageReceivedEventArgs e) {
 #pragma warning restore RECS0154 // Parameter is never used
 				//dynamic DynamicJson.Parse(e.Message);
 #if DEBUG

@@ -185,7 +185,7 @@ namespace IhildaWallet
 
 		//public bool IsValidated { get; set; }
 
-		public volatile bool IsValidated = false;
+		public bool IsValidated = false;
 
 		public static AutomatedOrder ReconstructFromNode (RippleNode node)
 		{

@@ -120,6 +120,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="SuperSocket.ClientEngine">
       <HintPath>packages\SuperSocket.ClientEngine.Core.0.10.0\lib\net45\SuperSocket.ClientEngine.dll</HintPath>
+      <Aliases>SupermanSocket</Aliases>
     </Reference>
     <Reference Include="WebSocket4Net">
       <HintPath>packages\WebSocket4Net.0.14.1\lib\net45\WebSocket4Net.dll</HintPath>
