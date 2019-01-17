@@ -331,8 +331,8 @@ namespace IhildaWallet
 						});*/
 
 
-
-						Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> tuple = 
+						MultipleOrdersSubmitResponse responses =
+						//Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> tuple = 
 							orderSubmitter.SubmitOrders (
 								automatedOrders, 
 								rw, 
@@ -342,13 +342,13 @@ namespace IhildaWallet
 							);
 
 
-						if (tuple == null) {
+						if (responses == null) {
 							// TODO likely unreachable code
 
 							return;
 						}
 
-						if (!tuple.Item1) {
+						if (!responses.Succeeded) {
 							// TODO 
 							WriteToInfoBox ("Submitting orders failed \n");
 							return;

@@ -251,10 +251,25 @@ namespace IhildaWallet
 
 			this.automatebutton.Clicked += (object sender, EventArgs e) => {
 
-				if (tokenSource != null) {
+
+				if (this.tokenSource != null) {
+
+					string srmessage = "A rule script is already running\n";
+					WriteToInfoBox (srmessage);
+					this.SetIsRunningUI (false);
+
+#if DEBUG
+					if (DebugIhildaWallet.FilledRuleManagementWindow) {
+						//Logging.WriteLog (method_sig, srmessage);
+					}
+#endif
+
 					MessageDialog.ShowMessage ("Automation thread is already running");
 					return;
 				}
+
+				
+
 
 				StopWhenConvenient = false;
 				stopWhenConvenientCheckbutton.Active = false;
@@ -370,7 +385,7 @@ namespace IhildaWallet
 
 
 
-						accountSequnceCache.SyncOrdersCache (wallet.GetStoredReceiveAddress (), token);
+						accountSequnceCache.SyncOrdersCache ( token);
 						Application.Invoke (delegate {
 							progressbar1.Pulse ();
 
@@ -592,6 +607,7 @@ namespace IhildaWallet
 		}
 
 		StringBuilder infoBoxBuffer = new StringBuilder ();
+		List<string> lines = new List<string> ();
 		public void WriteToInfoBox (string message)
 		{
 			if (message == null) {
@@ -600,16 +616,28 @@ namespace IhildaWallet
 
 			string msg = message;
 
-			infoBoxBuffer.Append (message);
 
-			if (infoBoxBuffer.Length > 10000) {
-				infoBoxBuffer.Remove (0, infoBoxBuffer.Length - 10000);
-			}
 
 			Application.Invoke (delegate {
 
+
+				lines.Add (message);
+
+				if (lines.Count > 2000) {
+					lines.RemoveAt (0);
+				}
+
+				infoBoxBuffer.Clear ();
+				foreach (String s in lines) {
+
+					infoBoxBuffer.Append (s);
+				}
+
 				if (label6 != null) {
-					label6.Markup = infoBoxBuffer.ToString ();
+					//if (infoBoxBuffer.Length > 0) {
+						label6.Markup = infoBoxBuffer.ToString ();
+					//}
+					
 				}
 
 				if (scrolledwindow1 != null) {
@@ -851,11 +879,11 @@ namespace IhildaWallet
 				this.WriteToInfoBox ("Polling data for " + (rw?.GetStoredReceiveAddress () ?? "null") + "\n");
 				int last = RuleManagerObj.LastKnownLedger;
 				if (strt != null) {
-					this.WriteToInfoBox ("Starting from ledger " + (strt?.ToString () ?? "null") + "\n");
+					this.WriteToInfoBox ("\nStarting from ledger " + (strt?.ToString () ?? "null") + "\n");
 				} else {
 
 
-					this.WriteToInfoBox ("Starting ledger is null\n Using last known ledger " + last + "\n");
+					this.WriteToInfoBox ("\nStarting ledger is null\n Using last known ledger " + last + "\n");
 				}
 
 				if (last == 0) {
@@ -1131,20 +1159,8 @@ namespace IhildaWallet
 #endif
 
 
-
-			if (this.tokenSource != null) {
-
-				string srmessage = "A rule script is already running\n";
-				WriteToInfoBox (srmessage);
-
-#if DEBUG
-				if (DebugIhildaWallet.FilledRuleManagementWindow) {
-					Logging.WriteLog (method_sig, srmessage);
-				}
-#endif
-
-				return;
-			}
+			this.tokenSource = new BotCancellTokenSource () { auto = true };
+			CancellationToken token = tokenSource.Token;
 
 			RippleWallet rw = walletswitchwidget1.GetRippleWallet ();
 			if (rw == null) {
@@ -1216,15 +1232,6 @@ namespace IhildaWallet
 				return;
 			}
 
-			if (this.tokenSource != null) {
-				WriteToInfoBox ( "A rule script is already running\n" );
-				this.SetIsRunningUI (false);
-				return;
-			}
-
-			this.tokenSource = new BotCancellTokenSource () { auto = true };
-
-			CancellationToken token = tokenSource.Token;
 
 			SoundSettings settings = SoundSettings.LoadSoundSettings ();
 
@@ -1456,11 +1463,11 @@ namespace IhildaWallet
 
 					int last = RuleManagerObj.LastKnownLedger;
 					if (strt != null) {
-						this.WriteToInfoBox ("Starting from ledger " + (strt?.ToString () ?? "null") + "\n");
+						this.WriteToInfoBox ("\nStarting from ledger " + (strt?.ToString () ?? "null") + "\n");
 					} else {
 
 
-						this.WriteToInfoBox ("Starting ledger is null\n Using last known ledger " + last + "\n");
+						this.WriteToInfoBox ("\nStarting ledger is null\n Using last known ledger " + last + "\n");
 						if (last == 0) {
 							bool b = AreYouSure.AskQuestion (
 								"Process entire transaction history?",
@@ -1590,17 +1597,17 @@ namespace IhildaWallet
 						progressbar1?.Pulse ();
 					});
 
-					Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> tupleResp = null;
-
+					//Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> tupleResp = null;
+					MultipleOrdersSubmitResponse responses = null;
 
 					bool parallelSubmit = Program.parallelVerify;
 
 					if (!parallelSubmit) {
-						tupleResp = orderSubmitter.SubmitOrders (
+						responses = orderSubmitter.SubmitOrders (
 								orders, rw, rippleSeedAddress, ni, token
 							);
 					} else {
-						tupleResp = orderSubmitter.SubmitOrdersParallel (
+						responses = orderSubmitter.SubmitOrdersParallel (
 								orders, rw, rippleSeedAddress, ni, token
 							);
 					}
@@ -1610,7 +1617,7 @@ namespace IhildaWallet
 						progressbar1?.Pulse ();
 					});
 
-					if (tupleResp == null) {
+					if (responses == null) {
 						// 
 
 						if (settings.HasOnAutomateFail && settings.OnAutomateFail != null) {
@@ -1627,10 +1634,11 @@ namespace IhildaWallet
 						MessageDialog.ShowMessage ("Scripting error", "Application behaved unexpectedly");
 						return;
 					}
-					success = tupleResp.Item1;
+					success = responses.Succeeded;
 					if (!success) {
 						string errMess = "Error submitting orders\n";
 						this.WriteToInfoBox (errMess);
+						this.WriteToInfoBox (responses.Message);
 						//shouldContinue = false;
 
 						if (settings.HasOnAutomateFail && settings.OnAutomateFail != null) {

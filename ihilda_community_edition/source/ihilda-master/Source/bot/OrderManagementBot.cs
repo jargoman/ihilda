@@ -463,11 +463,11 @@ namespace IhildaWallet
 
 			requestTask.Wait (250, token);
 
-			while (!requestTask.IsCompleted) {
+			while (requestTask != null && !requestTask.IsCompleted && !requestTask.IsCanceled && !requestTask.IsFaulted) {
 				try {
 					if (!requestTask.IsCompleted) OnMessage?.Invoke ( this, new MessageEventArgs () { Message = "Waiting on network" });
-					for (int i = 0; i < 10 && !requestTask.IsCompleted; i++) {
-						if (!requestTask.IsCompleted) OnMessage?.Invoke ( this, new MessageEventArgs () { Message = "." });
+					for (int i = 0; i < 10 && !requestTask.IsCompleted && !requestTask.IsCanceled && !requestTask.IsFaulted; i++) {
+						OnMessage?.Invoke ( this, new MessageEventArgs () { Message = "." });
 						requestTask.Wait (1000, token);
 					}
 
@@ -505,10 +505,10 @@ namespace IhildaWallet
 				}
 
 				dataTask.Wait (250, token);
-				while (!dataTask.IsCompleted) {
+				while (dataTask != null && !dataTask.IsCompleted && !dataTask.IsFaulted && !dataTask.IsCompleted) {
 					try {
 						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Waiting on network" });
-						for (int i = 0; i < 10 && !dataTask.IsCompleted; i++) {
+						for (int i = 0; i < 10 && dataTask != null && !dataTask.IsCompleted && !dataTask.IsFaulted && !dataTask.IsCompleted; i++) {
 							OnMessage?.Invoke (this, new MessageEventArgs () { Message = "." });
 							dataTask.Wait (1000, token);
 						}
@@ -552,13 +552,13 @@ namespace IhildaWallet
 				return null;
 			}
 
-			var n = from RippleNodeGroup gr in nodes
+			IEnumerable<RippleNode> n = from RippleNodeGroup gr in nodes
 				where gr.GetNode ().FinalFields != null
 				&& gr.GetNode ().FinalFields.Sequence == targetsequence
 
 				select gr.GetNode ();
 
-			RippleNode p = n.First ();
+			RippleNode p = n.FirstOrDefault ();
 
 			if (p != null) {
 				RoboMem.SetNodeTrace (PreviousTxnID, p);

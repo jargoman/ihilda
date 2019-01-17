@@ -23,7 +23,7 @@ namespace IhildaWallet
 			this.button55.Clicked += (object sender, EventArgs e) => {
 
 
-				tokenSource?.Cancel ();
+				//tokenSource?.Cancel ();
 				tokenSource = new CancellationTokenSource ();
 				CancellationToken token = tokenSource.Token;
 

@@ -14,7 +14,11 @@ namespace IhildaWallet
 			this.connectStatusLabel.UseMarkup = true;
 
 			if (!Program.network) {
-				this.connectStatusLabel.Markup = "<span foreground=\"red\">Networking Disabled</span>";
+				if (Program.darkmode) {
+					this.connectStatusLabel.Markup = "<span foreground=\"#FFAABB\">Networking Disabled</span>";
+				} else {
+					this.connectStatusLabel.Markup = "<span foreground=\"red\">Networking Disabled</span>";
+				}
 			}
 		}
 

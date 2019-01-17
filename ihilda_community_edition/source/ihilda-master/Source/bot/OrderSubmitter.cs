@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using IhildaWallet.Networking;
 using RippleLibSharp.Commands.Accounts;
 using RippleLibSharp.Commands.Server;
+using RippleLibSharp.Commands.Subscriptions;
 using RippleLibSharp.Commands.Tx;
 using RippleLibSharp.Keys;
 using RippleLibSharp.Network;
@@ -24,7 +25,13 @@ namespace IhildaWallet
 		//private IEnumerable<AutomatedOrder> orders = null;
 
 
-		public Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> SubmitOrdersParallel (IEnumerable<AutomatedOrder> orders, RippleWallet rw, RippleIdentifier rippleIdentifier, NetworkInterface networkInterface, CancellationToken token)
+		public MultipleOrdersSubmitResponse SubmitOrdersParallel (
+			IEnumerable<AutomatedOrder> orders, 
+			RippleWallet rw, 
+	    		RippleIdentifier rippleIdentifier, 
+	    		NetworkInterface networkInterface, 
+			CancellationToken token
+		)
 		{
 
 
@@ -87,7 +94,15 @@ namespace IhildaWallet
 						order.SubmittedEventArgs = _SubmitOrder (order, rw, networkInterface, token, identifier, true);
 						if (order.SubmittedEventArgs == null) {
 							MessageDialog.ShowMessage ("this should never return null !!!");
-							return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (false, events);
+
+
+							return new MultipleOrdersSubmitResponse () {
+								Message = "Order submit returned null\n",
+								Succeeded = false,
+								SubmitResponses = events
+							};
+
+							//return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (false, events);
 						}
 
 						OnOrderSubmitted?.Invoke (this, order.SubmittedEventArgs);
@@ -170,8 +185,8 @@ namespace IhildaWallet
 
 					}
 
-					token.WaitHandle.WaitOne (20);
-					Task.WaitAll ( taskList.ToArray () ); // this is outside the for loop and waits on all
+					//token.WaitHandle.WaitOne (20);
+					Task.WaitAll ( taskList.ToArray (), token ); // this is outside the for loop and waits on all
 
 					ords = ords.Where ((AutomatedOrder arg) => !arg.IsValidated);
 
@@ -188,9 +203,13 @@ namespace IhildaWallet
 				});
 
 
-			
+				return new MultipleOrdersSubmitResponse () {
+					Message = "All orders succeeded\n",
+					Succeeded = true,
+					SubmitResponses = events
+				};
 
-				return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (true, events);
+				//return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (true, events);
 
 			} catch (Exception e) {
 
@@ -200,14 +219,31 @@ namespace IhildaWallet
 				}
 #endif
 
-				return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (false, events);
+				StringBuilder strBuild = new StringBuilder ();
+				strBuild.AppendLine ("Exception thrown : ");
+				strBuild.AppendLine (e.Message);
+				strBuild.AppendLine (e.StackTrace);
+
+				return new MultipleOrdersSubmitResponse () {
+					Message = strBuild.ToString (),
+		    			Succeeded = false,
+					SubmitResponses = events
+				};
+
+				//return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (false, events);
 			}
 
 		}
 
 
 
-		public Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> SubmitOrders (IEnumerable<AutomatedOrder> orders, RippleWallet rw, RippleIdentifier rippleIdentifier, NetworkInterface networkInterface, CancellationToken token)
+		public MultipleOrdersSubmitResponse SubmitOrders (
+			IEnumerable<AutomatedOrder> orders, 
+			RippleWallet rw, 
+	    		RippleIdentifier rippleIdentifier, 
+	    		NetworkInterface networkInterface, 
+			CancellationToken token
+		)
 		{
 
 
@@ -267,7 +303,14 @@ namespace IhildaWallet
 					OrderSubmittedEventArgs submitEvent = _SubmitOrder (order, rw, networkInterface, token, identifier, false);
 					if (submitEvent == null) {
 						MessageDialog.ShowMessage ("this should never return null !!!");
-						return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (false, events);
+
+						return new MultipleOrdersSubmitResponse () {
+							Succeeded = false,
+			    				SubmitResponses = events,
+							Message = "Order Submit returned null\n"
+						};
+
+						//return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (false, events);
 					}
 					events.Add (submitEvent);
 
@@ -277,7 +320,20 @@ namespace IhildaWallet
 
 
 					if (!submitEvent.Success) {
-						return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (false, events);
+
+						StringBuilder stringBuilder = new StringBuilder ();
+						stringBuilder.AppendLine ("Order Submit not successful\n");
+						stringBuilder.AppendLine ();
+
+
+						return new MultipleOrdersSubmitResponse () {
+							Succeeded = false,
+			    				SubmitResponses = events,
+							Message = ""
+
+						};
+
+						//return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (false, events);
 					}
 					
 					if (settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
@@ -292,8 +348,13 @@ namespace IhildaWallet
 					accountSequenceCache?.Save ();
 				}
 
+				return new MultipleOrdersSubmitResponse () {
+					Message = "All orders succeeded\n",
+					Succeeded = true,
+					SubmitResponses = events
+				};
 
-				return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (true, events);
+				//return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (true, events);
 
 			} catch (Exception e) {
 
@@ -303,12 +364,31 @@ namespace IhildaWallet
 				}
 #endif
 
-				return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (false, events);
+				StringBuilder strBuild = new StringBuilder ();
+				strBuild.AppendLine ("Exception thrown : ");
+				strBuild.AppendLine (e.Message);
+				strBuild.AppendLine (e.StackTrace);
+
+				return new MultipleOrdersSubmitResponse () {
+					Message = strBuild.ToString (),
+					Succeeded = false,
+					SubmitResponses = events
+				};
+
+
+				//return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (false, events);
 			}
 
 		}
 
-		private OrderSubmittedEventArgs _SubmitOrder (AutomatedOrder order, RippleWallet rw, NetworkInterface networkInterface, CancellationToken token, RippleIdentifier rippleSeedAddress, bool paralell)
+		private OrderSubmittedEventArgs _SubmitOrder (
+			AutomatedOrder order, 
+			RippleWallet rw, 
+	    		NetworkInterface networkInterface, 
+	    		CancellationToken token, 
+			RippleIdentifier rippleSeedAddress, 
+			bool paralell
+	    	)
 		{
 
 			// serial vs paralell. serial is one order at a time, verified before continuing to the next. Paralell is submitting them all then verifying the bunch
@@ -351,7 +431,8 @@ namespace IhildaWallet
 
 			if ( orderSubmittedEventArgs.submit_attempts >= MAX_SUBMIT_ATTEMPTS) {
 				orderSubmittedEventArgs.Success = false;
-				//orderSubmittedEventArgs.Unrecoverable = ;
+				orderSubmittedEventArgs.Unrecoverable = true;
+				orderSubmittedEventArgs.Message = "Max submit retry attempts reached\n";
 				return orderSubmittedEventArgs;
 			}
 
@@ -368,6 +449,7 @@ namespace IhildaWallet
 				// todo
 				orderSubmittedEventArgs.Success = false;
 				orderSubmittedEventArgs.Unrecoverable = false;
+				orderSubmittedEventArgs.Message = "Unable to retrieve fee and last ledger\n";
 				return orderSubmittedEventArgs;
 			}
 
@@ -1250,7 +1332,7 @@ namespace IhildaWallet
 						decimal spread = 1.006m;
 
 						decimal resaleEstimate = price * spread;
-						//diff = Math.Abs (dif);
+
 
 						// 
 						bool spreadTooSmall = resaleEstimate > costj;
@@ -1305,7 +1387,7 @@ namespace IhildaWallet
 
 			if (offerTransaction.hash == null) {
 
-				throw new ArgumentNullException ("Hash MUST be set to sign transactions!!");
+				throw new ArgumentNullException (nameof(offerTransaction), "Hash MUST be set to sign transactions!!");
 
 				//return verifyEventArgs;
 			}
@@ -1315,21 +1397,31 @@ namespace IhildaWallet
 
 			Logging.WriteLog ("Validating Tx\n");
 			//Thread.Sleep (2000);
-			token.WaitHandle.WaitOne (2000);
+			token.WaitHandle.WaitOne (1000);
 
 			OnVerifyingTxBegin?.Invoke (this, verifyEventArgs);
 
 			for (int i = 0; i < 100; i++) {
 
-				token.WaitHandle.WaitOne (3000);
+				//token.WaitHandle.WaitOne (3000);
+
+				WaitHandle.WaitAny ( new WaitHandle[] { token.WaitHandle, LedgerTracker.LedgerResetEvent }, 4000 );
 				//Thread.Sleep (3000);
 
 
 
-				Task<Response<RippleTransaction>> task = tx.GetRequest (offerTransaction.hash, networkInterface, token);
+				Task<Response<RippleTransaction>> task = tx.GetRequest (
+					offerTransaction.hash, 
+					networkInterface, 
+		    			token
+		    		);
 
+				uint? led = LedgerTracker.GetRecentLedgerOrNull ();
 
-				Tuple<string, uint> tuple = ServerInfo.GetFeeAndLedgerSequence (networkInterface, token);
+				if (led == null) {
+					Tuple<string, uint> tuple = ServerInfo.GetFeeAndLedgerSequence (networkInterface, token);
+					led = tuple?.Item2;
+				}
 
 				if (task == null) {
 					// TODO Debug
@@ -1343,7 +1435,7 @@ namespace IhildaWallet
 					goto End;
 				}
 
-				task.Wait (1000 * 60 * 1, token);
+				task.Wait (1000 * 60 * 2, token);
 
 				//if () {
 
@@ -1377,11 +1469,14 @@ namespace IhildaWallet
 
 				}
 
-				
 				End:
+					
+				
+				
+				//
 
 				
-				if ( tuple != null && tuple.Item2 > offerTransaction.LastLedgerSequence) {
+				if ( led != null && led > offerTransaction.LastLedgerSequence) {
 
 					verifyEventArgs.Message = "failed to validate before LastLedgerSequence exceeded\n";
 					Logging.WriteLog (verifyEventArgs.Message);
@@ -1390,13 +1485,13 @@ namespace IhildaWallet
 				}
 
 
-				verifyEventArgs.Message = "Tx " + offerTransaction.hash + "Not validated yet\n";
+				verifyEventArgs.Message = "Tx " + offerTransaction.hash + " not validated yet\n";
 				Logging.WriteLog (verifyEventArgs.Message);
 
 			}
 
 
-			Logging.WriteLog ("Max validation attempts exceeded\n");
+			Logging.WriteLog ("Tx " + offerTransaction.hash + " Max validation attempts exceeded\n");
 			return verifyEventArgs;
 
 		}
@@ -1428,6 +1523,28 @@ namespace IhildaWallet
 
 	}
 
+	public class MultipleOrdersSubmitResponse
+	{
+		public string Message {
+			get;
+			set;
+		}
+
+		public bool Succeeded {
+			get;
+			set;
+		}
+
+		public IEnumerable<OrderSubmittedEventArgs> SubmitResponses {
+			get;
+			set;
+		}
+
+		
+
+
+	}
+
 	public class VerifyEventArgs : EventArgs
 	{
 
@@ -1451,6 +1568,11 @@ namespace IhildaWallet
 	public class OrderSubmittedEventArgs : EventArgs
 	{
 
+
+		public string Message {
+			get;
+			set;
+		}
 		public bool Success {
 			get;
 			set;

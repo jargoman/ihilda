@@ -20,14 +20,18 @@ namespace IhildaWallet
 		private AccountSequenceCache (string account)
 		{
 			this.Account = account;
-			this.SequenceCache = Load (account);
 			this.actualSettingsFileName = account + settingsFileName;
+			settingsPath = FileHelper.GetSettingsPath (actualSettingsFileName);
+			// must be called after settingspathset
+			this.SequenceCache = Load ();
+
+			
 		}
 
 		public static AccountSequenceCache GetCacheForAccount (string account)
 		{
 			AccountSequenceCache accountSequence = null;
-			lock (lockobj) {
+			//lock (lockSeq) {
 				if (account == null) {
 					throw new NullReferenceException ();
 				}
@@ -44,13 +48,9 @@ namespace IhildaWallet
 				}
 
 				accountSequence = new AccountSequenceCache (account);
-				if (accountSequence != null) {
-					if (CacheManager.ContainsKey (account)) {
-						CacheManager.Add (account, accountSequence);
-					}
 
-				}
-			}
+				CacheManager.Add (account, accountSequence);
+			//}
 			return accountSequence;
 
 		}
@@ -62,7 +62,7 @@ namespace IhildaWallet
 		{
 
 			Task.Run (delegate {
-				lock (lockobj) {
+				lock (lockSeq) {
 					if (order == null) {
 						return;
 					}
@@ -121,15 +121,14 @@ namespace IhildaWallet
 
 		public void RemoveAndSave (string key)
 		{
-			lock (lockobj) {
+			lock (lockSeq) {
 				Dictionary<string, AutomatedOrder> dict = this.SequenceCache;
 				bool updated = dict != null && dict.Remove(key);
 
 				if (updated) {
 
-					var settingsPath = FileHelper.GetSettingsPath (actualSettingsFileName);
 
-					//ConfStruct confstruct = new ConfStruct( orderDict.Values );
+
 					ConfStruct confstruct = new ConfStruct (dict.Values);
 
 					string conf = DynamicJson.Serialize (confstruct);
@@ -146,7 +145,7 @@ namespace IhildaWallet
 				return;
 			}
 
-			lock (lockobj) {
+			lock (lockSeq) {
 				string id = order.Bot_ID;
 				Logging.WriteLog ("Synccache : " + (id ?? "null"));
 
@@ -168,7 +167,7 @@ namespace IhildaWallet
 
 				IEnumerable<AutomatedOrder> offers = dict.Values;
 
-				var settingsPath = FileHelper.GetSettingsPath (actualSettingsFileName);
+				//var settingsPath = FileHelper.GetSettingsPath (actualSettingsFileName);
 
 				//ConfStruct confstruct = new ConfStruct( orderDict.Values );
 				ConfStruct confstruct = new ConfStruct (offers);
@@ -181,7 +180,7 @@ namespace IhildaWallet
 
 
 
-		public void SyncOrdersCache (string account, CancellationToken token)
+		public void SyncOrdersCache (CancellationToken token)
 		{
 
 #if DEBUG
@@ -194,10 +193,10 @@ namespace IhildaWallet
 
 			try {
 				token.ThrowIfCancellationRequested ();
-				if (account == null) {
+				if (Account == null) {
 #if DEBUG
 					if (DebugIhildaWallet.AccountSequenceCache) {
-						Logging.WriteLog (method_sig, nameof (account) + DebugRippleLibSharp.null_str);
+						Logging.WriteLog (method_sig, nameof (Account) + DebugRippleLibSharp.null_str);
 					}
 #endif
 					return;
@@ -209,7 +208,7 @@ namespace IhildaWallet
 					return;
 				}
 
-				Task<IEnumerable<Response<AccountOffersResult>>> task = AccountOffers.GetFullOfferList (account, networkInterface, token);
+				Task<IEnumerable<Response<AccountOffersResult>>> task = AccountOffers.GetFullOfferList (Account, networkInterface, token);
 
 
 				if (task == null) {
@@ -235,7 +234,7 @@ namespace IhildaWallet
 
 				IEnumerable<Response<AccountOffersResult>> responses = task.Result;
 
-				Dictionary<string, AutomatedOrder> cached = Load (account);
+				Dictionary<string, AutomatedOrder> cached = Load ();
 
 
 
@@ -422,54 +421,60 @@ namespace IhildaWallet
 
 		public Dictionary<String, AutomatedOrder> SequenceCache;
 
-		public static Dictionary<String, AutomatedOrder> Load (string account)
+		public Dictionary<String, AutomatedOrder> Load ()
 		{
 
 
-			var settingsPath = FileHelper.GetSettingsPath (account + settingsFileName);
+			//var settingsPath = FileHelper.GetSettingsPath (account + settingsFileName);
 			string str = null;
-
-			lock (lockobj) {
-				str = FileHelper.GetJsonConf (settingsPath);
-
-
-
-				if (str == null) {
-					return null;
-				}
-				ConfStruct jsconf = null;
-				try {
-					jsconf = DynamicJson.Parse (str);
-
-				} catch (Exception e) {
-					Logging.WriteLog (e.Message + e.StackTrace);
-					return null;
-				}
-
-				if (jsconf == null) {
-					return null;
-				}
-
-				AutomatedOrder [] ords = jsconf?.Orders;
-
-				if (ords == null || !ords.Any ()) {
-					return null;
-				}
-
-				Dictionary<String, AutomatedOrder> orderDict = new Dictionary<string, AutomatedOrder> (ords.Length);
-
-				//orderDict.Clear ();
-				foreach (AutomatedOrder order in ords) {
-					string key = order.Bot_ID;
-
-					if (key != null) {
-						//orderDict.TryAdd (key, order);
-						orderDict.Add (key, order);
-					}
-				}
-
-				return orderDict;
+			str = FileHelper.GetJsonConf (settingsPath);
+			if (str == null) {
+				return null;
 			}
+			ConfStruct jsconf = null;
+
+			try {
+				jsconf = DynamicJson.Parse (str);
+
+			} catch (Exception e) {
+				Logging.WriteLog (e.Message + e.StackTrace);
+				return null;
+			}
+
+			if (jsconf == null) {
+				return null;
+			}
+
+			AutomatedOrder [] ords = jsconf?.Orders;
+
+			if (ords == null || !ords.Any ()) {
+				return null;
+			}
+
+	    		
+			Dictionary<String, AutomatedOrder> orderDict = new Dictionary<string, AutomatedOrder> (ords.Length);
+
+			//orderDict.Clear ();
+			foreach (AutomatedOrder order in ords) {
+				string key = order.Bot_ID;
+
+				if (key != null) {
+					//orderDict.TryAdd (key, order);
+					orderDict.Add (key, order);
+				}
+			}
+
+			return orderDict;
+
+			//lock (lockSeq) {
+
+
+
+
+
+
+
+			//}
 
 
 		}
@@ -532,39 +537,43 @@ namespace IhildaWallet
 		public static void DeleteSettingsFile (string account)
 		{
 			var settingsPath = FileHelper.GetSettingsPath (account + settingsFileName);
-			lock (lockobj) {
+			//lock (lockobj) {
 
 				if (File.Exists (settingsPath)) {
 					File.Delete (settingsPath);
 				}
-			}
+			//}
 
 		}
 
 		public void Save ()
 		{
-			lock (lockobj) {
+			IEnumerable<AutomatedOrder> offers = null;
+			lock (lockSeq) {
 
-				IEnumerable<AutomatedOrder> offers = this.SequenceCache?.Values;
-				if (offers == null) {
-					return;
-				}
-				var settingsPath = FileHelper.GetSettingsPath (actualSettingsFileName);
-
-				ConfStruct confstruct = new ConfStruct (offers);
-
-				string conf = DynamicJson.Serialize (confstruct);
-
-				FileHelper.SaveConfig (settingsPath, conf);
+				offers = this.SequenceCache?.Values;
 			}
+
+			if (offers == null) {
+				return;
+			}
+			//var settingsPath = FileHelper.GetSettingsPath (actualSettingsFileName);
+
+			ConfStruct confstruct = new ConfStruct (offers);
+
+			string conf = DynamicJson.Serialize (confstruct);
+
+			FileHelper.SaveConfig (settingsPath, conf);
+			
 		}
 
-		private static readonly object lockobj = new object ();
+		private readonly object lockSeq = new object ();
 
 		public event EventHandler<OrderCachedEventArgs> OnOrderCacheEvent;
 
 		public const string settingsFileName = "OrderManagementBot.jsn";
 		public string actualSettingsFileName = null;
+		public string settingsPath = null;
 #if DEBUG
 		public const string clsstr = nameof (OrderManagementBot) + DebugRippleLibSharp.both_parentheses;
 #endif

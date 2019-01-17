@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading;
-using RippleLibSharp.Util;
-using RippleLibSharp.Network;
-using RippleLibSharp.Transactions;
+using System.Threading.Tasks;
 using Codeplex.Data;
 using RippleLibSharp.Commands.Subscriptions;
-using System.Threading.Tasks;
+using RippleLibSharp.Network;
+using RippleLibSharp.Util;
 
 namespace IhildaWallet
 {
@@ -233,6 +232,9 @@ namespace IhildaWallet
 
 			Tuple<string, UInt32> tupe = null;
 
+			if (token.IsCancellationRequested) {
+				throw new TaskCanceledException ( nameof(FeeSettings) + " : " + nameof (ParseFee) + " : Task Cancelation recieved");
+			}
 			// try to retrieve from last server state subscribe response
 			tupe = LedgerTracker.GetFeeAndLastLedger (token);
 
@@ -296,8 +298,8 @@ namespace IhildaWallet
 
 
 
-			fs = ParseFee (ni, token);
-
+			//fs = ParseFee (ni, token);
+	    		/*
 			if (fs == null) {
 
 				if (nullFeeCount++ > 5) {
@@ -305,7 +307,7 @@ namespace IhildaWallet
 				}
 
 				goto START;
-			}
+			}*/
 
 			if (this.Multiplier != null) {
 
@@ -377,40 +379,25 @@ namespace IhildaWallet
 					feeSleepEventArgs.State = FeeSleepState.Begin;
 
 					OnFeeSleep?.Invoke (this, feeSleepEventArgs);
+					using (Task threeseconds = Task.Run (delegate {
 
-
-					
-					Task threeseconds = Task.Run ( delegate {
-
-
-
-
-						//Thread.Sleep (3000);
-
-						feeSleepEventArgs.State = FeeSleepState.PumpUI;
-
+			    			feeSleepEventArgs.State = FeeSleepState.PumpUI;
 						for (int i = 0; i < 3; i++) {
-							OnFeeSleep?.Invoke (this, feeSleepEventArgs);
-							token.WaitHandle.WaitOne (1000);
+					    		OnFeeSleep?.Invoke (this, feeSleepEventArgs);
+				 	   		token.WaitHandle.WaitOne (1000);
+				    			//LedgerTracker.ServerStateEv
+			    			}
+			    			return;
+			    		})) {
+						using (Task ledgerTask = Task.Run (delegate {
 
-							//LedgerTracker.ServerStateEv
-
-
+							WaitHandle.WaitAny (new WaitHandle [] { LedgerTracker.LedgerResetEvent, LedgerTracker.ServerStateEvent, token.WaitHandle });
+						})) {
+							Task.WaitAny (new Task [] { threeseconds, ledgerTask });
 						}
-						return;
-					});
+					}
 
-					Task ledgerTask = Task.Run ( delegate {
-
-						WaitHandle.WaitAny (new WaitHandle [] { LedgerTracker.LedgerResetEvent, LedgerTracker.ServerStateEvent, token.WaitHandle });
-					});
-
-					Task.WaitAny ( new Task [] { threeseconds, ledgerTask });
-					
-
-					
-
-				       feeSleepEventArgs.State = FeeSleepState.Wake;
+					feeSleepEventArgs.State = FeeSleepState.Wake;
 					OnFeeSleep?.Invoke (this, feeSleepEventArgs);
 
 					goto START;

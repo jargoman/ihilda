@@ -1,20 +1,45 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default" NuGet.AddPackagesDialog.IncludePrerelease="True">
   <MonoDevelop.Ide.ItemProperties.RippleLibSharp PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Source/bot/AccountSequenceCache.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/Program.cs">
     <Files>
-      <File FileName="Source/bot/OrderSubmitter.cs" Line="149" Column="26" />
-      <File FileName="Source/bot/AccountSequenceCache.cs" Line="83" Column="6" />
-      <File FileName="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs" Line="1603" Column="34" />
-      <File FileName="Source/bot/OrderManagementBot.cs" Line="251" Column="6" />
-      <File FileName="Source/bot/AutomatedOrder.cs" Line="200" Column="37" />
+      <File FileName="Source/Program.cs" Line="396" Column="27" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Ihilda" expanded="True">
+            <Node name="IhildaWallet" expanded="True">
+              <Node name="Source" expanded="True">
+                <Node name="bot" expanded="True" />
+                <Node name="gui-classes" expanded="True">
+                  <Node name="Dialogs" expanded="True" />
+                  <Node name="Widgets" expanded="True">
+                    <Node name="PayUI" expanded="True" />
+                    <Node name="RuleWidgets" expanded="True" />
+                    <Node name="TransactionsWidgets" expanded="True" />
+                  </Node>
+                </Node>
+                <Node name="Program.cs" selected="True" />
+              </Node>
+            </Node>
+            <Node name="RippleLibSharp" expanded="True">
+              <Node name="Source" expanded="True">
+                <Node name="Commands" expanded="True">
+                  <Node name="Server" expanded="True" />
+                  <Node name="Subscriptions" expanded="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/Source/Unit-Testing/RLSTest.cs" line="263" column="1" />
-      <Breakpoint file="/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/Source/bot/AccountSequenceCache.cs" relfile="Source/bot/AccountSequenceCache.cs" line="145" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MultiItemStartupConfigurations />

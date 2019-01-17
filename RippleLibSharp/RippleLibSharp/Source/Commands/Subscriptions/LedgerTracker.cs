@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using RippleLibSharp.Commands.Server;
+using RippleLibSharp.Network;
 
 namespace RippleLibSharp.Commands.Subscriptions
 {
@@ -21,15 +23,15 @@ namespace RippleLibSharp.Commands.Subscriptions
 		{
 			LastLedgerClosed = ledger;
 			Task.Run ( delegate {
-				if (OnLedgerClosed != null) {
-					OnLedgerClosed.Invoke (null, ledger);
-				}
+				//if (OnLedgerClosed != null) {
+					OnLedgerClosed?.Invoke (null, ledger);
+				//}
 
 				
 				
 			});
 
-			LedgerResetEvent.Set ();
+			LedgerResetEvent?.Set ();
 
 
 			
@@ -42,11 +44,11 @@ namespace RippleLibSharp.Commands.Subscriptions
 			ServerStateEv = serverState;
 			Task.Run ( delegate {
 
-				if (OnServerStateChanged != null) {
-					OnServerStateChanged.Invoke (null, serverState);
-				}
+				//if (OnServerStateChanged != null) {
+					OnServerStateChanged?.Invoke (null, serverState);
+				//}
 			});
-			ServerStateEvent.Set ();
+			ServerStateEvent?.Set ();
 			
 		}
 
@@ -58,7 +60,7 @@ namespace RippleLibSharp.Commands.Subscriptions
 
 
 				TimeSpan timeSpan = DateTime.Now - _LastLedgerClosed.ReceivedTime;
-				if ( timeSpan.TotalMinutes > 1) {
+				if ( timeSpan.TotalSeconds > 30) {
 					return null;
 				}
 
@@ -84,6 +86,15 @@ namespace RippleLibSharp.Commands.Subscriptions
 		public static CancellationTokenSource TokenSource {
 			get;
 			set;
+		}
+
+		public static UInt32? GetRecentLedgerOrNull ()
+		{
+			var led = LastLedgerClosed;
+
+			return led?.ledger_index;
+	    		
+
 		}
 
 
@@ -119,7 +130,7 @@ namespace RippleLibSharp.Commands.Subscriptions
 			Tuple<string, UInt32> ret = new Tuple<string, UInt32> (transaction_fee.ToString (), ledger.ledger_index);
 
 			return ret;
-
+		
 
 
 		}

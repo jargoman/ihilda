@@ -23,4 +23,3 @@
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Debug/RippleLibSharp.csproj.CopyComplete
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Debug/riplibsharp.exe
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Debug/riplibsharp.pdb
-/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Debug/RippleLibSharp.csprojAssemblyReference.cache

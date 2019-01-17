@@ -40,7 +40,7 @@ namespace IhildaWallet
 		//static extern bool SetDllDirectory (string lpPathName);
 
 		public static readonly string appname = "ihilda";
-		public static readonly string version = "0.10.4";
+		public static readonly string version = "1.0.1";
 		public static readonly string verboseName = appname + "_community_edition_" + version;
 
 		public static bool showPopUps = true;
@@ -389,11 +389,11 @@ namespace IhildaWallet
 				int last = RuleManagerObj.LastKnownLedger;
 
 				if (Program.ledger != 0) {
-					Logging.WriteLog ("Starting from ledger " + (string)Program.ledger.ToString () + "\n");
+					Logging.WriteLog ("\nStarting from ledger " + (string)Program.ledger.ToString () + "\n");
 				} else {
 
 
-					Logging.WriteLog ("Using last known ledger " + last + "\n");
+					Logging.WriteLog ("\nUsing last known ledger " + last + "\n");
 					if (last == 0) {
 
 						Logging.WriteLog ("");

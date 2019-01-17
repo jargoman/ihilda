@@ -625,6 +625,8 @@ namespace IhildaWallet
 
 			}
 
+			StringBuilder priceString = new StringBuilder ();
+			StringBuilder priceStringj = new StringBuilder ();
 
 			bool hasred = false;
 			for (int i = 0; i < _offers.Length; i++) {
@@ -652,19 +654,6 @@ namespace IhildaWallet
 
 					decimal resaleEstimate = price * spread;
 
-					StringBuilder priceString = new StringBuilder ();
-					priceString.Append (price);
-					priceString.AppendLine ();
-					priceString.Append ("<span fgcolor=\"grey\">");
-					priceString.Append (cost);
-					priceString.Append ("</span>");
-
-					StringBuilder priceStringj = new StringBuilder ();
-					priceStringj.Append (pricej);
-					priceStringj.AppendLine ();
-					priceStringj.Append ("<span fgcolor=\"grey\">");
-					priceStringj.Append (costj);
-					priceStringj.Append ("</span>");
 
 					bool spreadTooSmall = resaleEstimate > costj;
 					if (spreadTooSmall) {
@@ -672,6 +661,21 @@ namespace IhildaWallet
 						_offers [j].Red = true;
 
 						hasred = true;
+
+						priceString.Clear ();
+						priceString.Append (price);
+						priceString.AppendLine ();
+						priceString.Append ("<span fgcolor=\"grey\">");
+						priceString.Append (cost);
+						priceString.Append ("</span>");
+
+						priceStringj.Clear ();
+						priceStringj.Append (pricej);
+						priceStringj.AppendLine ();
+						priceStringj.Append ("<span fgcolor=\"grey\">");
+						priceStringj.Append (costj);
+						priceStringj.Append ("</span>");
+
 
 						HighLightPrice (i.ToString (), priceString.ToString ());
 						//HighLightCost (i.ToString (), cost.ToString ());
@@ -686,15 +690,9 @@ namespace IhildaWallet
 			if (hasred) {
 
 				// gui invoke may be needed for timing rather than being on the right thread
-				Application.Invoke (delegate {
-					label2.UseMarkup = true;
-					this.label2.Markup = "<span fgcolor=\"red\">Conflicting orders. Trading with self</span>";
-					this.label2.Show ();
-					this.label2.Visible = true;
-
-
-				});
-
+				
+				string message = "<span fgcolor=\"red\">Conflicting orders. Trading with self</span>";
+				SetInfoBar (message);
 			}
 			//SetOffers (_offers);
 
@@ -813,12 +811,11 @@ namespace IhildaWallet
 
 			Liststore.Clear ();
 			if (offers == null) {
-				Application.Invoke (delegate {
-					label2.Markup = "<span fgcolor=\"red\">Error null offer list\n</span>";
-
-				});
+				string messge = "<span fgcolor=\"red\">Error null offer list\n</span>";
+				SetInfoBar (messge);
 				return;
 			}
+	    		
 
 			this._offers = new AutomatedOrder [offers.Count ()];
 
@@ -1090,25 +1087,13 @@ namespace IhildaWallet
 			FeeSettings feeSettings = FeeSettings.LoadSettings ();
 			if (feeSettings == null) {
 
-
-				Gtk.Application.Invoke (
-					delegate {
-
-						if (token.IsCancellationRequested) {
-							return;
-
-						}
-						label2.Markup =
-							"<span fgcolor=\"red\">" +
-							"Could not load xrp fee preferences. \n" +
-							"Configure fee settings at : \n" +
+				string message = Program.darkmode ? "<span fgcolor=\"#FFAABB\">" : "<span fgcolor=\"red\">" +
+							"Could not load xrp fee preferences. " +
+							"Configure fee settings at : " +
 							"{wallet manager > Options Tab > Options > XRP fee options}" +
 							"</span>";
+				SetInfoBar (message);
 
-						label2.Visible = true;
-					}
-				);
-				//return false;
 			}
 
 			return feeSettings;
@@ -1145,12 +1130,7 @@ namespace IhildaWallet
 			stringBuilder.Append ("</span>");
 
 			string infoBarMessage = stringBuilder.ToString ();
-			Application.Invoke ( delegate {
-
-				this.label2.Markup = infoBarMessage;
-				this.label2.Visible = true;
-			});
-
+			this.SetInfoBar (infoBarMessage);
 			try {
 				ClearIndex (index);
 
@@ -1194,14 +1174,7 @@ namespace IhildaWallet
 					feeReq, 
 		    			Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
-				Application.Invoke (
-					delegate {
-						label2.Markup = ms3;
-						label2.Visible = true;
-
-					}
-				);
-
+				this.SetInfoBar (ms3);
 
 				Tuple<UInt32, UInt32> tupe = null;
 
@@ -1243,18 +1216,13 @@ namespace IhildaWallet
 
 						sb.Clear ();
 						if (txAtIndexStr != null) {
-							sb.Append (txAtIndexStr ?? "");
+							sb.Append (txAtIndexStr);
 						}
 						sb.Append (feestr);
 
 						string ms4 = sb.ToString ();
 
-						Application.Invoke (delegate {
-							label2.Markup = ms4;
-							//label2.Visible = true;
-
-						});
-
+						this.SetInfoBar (ms4);
 					};
 
 					tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, token, lastFee);
@@ -1307,29 +1275,28 @@ namespace IhildaWallet
 
 
 					string canstr = "Aborted";
-					this.SetResult (index.ToString (), canstr, TextHighlighter.RED);
+					this.SetResult (index.ToString (), canstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (canstr);
 					stringBuilder.Append ("</span>");
 					string ms6 = stringBuilder.ToString ();
 
-					Application.Invoke (
-
-						delegate {
-							label2.Markup = ms6;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (ms6);
 					return false;
 				}
 
 
 				int feeDots = 0;
-				while (!getFeeTask.IsCompleted && !getFeeTask.IsCanceled && !getFeeTask.IsFaulted) {
+				while (!getFeeTask.IsCompleted && !getFeeTask.IsCanceled && !getFeeTask.IsFaulted && !token.IsCancellationRequested) {
 
 					feeDots++;
 
@@ -1354,13 +1321,7 @@ namespace IhildaWallet
 						Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN
 					);
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = mssg;
-							//label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (mssg);
 
 					getFeeTask.Wait (1000, token);
 
@@ -1373,7 +1334,7 @@ namespace IhildaWallet
 				if (tupe == null) {
 
 					string feeEr = "Error retrieving fee and last ledger sequence";
-					this.SetResult (index.ToString (), feeEr, TextHighlighter.RED);
+					this.SetResult (index.ToString (), feeEr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 					stringBuilder.Append (txAtIndexStr);
@@ -1381,13 +1342,7 @@ namespace IhildaWallet
 
 					string ms5 = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = ms5;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (ms5);
 					return false;
 				}
 
@@ -1416,21 +1371,20 @@ namespace IhildaWallet
 				if (tx.fee.amount == 0) {
 
 					string invstr = "Invalid Fee";
-					this.SetResult (index.ToString (), invstr, TextHighlighter.RED);
+					this.SetResult (index.ToString (), invstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (invstr);
 					stringBuilder.Append ("</span>");
 					string ms7 = stringBuilder.ToString ();
-					Application.Invoke (
-						delegate {
-							label2.Markup = ms7;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (ms7);
 					goto retry;
 				}
 
@@ -1441,31 +1395,31 @@ namespace IhildaWallet
 				if (tx.Sequence == 0) {
 
 					string invstr = "Invalid Sequence";
-					this.SetResult (index.ToString (), invstr, TextHighlighter.RED);
+					this.SetResult (index.ToString (), invstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (invstr);
 					stringBuilder.Append ("</span>");
 					string ms7 = stringBuilder.ToString ();
-					Application.Invoke (
-						delegate {
-							label2.Markup = ms7;
-							//label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (ms7);
 					goto retry;
 				}
 
 				string approvedFee = tx.fee.ToString ();
-
-				if (opts.SigningLibrary == "Rippled") {
+				switch (opts.SigningLibrary) {
+				case "Rippled":
 					stringBuilder.Clear ();
 					stringBuilder.Append ("Signing using rpc");
 
-					
+
 					this.SetStatus (index.ToString (), stringBuilder.ToString (), Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 					string rpsStr = stringBuilder.ToString ();
@@ -1483,15 +1437,8 @@ namespace IhildaWallet
 					stringBuilder.Append ("</span>");
 
 					string ms8 = stringBuilder.ToString ();
-					Application.Invoke (
-						delegate {
-							label2.Markup = ms8;
-							//label2.Visible = true;
-
-						}
-					);
-
-					var signTask = Task.Run<bool> (delegate {
+					this.SetInfoBar (ms8);
+					using (var signTask = Task.Run<bool> (delegate {
 
 						try {
 							tx.SignLocalRippled (rsa);
@@ -1505,66 +1452,63 @@ namespace IhildaWallet
 
 							string rpcErr = "Error signing over rpc. Is rippled running?";
 
-							this.SetStatus (index.ToString (), rpcErr, TextHighlighter.RED);
+							this.SetStatus (index.ToString (), rpcErr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 							stringBuilder.Clear ();
-							stringBuilder.Append ("<span fgcolor=\"red\">");
+
+							if (Program.darkmode) {
+								stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+							} else {
+								stringBuilder.Append ("<span fgcolor=\"red\">");
+							}
+
 							stringBuilder.Append (txAtIndexStr);
 							stringBuilder.Append (rpcErr);
 							stringBuilder.Append ("</span>");
 							string ms9 = stringBuilder.ToString ();
 
-							Application.Invoke (
-								delegate {
-									label2.Markup = ms9;
-									label2.Visible = true;
-
-								}
-							);
+							this.SetInfoBar (ms9);
 							return false;
 						}
-					});
+					})) {
 
-					StringBuilder stbuild = new StringBuilder ();
-					int x = 0;
-					while (!signTask.IsCompleted && !token.IsCancellationRequested && !signTask.IsFaulted) {
-						stbuild.Clear ();
-						stbuild.Append (rpsStr);
+						StringBuilder stbuild = new StringBuilder ();
+						int x = 0;
+						while (!signTask.IsCompleted && !token.IsCancellationRequested && !signTask.IsFaulted && !token.IsCancellationRequested) {
+							stbuild.Clear ();
+							stbuild.Append (rpsStr);
 
-						stbuild.Append (new String ('.',x));
+							stbuild.Append (new String ('.', x));
 
-						if (x++ > 7) {
-							x = 0;
-
-						}
-
-						token.WaitHandle.WaitOne (1000);
-
-						this.SetStatus (index.ToString (), stbuild.ToString(), Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
-
-						stringBuilder.Clear ();
-						if (Program.darkmode) {
-							stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
-						} else {
-							stringBuilder.Append ("<span fgcolor=\"green\">");
-						}
-						stringBuilder.Append (txAtIndexStr);
-						stringBuilder.Append (rpsStr);
-						stringBuilder.Append ("</span>");
-
-						string signmessg = stringBuilder.ToString ();
-						Application.Invoke (
-							delegate {
-								label2.Markup = signmessg;
-								label2.Visible = true;
+							if (x++ > 7) {
+								x = 0;
 
 							}
-						);
+
+							token.WaitHandle.WaitOne (1000);
+
+							this.SetStatus (index.ToString (), stbuild.ToString (), Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+
+							stringBuilder.Clear ();
+							if (Program.darkmode) {
+								stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+							} else {
+								stringBuilder.Append ("<span fgcolor=\"green\">");
+							}
+							stringBuilder.Append (txAtIndexStr);
+							stringBuilder.Append (rpsStr);
+							stringBuilder.Append ("</span>");
+
+							string signmessg = stringBuilder.ToString ();
+							this.SetInfoBar (signmessg);
+						}
+
+						if (!signTask.Result) {
+							return false;
+						}
 					}
 
-					if (!signTask.Result) {
-						return false;
-					}
+					
 
 					string rpcStr = "Signed rpc";
 					this.SetStatus (index.ToString (), rpsStr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
@@ -1579,99 +1523,10 @@ namespace IhildaWallet
 					stringBuilder.Append ("</span>");
 
 					string ms10 = stringBuilder.ToString ();
-					Application.Invoke (
-						delegate {
-							label2.Markup = ms10;
-							label2.Visible = true;
-
-						}
-					);
-
-
-				} else if (opts.SigningLibrary == "RippleLibSharp") {
-
+					this.SetInfoBar (ms10);
+					break;
+				case "RippleLibSharp":
 					string rlsstr = "Signing using RippleLibSharp";
-
-					this.SetStatus ( index.ToString (), rlsstr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN );
-
-					stringBuilder.Clear ();
-
-					if (Program.darkmode) {
-						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
-					} else {
-						stringBuilder.Append ("<span fgcolor=\"green\">");
-					}
-					stringBuilder.Append (txAtIndexStr);
-					stringBuilder.Append (rlsstr);
-					stringBuilder.Append ( "</span>" );
-
-					string ms11 = stringBuilder.ToString ();
-					Application.Invoke (
-						delegate {
-
-							label2.Markup = ms11;
-							label2.Visible = true;
-
-						}
-					);
-
-					try {
-
-						//tx.SignRippleDotNet (rsa);
-						tx.Sign (rsa);
-					} catch (Exception exception) {
-
-#if DEBUG
-						if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
-							Logging.ReportException (method_sig, exception);
-						}
-#endif
-
-						string errrls = "Error signing using RippleLibSharp";
-						this.SetStatus (index.ToString (), errrls, TextHighlighter.RED);
-
-						stringBuilder.Clear ();
-						stringBuilder.Append ("<span fgcolor=\"red\">");
-						stringBuilder.Append (txAtIndexStr);
-						stringBuilder.Append (errrls);
-						stringBuilder.Append ("</span>");
-
-						string ms12 = stringBuilder.ToString ();
-
-						Application.Invoke (
-							delegate {
-								label2.Markup = ms12;
-								label2.Visible = true;
-
-							}
-						);
-						return false;
-					}
-
-					string sgnstr = "Signed RippleLibSharp";
-					this.SetStatus (index.ToString (), sgnstr , Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
-					
-					stringBuilder.Clear ();
-					if (Program.darkmode) {
-						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
-					} else {
-						stringBuilder.Append ("<span fgcolor=\"green\">");
-					}
-					stringBuilder.Append (txAtIndexStr);
-					stringBuilder.Append (sgnstr);
-					stringBuilder.Append ("</span>");
-
-					string ms13 = stringBuilder.ToString ();
-					Application.Invoke (
-						delegate {
-							label2.Markup = ms13;
-							label2.Visible = true;
-
-						}
-					);
-				} else if (opts.SigningLibrary == "RippleDotNet") {
-
-					string rlsstr = "Signing using RippleDotNet";
 
 					this.SetStatus (index.ToString (), rlsstr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
@@ -1687,19 +1542,11 @@ namespace IhildaWallet
 					stringBuilder.Append ("</span>");
 
 					string ms11 = stringBuilder.ToString ();
-					Application.Invoke (
-						delegate {
-
-							label2.Markup = ms11;
-							label2.Visible = true;
-
-						}
-					);
-
+					this.SetInfoBar (ms11);
 					try {
 
-						tx.SignRippleDotNet (rsa);
-						//tx.Sign (rsa);
+						//tx.SignRippleDotNet (rsa);
+						tx.Sign (rsa);
 					} catch (Exception exception) {
 
 #if DEBUG
@@ -1708,28 +1555,26 @@ namespace IhildaWallet
 						}
 #endif
 
-						string errrls = "Error signing using RippleDotNet";
-						this.SetStatus (index.ToString (), errrls, TextHighlighter.RED);
+						string errrls = "Error signing using RippleLibSharp";
+						this.SetStatus (index.ToString (), errrls, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 						stringBuilder.Clear ();
-						stringBuilder.Append ("<span fgcolor=\"red\">");
+						if (Program.darkmode) {
+							stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+						} else {
+							stringBuilder.Append ("<span fgcolor=\"red\">");
+						}
 						stringBuilder.Append (txAtIndexStr);
 						stringBuilder.Append (errrls);
 						stringBuilder.Append ("</span>");
 
 						string ms12 = stringBuilder.ToString ();
 
-						Application.Invoke (
-							delegate {
-								label2.Markup = ms12;
-								label2.Visible = true;
-
-							}
-						);
+						this.SetInfoBar (ms12);
 						return false;
 					}
 
-					string sgnstr = "Signed RippleDotNet";
+					string sgnstr = "Signed RippleLibSharp";
 					this.SetStatus (index.ToString (), sgnstr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 					stringBuilder.Clear ();
@@ -1743,35 +1588,94 @@ namespace IhildaWallet
 					stringBuilder.Append ("</span>");
 
 					string ms13 = stringBuilder.ToString ();
-					Application.Invoke (
-						delegate {
-							label2.Markup = ms13;
-							label2.Visible = true;
+					this.SetInfoBar (ms13);
+					break;
+				case "RippleDotNet":
+					string rlsstr2 = "Signing using RippleDotNet";
 
+					this.SetStatus (index.ToString (), rlsstr2, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+
+					stringBuilder.Clear ();
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"green\">");
+					}
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (rlsstr2);
+					stringBuilder.Append ("</span>");
+
+					string ms112 = stringBuilder.ToString ();
+					this.SetInfoBar (ms112);
+					try {
+
+						tx.SignRippleDotNet (rsa);
+						//tx.Sign (rsa);
+					} catch (Exception exception) {
+
+#if DEBUG
+						if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
+							Logging.ReportException (method_sig, exception);
 						}
-					);
+#endif
+
+						string errrls = "Error signing using RippleDotNet";
+						this.SetStatus (index.ToString (), errrls, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+
+						stringBuilder.Clear ();
+						if (Program.darkmode) {
+							stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+						} else {
+							stringBuilder.Append ("<span fgcolor=\"red\">");
+						}
+						stringBuilder.Append (txAtIndexStr);
+						stringBuilder.Append (errrls);
+						stringBuilder.Append ("</span>");
+
+						string ms12 = stringBuilder.ToString ();
+
+						this.SetInfoBar (ms12);
+						return false;
+					}
+
+					string signstr = "Signed RippleDotNet";
+					this.SetStatus (index.ToString (), signstr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+
+					stringBuilder.Clear ();
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"green\">");
+					}
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (signstr);
+					stringBuilder.Append ("</span>");
+
+					string ms132 = stringBuilder.ToString ();
+					this.SetInfoBar (ms132);
+					break;
 				}
 
 				if (tx.GetSignedTxBlob () == null) {
 
 					string errstr = "Error signing transaction";
-					this.SetResult (index.ToString (), errstr, TextHighlighter.RED);
+					this.SetResult (index.ToString (), errstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span = fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (errstr);
 					stringBuilder.Append ("</span>");
 
 					string m14 = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = m14;
-							label2.Visible = true;
-
-					}
-					);
+					this.SetInfoBar (m14);
 
 					return false;
 				}
@@ -1780,11 +1684,17 @@ namespace IhildaWallet
 				if (token.IsCancellationRequested) {
 
 					string abostr = "Aborted";
-					this.SetResult (index.ToString (), abostr, TextHighlighter.RED);
+					this.SetResult (index.ToString (), abostr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span = fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (abostr);
 					stringBuilder.Append ("</span>");
@@ -1792,13 +1702,7 @@ namespace IhildaWallet
 
 					string ms15 = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = ms15;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (ms15);
 					return false;
 				}
 
@@ -1824,13 +1728,7 @@ namespace IhildaWallet
 					stringBuilder.Append ("</span>");
 
 					string submitStr = stringBuilder.ToString ();
-					Application.Invoke (
-						delegate {
-							label2.Markup = submitStr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (submitStr);
 
 
 					int MAXDOTS = 5;
@@ -1838,7 +1736,7 @@ namespace IhildaWallet
 
 					//StringBuilder message = new StringBuilder ();
 					string wtmessg = "Waiting on network";
-					while (!task.IsCompleted && !task.IsCanceled && !token.IsCancellationRequested) {
+					while (task != null && !task.IsCompleted && !task.IsCanceled && !task.IsFaulted && !token.IsCancellationRequested) {
 
 						stringBuilder.Clear ();
 						stringBuilder.Append (wtmessg);
@@ -1864,11 +1762,8 @@ namespace IhildaWallet
 						stringBuilder.Append ("</span>");
 
 						string wtms = stringBuilder.ToString ();
-						Application.Invoke ( delegate {
-							label2.Markup = wtms;
-							label2.Visible = true;
 
-						});
+						this.SetInfoBar (wtms);
 
 						task.Wait (1000, token);
 					}
@@ -1882,24 +1777,27 @@ namespace IhildaWallet
 					}
 #endif
 					stringBuilder.Clear ();
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span = fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append ("Operation Cancelled");
 
+					stringBuilder.Append ("</span>");
+
 					string cancmess = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = cancmess;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (cancmess);
 					return false;
 				} catch (Exception e) {
 
 					// TODO catch actual net exception
 					Logging.WriteLog (e.Message);
-					this.SetResult (index.ToString (), "Network Error", TextHighlighter.RED);
+					this.SetResult (index.ToString (), "Network Error", Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					return false;
 				}
 
@@ -1914,8 +1812,8 @@ namespace IhildaWallet
 
 				if (response == null) {
 
-					string warningMessage = "response == null";
-					this.SetResult (index.ToString (), warningMessage, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					string warningMessage = "Order submit returned null. response == null";
+					this.SetResult (index.ToString (), warningMessage, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
 
 					if (Program.darkmode) {
@@ -1928,13 +1826,8 @@ namespace IhildaWallet
 					stringBuilder.Append ("</span>");
 
 					string msg = stringBuilder.ToString ();
-					Application.Invoke (
-						delegate {
-							label2.Markup = msg;
-							label2.Visible = true;
 
-						}
-					);
+					this.SetInfoBar (msg);
 
 #if DEBUG
 					if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
@@ -1956,11 +1849,18 @@ namespace IhildaWallet
 
 					string hasErrstr = stringBuilder.ToString ();
 
-					this.SetResult (index.ToString (), hasErrstr, TextHighlighter.RED);
+					this.SetResult (index.ToString (), hasErrstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (hasErrstr);
 					stringBuilder.Append ("</span>");
+
 #if DEBUG
 					if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
 						Logging.WriteLog ("Error submitting transaction ");
@@ -1969,14 +1869,7 @@ namespace IhildaWallet
 					}
 #endif
 					string haserrmess = stringBuilder.ToString ();
-					Application.Invoke (
-						delegate {
-							label2.Markup = hasErrstr;
-							label2.Visible = true;
-
-						}
-					);
-
+					this.SetInfoBar (hasErrstr);
 					return false;
 
 				}
@@ -1987,23 +1880,24 @@ namespace IhildaWallet
 
 				if (res == null) {
 					string bugstr = "res == null, Bug?";
-					this.SetResult (index.ToString (), bugstr, TextHighlighter.RED);
+					this.SetResult (index.ToString (), bugstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
 					stringBuilder.Append (txAtIndexStr);
 
 					stringBuilder.Append (bugstr);
 					stringBuilder.Append ("</span>");
 
 					string ms17 = stringBuilder.ToString ();
-					Application.Invoke (
-						delegate {
-							label2.Markup = ms17;
-							label2.Visible = true;
 
-						}
-					);
+					this.SetInfoBar (ms17);
+
 					return false;
 				}
 
@@ -2015,23 +1909,23 @@ namespace IhildaWallet
 
 					string engnull = "engine_result null";
 
-					this.SetStatus (index.ToString (), engnull, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), engnull, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (engnull);
 					stringBuilder.Append ("</span>");
 
 					string ms18 = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = ms18;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (ms18);
 
 					return false;
 				}
@@ -2049,10 +1943,16 @@ namespace IhildaWallet
 #endif
 
 					string argnull = "null exception";
-					this.SetStatus (index.ToString (), argnull, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), argnull, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (argnull);
 					stringBuilder.Append ("</span>");
@@ -2060,12 +1960,7 @@ namespace IhildaWallet
 
 					string ms19 = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = ms19;
-							label2.Visible = true;
-						}
-					);
+					this.SetInfoBar (ms19);
 
 					return false;
 				} catch (OverflowException overFlowException) {
@@ -2078,23 +1973,23 @@ namespace IhildaWallet
 					string flowstr = "Overflow Exception";
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (flowstr);
 					stringBuilder.Append ("</span>");
 
 					string ms20 = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = ms20;
-							label2.Visible = true;
-
-						}
-					);
-
-					this.SetStatus (index.ToString (), flowstr, TextHighlighter.RED);
+					this.SetInfoBar (ms20);
+					this.SetStatus (index.ToString (), flowstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					return false;
+
 				} catch (ArgumentException argumentException) {
 #if DEBUG
 					if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
@@ -2103,24 +1998,23 @@ namespace IhildaWallet
 #endif
 					string argexc = "Argument Exception";
 
-					this.SetStatus (index.ToString (), argexc, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), argexc, Program.darkmode ? TextHighlighter.LIGHT_RED: TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (argexc);
 					stringBuilder.Append ("</span>");
 
 
 					string ms21 = stringBuilder.ToString ();
-					Application.Invoke (
-						delegate {
-							label2.Markup = ms21;
-							label2.Visible = true;
-
-						}
-					);
-
+					this.SetInfoBar (ms21);
 					return false;
 				} catch (Exception e) {
 #if DEBUG
@@ -2130,23 +2024,21 @@ namespace IhildaWallet
 #endif
 					string unkexc = "Unknown Exception";
 
-					this.SetStatus (index.ToString (), unkexc, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), unkexc, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (unkexc);
 					stringBuilder.Append ("</span>");
 
 					string ms22 = stringBuilder.ToString ();
-					Application.Invoke (
-						delegate {
-							label2.Markup = ms22;
-							label2.Visible = true;
-
-						}
-					);
-
+					this.SetInfoBar (ms22);
 					return false;
 				}
 
@@ -2166,14 +2058,7 @@ namespace IhildaWallet
 					stringBuilder.Append ("</span>");
 					string alstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = alstr;
-							label2.Visible = true;
-
-						}
-					);
-
+					this.SetInfoBar (alstr);
 
 					this._offers [index].IsValidated = true;
 
@@ -2207,13 +2092,7 @@ namespace IhildaWallet
 					stringBuilder.Append ("</span>");
 					string sustr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = sustr;
-							label2.Visible = true;
-							
-						}
-					);
+					this.SetInfoBar (sustr);
 
 
 					this.VerifyTx (index, tx, off.Previous_Bot_ID, ni, token);
@@ -2225,22 +2104,22 @@ namespace IhildaWallet
 				case Ter.terPRE_SEQ:
 				case Ter.tefPAST_SEQ:
 				case Ter.tefMAX_LEDGER:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string maxstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = maxstr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (maxstr);
 
 					return false;
 
@@ -2275,57 +2154,54 @@ namespace IhildaWallet
 						string waitingForSecsString = stringBuilder.ToString ();
 
 						this.SetResult (index.ToString (), stringBuilder.ToString (), TextHighlighter.BLACK);
-						Application.Invoke ( delegate {
-							label2.Markup = txAtIndexStr + waitingForSecsString;
-							label2.Visible = true;
 
-						});
-
+						string msg = txAtIndexStr + waitingForSecsString;
+						this.SetInfoBar (msg);
 
 						token.WaitHandle.WaitOne (1000);
 						stringBuilder.Append (".");
 					}
 
 					//Thread.Sleep (6000);
-					this.SetStatus (index.ToString (), res.engine_result + " retrying", TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result + " retrying", Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string retstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = retstr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (retstr);
 
 
 					goto retry;
 
 
 				case Ter.temBAD_AMOUNT:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string badamstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = badamstr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (badamstr);
 
 
 
@@ -2333,44 +2209,44 @@ namespace IhildaWallet
 
 				case Ter.tecNO_ISSUER:
 				case Ter.temBAD_ISSUER:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string noissstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = noissstr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (noissstr);
 
 
 					return false;
 
 				case Ter.tecUNFUNDED_OFFER:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string unfstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = unfstr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (unfstr);
 
 
 					return false;
@@ -2381,23 +2257,22 @@ namespace IhildaWallet
 				case Ter.tecINSUFFICIENT_RESERVE:
 				case Ter.tecNO_LINE_INSUF_RESERVE:
 
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string nolinestr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = nolinestr;
-							label2.Visible = true;
-
-						}
-					);
-
+					this.SetInfoBar (nolinestr);
 
 
 					return false;
@@ -2405,106 +2280,99 @@ namespace IhildaWallet
 				case Ter.temBAD_AUTH_MASTER:
 				case Ter.tefBAD_AUTH_MASTER:
 				case Ter.tefMASTER_DISABLED:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string masterdisstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = masterdisstr;
-							label2.Visible = true;
-
-						}
-					);
-
+					this.SetInfoBar (masterdisstr);
 					return false;
 
 
 				case Ter.terNO_ACCOUNT:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string noaccstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = noaccstr;
-							label2.Visible = true;
-
-						}
-					);
-
+					this.SetInfoBar (noaccstr);
 					return false;
 
 				case Ter.tecNO_AUTH: // Not authorized to hold IOUs.
 				case Ter.tecNO_LINE:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string noauthstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = noauthstr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (noauthstr);
 
 					return false;
 
 				case Ter.tecFROZEN:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string frozenstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = frozenstr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (frozenstr);
 					return false;
 
 				case Ter.tefFAILURE:
 					// TODO what to do?
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string failurestr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = failurestr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (failurestr);
 
 					return false;
 
@@ -2523,206 +2391,198 @@ namespace IhildaWallet
 				case Ter.temDISABLED:
 				case Ter.tecOWNERS:
 				case Ter.tecINVARIANT_FAILED:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					} 
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string invstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = invstr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (invstr);
 
 					return false;
 
 				case Ter.tecPATH_DRY:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string drystr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = drystr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (drystr);
 					return false;
 
 				case Ter.tecPATH_PARTIAL:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string partstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = partstr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (partstr);
 
 					return false;
 
 				case Ter.tecOVERSIZE:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string oversizestr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = oversizestr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (oversizestr);
 					return false;
 
 				case Ter.tefINTERNAL:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					} else {
+						stringBuilder.Append ("<spanvfgcolor=\"#FFAABB\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string internalstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = internalstr;
-							label2.Visible = true;
-
-						}
-					);
-
+					this.SetInfoBar (internalstr);
 					return false;
 
 				case Ter.tefEXCEPTION:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					} 
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string excstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = excstr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (excstr);
 
 					return false;
 
 				case Ter.tefBAD_LEDGER:
 					// report bug to ripple labs
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string badledstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = badledstr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (badledstr);
 
 					return false;
 
 				case Ter.tecDIR_FULL:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					} 
+					
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string dirfullstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = dirfullstr;
-							label2.Visible = true;
-
-						}
-					);
-
+					this.SetInfoBar (dirfullstr);
 					return false;
 
 				case Ter.tecCLAIM:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string claimstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = claimstr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (claimstr);
 					return false;
 
 				case Ter.tecEXPIRED:
-					this.SetStatus (index.ToString (), res.engine_result, TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					stringBuilder.Append ("<span fgcolor=\"red\">");
+
+					if (Program.darkmode) {
+						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+					} else {
+						stringBuilder.Append ("<span fgcolor=\"red\">");
+					}
+
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (res.engine_result_message);
 					stringBuilder.Append ("</span>");
 					string expstr = stringBuilder.ToString ();
 
-					Application.Invoke (
-						delegate {
-							label2.Markup = expstr;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (expstr);
 
 					return false;
 
@@ -2734,20 +2594,14 @@ namespace IhildaWallet
 					stringBuilder.Append (" not imlemented");
 
 					string statstr = stringBuilder.ToString ();
-					this.SetStatus (index.ToString (), statstr , TextHighlighter.RED);
+					this.SetStatus (index.ToString (), statstr , Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 					stringBuilder.Append (txAtIndexStr);
 					stringBuilder.Append (statstr);
 
 					string areWethereYet = stringBuilder.ToString ();
-					Application.Invoke (
-						delegate {
-							label2.Markup = areWethereYet;
-							label2.Visible = true;
-
-						}
-					);
+					this.SetInfoBar (areWethereYet);
 
 					return false;
 
@@ -2794,13 +2648,9 @@ namespace IhildaWallet
 #endif
 
 				string mssg = "Operation cancelled";
-				this.SetResult (index.ToString (), mssg, TextHighlighter.RED);
+				this.SetResult (index.ToString (), mssg, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
-				Application.Invoke (delegate {
-					this.label2.Markup = mssg;
-					this.label2.Visible = true;
-
-				});
+				this.SetInfoBar (mssg);
 
 				return false;
 			}
@@ -2816,13 +2666,9 @@ namespace IhildaWallet
 				}
 #endif
 				string mssg = "Exception Thrown in code";
-				this.SetResult ( index.ToString (), mssg, TextHighlighter.RED);
+				this.SetResult ( index.ToString (), mssg, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
-				Application.Invoke (delegate {
-					this.label2.Markup = mssg;
-					this.label2.Visible = true;
-
-				});
+				this.SetInfoBar (mssg);
 
 
 				MessageDialog.ShowMessage (mssg, e.Message + e.StackTrace);
@@ -2830,6 +2676,18 @@ namespace IhildaWallet
 				//return false;
 			}
 
+		}
+
+		public void SetInfoBar (string message)
+		{
+			Application.Invoke (delegate {
+				if (label2 == null) {
+					return;
+				}
+				this.label2.Markup = message;
+				this.label2.Visible = true;
+
+			});
 		}
 
 
@@ -2870,20 +2728,20 @@ namespace IhildaWallet
 					Task<Response<RippleTransaction>> task = tx.GetRequest (offerTransaction.hash, ni, token);
 					if (task == null) {
 						// TODO Debug
-						this.SetResult (index.ToString (), "Error : task == null", TextHighlighter.RED);
+						this.SetResult (index.ToString (), "Error : task == null", Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 						return;
 					}
 					task.Wait (token);
 
 					Response<RippleTransaction> response = task.Result;
 					if (response == null) {
-						this.SetResult (index.ToString (), "Error : response == null", TextHighlighter.RED);
+						this.SetResult (index.ToString (), "Error : response == null", Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 						return;
 					}
 					RippleTransaction transaction = response.result;
 
 					if (transaction == null) {
-						this.SetResult (index.ToString (), "Error : transaction == null", TextHighlighter.RED);
+						this.SetResult (index.ToString (), "Error : transaction == null", Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					}
 
 					if (transaction.validated != null && (bool)transaction.validated) {
@@ -2904,7 +2762,7 @@ namespace IhildaWallet
 					}
 
 					if (tuple.Item2 > offerTransaction.LastLedgerSequence) {
-						this.SetResult (index.ToString (), "failed to validate before LastLedgerSequence exceeded", TextHighlighter.RED);
+						this.SetResult (index.ToString (), "failed to validate before LastLedgerSequence exceeded", Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					}
 
 					string str = "Not validated ";
@@ -2915,7 +2773,7 @@ namespace IhildaWallet
 					if (i < 2) {
 						this.SetResult (index.ToString (), stringBuilder.ToString (), TextHighlighter.ORANGE);
 					} else {
-						this.SetResult (index.ToString (), stringBuilder.ToString (), TextHighlighter.RED);
+						this.SetResult (index.ToString (), stringBuilder.ToString (), Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					}
 					//Thread.Sleep (3000);
 					for (int ind = 0; ind < 1; ind++) {
@@ -2924,7 +2782,7 @@ namespace IhildaWallet
 						if (i < 2) {
 							this.SetResult (index.ToString (), stringBuilder.ToString (), TextHighlighter.ORANGE);
 						} else {
-							this.SetResult (index.ToString (), stringBuilder.ToString (), TextHighlighter.RED);
+							this.SetResult (index.ToString (), stringBuilder.ToString (), Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 						}
 					}
 				
@@ -2947,19 +2805,29 @@ namespace IhildaWallet
 			}
 #endif
 
-			Gtk.Application.Invoke ( delegate {
-				if (Program.darkmode) {
-					label2.Markup = "<span fgcolor=\"chartreuse\">Submiting all</span>";
-				} else {
-					label2.Markup = "<span fgcolor=\"green\">Submiting all</span>";
-				}
-				label2.Visible = true;
-				progressbar3.Pulse ();
-			});
-
 			tokenSource?.Cancel ();
 			tokenSource = new CancellationTokenSource ();
 			CancellationToken token = tokenSource.Token;
+
+
+
+			if (Program.darkmode) {
+				
+				SetInfoBar ("<span fgcolor=\"chartreuse\">Submiting all</span>");
+			} else {
+				
+				SetInfoBar ("<span fgcolor=\"green\">Submiting all</span>");
+			}
+			
+
+
+			Gtk.Application.Invoke ( delegate {
+
+
+
+				progressbar3?.Pulse ();
+			});
+
 
 			AllSubmitted = false;
 
@@ -2993,7 +2861,7 @@ namespace IhildaWallet
 
 
 			// TODO verify inteneded address
-			RippleWallet rw = this.walletswitchwidget1.GetRippleWallet ();
+			RippleWallet rw = walletswitchwidget1?.GetRippleWallet ();
 			if (rw == null) {
 #if DEBUG
 				if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
@@ -3001,9 +2869,17 @@ namespace IhildaWallet
 				}
 #endif
 
+				if (!Program.darkmode) {
+					SetInfoBar ("<span fgcolor=\"red\">No wallet selected.</span>");
+				} else {
+					SetInfoBar ("<span fgcolor=\"#FFAABB\">No wallet selected.</span>");
+				}
+
 				Application.Invoke ( delegate {
-					this.label2.Markup = "<span fgcolor=\"red\">No wallet selected.</span>";
-					this.label2.Visible = true;
+
+					if (progressbar3 == null) {
+						return;
+					}
 					this.progressbar3.Fraction = 0;
 
 				});
@@ -3018,9 +2894,16 @@ namespace IhildaWallet
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
 			if (ni == null) {
 				// TODO network interface
+				if (Program.darkmode) {
+					SetInfoBar ("<span fgcolor=\"#FFAABB\">No network.</span>");
+				} else {
+					SetInfoBar ("<span fgcolor=\"red\">No network.</span>");
+				}
 				Application.Invoke (delegate {
-					this.label2.Markup = "<span fgcolor=\"red\">No network.</span>";
-					this.label2.Visible = true;
+
+					if (progressbar3 == null) {
+						return;
+					}
 					this.progressbar3.Fraction = 0;
 
 				});
@@ -3028,187 +2911,217 @@ namespace IhildaWallet
 				return;
 			}
 
+
+			//
+
+			if (Program.darkmode) {
+				SetInfoBar ("<span fgcolor=\"chartreuse\">Verifying License</span>");
+				
+			} else {
+				SetInfoBar ("<span fgcolor=\"green\">Verifying License</span>");
+			}
+
 			Application.Invoke (delegate {
-				if (Program.darkmode) {
-					this.label2.Markup = "<span fgcolor=\"chartreuse\">Verifying License</span>";
-				} else {
-					this.label2.Markup = "<span fgcolor=\"green\">Verifying License</span>";
+
+				if (progressbar3 == null) {
+					return;
 				}
-				//this.label2.Visible = true;
 				this.progressbar3.Fraction = 0.01;
 			});
 
 
 			bool ShouldContinue = false;
-			var contTask = Task.Run (
+			uint sequence;
+			RippleIdentifier rsa;
+			SignOptions signOptions;
+			using (var contTask = Task.Run (
 				delegate {
 					ShouldContinue = LeIceSense.LastDitchAttempt (rw, _licenseType);
 
 
 				}
-			);
-
-
-
-
-
-			uint sequence = 0;
-			var seqTask = Task.Run (delegate {
-				sequence =
-				Convert.ToUInt32 (
-					AccountInfo.GetSequence (
-						rw.GetStoredReceiveAddress (),
-						ni,
+			)) {
+				sequence = 0;
+				using (var seqTask = Task.Run (delegate {
+					sequence =
+					Convert.ToUInt32 (
+					    AccountInfo.GetSequence (
+					    	rw.GetStoredReceiveAddress (),
+					    	ni,
 						token
-					)
-				);
+			    			)
+					);
 
-			});
+				})) {
+					using (Task<SignOptions> signOptionsTask = Task.Run (
+						delegate {
 
-			Task<SignOptions> signOptionsTask = Task<SignOptions>.Run (
-				delegate {
-
-					return LoadSignOptions (token);
-				}
-			);
-			//int? f = FeeSettings.getFeeFromSettings (ni);
-			//if (f == null) {
-			//	return;
-			//}
-
-
-			contTask.Wait (token);
+				   			return LoadSignOptions (token);
+				   		}
+		       			)) {
+						//int? f = FeeSettings.getFeeFromSettings (ni);
+						//if (f == null) {
+						//	return;
+						//}
 
 
-			if (!ShouldContinue) {
-				Application.Invoke (delegate {
-					this.label2.Markup =
-						"<span fgcolor=\"red\">Insufficient "
-						+ LeIceSense.LICENSE_CURRENCY
-						+ "Requires "
-						+ _licenseType.ToString ()
-						+ "</span>";
-
-					//this.label2.Visible = true;
-
-				});
-				return;
-			}
-
-			Application.Invoke (delegate {
-				if (Program.darkmode) {
-					this.label2.Markup = "<span fgcolor=\"chartreuse>\">Requesting password</span>";
-				} else {
-					this.label2.Markup = "<span fgcolor=\"green\">Requesting password</span>";
-				}
-				//this.label2.Visible = true;
-				this.progressbar3.Fraction = 0.02;
-
-			});
-
-			token.WaitHandle.WaitOne (10);
-
-			RippleIdentifier rsa = rw.GetDecryptedSeed ();
-
-			Application.Invoke (delegate {
-
-				progressbar3.Fraction = 0.03;
-			});
+						contTask?.Wait (token);
 
 
-			while (rsa.GetHumanReadableIdentifier () == null) {
+						if (!ShouldContinue) {
 
-				Application.Invoke (delegate {
-					if (Program.darkmode) {
-						this.label2.Markup = "<span fgcolor=\"chartreuse\">Invalid password</span>";
-					} else {
-						this.label2.Markup = "<span fgcolor=\"green\">Invalid password</span>";
-					}
-					this.label2.Visible = true;
-					progressbar3.Pulse ();
-				});
+							string messg = 
+								"<span fgcolor=\"red\">Insufficient "
+				    				+ LeIceSense.LICENSE_CURRENCY
+				    				+ "Requires "
+				    				+ _licenseType.ToString ()
+				    				+ "</span>";
 
-				bool should = AreYouSure.AskQuestionNonGuiThread (
-				"Invalid password",
-				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
-				);
+							SetInfoBar (messg);
+						    	return;
+						}
 
+						if (Program.darkmode) {
+							SetInfoBar ( "<span fgcolor=\"chartreuse>\">Requesting password</span>" );
+						} else {
+							SetInfoBar ("<span fgcolor=\"green\">Requesting password</span>");
+						}
 
-
-				if (!should) {
-					Application.Invoke (delegate {
-
-						progressbar3.Fraction = 0.04;
-					});
-					return;
-				}
-
-				rsa = rw.GetDecryptedSeed ();
-			}
-
-			try {
-				StringBuilder stringBuilder = new StringBuilder ();
-
-				string frontspan = 
-					Program.darkmode 
-					? "<span fgcolor=\"chartreuse\">Preparing Payments" 
-					: "<span fgcolor=\"green\">Preparing Payments";
-
-				string backspan = "</span>";
-
-				stringBuilder.Append (frontspan);
-				//stringBuilder.Append (frontspan);
-				stringBuilder.Append (backspan);
-
-				string msg = stringBuilder.ToString ();
-
-				Application.Invoke (delegate {
-					this.label2.Markup = msg;
-
-					this.progressbar3.Fraction = 0.05;
-
-				});
+						Application.Invoke (delegate {
 
 
-				for ( 
-					int i = 0;
+							if (progressbar3 == null) {
+								return;
+							}
+							this.progressbar3.Fraction = 0.02;
 
-					 (!seqTask.IsCanceled && !seqTask.IsCompleted && !seqTask.IsFaulted) 
-		    			|| (!signOptionsTask.IsCanceled && !signOptionsTask.IsCompleted && !signOptionsTask.IsFaulted);
-		      
-		     			i++
+						});
 
-				) {
-					if (i == 10) {
-						i = 0;
-					}
+						token.WaitHandle.WaitOne (10);
+						rsa = rw.GetDecryptedSeed ();
 
-					Task.WaitAll (new [] { seqTask, signOptionsTask }, 1000, token);
+						Application.Invoke (delegate {
 
-					stringBuilder.Clear ();
-					stringBuilder.Append (frontspan);
+							if (progressbar3 == null) {
+								return;
+							}
+							progressbar3.Fraction = 0.03;
+						});
 
 
-					stringBuilder.Append (new String ('.', i));
+						while (rsa.GetHumanReadableIdentifier () == null) {
 
-					stringBuilder.Append (backspan);
-					Gtk.Application.Invoke (delegate {
+							if (Program.darkmode) {
+								SetInfoBar ("<span fgcolor=\"chartreuse\">Invalid password</span>");
+							} else {
+								SetInfoBar ("<span fgcolor=\"green\">Invalid password</span>");
+							}
 
-						this.label2.Markup = stringBuilder.ToString ();
+							Application.Invoke (delegate {
 
-					});
-				}
-			} catch (Exception e) {
+								progressbar3?.Pulse ();
+							});
+
+							bool should = AreYouSure.AskQuestionNonGuiThread (
+						    		"Invalid password",
+						    		"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+						    	);
+
+
+
+							if (!should) {
+								Application.Invoke (delegate {
+									if (progressbar3 == null) {
+										return;
+									}
+									progressbar3.Fraction = 0.04;
+								});
+								return;
+							}
+
+							rsa = rw.GetDecryptedSeed ();
+						}
+
+						try {
+							StringBuilder stringBuilder = new StringBuilder ();
+
+							string frontspan =
+						    	Program.darkmode
+						    	? "<span fgcolor=\"chartreuse\">Preparing Orders"
+						    	: "<span fgcolor=\"green\">Preparing Orders";
+
+							string backspan = "</span>";
+
+							stringBuilder.Append (frontspan);
+							//stringBuilder.Append (frontspan);
+							stringBuilder.Append (backspan);
+
+							string msg = stringBuilder.ToString ();
+
+							SetInfoBar (msg);
+
+							Application.Invoke (delegate {
+
+								if (progressbar3 == null) {
+									return;
+								}
+								this.progressbar3.Fraction = 0.05;
+
+							});
+
+
+							for (
+							    	int i = 0;
+
+						     		((seqTask != null && !seqTask.IsCanceled && !seqTask.IsCompleted && !seqTask.IsFaulted)
+								|| (signOptionsTask != null && !signOptionsTask.IsCanceled && !signOptionsTask.IsCompleted && !signOptionsTask.IsFaulted))
+				    				&& !token.IsCancellationRequested;
+								
+							 	i++
+
+						    	) {
+								if (i == 10) {
+									i = 0;
+								}
+
+								Task.WaitAll (new [] { seqTask, signOptionsTask }, 1000, token);
+
+								stringBuilder.Clear ();
+								stringBuilder.Append (frontspan);
+
+
+								stringBuilder.Append (new String ('.', i));
+
+								stringBuilder.Append (backspan);
+
+								SetInfoBar (stringBuilder.ToString ());
+							
+							}
+
+						} catch (Exception e) {
 
 #if DEBUG
-				if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
-					Logging.ReportException (method_sig, e);
-				}
+							if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
+								Logging.ReportException (method_sig, e);
+							}
 #endif
 
-			}
-			SignOptions signOptions = signOptionsTask.Result;
+						}
+						signOptions = signOptionsTask?.Result;
 
+					} // end using sign options task
+				}  // end using seq
+			} // end cont task
+
+
+			if (signOptions == null) {
+				if (Program.darkmode) {
+					SetInfoBar ("<span fgcolor=\"#FFAABB\">Unable to load sign options</span>");
+				} else {
+					SetInfoBar ("<span fgcolor=\"red\">Unable to load sign options</span>");
+				}
+				return;
+			}
 
 			double progressStep = 0.9 / _offers.Length;
 
@@ -3218,15 +3131,18 @@ namespace IhildaWallet
 			for (int index = 0; index < _offers.Length; index++) {
 
 				if (token.IsCancellationRequested) {
-					Gtk.Application.Invoke (delegate {
-						label2.Markup = "<span fgcolor=\"red\">Submit all task has been cancelled</span>";
-						//progressbar3.Fraction = 0;
 
-					});
+					if (Program.darkmode) {
+						SetInfoBar ("<span fgcolor=\"#FFAABB\">Submit all task has been cancelled</span>");
+					} else {
+						SetInfoBar ("<span fgcolor=\"red\">Submit all task has been cancelled</span>");
+					}
 					return;
 				} else {
-					Gtk.Application.Invoke ( delegate {
-
+					Gtk.Application.Invoke (delegate {
+						if (progressbar3 == null) {
+							return;
+						}
 						progressbar3.Fraction += progressStep;
 					});
 				}
@@ -3255,13 +3171,17 @@ namespace IhildaWallet
 				}
 			}
 
-			Gtk.Application.Invoke ( delegate {
+			if (Program.darkmode) {
+				SetInfoBar ("<span fgcolor=\"chartreuse\">All orders have been submitted successfully</span>");
+			} else {
+				SetInfoBar ("<span fgcolor=\"green\">All orders have been submitted successfully</span>");
+			}
 
-				this.label2.Markup = Program.darkmode ?
-					"<span fgcolor=\"chartreuse\">All orders have been submitted successfully</span>" :
-					"<span fgcolor=\"green\">All orders have been submitted successfully</span>";
-
-				this.label2.Visible = true;
+			Gtk.Application.Invoke (delegate {
+				
+				if (progressbar3 == null) {
+					return;
+				}
 				this.progressbar3.Fraction = 0.96;
 			});
 
@@ -3274,25 +3194,56 @@ namespace IhildaWallet
 		public void ConfirmValidationOfSelected (CancellationToken token)
 		{
 
+			var offs = _offers;
+			if (offs == null) {
+
+				SetInfoBar ("<span fgcolor=\"red\">Unable to verify selected orders. _offer == null</span>");
+
+				return;
+			}
 
 
 			for (int i = 0; i < 60 * 20; i++) {
 
-				Task.Delay (1000).Wait (token);
+				//Task.Delay (1000).Wait (token);
+				token.WaitHandle.WaitOne (1000);
 
 
+				var v = from off in offs where off != null && off.Selected select off;
+				if (v == null) {
+					return;
+				}
+				if (!v.Any (x => !x.IsValidated)) {
 
-				var v = from off in _offers where off.Selected select off;
-				if (!v.Any(x => !x.IsValidated)) {
-					Gtk.Application.Invoke ( delegate {
-						if (Program.darkmode) {
-							this.label2.Markup = "<span fgcolor=\"chartreuse\">All selected orders have been validated</span>";
-						} else {
-							this.label2.Markup = "<span fgcolor=\"green\">All selected orders have been validated</span>";
+					if (Program.darkmode) {
+						SetInfoBar ("<span fgcolor=\"chartreuse\">All selected orders have been validated</span>");
+					} else {
+						SetInfoBar ("<span fgcolor=\"green\">All selected orders have been validated</span>");
+					}
+
+					Gtk.Application.Invoke (delegate {
+						
+						if (progressbar3 == null) {
+							return;
 						}
 						this.progressbar3.Fraction = 1;
 					});
 					return;
+				} else {
+
+					if (Program.darkmode) {
+						SetInfoBar("<span fgcolor=\"yellow\">All orders have not been validated yet</span>");
+					} else {
+						SetInfoBar ("<span fgcolor=\"orange\">All orders have not been validated yet</span>");
+					}
+
+					Gtk.Application.Invoke (delegate {
+
+						if (progressbar3 == null) {
+							return;
+						}
+						this.progressbar3.Fraction = 1;
+					});
 				}
 			}
 			
@@ -3305,7 +3256,7 @@ namespace IhildaWallet
 
 		public void SetRippleWallet ( RippleWallet rippleWallet ) 
 		{
-			this.walletswitchwidget1.SetRippleWallet (rippleWallet);
+			this.walletswitchwidget1?.SetRippleWallet (rippleWallet);
 		}
 		/*
 		private RippleWallet _rippleWallet {
