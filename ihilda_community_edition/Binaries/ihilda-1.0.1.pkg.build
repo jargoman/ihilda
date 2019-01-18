@@ -17,6 +17,7 @@ source=("https://github.com/jargoman/ihilda_community_editon_alpha/raw/master/ih
 
 package() {
 	install -Dm755 Ihilda-1.0.1/ihildawallet_sys ${pkgdir}/usr/bin/ihildawallet
-	install -Dm644 Ihilda-1.0.1 ${pkgdir}/usr/share/${_pkgname}/all
+	install -d -Dm755 ${pkgdir}/usr/share/${_pkgname}/all
+	cp -rf Ihilda-1.0.1/* ${pkgdir}/usr/share/${_pkgname}/all
 }
 
