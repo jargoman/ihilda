@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using RippleLibSharp.Commands.Server;
@@ -90,7 +91,7 @@ namespace RippleLibSharp.Commands.Subscriptions
 
 		public static UInt32? GetRecentLedgerOrNull ()
 		{
-			var led = LastLedgerClosed;
+			LedgerClosed led = LastLedgerClosed;
 
 			return led?.ledger_index;
 	    		
@@ -99,18 +100,26 @@ namespace RippleLibSharp.Commands.Subscriptions
 
 
 		//private static uint? lastRetrieved = null;
-		public static Tuple<string, UInt32> GetFeeAndLastLedger (CancellationToken token) {
+		public static FeeAndLastLedgerResponse GetFeeAndLastLedger (CancellationToken token) {
+
+			StringBuilder stringBuilder = new StringBuilder ();
+			stringBuilder.Append ("Could not retrieve Fee and last ledger from Ledger tracker\n");
+			FeeAndLastLedgerResponse feeResp = new FeeAndLastLedgerResponse ();
 
 			LedgerClosed ledger = LastLedgerClosed;
 
 			if (ledger == null) {
-				return null;
+				stringBuilder.Append ("Last Stored Ledger is null");
+				feeResp.ErrorMessage += stringBuilder.ToString ();
+				return feeResp;
 			}
 			
 
 			ServerStateEventArgs serverState = ServerStateEv;
 			if (serverState == null) {
-				return null;
+				stringBuilder.Append ("Last stored server state is null");
+				feeResp.ErrorMessage += stringBuilder.ToString ();
+				return feeResp;
 			}
 
 
@@ -127,9 +136,12 @@ namespace RippleLibSharp.Commands.Subscriptions
 
 			ulong transaction_fee = (ulong)((native_base_fee * serverState.load_factor) / serverState.load_base);
 
-			Tuple<string, UInt32> ret = new Tuple<string, UInt32> (transaction_fee.ToString (), ledger.ledger_index);
+			//Tuple<string, UInt32> ret = new Tuple<string, UInt32> (transaction_fee.ToString (), ledger.ledger_index);
 
-			return ret;
+			feeResp.Fee = transaction_fee.ToString ();
+			feeResp.LastLedger = ledger.ledger_index;
+
+			return feeResp;
 		
 
 

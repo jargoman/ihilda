@@ -68,22 +68,24 @@ namespace IhildaWallet
 
 		public static bool AskQuestionNonGuiThread (String title, String message)
 		{
-			ManualResetEvent ev = new ManualResetEvent (false);
-			int rt = (int)ResponseType.None;
-			Gtk.Application.Invoke ( (object sender, EventArgs e) => {
+			int rt;
+			using (ManualResetEvent ev = new ManualResetEvent (false)) {
+				rt = (int)ResponseType.None;
+				Gtk.Application.Invoke ((object sender, EventArgs e) => {
 
-				using (AreYouSure aus = new AreYouSure (title, message)) {
-					rt = aus.Run ();
+					using (AreYouSure aus = new AreYouSure (title, message)) {
+						rt = aus.Run ();
 
-					aus.Destroy ();
+						aus.Destroy ();
 
-					//
-				}
+						//
+					}
 
-				ev.Set();
-			});
+					ev.Set ();
+				});
 
-			ev.WaitOne ();
+				ev.WaitOne ();
+			}
 
 			return rt == (int)ResponseType.Ok;
 

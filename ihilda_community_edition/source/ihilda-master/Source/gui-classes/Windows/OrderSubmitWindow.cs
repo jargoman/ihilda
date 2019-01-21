@@ -40,26 +40,27 @@ namespace IhildaWallet
 		{
 
 			bool ret = false;
-			ManualResetEvent manualReset = new ManualResetEvent (false);
-			manualReset.Reset ();
+			using (ManualResetEvent manualReset = new ManualResetEvent (false)) {
+				manualReset.Reset ();
 
-			Application.Invoke (
-				delegate {
-					OrderSubmitWindow orderSubmitWindow = new OrderSubmitWindow (rippleWallet, licenseType);
+				Application.Invoke (
+				    delegate {
+					    OrderSubmitWindow orderSubmitWindow = new OrderSubmitWindow (rippleWallet, licenseType);
 
-					orderSubmitWindow.SetOrders (offers);
+					    orderSubmitWindow.SetOrders (offers);
 
-					orderSubmitWindow.DeleteEvent += (object o, DeleteEventArgs args) => {
-						ret = orderSubmitWindow.GetReturnValue ();
-						manualReset.Set ();
-					};
+					    orderSubmitWindow.DeleteEvent += (object o, DeleteEventArgs args) => {
+						    ret = orderSubmitWindow.GetReturnValue ();
+						    manualReset.Set ();
+					    };
 
-				}
-			);
+				    }
+				);
 
-			manualReset.WaitOne ();
+				manualReset.WaitOne ();
 
-			manualReset.Dispose ();
+				manualReset.Dispose ();
+			}
 
 			return ret;
 

@@ -47,6 +47,8 @@ namespace IhildaWallet
 			WalletManagerWidget.currentInstance?.TestConnectivity ();
 
 			try {
+
+				// TODO error handling 
 				NetworkInterface ni = NetworkController.CurrentInterface;
 				if (ni == null || !ni.IsConnected()) {
 					NetworkController.AutoConnect ();
@@ -59,15 +61,21 @@ namespace IhildaWallet
 				}
 
 
-				var info = ServerInfo.GetFeeAndLedgerSequence (ni, _token);
+				FeeAndLastLedgerResponse feeResp = ServerInfo.GetFeeAndLedgerSequence (ni, _token);
 
-				if (info == null || info.Item2 == 0) {
+				if (feeResp == null) {
 					return;
 				}
 
-				//lock(WalletManager.walletLock) {
+				if (feeResp.HasError) {
+					return;
+				}
 
-				//}
+				if (feeResp.LastLedger == 0) {
+					return;
+				}
+
+				
 
 
 				IEnumerable<RippleWallet> wal = wallets.Values.AsEnumerable ();
@@ -75,10 +83,10 @@ namespace IhildaWallet
 
 				if (wallets.Count < 10 && !_token.IsCancellationRequested) {
 
-					DoExtensiveNotification (info.Item2, ni, _token, wal);
+					DoExtensiveNotification ((uint)feeResp.LastLedger, ni, _token, wal);
 
 				} else if (wallets.Count < 100 && !_token.IsCancellationRequested) {
-					DoBasicNotification (info.Item2, ni, _token, wal);
+					DoBasicNotification ((uint)feeResp.LastLedger, ni, _token, wal);
 				}
 
 
@@ -623,7 +631,7 @@ namespace IhildaWallet
 			uint lastKnownLedger = 0;
 			//int lim = limit ?? 200;
 
-			Task<IEnumerable<Response<AccountTxResult>>> task = null;
+			Task<FullTxResponse> task = null;
 
 			try {
 				task =
@@ -664,7 +672,16 @@ namespace IhildaWallet
 				return null;
 			}
 
-			IEnumerable<Response<AccountTxResult>> res = task.Result;
+			FullTxResponse fullTx = task.Result;
+			if (fullTx == null) {
+				return null;
+			}
+
+			if (fullTx.HasError) {
+				return null;
+			}
+
+			IEnumerable<Response<AccountTxResult>> res = fullTx.Responses;
 
 			if (res == null) {
 				return null;
@@ -786,73 +803,61 @@ namespace IhildaWallet
 
 		public Task InitNotificationSystem () => Task.Run (
 				delegate {
-
-					ManualResetEvent mre = new ManualResetEvent (false);
-					mre.Reset ();
-					Application.Invoke (delegate {
-
+					using (ManualResetEvent mre = new ManualResetEvent (false)) {
+						mre.Reset ();
+						Application.Invoke (delegate {
 
 
-						Gdk.Pixbuf icon = Gdk.PixbufLoader.LoadFromResource (nameof (IhildaWallet) + ".Images.ih_alpha.png").Pixbuf;
 
-						StatusTrayIcon = new StatusIcon {
-							Pixbuf = icon,
-							Blinking = false,
-							Visible = true
+							Gdk.Pixbuf icon = Gdk.PixbufLoader.LoadFromResource (nameof (IhildaWallet) + ".Images.ih_alpha.png").Pixbuf;
 
-						};
+							StatusTrayIcon = new StatusIcon {
+								Pixbuf = icon,
+								Blinking = false,
+								Visible = true
 
-
-						var cur = WalletManagerWindow.currentInstance;
-						if (cur != null) {
-							cur.ExposeEvent += delegate {
-								StatusTrayIcon.Blinking = false;
 							};
 
-							cur.EnterNotifyEvent += delegate {
-								StatusTrayIcon.Blinking = false;
-							};
-						}
-						
 
-						//StatusTrayIcon.Visible = true;
+							var cur = WalletManagerWindow.currentInstance;
+							if (cur != null) {
+								cur.ExposeEvent += delegate {
+									StatusTrayIcon.Blinking = false;
+								};
 
-						StatusTrayIcon.Activate += delegate {
-							var cu = WalletManagerWindow.currentInstance;
-							if (cu != null) {
-								if (cu.Visible) {
-									cu.Visible = false;
-								} else {
-
-									Program.splash?.Hide ();
-
-
-									cu.Visible = true;
-
-								}
+								cur.EnterNotifyEvent += delegate {
+									StatusTrayIcon.Blinking = false;
+								};
 							}
-							
-							
-						};
 
-						/*
 							StatusTrayIcon.Activate += delegate {
+								var cu = WalletManagerWindow.currentInstance;
+								if (cu != null) {
+									if (cu.Visible) {
+										cu.Visible = false;
+									} else {
+
+										Program.splash?.Hide ();
+
+
+										cu.Visible = true;
+
+									}
+								}
+
 
 							};
-						*/
 
 
+							mre.Set ();
 
+						});
 
+						//mre.WaitOne ();
+						WaitHandle.WaitAny (new [] { mre, _token.WaitHandle });
+					}
 
-						mre.Set ();
-
-					});
-
-					//mre.WaitOne ();
-				WaitHandle.WaitAny (new [] { mre, _token.WaitHandle });
-
-				if (!Program.network) {
+					if (!Program.network) {
 					// if networking explicitly prohibited don't do networking loop. 
 						return;
 

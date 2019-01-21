@@ -21756,6 +21756,7 @@ OR</property>
   </widget>
   <widget class="Gtk.Dialog" id="IhildaWallet.AggreementDialog" design-size="760 424">
     <property name="MemberName" />
+    <property name="Title" translatable="yes">window1</property>
     <property name="WindowPosition">CenterOnParent</property>
     <property name="Buttons">2</property>
     <property name="HelpButton">False</property>

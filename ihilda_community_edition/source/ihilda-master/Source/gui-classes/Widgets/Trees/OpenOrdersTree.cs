@@ -318,11 +318,17 @@ namespace IhildaWallet
 
 				FeeSettings feeSettings = FeeSettings.LoadSettings ();
 				feeSettings.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
-					this.SetIsSubmitted (index.ToString (), "Fee " + e.FeeAndLastLedger.Item1.ToString () + " is too high, waiting on lower fee");
+					this.SetIsSubmitted (
+
+						index.ToString (),
+						 
+						"Fee " 
+						+ (string)(e?.FeeAndLastLedger?.Fee.ToString () ?? "null") 
+						+ " is too high, waiting on lower fee");
 				};
 
 				// TODO possibly use a real token
-				Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, new CancellationToken ());
+				ParsedFeeAndLedgerResp tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, new CancellationToken ());
 
 				if (tokenSource?.IsCancellationRequested == true) {
 
@@ -330,8 +336,18 @@ namespace IhildaWallet
 					//stop = false;
 					return false;
 				}
+
+				if (tupe == null) {
+					this.SetFailed (index.ToString (), "Parsed Fee and Last ledger object nul");
+					return false;
+				}
+				if (tupe.HasError) {
+					this.SetFailed (index.ToString (), tupe.ErrorMessage);
+					return false;
+				}
+
 				//UInt32 f = tupe.Item1; 
-				UInt32 f = tupe.Item1;
+				UInt32 f = (UInt32)tupe.Fee;
 
 				RippleCancelTransaction tx = new RippleCancelTransaction {
 					Account = off.Account,
@@ -357,7 +373,7 @@ namespace IhildaWallet
 				}
 
 
-				tx.LastLedgerSequence = tupe.Item2 + lls;
+				tx.LastLedgerSequence = (UInt32)tupe.LastLedger + lls;
 
 				if (tx.fee.amount == 0 || tx.Sequence == 0) {
 					this.SetFailed (index.ToString (), "Invalid Fee or Sequence");

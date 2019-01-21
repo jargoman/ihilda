@@ -60,41 +60,41 @@ namespace IhildaWallet
 				string method_sig = clsstr + nameof (InitGUI) + DebugRippleLibSharp.both_parentheses;
 				#endif
 				ConsoleWindow csw = null;
-				ManualResetEvent ewh = new ManualResetEvent(true);
-				ewh.Reset ();
+				using (ManualResetEvent ewh = new ManualResetEvent (true)) {
+					ewh.Reset ();
 
-				Application.Invoke ( delegate {
-					try {
-						#if DEBUG
-						if (DebugIhildaWallet.ConsoleWindow) {
-							Logging.WriteLog(method_sig + "Invoking ConsoleWindow creation thread : Thread priority = " + Thread.CurrentThread.Priority);
+					Application.Invoke (delegate {
+						try {
+#if DEBUG
+							if (DebugIhildaWallet.ConsoleWindow) {
+								Logging.WriteLog (method_sig + "Invoking ConsoleWindow creation thread : Thread priority = " + Thread.CurrentThread.Priority);
+							}
+#endif
+
+							csw = new ConsoleWindow ();
+							//csw.ShowAll();
+							ewh.Set ();
+
 						}
-						#endif
 
-						csw = new ConsoleWindow();
-						//csw.ShowAll();
-						ewh.Set();
+#pragma warning disable 0168
+			catch (Exception e) {
+#pragma warning restore 0168
 
-					}
-
-					#pragma warning disable 0168
-					catch ( Exception e ) {
-					#pragma warning restore 0168
-
-						#if DEBUG
-						if (DebugIhildaWallet.ConsoleWindow) {
-							Logging.ReportException(method_sig, e);
+#if DEBUG
+							if (DebugIhildaWallet.ConsoleWindow) {
+								Logging.ReportException (method_sig, e);
+							}
+#endif
+						} finally {
+							ewh.Set ();
 						}
-						#endif
-					}
 
-					finally {
-						ewh.Set();
-					}
+					});
 
-				});
+					ewh.WaitOne ();
+				}
 
-				ewh.WaitOne();
 				return csw;
 			});
 

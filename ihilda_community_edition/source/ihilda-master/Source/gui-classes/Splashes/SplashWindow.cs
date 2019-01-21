@@ -67,16 +67,23 @@ namespace IhildaWallet
 
 
 
-				if (width.HasValue) {
+				if (width.HasValue && width != 0) {
 					this.image87.WidthRequest = width.Value;
 					this.WidthRequest = width.Value;
 					this.DefaultWidth = width.Value;
+				} else {
+					this.image87.WidthRequest = DefaultWidth;
+					WidthRequest = DefaultWidth + 8;
+
 				}
 
-				if (height.HasValue) {
+				if (height.HasValue && height != 0) {
 					image87.HeightRequest = height.Value;
 					this.HeightRequest = height.Value;
 					this.DefaultHeight = height.Value;
+				} else {
+					this.image87.HeightRequest = DefaultHeight;
+					HeightRequest = DefaultHeight + 8;
 				}
 
 

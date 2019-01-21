@@ -596,50 +596,52 @@ namespace IhildaWallet
 					string method_sig = clsstr + nameof (InitGUI) + DebugRippleLibSharp.both_parentheses;
 #endif
 					PaymentWindow win = null;
-					EventWaitHandle wh = new ManualResetEvent (true);
-					wh.Reset ();
-					Gtk.Application.Invoke (
-						delegate {
+					using (EventWaitHandle wh = new ManualResetEvent (true)) {
+						wh.Reset ();
+						Gtk.Application.Invoke (
+						    delegate {
 
-							try {
-
-#if DEBUG
-								if (DebugIhildaWallet.PaymentWindow) {
-									Logging.WriteLog (method_sig + "Invoking MainWindow creation thread : Thread priority = " + Thread.CurrentThread.Priority);
-								}
-#endif
-								win = new PaymentWindow ();  // not visible yet
-								win.Hide ();
-								//win.HideAll ();
-								//win.Visible = false;
+							    try {
 
 #if DEBUG
-								if (DebugIhildaWallet.PaymentWindow) {
-									Logging.WriteLog (method_sig + "finished creating window \n");
-								}
+					    if (DebugIhildaWallet.PaymentWindow) {
+									    Logging.WriteLog (method_sig + "Invoking MainWindow creation thread : Thread priority = " + Thread.CurrentThread.Priority);
+								    }
+#endif
+					    win = new PaymentWindow ();  // not visible yet
+					    win.Hide ();
+					    //win.HideAll ();
+					    //win.Visible = false;
+
+#if DEBUG
+					    if (DebugIhildaWallet.PaymentWindow) {
+									    Logging.WriteLog (method_sig + "finished creating window \n");
+								    }
 #endif
 
 #if DEBUG
-								if (DebugIhildaWallet.PaymentWindow) {
-									Logging.WriteLog (method_sig + "t4 complete");
-								}
+					    if (DebugIhildaWallet.PaymentWindow) {
+									    Logging.WriteLog (method_sig + "t4 complete");
+								    }
 #endif
-								wh.Set ();
-							} catch (Exception e) {
+					    wh.Set ();
+							    } catch (Exception e) {
 
 #if DEBUG
-								Logging.ReportException (method_sig, e);
+					    Logging.ReportException (method_sig, e);
 #endif
 
-								wh.Set ();
+					    wh.Set ();
 
-							} finally {
-								wh.Set ();
-							}
+							    } finally {
+								    wh.Set ();
+							    }
 
-						}
-						);
-					wh.WaitOne ();
+						    }
+						    );
+						wh.WaitOne ();
+					}
+
 					return win;
 				}
 

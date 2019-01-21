@@ -609,69 +609,70 @@ namespace IhildaWallet
 					RippleWallet rw = _rippleWallet;
 					string address = rw.GetStoredReceiveAddress ();
 					String cur = null;
-					ManualResetEvent manualResetEvent = new ManualResetEvent (false);
-					manualResetEvent.Reset ();
-					Gtk.Application.Invoke (delegate {
+					using (ManualResetEvent manualResetEvent = new ManualResetEvent (false)) {
+						manualResetEvent.Reset ();
+						Gtk.Application.Invoke (delegate {
 #if DEBUG
-						if (DebugIhildaWallet.SendAndConvert) {
-							Logging.WriteLog (method_sig + "gtk invoke");
-						}
+							if (DebugIhildaWallet.SendAndConvert) {
+								Logging.WriteLog (method_sig + "gtk invoke");
+							}
 #endif
 
-						cur = this.comboboxentry.ActiveText;
+							cur = this.comboboxentry.ActiveText;
 
 
-						if (RippleCurrency.NativeCurrency == cur) {
+							if (RippleCurrency.NativeCurrency == cur) {
 
-							issuerentry.Entry.Text = "";
-							issuerentry.Sensitive = false;
-							issuerentry.Visible = false;
+								issuerentry.Entry.Text = "";
+								issuerentry.Sensitive = false;
+								issuerentry.Visible = false;
 
-							label17.Visible = false;
+								label17.Visible = false;
 
-							Task.Run ((System.Action)SyncXRPBalance);
+								Task.Run ((System.Action)SyncXRPBalance);
 
+								return;
+							}
+
+							issuerentry.Sensitive = true;
+							issuerentry.Visible = true;
+
+							label17.Visible = true;
+
+							manualResetEvent.Set ();
+
+						});
+
+						//manualResetEvent.WaitOne (token);
+						WaitHandle.WaitAny (new [] { manualResetEvent, token.WaitHandle });
+
+
+						NetworkInterface ni = NetworkController.CurrentInterface;
+
+						if (ni == null) {
 							return;
 						}
 
-						issuerentry.Sensitive = true;
-						issuerentry.Visible = true;
-
-						label17.Visible = true;
-
-						manualResetEvent.Set ();
-
-					});
-
-					//manualResetEvent.WaitOne (token);
-					WaitHandle.WaitAny (new [] { manualResetEvent, token.WaitHandle});
 
 
-					NetworkInterface ni = NetworkController.CurrentInterface;
+						IEnumerable<String> lis = AccountLines.GetIssuersForCurrency (cur, address, ni, token);
 
-					if (ni == null) {
-						return;
+						manualResetEvent.Reset ();
+						Application.Invoke ((object sender, EventArgs e) => {
+							ListStore store = new ListStore (typeof (string));
+
+							foreach (String s in lis) {
+								store.AppendValues (s);
+							}
+
+
+							this.issuerentry.Model = store;
+							manualResetEvent.Set ();
+						});
+						//manualResetEvent.WaitOne ();
+
+						WaitHandle.WaitAny (new [] { manualResetEvent, token.WaitHandle });
 					}
-
-
-
-					IEnumerable<String> lis = AccountLines.GetIssuersForCurrency (cur, address, ni, token);
-
-					manualResetEvent.Reset ();
-					Application.Invoke ((object sender, EventArgs e) => {
-						ListStore store = new ListStore (typeof (string));
-
-						foreach (String s in lis) {
-							store.AppendValues (s);
-						}
-
-
-						this.issuerentry.Model = store;
-						manualResetEvent.Set ();
-					});
-					//manualResetEvent.WaitOne ();
-
-					WaitHandle.WaitAny (new [] { manualResetEvent, token.WaitHandle });
 
 					UpdateBalanceIOU (_rippleWallet?.GetStoredReceiveAddress ());
 
@@ -809,49 +810,48 @@ namespace IhildaWallet
 
 			string cur = null;
 			RippleAddress issuer = null;
+			using (ManualResetEvent mre = new ManualResetEvent (false)) {
+				mre.Reset ();
 
-			ManualResetEvent mre = new ManualResetEvent (false);
-			mre.Reset ();
+				Gtk.Application.Invoke (
 
-			Gtk.Application.Invoke (
+				    delegate {
 
-				delegate {
+					    if (this.comboboxentry == null) {
+				    // TODO bug
 
-					if (this.comboboxentry == null) {
-						// TODO bug
+				    return;
+					    }
+					    try {
+						    cur = this.comboboxentry.ActiveText;
 
-						return;
-					}
-					try {
-						cur = this.comboboxentry.ActiveText;
-
-					}
-
-#pragma warning disable 0168
-					catch (Exception e) {
-#pragma warning restore 0168
-						cur = null;
-						mre.Set ();
-						return;
-					}
-
-					try {
-						issuer = this.issuerentry.ActiveText;
-					}
+					    }
 
 #pragma warning disable 0168
-					catch (Exception e) {
+		    catch (Exception e) {
 #pragma warning restore 0168
-						issuer = null;
-					}
-					mre.Set ();
-				} // end delegate
+				    cur = null;
+						    mre.Set ();
+						    return;
+					    }
 
-			);  // end invoke
+					    try {
+						    issuer = this.issuerentry.ActiveText;
+					    }
 
-			//mre.WaitOne (token);
-			WaitHandle.WaitAny (new [] { mre, token.WaitHandle });
+#pragma warning disable 0168
+		    catch (Exception e) {
+#pragma warning restore 0168
+				    issuer = null;
+					    }
+					    mre.Set ();
+				    } // end delegate
 
+				);  // end invoke
+
+				//mre.WaitOne (token);
+				WaitHandle.WaitAny (new [] { mre, token.WaitHandle });
+			}
 
 			if (cur == null) {
 				return;

@@ -231,35 +231,33 @@ namespace IhildaWallet.Networking
 		}
 
 
-		public static Task<Response< RippleSubmitTxResult>> UiTxNetworkSubmit (RippleTransaction rt, NetworkInterface ni, CancellationToken token) {
-			return Task.Run (
+		public static Task<Response<RippleSubmitTxResult>> UiTxNetworkSubmit (RippleTransaction rt, NetworkInterface ni, CancellationToken token) => Task.Run (
 				delegate {
-					
-					ManualResetEvent mre = new ManualResetEvent (true);
-					mre.Reset ();
+					SpinWait sw;
+					using (ManualResetEvent mre = new ManualResetEvent (true)) {
+						mre.Reset ();
+						sw = null;
+						Gtk.Application.Invoke (
+						    (object sender, EventArgs e) => {
+							    sw = new SpinWait ();
+							    sw.Show ();
+							    //sw.ShowAll();
+							    mre.Set ();
+						    }
 
-					SpinWait sw = null;
+						);
 
-					Gtk.Application.Invoke (
-						(object sender, EventArgs e) => {
-							sw = new SpinWait ();
-							sw.Show();
-							//sw.ShowAll();
-							mre.Set();
-						}
+						//mre.WaitOne ();
+						WaitHandle.WaitAny (new [] { mre, token.WaitHandle });
+					}
 
-					);
-
-					//mre.WaitOne ();
-					WaitHandle.WaitAny (new [] { mre, token.WaitHandle });
-
-					Response<RippleSubmitTxResult> tsk = rt.Submit(ni, token);
+					Response<RippleSubmitTxResult> tsk = rt.Submit (ni, token);
 
 
 					Gtk.Application.Invoke (
 						(object sender, EventArgs e) => {
 							if (sw != null) {
-								sw.Hide();
+								sw.Hide ();
 							}
 						}
 					);
@@ -267,9 +265,6 @@ namespace IhildaWallet.Networking
 					return tsk;
 				}
 			);
-
-
-		}
 
 		public static Task<bool> AutoConnect () {
 

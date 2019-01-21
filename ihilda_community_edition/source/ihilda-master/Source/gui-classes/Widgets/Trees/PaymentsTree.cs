@@ -80,10 +80,10 @@ namespace IhildaWallet
 				}
 
 				feeSettings.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
-					this.SetResult (index.ToString(), "Fee " + e.FeeAndLastLedger.Item1.ToString() + " is too high, waiting on lower fee", TextHighlighter.BLACK);
+					this.SetResult (index.ToString(), (string)("Fee " + e?.FeeAndLastLedger?.Fee.ToString() ?? "null") + " is too high, waiting on lower fee", TextHighlighter.BLACK);
 				};
 
-				Tuple< UInt32,UInt32 > tupe = feeSettings.GetFeeAndLastLedgerFromSettings ( ni, token );
+				ParsedFeeAndLedgerResp tupe = feeSettings.GetFeeAndLastLedgerFromSettings ( ni, token );
 
 
 				if (token.IsCancellationRequested) {
@@ -92,8 +92,20 @@ namespace IhildaWallet
 					
 					return false;
 				}
+
+				if (tupe == null) {
+					this.SetResult (index.ToString (), "Unable to retrieve fee and last ledger from settings\n", TextHighlighter.RED);
+					return false;
+				}
+
+				if (tupe.HasError) {
+					this.SetResult (index.ToString (), tupe.ErrorMessage, TextHighlighter.RED);
+					return false;
+				}
+
+				
 				//UInt32 f = tupe.Item1; 
-				UInt32 f = tupe.Item1;
+				UInt32 f = (UInt32)tupe.Fee;
 				tx.fee = f.ToString ();
 
 				tx.Sequence = sequence; // note: don't update se++ with forloop, update it with each payment
@@ -110,7 +122,7 @@ namespace IhildaWallet
 				}
 
 
-				tx.LastLedgerSequence = tupe.Item2 + lls;
+				tx.LastLedgerSequence = (UInt32)tupe.LastLedger + lls;
 
 				if (tx.fee.amount == 0 || tx.Sequence == 0 ) {
 					this.SetResult(index.ToString(), "Invalid Fee or Sequence", TextHighlighter.RED);

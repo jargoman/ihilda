@@ -641,16 +641,12 @@ namespace IhildaWallet
 #endif
 				return;
 			}
-			EventWaitHandle ewh = new ManualResetEvent (true);
-			ewh.Reset ();
+			
 
 			Object ob = null;
-			//Gtk.Application.Invoke (delegate {
-
-
 
 			ob = new {
-				ServerUrls = servs,   //this.serverentry.Text,
+				ServerUrls = servs,  
 				LocalUrl = this.localentry.Text,
 
 				UserAgent = this.agententry.Text,
@@ -723,52 +719,55 @@ namespace IhildaWallet
 			if (DebugIhildaWallet.NetworkSettings) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
+
+			ConnectionSettings conny;
 #endif
 
 
-			ManualResetEvent ev = new ManualResetEvent(false);
-			ConnectionSettings conny = new ConnectionSettings();
+			using (ManualResetEvent ev = new ManualResetEvent (false)) {
+				conny = new ConnectionSettings ();
 
 
 
-			// if we call this from the gtk thread things are much easier
-			Gtk.Application.Invoke( delegate {  
+				// if we call this from the gtk thread things are much easier
+				Gtk.Application.Invoke (delegate {
+
+#if DEBUG
+					if (DebugIhildaWallet.NetworkSettings) {
+						Logging.WriteLog (method_sig + "gtk invoke : " + DebugRippleLibSharp.beginn);
+					}
+#endif
+
+
+					String str = servertextview.Buffer.Text;
+					String [] srv = str.Split (' ', '\r', '\n', '\t', ',');
+
+					if (srv == null || srv.Length == 0) {
+#if DEBUG
+						if (DebugIhildaWallet.NetworkSettings) {
+							Logging.WriteLog (method_sig + "no servers specified : returning \n");
+						}
+#endif
+						//.showMessage ("");
+						return;
+					}
+
+					conny.ServerUrls = srv;
+					conny.LocalUrl = localentry.Text;
+					conny.UserAgent = agententry.Text;
+					if (this.autoconnectbutton != null) conny.Reconnect = this.autoconnectbutton.Active;
+					ev.Set ();
+
+				});
+
 
 #if DEBUG
 				if (DebugIhildaWallet.NetworkSettings) {
-					Logging.WriteLog (method_sig + "gtk invoke : " + DebugRippleLibSharp.beginn);
+					Logging.WriteLog (method_sig + "Connection info =" + DebugIhildaWallet.ToAssertString (conny) + "\n");
 				}
 #endif
-
-
-				String str = servertextview.Buffer.Text;
-				String[] srv = str.Split(' ', '\r', '\n', '\t', ',');
-
-				if ( srv == null || srv.Length == 0 ) {
-#if DEBUG
-					if (DebugIhildaWallet.NetworkSettings) {
-						Logging.WriteLog (method_sig + "no servers specified : returning \n");
-					}
-#endif
-					//.showMessage ("");
-					return;
-				}
-
-				conny.ServerUrls = srv;
-				conny.LocalUrl = localentry.Text;
-				conny.UserAgent = agententry.Text;
-				if (this.autoconnectbutton != null) conny.Reconnect = this.autoconnectbutton.Active;
-				ev.Set();
-
-			});
-
-
-#if DEBUG
-			if (DebugIhildaWallet.NetworkSettings) {
-				Logging.WriteLog(method_sig + "Connection info =" + DebugIhildaWallet.ToAssertString(conny) + "\n");
+				ev.WaitOne ();
 			}
-#endif
-			ev.WaitOne();
 
 			return conny;
 			// TODO validate url, yuck :/

@@ -522,44 +522,44 @@ namespace IhildaWallet
 				string method_sig = clsstr + nameof (InitGUI) + DebugRippleLibSharp.both_parentheses;
 #endif
 				TradeWindow trdw = null;
-				EventWaitHandle wh = new ManualResetEvent (true);
-				wh.Reset ();
-				Gtk.Application.Invoke (delegate {
-					try {
-						#if DEBUG
-						if (DebugIhildaWallet.Program) {
-							Logging.WriteLog (
-								method_sig
-								+ "Invoking " + nameof (TradeWindow) + " creation thread : " 
+				using (EventWaitHandle wh = new ManualResetEvent (true)) {
+					wh.Reset ();
+					Gtk.Application.Invoke (delegate {
+						try {
+#if DEBUG
+							if (DebugIhildaWallet.Program) {
+								Logging.WriteLog (
+								    method_sig
+								    + "Invoking " + nameof (TradeWindow) + " creation thread : "
 
-							);
+								);
+							}
+#endif
+							trdw = new TradeWindow (rw, tradePair);
+							trdw.Hide ();
+							//trdw.HideAll ();
+							trdw.Visible = false;
+#if DEBUG
+							if (DebugIhildaWallet.Program) {
+								Logging.WriteLog (method_sig + "creation complete");
+							}
+#endif
+							wh.Set ();
 						}
-						#endif
-						trdw = new TradeWindow (rw, tradePair);
-						trdw.Hide ();
-						//trdw.HideAll ();
-						trdw.Visible = false;
-						#if DEBUG
-						if (DebugIhildaWallet.Program) {
-							Logging.WriteLog (method_sig + "creation complete");
+
+#pragma warning disable 0168
+			catch (Exception e) {
+#pragma warning restore 0168
+#if DEBUG
+							Logging.ReportException (method_sig, e);
+#endif
+						} finally {
+							wh.Set ();
 						}
-						#endif
-						wh.Set ();
-					}
+					});
+					wh.WaitOne ();
+				}
 
-					#pragma warning disable 0168
-					catch (Exception e) {
-					#pragma warning restore 0168
-						#if DEBUG
-						Logging.ReportException(method_sig, e);
-						#endif
-					}
-
-					finally {
-						wh.Set();
-					}
-				});
-				wh.WaitOne ();
 				return trdw;
 			});
 

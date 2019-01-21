@@ -153,40 +153,40 @@ namespace IhildaWallet
 			}
 
 			TrippleEntente tripple = null;
-
-			ManualResetEventSlim mre = new ManualResetEventSlim ();
-			mre.Reset ();
-			Application.Invoke ((object sender, EventArgs e) => {
-				using (TrippleEntenteDialog dialog = new TrippleEntenteDialog ()) {
-					dialog.HideInfoBarLabels ();
-					while (tripple == null) {
-
-						//dialog.HideInfoBarLabels ();
-						ResponseType rt = (ResponseType)dialog.Run ();
+			using (ManualResetEventSlim mre = new ManualResetEventSlim ()) {
+				mre.Reset ();
+				Application.Invoke ((object sender, EventArgs e) => {
+					using (TrippleEntenteDialog dialog = new TrippleEntenteDialog ()) {
 						dialog.HideInfoBarLabels ();
-						if (rt != ResponseType.Ok) {
-							//dialog.Destroy ();
-							break;
+						while (tripple == null) {
+
+							//dialog.HideInfoBarLabels ();
+							ResponseType rt = (ResponseType)dialog.Run ();
+							dialog.HideInfoBarLabels ();
+							if (rt != ResponseType.Ok) {
+								//dialog.Destroy ();
+								break;
+							}
+
+							tripple = dialog.GetEntente ();
+
+							/*
+							if (tripple != null) {
+							    break;
+							}
+							*/
+
 						}
 
-						tripple = dialog.GetEntente ();
+						dialog.Destroy ();
 
-						/*
-						if (tripple != null) {
-							break;
-						}
-						*/
 
 					}
+					mre.Set ();
 
-					dialog.Destroy ();
-
-
-				}
-				mre.Set ();
-
-			});
-			mre.Wait ();
+				});
+				mre.Wait ();
+			}
 
 			return tripple;
 

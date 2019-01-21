@@ -705,7 +705,7 @@ namespace IhildaWallet
 						// TODO are ya sure. limited account capabilities 
 						// I haven't tested regular accounts yet
 
-						this.label6.Markup = "<span fgcolor=\"red\">To create a regular key wallet; you must specify the master account it signs on behalf of</span>";
+						this.label6.Markup = "<span fgcolor=\"red\">Failed to create a regular key wallet; you must specify the master account it signs on behalf of</span>";
 						comboboxentry2.ModifyBase (StateType.Normal, orchid);
 						this.label6.Show ();
 						return null;
@@ -818,7 +818,7 @@ namespace IhildaWallet
 				case EncryptionType.Rijndaelio:
 					ie = new Rijndaelio ();
 
-
+					ie.Password = PasswordCreateDialog.DoDialog ("Enter a new password to encrypt wallet\n");
 
 					break;
 

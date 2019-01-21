@@ -36,6 +36,12 @@ namespace IhildaWallet
 
 		}
 
+		~ServerInfoWidget ()
+		{
+			_waitHandle?.Close ();
+
+
+		}
 
 		public void SetServer (NetworkInterface ni) {
 			//this.networkInterface = ni;
@@ -281,8 +287,7 @@ namespace IhildaWallet
 
 
 
-
-		static EventWaitHandle _waitHandle = new ManualResetEvent( true );
+		EventWaitHandle _waitHandle = new ManualResetEvent( true );
 
 
 #if DEBUG

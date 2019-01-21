@@ -43,31 +43,29 @@ namespace IhildaWallet
 		public static bool DoDialog (RippleWallet rw, Decimal amount)
 		{
 			ResponseType r = ResponseType.None;
+			using (ManualResetEvent ev = new ManualResetEvent (false)) {
+				Application.Invoke (
+					(object sender, EventArgs e) => {
 
-			ManualResetEvent ev = new ManualResetEvent (false);
-			Application.Invoke (
-				(object sender, EventArgs e) => {
+						using (FreeTrialAlertDialog ftad = new FreeTrialAlertDialog ()) {
 
-					using (FreeTrialAlertDialog ftad = new FreeTrialAlertDialog ()) {
-
-						ftad.SetMessageString (rw, amount.ToString ());
-
-
-						r = (ResponseType)ftad.Run ();
-						ftad.Destroy ();
-						ev.Set ();
+							ftad.SetMessageString (rw, amount.ToString ());
 
 
+							r = (ResponseType)ftad.Run ();
+							ftad.Destroy ();
+							ev.Set ();
 
-					}
+
+						}
 
 
 
-				});
+					});
 
-			
-			ev.WaitOne ();
 
+				ev.WaitOne ();
+			}
 
 			switch (r) {
 			case ResponseType.Cancel:

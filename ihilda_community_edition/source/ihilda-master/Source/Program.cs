@@ -233,7 +233,7 @@ namespace IhildaWallet
 
 			orderSubmitter.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
 				if (e.State == FeeSleepState.Begin) {
-					Logging.WriteLog ("Fee " + e.FeeAndLastLedger.Item1.ToString () + " is too high, waiting on lower fee");
+					Logging.WriteLog ("Fee " + (string)(e?.FeeAndLastLedger?.Fee.ToString () ?? "null") + " is too high, waiting on lower fee");
 					return;
 				}
 
@@ -1130,44 +1130,45 @@ namespace IhildaWallet
 					string method_sig = clsstr + nameof (InitSplash) + DebugRippleLibSharp.right_parentheses;
 #endif
 
-				EventWaitHandle whandle = new ManualResetEvent (true);
-				whandle.Reset ();
+					using (EventWaitHandle whandle = new ManualResetEvent (true)) {
+						whandle.Reset ();
 
-				Gtk.Application.Invoke (delegate {
-				try {
+						Gtk.Application.Invoke (delegate {
+							try {
 
-#if DEBUG
-							if (DebugIhildaWallet.Program) {
-								Logging.WriteLog (method_sig + DebugIhildaWallet.gtkInvoke + DebugRippleLibSharp.beginn);
-							}
-#endif
-
-					if (SplashWindow.isSplash) {
 #if DEBUG
 								if (DebugIhildaWallet.Program) {
-									Logging.WriteLog (method_sig + "Creating splash");
+									Logging.WriteLog (method_sig + DebugIhildaWallet.gtkInvoke + DebugRippleLibSharp.beginn);
 								}
 #endif
-						splash = new SplashWindow ();
-					}
+
+								if (SplashWindow.isSplash) {
 #if DEBUG
-							if (DebugIhildaWallet.Program) {
-								Logging.WriteLog (method_sig + "t1 complete");
+									if (DebugIhildaWallet.Program) {
+										Logging.WriteLog (method_sig + "Creating splash");
+									}
+#endif
+									splash = new SplashWindow ();
+								}
+#if DEBUG
+								if (DebugIhildaWallet.Program) {
+									Logging.WriteLog (method_sig + "t1 complete");
+								}
+#endif
+								//whandle.Set();	
+							} catch (Exception e) {
+#if DEBUG
+								Logging.ReportException (method_sig, e);
+#endif
+
+							} finally {
+								whandle.Set ();
 							}
-#endif
-					//whandle.Set();	
-				} catch (Exception e) {
-#if DEBUG
-							Logging.ReportException (method_sig, e);
-#endif
 
-						} finally {
-							whandle.Set ();
-						}
+						});
 
-					});
-
-					whandle.WaitOne ();
+						whandle.WaitOne ();
+					}
 				});
 
 

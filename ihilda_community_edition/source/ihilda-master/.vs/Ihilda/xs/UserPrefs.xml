@@ -1,39 +1,9 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default" NuGet.AddPackagesDialog.IncludePrerelease="True">
   <MonoDevelop.Ide.ItemProperties.RippleLibSharp PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Source/Program.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../../RippleLibSharp/RippleLibSharp/Source/Transactions/TxTypes/RippleAccountSetTransaction.cs">
     <Files>
-      <File FileName="Source/Program.cs" Line="396" Column="27" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Transactions/TxTypes/RippleAccountSetTransaction.cs" Line="24" Column="3" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State name="__root__">
-          <Node name="Ihilda" expanded="True">
-            <Node name="IhildaWallet" expanded="True">
-              <Node name="Source" expanded="True">
-                <Node name="bot" expanded="True" />
-                <Node name="gui-classes" expanded="True">
-                  <Node name="Dialogs" expanded="True" />
-                  <Node name="Widgets" expanded="True">
-                    <Node name="PayUI" expanded="True" />
-                    <Node name="RuleWidgets" expanded="True" />
-                    <Node name="TransactionsWidgets" expanded="True" />
-                  </Node>
-                </Node>
-                <Node name="Program.cs" selected="True" />
-              </Node>
-            </Node>
-            <Node name="RippleLibSharp" expanded="True">
-              <Node name="Source" expanded="True">
-                <Node name="Commands" expanded="True">
-                  <Node name="Server" expanded="True" />
-                  <Node name="Subscriptions" expanded="True" />
-                </Node>
-              </Node>
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />

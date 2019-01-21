@@ -44,13 +44,19 @@ namespace IhildaWallet
 
 		public RippleWallet (RippleSeedAddress rseed, RippleWalletTypeEnum wallettype)
 		{
-			if (wallettype == RippleWalletTypeEnum.Master) {
+			switch (wallettype) {
+			case RippleWalletTypeEnum.Master:
 				this.Seed = rseed;
 				this.Account = rseed.GetPublicRippleAddress ();
-			} else if (wallettype == RippleWalletTypeEnum.Regular) {
+				break;
+			case RippleWalletTypeEnum.Regular:
 				this.Regular_Seed = rseed;
-				this.Regular_Key_Account = rseed.GetPublicRippleAddress ();
-			} 
+				this.Regular_Key_Account = rseed.GetPublicRippleAddress ().ToString ();
+				break;
+			case RippleWalletTypeEnum.MasterPrivateKey:
+				throw new ArgumentException ("Wallet type master private can not be instantiated wuth a seed\n", nameof (wallettype));
+				//break;
+			}
 
 			this.AccountType = wallettype;
 			NextTransactionSequenceNumber = -1;
@@ -63,19 +69,26 @@ namespace IhildaWallet
 				return;
 			}
 
-			if (walletType == RippleWalletTypeEnum.Master) {
+			switch (walletType) {
+			case RippleWalletTypeEnum.Master:
 				this.Encrypted_Wallet = encrypted;
+				this.Encryption_Type = encryptionType;
 
-				if (encrypted != null) {
-					this.Encryption_Type = encryptionType;
-				}
-			} else {
+				break;
+
+			case RippleWalletTypeEnum.Regular:
 				this.Encrypted_Regular_Wallet = encrypted;
+				//this.Encryption_Type = encryptionType;
+				this.Regular_Key_Encryption_Type = encryptionType;
+				break;
 
-				if (encrypted != null) {
-					this.Regular_Key_Encryption_Type = encryptionType;
-				}
+			case RippleWalletTypeEnum.MasterPrivateKey:
+				this.Encrypted_Wallet = encrypted;
+				this.Encryption_Type = encryptionType;
+				break;
 			}
+
+
 
 			this.AccountType = walletType;
 
@@ -249,12 +262,7 @@ namespace IhildaWallet
 			set;
 		}
 
-		/*
-		public String saltTwo {
-			get;
-			set;
-		}
-		*/
+
 
 		public uint? LastKnownLedger {
 			get;
@@ -309,34 +317,6 @@ namespace IhildaWallet
 
 			ResponseType resp = ResponseType.None;
 			EncryptionType et = EncryptionType.None;
-			ManualResetEventSlim mre = new ManualResetEventSlim ();
-			mre.Reset ();
-			Application.Invoke ( delegate /*(object sender, EventArgs e )*/ {
-
-				EncryptionTypeDialog etd = new EncryptionTypeDialog ();
-				etd.ClearInfoBar ();
-				while (et == EncryptionType.None) {
-					
-					resp = (ResponseType)etd.Run ();
-
-					if (resp != ResponseType.Ok) {
-						break;
-					}
-
-					etd?.ClearInfoBar ();
-					et = etd.GetComboBoxChoice ();
-
-				}
-				etd.Destroy ();
-				mre.Set ();
-			});
-
-			mre.Wait ();
-
-
-			if (resp != ResponseType.Ok) {
-				return;
-			}
 
 
 
@@ -344,21 +324,51 @@ namespace IhildaWallet
 
 
 			//byte[] payload = seed.getBytes();
-			ResponseType rt = ResponseType.None;
-			RippleSeedAddress throwawayseed = null;
+			ResponseType rt;
+			RippleSeedAddress throwawayseed;
+			using (ManualResetEventSlim mre = new ManualResetEventSlim ()) {
+				mre.Reset ();
+				Application.Invoke (delegate /*(object sender, EventArgs e )*/
+				 {
 
-			mre.Reset ();
-			Application.Invoke ( (object sender, EventArgs e) => {
-				using (RandomSeedGenerator rsg = new RandomSeedGenerator ()) {
-					rt = (ResponseType)rsg.Run ();
-					throwawayseed = rsg.GetGeneratedSeed ();
+					 EncryptionTypeDialog etd = new EncryptionTypeDialog ();
+					 etd.ClearInfoBar ();
+					 while (et == EncryptionType.None) {
 
-					rsg.Destroy ();
-					mre.Set ();
+						 resp = (ResponseType)etd.Run ();
+
+						 if (resp != ResponseType.Ok) {
+							 break;
+						 }
+
+						 etd?.ClearInfoBar ();
+						 et = etd.GetComboBoxChoice ();
+
+					 }
+					 etd.Destroy ();
+					 mre.Set ();
+				 });
+
+				mre.Wait ();
+
+
+				if (resp != ResponseType.Ok) {
+					return;
 				}
-			});
-			mre.Wait ();
+				rt = ResponseType.None;
+				throwawayseed = null;
+				mre.Reset ();
+				Application.Invoke ((object sender, EventArgs e) => {
+					using (RandomSeedGenerator rsg = new RandomSeedGenerator ()) {
+						rt = (ResponseType)rsg.Run ();
+						throwawayseed = rsg.GetGeneratedSeed ();
 
+						rsg.Destroy ();
+						mre.Set ();
+					}
+				});
+				mre.Wait ();
+			}
 
 			if (rt != ResponseType.Ok) {
 				return;
@@ -380,7 +390,7 @@ namespace IhildaWallet
 			case EncryptionType.Rijndaelio:
 				ie = new Rijndaelio ();
 
-
+				ie.Password = Rijndaelio.GetPasswordCreateInput ();
 
 				break;
 
@@ -403,7 +413,7 @@ namespace IhildaWallet
 
 
 
-			if (Account == null && this.AccountType == RippleWalletTypeEnum.Master) {
+			if (Account == null) {
 				if (this.AccountType == RippleWalletTypeEnum.Master) {
 					Account = Seed?.GetPublicRippleAddress ();
 				}
@@ -413,16 +423,22 @@ namespace IhildaWallet
 				}
 			}
 
+			if (Regular_Key_Account == null && this.AccountType == RippleWalletTypeEnum.Regular) {
+				Regular_Key_Account = Regular_Seed?.GetPublicRippleAddress ();
+			}
+
 
 
 
 			Salt = Base58.Encode (salty);
 
 
-			byte [] enc = ie.Encrypt (Seed, salty);
+			byte [] enc = null;  
 
 			switch (AccountType) {
 			case RippleWalletTypeEnum.Master:
+
+				enc = ie.Encrypt (Seed, salty);
 				Encrypted_Wallet = Base58.Encode (enc);
 
 				Encryption_Type = ie.Name;
@@ -430,6 +446,9 @@ namespace IhildaWallet
 				Seed = null;
 				break;
 			case RippleWalletTypeEnum.Regular:
+
+				enc = ie.Encrypt (Regular_Seed, salty);
+
 				Encrypted_Regular_Wallet = Base58.Encode (enc);
 
 				Regular_Key_Encryption_Type = ie.Name;

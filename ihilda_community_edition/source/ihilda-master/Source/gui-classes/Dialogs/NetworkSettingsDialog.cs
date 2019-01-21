@@ -187,48 +187,48 @@ namespace IhildaWallet
 			}
 #endif
 
-			ManualResetEvent ev = new ManualResetEvent (false);
-
-			Application.Invoke (delegate {
-				NetworkSettingsDialog nsd = RetrieveDialog ();
-#if DEBUG
-				if (DebugIhildaWallet.NetworkSettingsDialog) {
-					Logging.WriteLog (method_sig + "using NetworkSettingsDialog\n");
-				}
-#endif
-
-				ResponseType resp = (ResponseType)nsd.Run ();
-
-#if DEBUG
-				if (DebugIhildaWallet.NetworkSettingsDialog) {
-					Logging.WriteLog (method_sig + "responded\n");
-				}
-#endif
-
-
-				if (resp == ResponseType.Ok) {
+			using (ManualResetEvent ev = new ManualResetEvent (false)) {
+				Application.Invoke (delegate {
+					NetworkSettingsDialog nsd = RetrieveDialog ();
 #if DEBUG
 					if (DebugIhildaWallet.NetworkSettingsDialog) {
-						Logging.WriteLog (method_sig + "ok clicked\n");
+						Logging.WriteLog (method_sig + "using NetworkSettingsDialog\n");
 					}
 #endif
-					nsd.Save ();
-				}
 
-				nsd.Destroy ();
+					ResponseType resp = (ResponseType)nsd.Run ();
+
+#if DEBUG
+					if (DebugIhildaWallet.NetworkSettingsDialog) {
+						Logging.WriteLog (method_sig + "responded\n");
+					}
+#endif
+
+
+					if (resp == ResponseType.Ok) {
+#if DEBUG
+						if (DebugIhildaWallet.NetworkSettingsDialog) {
+							Logging.WriteLog (method_sig + "ok clicked\n");
+						}
+#endif
+						nsd.Save ();
+					}
+
+					nsd.Destroy ();
 
 
 #if DEBUG
-				if (DebugIhildaWallet.NetworkSettingsDialog) {
-					Logging.WriteLog (method_sig + "closed using\n");
-				}
+					if (DebugIhildaWallet.NetworkSettingsDialog) {
+						Logging.WriteLog (method_sig + "closed using\n");
+					}
 #endif
 
-				ev.Set ();
+					ev.Set ();
 
-			}); // end gtk invoke
+				}); // end gtk invoke
 
-			ev.WaitOne ();
+				ev.WaitOne ();
+			}
 
 			// TODO what to return? isconnected netinterface ect...
 			return false;

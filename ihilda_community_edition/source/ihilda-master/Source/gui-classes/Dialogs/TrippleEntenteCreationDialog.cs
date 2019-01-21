@@ -119,17 +119,16 @@ namespace IhildaWallet
 		}
 		public static TrippleEntente DoDialog () {
 			TrippleEntente tripple = null;
+			using (ManualResetEventSlim mre = new ManualResetEventSlim ()) {
+				mre.Reset ();
 
-			ManualResetEventSlim mre = new ManualResetEventSlim ();
+				Application.Invoke ((object sender, EventArgs e) => {
+					tripple = DoDialogGuiThread ();
+					mre.Set ();
 
-			mre.Reset ();
-
-			Application.Invoke( (object sender, EventArgs e) => {
-				tripple = DoDialogGuiThread ();
-				mre.Set();
-
-			});
-			mre.Wait ();
+				});
+				mre.Wait ();
+			}
 
 			return tripple;
 

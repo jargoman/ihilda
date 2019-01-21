@@ -60,8 +60,7 @@ namespace IhildaWallet
 			}
 			*/
 
-			string password = GetPasswordCreateInput ();
-
+			string password = Password;
 			// TODO should I OR the byte values? with an array of known hardcoded bytes?
 			// should I OR it with a random salt and save that with the encrypted file?
 			// scramble them?
@@ -189,28 +188,36 @@ namespace IhildaWallet
 		public string Password { get; set; }
 
 		public static Rijndaelio GetPasswordInput () {
+			Rijndaelio rijndaelio;
+			using (ManualResetEventSlim mre = new ManualResetEventSlim ()) {
+				mre.Reset ();
+				rijndaelio = null;
+				Application.Invoke ((object sender, EventArgs e) => {
 
-			ManualResetEventSlim mre = new ManualResetEventSlim ();
-			mre.Reset ();
-			Rijndaelio rijndaelio = null;
-			Application.Invoke ( (object sender, EventArgs e) => {
+					rijndaelio = Rijndaelio.DoRijndaelioDialog ();
+					mre.Set ();
+				});
+				mre.Wait ();
+			}
 
-				rijndaelio = Rijndaelio.DoRijndaelioDialog ();
-				mre.Set();
-			});
-			mre.Wait ();
 			return rijndaelio;
 		}
 
-		public string GetPasswordCreateInput () {
-			ManualResetEventSlim mre = new ManualResetEventSlim ();
-			mre.Reset ();
-			string pass = null;
-			Application.Invoke ( (object sender, EventArgs e) => {
-				pass = PasswordCreateDialog.DoDialog ("Enter a new password");
-				mre.Set();
-			});
-			mre.Wait ();
+
+
+
+		public static string GetPasswordCreateInput () {
+			string pass;
+			using (ManualResetEventSlim mre = new ManualResetEventSlim ()) {
+				mre.Reset ();
+				pass = null;
+				Application.Invoke ((object sender, EventArgs e) => {
+					pass = PasswordCreateDialog.DoDialog ("Enter a new password");
+					mre.Set ();
+				});
+				mre.Wait ();
+			}
+
 			return pass;
 		}
 

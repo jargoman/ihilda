@@ -141,19 +141,18 @@ namespace IhildaWallet
 
 		protected void OnDeleteEvent (object sender, DeleteEventArgs a)
 		{
-			Goback();
+			Goback ();
 		}
 
-		private void Goback () {
+		private void Goback ()
+		{
 
 			this.Hide ();
 
 			if (WalletManagerWindow.currentInstance != null) {
-				
-				WalletManagerWindow.currentInstance.Show();
-			}
 
-			else {
+				WalletManagerWindow.currentInstance.Show ();
+			} else {
 				// todo debug
 			}
 		}
@@ -178,56 +177,59 @@ namespace IhildaWallet
 			}
 		});*/
 
-		public static Task<TrustManagementWindow> InitGUI (RippleWallet rippleWallet) {
-			return Task.Run ( delegate {
+		public static Task<TrustManagementWindow> InitGUI (RippleWallet rippleWallet)
+		{
+			return Task.Run (delegate {
 #if DEBUG
 				string method_sig = clsstr + DebugRippleLibSharp.both_parentheses;
 #endif
 				TrustManagementWindow tmw = null;
-				EventWaitHandle wh = new ManualResetEvent (true);
-				wh.Reset ();
-				Gtk.Application.Invoke (
-					delegate {
+				using (EventWaitHandle wh = new ManualResetEvent (true)) {
+					wh.Reset ();
+					Gtk.Application.Invoke (
+					    delegate {
 #if DEBUG
-						if (DebugIhildaWallet.TrustManagementWindow) {
-							Logging.WriteLog (
-								method_sig
-								+ "Invoking TrustManagerWindow creation thread : "
-							);
-						}
+						    if (DebugIhildaWallet.TrustManagementWindow) {
+							    Logging.WriteLog (
+					    			method_sig
+					    			+ "Invoking TrustManagerWindow creation thread : "
+				    				);
+						    }
 #endif
-						tmw = new TrustManagementWindow (rippleWallet);
-						tmw.Hide ();
-						//tmw.HideAll ();
-						tmw.Visible = false;
+						    tmw = new TrustManagementWindow (rippleWallet);
+						    tmw.Hide ();
+						    //tmw.HideAll ();
+						    tmw.Visible = false;
 
 #if DEBUG
-						if (DebugIhildaWallet.Program) {
-							Logging.WriteLog (method_sig + "finished creating trust management window \n");
-						}
+						    if (DebugIhildaWallet.Program) {
+							    Logging.WriteLog (method_sig + "finished creating trust management window \n");
+						    }
 
 
 
-						if (DebugIhildaWallet.Program) {
-							Logging.WriteLog (method_sig + "t5 complete");
-						}
+						    if (DebugIhildaWallet.Program) {
+							    Logging.WriteLog (method_sig + "t5 complete");
+						    }
 #endif
-						wh.Set ();
-					}
-				);
-				wh.WaitOne ();
+						    wh.Set ();
+					    }
+					);
+					wh.WaitOne ();
+				}
+
 				return tmw;
-			
+
 
 			});
 
 		}
 
-			/*
-		public static delegate initGUI () {
+		/*
+	public static delegate initGUI () {
 
 
-		}*/
+	}*/
 
 		//public static TrustManagementWindow currentInstance = null;
 

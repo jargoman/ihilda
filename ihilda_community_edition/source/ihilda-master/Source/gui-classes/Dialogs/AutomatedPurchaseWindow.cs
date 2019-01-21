@@ -74,7 +74,11 @@ namespace IhildaWallet
 
 					switch (ee.State) {
 					case FeeSleepState.Begin:
-						this.WriteToInfoBox ("Fee " + ee.FeeAndLastLedger.Item1.ToString () + " is too high, waiting on lower fee");
+						this.WriteToInfoBox (
+							"Fee " 
+							+ (string)(ee?.FeeAndLastLedger?.Fee.ToString () ?? "null") 
+			    				+ " is too high, waiting on lower fee"
+			    			);
 						break;
 					case FeeSleepState.PumpUI:
 						this.WriteToInfoBox (".");
@@ -517,6 +521,12 @@ namespace IhildaWallet
 
 
 			};
+		}
+
+		~AutomatedPurchaseWindow ()
+		{
+			this.manualReset?.Close ();
+			this.manualReset = null;
 		}
 
 		private CancellationTokenSource tokenSource = null;

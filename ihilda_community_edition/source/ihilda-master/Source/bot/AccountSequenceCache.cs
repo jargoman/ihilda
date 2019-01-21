@@ -549,19 +549,24 @@ namespace IhildaWallet
 		public void Save ()
 		{
 			IEnumerable<AutomatedOrder> offers = null;
+			string conf = null;
 			lock (lockSeq) {
 
 				offers = this.SequenceCache?.Values;
+
+				if (offers == null) {
+					return;
+				}
+				//var settingsPath = FileHelper.GetSettingsPath (actualSettingsFileName);
+
+				ConfStruct confstruct = new ConfStruct (offers);
+
+				conf = DynamicJson.Serialize (confstruct);
 			}
 
-			if (offers == null) {
+			if (conf == null) {
 				return;
 			}
-			//var settingsPath = FileHelper.GetSettingsPath (actualSettingsFileName);
-
-			ConfStruct confstruct = new ConfStruct (offers);
-
-			string conf = DynamicJson.Serialize (confstruct);
 
 			FileHelper.SaveConfig (settingsPath, conf);
 			

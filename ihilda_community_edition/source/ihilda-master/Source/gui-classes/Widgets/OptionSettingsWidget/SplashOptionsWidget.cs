@@ -31,6 +31,7 @@ namespace IhildaWallet
 				FileFilter fileFilter = new FileFilter ();
 				fileFilter.AddPattern ("*.jpg");
 				fileFilter.AddPattern ("*.png");
+				fileFilter.AddPattern ("*.gif");
 				fileChooser.AddFilter (fileFilter);
 
 				Gtk.ResponseType resp = (ResponseType)fileChooser.Run ();

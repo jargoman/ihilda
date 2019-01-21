@@ -168,6 +168,7 @@ namespace RippleLibSharp.Network
 						}
 						if (responsesConsumer == null) {
 							bool successfull = ticketCache.TryRemove (ticket, out TicketStub tempStub);
+							tempStub.Handle.Close ();
 
 						}
 

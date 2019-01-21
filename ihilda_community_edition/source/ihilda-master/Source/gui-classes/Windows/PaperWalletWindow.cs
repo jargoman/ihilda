@@ -68,6 +68,16 @@ namespace IhildaWallet
 			SolidBrush solidBrush = new SolidBrush (System.Drawing.Color.Black);
 
 
+			FontFamily fontFamilyBig = new FontFamily ("Arial");
+			System.Drawing.Font fontBig = new System.Drawing.Font (
+			   fontFamilyBig,
+			   14,
+			   FontStyle.Bold,
+			   GraphicsUnit.Point);
+			RectangleF rectFBig = new RectangleF (0, 0, 302, 20);
+			SolidBrush solidBrushBig = new SolidBrush (System.Drawing.Color.Black);
+
+
 			accGraphic.DrawString (acc, font, solidBrush, rectF);
 
 
@@ -75,23 +85,23 @@ namespace IhildaWallet
 
 
 			rectF = new RectangleF (0,0,600, 600);
-			noteGraphics.DrawString (notes, font, solidBrush, rectF);
+			noteGraphics.DrawString (notes, font, solidBrushBig, rectF);
 
 			XImage xImageAcc = XImage.FromGdiPlusImage (accBitmap);
 			XImage xImageSec = XImage.FromGdiPlusImage (secBitmap);
 
 			//gfx.DrawString (acc, xFont, XBrushes.Black, 0, 0);
 
-			gfx.DrawImage (accTextBitMap, 25, 15, 275, 20);
+			gfx.DrawImage (accTextBitMap, 27, 65, 275, 20);
 
-			gfx.DrawImage (xImageAcc, 5, 30, 275, 275);
+			gfx.DrawImage (xImageAcc, 5, 100, 275, 275);
 
 			//gfx.DrawString (sec, xFont, XBrushes.Black, 0, 200);
-			gfx.DrawImage (secTextBitMap, 300, 15, 275, 20);
+			gfx.DrawImage (secTextBitMap, 302, 65, 275, 20);
 
-			gfx.DrawImage (xImageSec, 280, 30, 275, 275);
+			gfx.DrawImage (xImageSec, 280, 100, 275, 275);
 
-			gfx.DrawImage (noteBitMap, 25, 310, 600, 600);
+			gfx.DrawImage (noteBitMap, 27, 380, 600, 600);
 
 
 			FileChooserDialog fileChooserDialog = new FileChooserDialog (

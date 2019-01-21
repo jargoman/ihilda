@@ -444,7 +444,7 @@ namespace IhildaWallet
 					limit = null;
 				}
 
-				Task<IEnumerable<Response<AccountTxResult>>> tsk = null;
+				Task<FullTxResponse> tsk = null;
 
 
 
@@ -511,16 +511,37 @@ namespace IhildaWallet
 				}
 
 
-				IEnumerable<Response<AccountTxResult>> results = tsk.Result;
+				FullTxResponse results = tsk.Result;
 
 				if (results == null) {
 					Gtk.Application.Invoke (
 						delegate {
 							infoBarLabel.Text = "Failed to retrieve transactions for account " + para.address;
-							infoBarLabel.Visible = true;
+							//infoBarLabel.Visible = true;
 
 						}
 					);
+					return;
+				}
+
+				if (results.HasError) {
+					Gtk.Application.Invoke (
+						delegate {
+
+							infoBarLabel.Text = results.ErrorMessage ?? "Error : ";
+
+						}
+					);
+					return;
+				}
+
+				if (results.Responses == null) {
+					Gtk.Application.Invoke (
+						delegate {
+							infoBarLabel.Text = "Missing responses\n";
+						}
+					);
+
 					return;
 				}
 
@@ -543,7 +564,7 @@ namespace IhildaWallet
 				} */
 
 
-				IEnumerable<RippleTxStructure> transactions = results
+				IEnumerable<RippleTxStructure> transactions = results.Responses
 					.Where((Response<AccountTxResult> arg) =>  (arg?.result?.transactions != null))
 					.SelectMany( (Response<AccountTxResult> arg) => { return arg.result.transactions; } );
 
@@ -578,9 +599,16 @@ namespace IhildaWallet
 
 			try {
 
-				Task<IEnumerable<Response<AccountTxResult>>> task =
+				Task<FullTxResponse> task =
 					//AccountTx.GetFullTxResult (account, ni);
-					AccountTx.GetFullTxResult (account, (-1).ToString (), (-1).ToString (), ni, token);
+					AccountTx.GetFullTxResult (
+		    				account, 
+						(-1).ToString (), 
+			    			(-1).ToString (), 
+						ni, 
+			    			token
+					)
+			    ;
 				if (task == null) {
 					Gtk.Application.Invoke (
 						(object sender, EventArgs e) => {
@@ -592,7 +620,7 @@ namespace IhildaWallet
 					return;
 				}
 
-				while (!token.IsCancellationRequested && !task.IsCompleted) {
+				while (task != null && !token.IsCancellationRequested && !task.IsCompleted && !task.IsCanceled && !task.IsFaulted) {
 
 
 					task.Wait (250, token);
@@ -605,10 +633,30 @@ namespace IhildaWallet
 				}
 
 
+				FullTxResponse fullTx = task.Result;
+
+				if (fullTx == null) {
+					Gtk.Application.Invoke (
+						delegate {
+
+							infoBarLabel.Text = "Fulltx == null";
+						}
+					);
+					return;
+				}
+
+				if (fullTx.HasError) {
+					Gtk.Application.Invoke (
+						delegate {
+							infoBarLabel.Text = fullTx.ErrorMessage;
+
+						}
+					);
+					return;
+				}
 
 
-
-				IEnumerable<Response<AccountTxResult>> res = task.Result;
+				IEnumerable<Response<AccountTxResult>> res = task.Result.Responses;
 
 				if (res == null) {
 					Gtk.Application.Invoke (

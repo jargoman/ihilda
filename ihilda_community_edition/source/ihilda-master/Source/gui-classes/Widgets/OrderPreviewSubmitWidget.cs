@@ -12,6 +12,7 @@ using IhildaWallet.Util;
 using RippleLibSharp.Binary;
 using RippleLibSharp.Commands.Accounts;
 using RippleLibSharp.Commands.Server;
+using RippleLibSharp.Commands.Subscriptions;
 using RippleLibSharp.Commands.Tx;
 using RippleLibSharp.Keys;
 using RippleLibSharp.Network;
@@ -1039,29 +1040,28 @@ namespace IhildaWallet
 
 				opts = SignOptions.LoadSignOptions ();
 				if (opts != null) break;
-
-
-				ManualResetEvent manualReset = new ManualResetEvent (false);
-				manualReset.Reset ();
-
-				ResponseType type = ResponseType.None;
-				Gtk.Application.Invoke (delegate {
-					using (SignOptionsDialog signOptionsDialog = new SignOptionsDialog ()) {
-						type = (ResponseType)signOptionsDialog.Run ();
-						if (type == ResponseType.Ok) {
-							signOptionsDialog.ProcessSignOptionsWidget ();
+				ResponseType type;
+				using (ManualResetEvent manualReset = new ManualResetEvent (false)) {
+					manualReset.Reset ();
+					type = ResponseType.None;
+					Gtk.Application.Invoke (delegate {
+						using (SignOptionsDialog signOptionsDialog = new SignOptionsDialog ()) {
+							type = (ResponseType)signOptionsDialog.Run ();
+							if (type == ResponseType.Ok) {
+								signOptionsDialog.ProcessSignOptionsWidget ();
+							}
+							signOptionsDialog.Destroy ();
 						}
-						signOptionsDialog.Destroy ();
-					}
-					manualReset.Set ();
+						manualReset.Set ();
 
-				});
+					});
 
-				WaitHandle.WaitAny (new [] {
+					WaitHandle.WaitAny (new [] {
 						manualReset,
 						token.WaitHandle
-					});
-				//manualReset.WaitOne ();
+		    			});
+				}
+				
 
 				switch (type) {
 				case ResponseType.Ok:
@@ -1176,161 +1176,167 @@ namespace IhildaWallet
 
 				this.SetInfoBar (ms3);
 
-				Tuple<UInt32, UInt32> tupe = null;
 
-
-				
-				var getFeeTask = Task.Run (delegate {
-
-					FeeSettings feeSettings = LoadFeeSettings (token);
-
-					string indexStr = index.ToString ();
-					feeSettings.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
-
-						if (e == null) {
-#if DEBUG
-							if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
-								Logging.WriteLog (method_sig, nameof (FeeSleepEventArgs) + " is null");
-							}
-							return;
-#endif
-						}
-
-						if (e.State != FeeSleepState.Begin) {
-							return;
-						}
-
-						StringBuilder sb = new StringBuilder ();
-
-						sb.Append ("Fee ");
-						sb.Append (e.FeeAndLastLedger.Item1.ToString ());
-						sb.Append (" is too high, waiting on lower fee");
-
-						string feestr = sb.ToString ();
-
-
-						this.SetResult (
-							indexStr,
-							feestr, 
-			    				Program.darkmode ? TextHighlighter.YELLOW : TextHighlighter.BLACK);
-
-						sb.Clear ();
-						if (txAtIndexStr != null) {
-							sb.Append (txAtIndexStr);
-						}
-						sb.Append (feestr);
-
-						string ms4 = sb.ToString ();
-
-						this.SetInfoBar (ms4);
-					};
-
-					tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, token, lastFee);
-
-
-				}, token);
-
+				ParsedFeeAndLedgerResp tupe = null;
 
 				AutomatedOrder off = _offers [index];
-
-
-				#region clientmemo
-
-
-				MemoIndice memoIndice = Program.GetClientMemo ();
-
-				off.AddMemo (memoIndice);
-
-				#endregion
-
-
-
-				#region markmemo
-				if (off.BotMarking != null) {
-					MemoIndice markIndice = new MemoIndice {
-						Memo = new RippleMemo {
-							MemoType = Base58.StringToHex ("ihildamark"),
-							MemoFormat = Base58.StringToHex (""),
-							MemoData = Base58.StringToHex (off?.BotMarking ?? "")
-						}
-					};
-
-					off.AddMemo (markIndice);
-				}
-
-				#endregion
-
-
 				RippleOfferTransaction tx = new RippleOfferTransaction (off.Account, off);
 
+				using (Task getFeeTask = Task.Run (delegate {
+					try {
+						FeeSettings feeSettings = LoadFeeSettings (token);
+
+						string indexStr = index.ToString ();
+						feeSettings.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
+
+							if (e == null) {
+#if DEBUG
+								if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
+									Logging.WriteLog (method_sig, nameof (FeeSleepEventArgs) + " is null");
+								}
+								return;
+#endif
+							}
+
+							if (e.State != FeeSleepState.Begin) {
+								return;
+							}
+
+							StringBuilder sb = new StringBuilder ();
+
+							sb.Append ("Fee ");
+							sb.Append (e?.FeeAndLastLedger?.Fee.ToString () ?? "null");
+							sb.Append (" is too high, waiting on lower fee");
+
+							string feestr = sb.ToString ();
+
+
+							this.SetResult (
+								indexStr,
+								feestr,
+								    Program.darkmode ? TextHighlighter.YELLOW : TextHighlighter.BLACK);
+
+							sb.Clear ();
+							if (txAtIndexStr != null) {
+								sb.Append (txAtIndexStr);
+							}
+							sb.Append (feestr);
+
+							string ms4 = sb.ToString ();
+
+							this.SetInfoBar (ms4);
+						};
+
+						tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, token, lastFee);
+
+					} catch (Exception e) when (e is TaskCanceledException || e is OperationCanceledException) {
+						return;
+					} catch (Exception e) {
+						return;
+					}
+				}, token)) {
 
 
 
 
 
+					#region clientmemo
+
+
+					MemoIndice memoIndice = Program.GetClientMemo ();
+
+					off.AddMemo (memoIndice);
+
+					#endregion
 
 
 
-				if (token.IsCancellationRequested) {
+					#region markmemo
+					if (off.BotMarking != null) {
+						MemoIndice markIndice = new MemoIndice {
+							Memo = new RippleMemo {
+								MemoType = Base58.StringToHex ("ihildamark"),
+								MemoFormat = Base58.StringToHex (""),
+								MemoData = Base58.StringToHex (off?.BotMarking ?? "")
+							}
+						};
 
-
-					string canstr = "Aborted";
-					this.SetResult (index.ToString (), canstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-
-					stringBuilder.Clear ();
-
-					if (Program.darkmode) {
-						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
-					} else {
-						stringBuilder.Append ("<span fgcolor=\"red\">");
+						off.AddMemo (markIndice);
 					}
 
-					stringBuilder.Append (txAtIndexStr);
-					stringBuilder.Append (canstr);
-					stringBuilder.Append ("</span>");
-					string ms6 = stringBuilder.ToString ();
+					#endregion
 
-					this.SetInfoBar (ms6);
-					return false;
+
+					
+
+
+
+
+
+
+
+
+
+					if (token.IsCancellationRequested) {
+
+
+						string canstr = "Aborted";
+						this.SetResult (index.ToString (), canstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+
+						stringBuilder.Clear ();
+
+						if (Program.darkmode) {
+							stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
+						} else {
+							stringBuilder.Append ("<span fgcolor=\"red\">");
+						}
+
+						stringBuilder.Append (txAtIndexStr);
+						stringBuilder.Append (canstr);
+						stringBuilder.Append ("</span>");
+						string ms6 = stringBuilder.ToString ();
+
+						this.SetInfoBar (ms6);
+						return false;
+					}
+
+
+					int feeDots = 0;
+					while (getFeeTask != null && !getFeeTask.IsCompleted && !getFeeTask.IsCanceled && !getFeeTask.IsFaulted && !token.IsCancellationRequested) {
+
+						feeDots++;
+
+						StringBuilder feeReq2 = new StringBuilder (feeReq);
+						feeReq2.Append (new string ('.', feeDots));
+
+
+						stringBuilder.Clear ();
+						if (Program.darkmode) {
+							stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
+						} else {
+							stringBuilder.Append ("<span fgcolor=\"green\">");
+						}
+						stringBuilder.Append (txAtIndexStr);
+						stringBuilder.Append (feeReq2);
+						stringBuilder.Append ("</span>");
+
+						string mssg = stringBuilder.ToString ();
+						this.SetStatus (
+							index.ToString (),
+							feeReq2.ToString (),
+							Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN
+						);
+
+						this.SetInfoBar (mssg);
+
+						getFeeTask.Wait (1000, token);
+
+						if (feeDots == 10) {
+							feeDots = 0;
+						}
+
+					}
 				}
-
-
-				int feeDots = 0;
-				while (!getFeeTask.IsCompleted && !getFeeTask.IsCanceled && !getFeeTask.IsFaulted && !token.IsCancellationRequested) {
-
-					feeDots++;
-
-					StringBuilder feeReq2 = new StringBuilder (feeReq);
-					feeReq2.Append ( new string('.',feeDots));
-
-
-					stringBuilder.Clear ();
-					if (Program.darkmode) {
-						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
-					} else {
-						stringBuilder.Append ("<span fgcolor=\"green\">");
-					}
-					stringBuilder.Append (txAtIndexStr);
-					stringBuilder.Append (feeReq2);
-					stringBuilder.Append ("</span>");
-
-					string mssg = stringBuilder.ToString ();
-					this.SetStatus (
-						index.ToString (),
-						feeReq2.ToString (),
-						Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN
-					);
-
-					this.SetInfoBar (mssg);
-
-					getFeeTask.Wait (1000, token);
-
-					if (feeDots == 10) {
-						feeDots = 0;
-					}
-
-				}
-
 				if (tupe == null) {
 
 					string feeEr = "Error retrieving fee and last ledger sequence";
@@ -1346,8 +1352,26 @@ namespace IhildaWallet
 					return false;
 				}
 
+				if (tupe.HasError) {
+
+					
+					string feeEr = "Error retrieving fee and last ledger sequence";
+
+					this.SetResult (index.ToString (), feeEr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append (txAtIndexStr);
+					stringBuilder.Append (feeEr);
+					stringBuilder.Append (tupe?.ErrorMessage );
+
+					string ms5 = stringBuilder.ToString ();
+
+					this.SetInfoBar (ms5);
+					return false;
+				}
+
 				//UInt32 f = tupe.Item1; 
-				UInt32 f = tupe.Item1;
+				UInt32 f = (UInt32)tupe.Fee;
 				tx.fee = f.ToString ();
 
 				tx.Sequence = sequence; // note: don't update se++ with forloop, update it with each order 
@@ -1366,7 +1390,7 @@ namespace IhildaWallet
 				}
 
 
-				tx.LastLedgerSequence = tupe.Item2 + lls;
+				tx.LastLedgerSequence = (UInt32)tupe.LastLedger + lls;
 
 				if (tx.fee.amount == 0) {
 
@@ -2723,9 +2747,35 @@ namespace IhildaWallet
 
 				for (int i = 0; i < 100; i++) {
 
-					Tuple<string, uint> tuple = ServerInfo.GetFeeAndLedgerSequence (ni, token);
 
+					//FeeAndLastLedgerResponse feeResp = ServerInfo.GetFeeAndLedgerSequence (ni, token);
 					Task<Response<RippleTransaction>> task = tx.GetRequest (offerTransaction.hash, ni, token);
+
+
+
+					Task<uint?> ledgerTask = Task.Run (
+						delegate {
+
+							for (int attempt = 0; attempt < 5; attempt++) {
+								uint? led = LedgerTracker.GetRecentLedgerOrNull ();
+
+								if (led == null) {
+
+									FeeAndLastLedgerResponse feeResp = ServerInfo.GetFeeAndLedgerSequence (ni, token);
+									led = feeResp?.LastLedger;
+
+
+								}
+								if (led != null) {
+									return led;
+								}
+							}
+
+							return null;
+						}
+					);
+
+
 					if (task == null) {
 						// TODO Debug
 						this.SetResult (index.ToString (), "Error : task == null", Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
@@ -2761,7 +2811,15 @@ namespace IhildaWallet
 						return;
 					}
 
-					if (tuple.Item2 > offerTransaction.LastLedgerSequence) {
+					if (ledgerTask != null) {
+						ledgerTask.Wait (1000 * 60 * 2, token);
+					}
+
+
+					//
+					uint? ledger = ledgerTask?.Result;
+
+					if (ledger != null && ledger > offerTransaction.LastLedgerSequence) {
 						this.SetResult (index.ToString (), "failed to validate before LastLedgerSequence exceeded", Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					}
 

@@ -17,6 +17,7 @@ using RippleLibSharp.Commands.Accounts;
 using Ripple.TxSigning;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using RippleLibSharp.Commands.Server;
 
 namespace RippleLibSharp.Transactions.TxTypes
 {
@@ -437,11 +438,12 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 
 
-		public UInt32 AutoRequestFee (NetworkInterface ni, CancellationToken token)
+		public void AutoRequestFee (NetworkInterface ni, CancellationToken token)
 		{
-			Tuple<string, UInt32> tupe = RippleLibSharp.Commands.Server.ServerInfo.GetFeeAndLedgerSequence (ni, token);
-			fee = tupe.Item1;
-			return tupe.Item2;
+
+			FeeAndLastLedgerResponse resp = ServerInfo.GetFeeAndLedgerSequence (ni, token);
+			fee = resp.Fee;
+			//return resp.Fee;
 		}
 
 		public uint AutoRequestSequence (RippleAddress rw, NetworkInterface ni, CancellationToken token)

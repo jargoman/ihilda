@@ -112,12 +112,20 @@ namespace IhildaWallet
 			SignOptions opts = SignOptions.LoadSignOptions ();
 			FeeSettings feeSettings = FeeSettings.LoadSettings ();
 
-			Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, token);
+			ParsedFeeAndLedgerResp tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, token);
+			if (tupe == null) {
+				//TODO
+				return;
+			}
 
+			if (tupe.HasError) {
+				// TODO
+				return;
+			}
 			uint se = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence (rw.GetStoredReceiveAddress (), ni, token));
 
 
-			UInt32 f = tupe.Item1;
+			UInt32 f = (UInt32)tupe.Fee;
 			rts.fee = f.ToString ();
 
 			rts.Sequence = se;
@@ -132,7 +140,7 @@ namespace IhildaWallet
 			}
 
 
-			rts.LastLedgerSequence = tupe.Item2 + lls;
+			rts.LastLedgerSequence = (UInt32)tupe.LastLedger + lls;
 
 			if (rts.fee.amount == 0 || rts.Sequence == 0) {
 				//

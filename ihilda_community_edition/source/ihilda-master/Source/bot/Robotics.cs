@@ -81,7 +81,7 @@ namespace IhildaWallet
 				return null;
 			}
 
-			Task<IEnumerable <Response<AccountTxResult>>> task = null;
+			Task<FullTxResponse> task = null;
 
 			try {
 
@@ -250,7 +250,22 @@ namespace IhildaWallet
 				return null;
 			}
 
-			IEnumerable<Response<AccountTxResult>> responses = task?.Result;  
+			FullTxResponse fullTx = task?.Result;
+
+			if (fullTx == null) {
+				return null;
+			}
+
+			if (fullTx.HasError) {
+				return null;
+			}
+
+			if (fullTx.Responses == null) {
+				return null;
+			}
+
+
+			IEnumerable<Response<AccountTxResult>> responses = fullTx.Responses;  
 
 
 

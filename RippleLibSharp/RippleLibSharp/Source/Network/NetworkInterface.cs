@@ -1047,7 +1047,7 @@ namespace RippleLibSharp.Network
 
 
 
-
+		// TODO how to dispose ??
 		private EventWaitHandle OnOpenWaitHandler = new ManualResetEvent (true);
 		#endregion
 

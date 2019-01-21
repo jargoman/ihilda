@@ -55,17 +55,17 @@ namespace RippleLibSharp.Commands.Accounts
 		}
 
 
-		public static Task< IEnumerable< Response < AccountTxResult >> > GetFullTxResult (
+		public static Task<FullTxResponse > GetFullTxResult (
 			string account,
 
 			NetworkInterface ni,
 			CancellationToken token
 		) {
-			
+
 			return GetFullTxResult (account, (-1).ToString(), (-1).ToString(), ni, token);
 		}
 
-		public static Task<IEnumerable<Response<AccountTxResult>>> GetFullTxResult (
+		public static Task<FullTxResponse> GetFullTxResult (
 			string account,
 			string ledger_index_min,
 			string ledger_index_max,
@@ -76,10 +76,12 @@ namespace RippleLibSharp.Commands.Accounts
 		{
 			return Task.Run (
 				delegate {
+
+					FullTxResponse fullTxResponse = new FullTxResponse ();
 					bool forward = true; // almost certain it has to be true
 					List<Response<AccountTxResult>> list = new List<Response<AccountTxResult>> ();
 
-
+					fullTxResponse.Responses = list;
 
 					IdentifierTag identifierTag = new IdentifierTag {
 						IdentificationNumber = NetworkRequestTask.ObtainTicket ()
@@ -105,7 +107,12 @@ namespace RippleLibSharp.Commands.Accounts
 
 					if (task == null) {
 						//TODO
-						return null;
+
+						fullTxResponse.HasError = true;
+						fullTxResponse.ErrorMessage += "task == null\n";
+
+						return fullTxResponse;
+						//return null;
 					}
 
 					task.Wait (token);
@@ -114,12 +121,30 @@ namespace RippleLibSharp.Commands.Accounts
 					Response<AccountTxResult> res = task.Result;
 					if (task.Result == null) {
 						//TODO
-						return null;
+						fullTxResponse.HasError = true;
+						fullTxResponse.ErrorMessage += "Tasked returned null value\n";
+
+						return fullTxResponse;
 					}
+
+		    			
 
 					list.Add (res);
 
+					if (res.HasError ()) {
+						fullTxResponse.HasError = true;
+						fullTxResponse.ErrorMessage += res.error_message;
+						fullTxResponse.TroubleResponse = res;
+						return fullTxResponse;
+					}
+
 					AccountTxResult accountTx = res.result;
+
+					if (accountTx == null) {
+						fullTxResponse.HasError = true;
+						fullTxResponse.ErrorMessage += "Server Returned null value\n";
+						return fullTxResponse;
+					}
 
 					limit -= accountTx.transactions.Count ();
 
@@ -152,7 +177,13 @@ namespace RippleLibSharp.Commands.Accounts
 							//TODO
 							Logging.WriteLog ("task == null");
 							//break;
-							return null;
+
+							fullTxResponse.HasError = true;
+							fullTxResponse.ErrorMessage += "task == null\n";
+
+							return fullTxResponse;
+
+							//return null;
 						}
 
 						task.Wait (token);
@@ -164,24 +195,45 @@ namespace RippleLibSharp.Commands.Accounts
 						if (task.Result == null) {
 							// TODO
 							Logging.WriteLog ("task.result == null");
-							//break;
+
+
+							fullTxResponse.HasError = true;
+							fullTxResponse.ErrorMessage += "Tasked returned null value\n";
+
 							return null;
 						}
 
 						list.Add (res);
 
+						if (res.HasError ()) {
+							fullTxResponse.HasError = true;
+							fullTxResponse.ErrorMessage += res.error_message;
+							fullTxResponse.TroubleResponse = res;
+							return fullTxResponse;
+						}
+
 						accountTx = res.result;
+
+
+						if (accountTx == null) {
+							fullTxResponse.HasError = true;
+							fullTxResponse.ErrorMessage += "Server Returned null value\n";
+							return fullTxResponse;
+						}
 
 						limit -= accountTx.transactions.Count ();
 
 					}
 
-					return list.AsEnumerable ();
+		    			
+					return fullTxResponse;
+
+					//return list.AsEnumerable ();
 				}
 				, token);
 		}
 
-		public static Task< IEnumerable< Response < AccountTxResult >> > GetFullTxResult (
+		public static Task< FullTxResponse > GetFullTxResult (
 			string account, 
 			string ledger_index_min, 
 			string ledger_index_max,
@@ -197,6 +249,7 @@ namespace RippleLibSharp.Commands.Accounts
 		 {
 			return Task.Run(
 				delegate {
+					FullTxResponse fullTxResponse = new FullTxResponse ();
 					bool forward = true; // almost certain it has to be true
 					List<Response<AccountTxResult>> list = new List<Response<AccountTxResult>>();
 
@@ -224,23 +277,46 @@ namespace RippleLibSharp.Commands.Accounts
 						NetworkRequestTask.RequestResponse < AccountTxResult> (identifierTag, request, ni, token);
 
 					if (task == null) {
-						//TODO
-						return null;
+
+						fullTxResponse.HasError = true;
+						fullTxResponse.ErrorMessage += "task == null\n";
+
+						return fullTxResponse;
 					}
 
 					task.Wait(token);
 
 
 					Response<AccountTxResult> res = task.Result;
-					if (task.Result == null) {
-						//TODO
-						return null;
+					if (res == null) {
+
+
+						fullTxResponse.HasError = true;
+						fullTxResponse.ErrorMessage += "Tasked returned null value\n";
+						
+						return fullTxResponse;
 					}
+
+		    			
 
 					list.Add(res);
 
+					if (res.HasError()) {
+						fullTxResponse.HasError = true;
+						fullTxResponse.ErrorMessage += res.error_message;
+						fullTxResponse.TroubleResponse = res;
+						return fullTxResponse;
+					}
+
 					AccountTxResult accountTx = res.result;
 
+					if (accountTx == null) {
+						fullTxResponse.HasError = true;
+						fullTxResponse.ErrorMessage += "Server Returned null value\n";
+						return fullTxResponse;
+					}
+
+					
 
 					while (accountTx?.marker != null) {
 						//Thread.Sleep(18000);
@@ -270,8 +346,12 @@ namespace RippleLibSharp.Commands.Accounts
 						if (task == null) {
 							//TODO
 							Logging.WriteLog("task == null");
-							return null; // all or nothing
-							//break;
+
+							fullTxResponse.HasError = true;
+							fullTxResponse.ErrorMessage += "task == null\n";
+
+							return fullTxResponse;
+
 						}
 
 						task.Wait(token);
@@ -283,24 +363,77 @@ namespace RippleLibSharp.Commands.Accounts
 						if (task.Result == null) {
 							// TODO
 							Logging.WriteLog("task.result == null");
-							return null;
-							//break;
+							fullTxResponse.HasError = true;
+							fullTxResponse.ErrorMessage += "Tasked returned null value\n";
+
+							return fullTxResponse;
+
 						}
 
 
 						list.Add(res);
 
+						if (res.HasError ()) {
+							fullTxResponse.HasError = true;
+							fullTxResponse.ErrorMessage += res.error_message;
+							fullTxResponse.TroubleResponse = res;
+							return fullTxResponse;
+						}
+
 						accountTx = res.result; // not redundant, needed for while loop condition 
 
+						if (accountTx == null) {
+							fullTxResponse.HasError = true;
+							fullTxResponse.ErrorMessage += "Server Returned null value\n";
+							return fullTxResponse;
+						}
 
 
 					}
 
-					return list.AsEnumerable();
+					fullTxResponse.Responses = list.ToArray ();
+					return fullTxResponse;
+					//return list.AsEnumerable();
 				}
 			);
 		}
 
+	}
+
+	public class FullTxResponse
+	{
+
+		public string ErrorMessage {
+			get { return _err_mess; }
+			set { _err_mess = value; }
+		}
+		private string _err_mess = null;
+
+		public bool HasError {
+			get {
+				if (_err_mess != null) {
+					return true;
+				}
+
+				return _has_err;
+			}
+			set {
+				_has_err = value;
+			}
+		}
+
+		private bool _has_err = false;
+		public IEnumerable<Response<AccountTxResult>> Responses {
+			get;
+			set;
+		}
+
+		public Response<AccountTxResult> TroubleResponse {
+			get;
+			set;
+		}
+
+		
 	}
 }
 

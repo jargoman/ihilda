@@ -89,23 +89,23 @@ namespace IhildaWallet
 
 			DepthChartWidget dcw = null;
 			DepthChartWindow dcwin = null;
+			using (ManualResetEvent manualResetEvent = new ManualResetEvent (false)) {
+				manualResetEvent.Reset ();
+				Application.Invoke (
+				    delegate {
+					    dcwin = new DepthChartWindow (rippleWallet, tp);
+					    dcwin.Show ();
 
-			ManualResetEvent manualResetEvent = new ManualResetEvent (false);
-			manualResetEvent.Reset ();
-			Application.Invoke (
-				delegate {
-					dcwin = new DepthChartWindow (rippleWallet, tp);
-					dcwin.Show ();
+					    dcw = dcwin.GetWidget ();
 
-					dcw = dcwin.GetWidget ();
+					    manualResetEvent.Set ();
 
-					manualResetEvent.Set ();
-		    			
-					
 
-				}
-			);
-			manualResetEvent.WaitOne ();
+
+				    }
+				);
+				manualResetEvent.WaitOne ();
+			}
 
 			if (dcw == null) {
 				return;

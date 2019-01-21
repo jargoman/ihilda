@@ -54,13 +54,13 @@ namespace IhildaWallet
 			SoundPlayer txSubmitPlayer = null;
 			SoundPlayer txFailPlayer = null;
 
-			if (settings.HasOnTxSubmit && settings.OnTxSubmit != null){
+			if (settings != null && settings.HasOnTxSubmit && settings.OnTxSubmit != null){
 				txSubmitPlayer = new SoundPlayer (settings.OnTxSubmit);
 
 				txSubmitPlayer.Load ();
 			}
 
-			if (settings.HasOnTxFail && settings.OnTxFail != null) {
+			if (settings != null && settings.HasOnTxFail && settings.OnTxFail != null) {
 
 
 				txFailPlayer = new SoundPlayer (settings.OnTxFail);
@@ -110,7 +110,7 @@ namespace IhildaWallet
 						if (order.SubmittedEventArgs.Unrecoverable) {
 							// todo
 							//OnOrderSubmitted?.Invoke (this, o
-							if (settings.HasOnTxFail && settings.OnTxFail != null) {
+							if (settings != null && settings.HasOnTxFail && settings.OnTxFail != null) {
 
 								Task.Run (delegate {
 
@@ -121,7 +121,12 @@ namespace IhildaWallet
 							}
 
 
-							return null;
+							return new MultipleOrdersSubmitResponse () {
+								Succeeded = false,
+								SubmitResponses =events,
+								Message = "Unrecoverable error",
+								TroubleResponse = order?.SubmittedEventArgs
+							};
 						}
 
 						
@@ -149,7 +154,7 @@ namespace IhildaWallet
 
 
 						if (!order.SubmittedEventArgs.Success) {
-							if (settings.HasOnTxFail && settings.OnTxFail != null) {
+							if (settings != null && settings.HasOnTxFail && settings.OnTxFail != null) {
 
 								Task.Run (delegate {
 
@@ -166,7 +171,7 @@ namespace IhildaWallet
 							}
 							break;
 						} else {
-							if (settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
+							if (settings != null && settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
 
 								Task.Run (delegate {
 
@@ -221,16 +226,17 @@ namespace IhildaWallet
 
 				StringBuilder strBuild = new StringBuilder ();
 				strBuild.AppendLine ("Exception thrown : ");
-				strBuild.AppendLine (e.Message);
-				strBuild.AppendLine (e.StackTrace);
+				strBuild.AppendLine (e?.Message ?? "");
+				strBuild.AppendLine (e?.StackTrace ?? "");
 
 				return new MultipleOrdersSubmitResponse () {
 					Message = strBuild.ToString (),
+		    			
 		    			Succeeded = false,
 					SubmitResponses = events
 				};
 
-				//return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (false, events);
+
 			}
 
 		}
@@ -323,13 +329,14 @@ namespace IhildaWallet
 
 						StringBuilder stringBuilder = new StringBuilder ();
 						stringBuilder.AppendLine ("Order Submit not successful\n");
-						stringBuilder.AppendLine ();
+						//stringBuilder.AppendLine ();
 
 
 						return new MultipleOrdersSubmitResponse () {
 							Succeeded = false,
 			    				SubmitResponses = events,
-							Message = ""
+							Message = stringBuilder.ToString(),
+			    				TroubleResponse = submitEvent
 
 						};
 
@@ -443,17 +450,27 @@ namespace IhildaWallet
 				this.OnFeeSleep.Invoke (sender,e);
 			};
 
-			Tuple<UInt32, UInt32> tupe = orderSubmittedEventArgs.feeSettings.GetFeeAndLastLedgerFromSettings (networkInterface, token, lastFee);
-			if (tupe == null) {
+			ParsedFeeAndLedgerResp ledFee = orderSubmittedEventArgs.feeSettings.GetFeeAndLastLedgerFromSettings (networkInterface, token, lastFee);
+
+			string unable = "Unable to retrieve fee and last ledger\n";
+
+			if (ledFee == null) {
 
 				// todo
 				orderSubmittedEventArgs.Success = false;
 				orderSubmittedEventArgs.Unrecoverable = false;
-				orderSubmittedEventArgs.Message = "Unable to retrieve fee and last ledger\n";
+				orderSubmittedEventArgs.Message = unable + "paresed fee is null";
 				return orderSubmittedEventArgs;
 			}
 
-			UInt32 f = tupe.Item1;
+			if (ledFee.HasError) {
+				orderSubmittedEventArgs.Success = false;
+				orderSubmittedEventArgs.Unrecoverable = false;
+				orderSubmittedEventArgs.Message = unable + (string)(ledFee?.ErrorMessage ?? "(null error message)");
+				return orderSubmittedEventArgs;
+			}
+
+			UInt32 f = (UInt32)ledFee.Fee;
 			orderSubmittedEventArgs.RippleOfferTransaction.fee = f.ToString ();
 
 			orderSubmittedEventArgs.RippleOfferTransaction.Sequence = orderSubmittedEventArgs.Sequence; // sequence;
@@ -467,7 +484,7 @@ namespace IhildaWallet
 				lls = SignOptions.DEFAUL_LAST_LEDGER_SEQ;
 			}
 
-			orderSubmittedEventArgs.RippleOfferTransaction.LastLedgerSequence = tupe.Item2 + lls;
+			orderSubmittedEventArgs.RippleOfferTransaction.LastLedgerSequence = (UInt32)ledFee.LastLedger + lls;
 
 			if (orderSubmittedEventArgs.RippleOfferTransaction.fee.amount == 0) {
 				// TODO robust error dealing
@@ -497,6 +514,7 @@ namespace IhildaWallet
 					if (signature == null) {
 						orderSubmittedEventArgs.Unrecoverable = true;
 						orderSubmittedEventArgs.Success = false;
+						orderSubmittedEventArgs.Message = "Rippled returned a null signature\n";
 						return orderSubmittedEventArgs;
 					}
 				} catch (Exception ex) {
@@ -528,6 +546,10 @@ namespace IhildaWallet
 
 					orderSubmittedEventArgs.Success = false;
 					orderSubmittedEventArgs.Unrecoverable = true;
+					orderSubmittedEventArgs.Message = "Rippled threw an en error exception\n";
+					orderSubmittedEventArgs.Message += ex?.Message ?? "";
+					orderSubmittedEventArgs.Message += ex?.StackTrace ?? "";
+
 					return orderSubmittedEventArgs;
 
 				}
@@ -553,6 +575,7 @@ namespace IhildaWallet
 					if (signature == null) {
 						orderSubmittedEventArgs.Unrecoverable = true;
 						orderSubmittedEventArgs.Success = false;
+						orderSubmittedEventArgs.Message = "RippleLibSharp returned null signature\n";
 						return orderSubmittedEventArgs;
 					}
 
@@ -567,6 +590,9 @@ namespace IhildaWallet
 
 					orderSubmittedEventArgs.Unrecoverable = true;
 					orderSubmittedEventArgs.Success = false;
+					orderSubmittedEventArgs.Message = "RippleLibSharp threw an error exception\n";
+					orderSubmittedEventArgs.Message += e?.Message ?? "";
+					orderSubmittedEventArgs.Message += e?.StackTrace ?? "";
 					return orderSubmittedEventArgs;
 				}
 #if DEBUG
@@ -589,6 +615,7 @@ namespace IhildaWallet
 					if (signature == null) {
 						orderSubmittedEventArgs.Unrecoverable = true;
 						orderSubmittedEventArgs.Success = false;
+						orderSubmittedEventArgs.Message = "Ripple-Dot-Net returned null signature\n";
 						return orderSubmittedEventArgs;
 					}
 		    		
@@ -604,6 +631,9 @@ namespace IhildaWallet
 
 					orderSubmittedEventArgs.Unrecoverable = true;
 					orderSubmittedEventArgs.Success = false;
+					orderSubmittedEventArgs.Message = "Ripple-Dot-Net threw an error exception\n";
+					orderSubmittedEventArgs.Message += e?.Message ?? "";
+					orderSubmittedEventArgs.Message += e?.StackTrace ?? "";
 					
 					return orderSubmittedEventArgs;
 				}
@@ -644,7 +674,7 @@ namespace IhildaWallet
 				int maxseconds = 60 * 3; // 3 minutes max wait
 
 				int faults = 0;
-				for (int seconds = 0; !task.IsCanceled && !task.IsCompleted && !task.IsFaulted && !token.IsCancellationRequested && seconds < maxseconds; seconds++) {
+				for (int seconds = 0; task != null && !task.IsCanceled && !task.IsCompleted && !task.IsFaulted && !token.IsCancellationRequested && seconds < maxseconds; seconds++) {
 					task.Wait (1000, token);
 
 					if (seconds == 30) {  // after 30 seconds check to see what's going on by starting a verification task
@@ -655,20 +685,31 @@ namespace IhildaWallet
 					}
 
 					if (verifyTask != null) {
+
+						if (verifyTask.IsCanceled) {
+							orderSubmittedEventArgs.Unrecoverable = true;
+							orderSubmittedEventArgs.Success = false;
+							orderSubmittedEventArgs.Message = "Order submit cancelled\n";
+							return orderSubmittedEventArgs;
+						}
+
 						if (verifyTask.IsCompleted) {
 
-							if (verifyTask.IsCanceled) {
-								//orderSubmittedEventArgs.
-								return orderSubmittedEventArgs;
-							}
+
 
 							var v = verifyTask.Result;
 							orderSubmittedEventArgs.Success = v.Success;
+
+							orderSubmittedEventArgs.Message =
+								v.Success ?
+								"Transaction validated\n" :
+				    				"Unable to validate transaction\n";
+
 							return orderSubmittedEventArgs;
 						}
 
 						if (verifyTask.IsFaulted) {
-							// if verification fails we will keep start a new one
+							// if verification fails we will keep starting a new one
 
 							if (faults < 2) {
 
@@ -699,6 +740,11 @@ namespace IhildaWallet
 #endif
 				orderSubmittedEventArgs.Unrecoverable = false;
 				orderSubmittedEventArgs.Success = false;
+				orderSubmittedEventArgs.Message = nameof (NullReferenceException);
+				orderSubmittedEventArgs.Message += " : \n";
+				orderSubmittedEventArgs.Message = nullEx?.Message ?? "";
+				orderSubmittedEventArgs.Message = nullEx?.StackTrace ?? "";
+
 				return orderSubmittedEventArgs;
 
 			} catch (Exception e) {
@@ -709,6 +755,12 @@ namespace IhildaWallet
 
 #endif
 
+				StringBuilder stringBuilder = new StringBuilder ();
+
+				stringBuilder.AppendLine ("Exception thrown : ");
+				stringBuilder.AppendLine (e?.Message ?? "");
+				stringBuilder.AppendLine (e?.StackTrace ?? "");
+
 
 				//this.SetResult (index.ToString (), "Network Error", TextHighlighter.RED);
 				if (!paralell) {
@@ -718,6 +770,8 @@ namespace IhildaWallet
 
 						if (verifyResul.Success) {
 							orderSubmittedEventArgs.Success = true;
+							orderSubmittedEventArgs.Unrecoverable = true;
+							orderSubmittedEventArgs.Message = stringBuilder.ToString ();
 							return orderSubmittedEventArgs;
 						}
 					} else {
@@ -732,7 +786,8 @@ namespace IhildaWallet
 
 					// this is recoverable. Probably means no network. Maybe we can discover, throw, catch network errors ect
 					orderSubmittedEventArgs.Success = false;
-					orderSubmittedEventArgs.Unrecoverable = false;
+					orderSubmittedEventArgs.Unrecoverable = true;
+					orderSubmittedEventArgs.Message = stringBuilder.ToString ();
 					return orderSubmittedEventArgs;
 				}
 
@@ -811,13 +866,17 @@ namespace IhildaWallet
 
 #if DEBUG
 				if (DebugIhildaWallet.OrderSubmitter) {
-					Logging.WriteLog ("res == null, Bug?");
+					Logging.WriteLog ("res == null, Bug?\n");
 				}
 #endif
+
+				string msg = "Order submit returned null\n";
+
 				if (!paralell) {
 					VerifyEventArgs verifyR = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface, token);
 					if (verifyR.Success) {
 						orderSubmittedEventArgs.Success = true;
+						orderSubmittedEventArgs.Message = msg;
 						return orderSubmittedEventArgs;
 					}
 
@@ -827,23 +886,28 @@ namespace IhildaWallet
 				}
 
 				orderSubmittedEventArgs.Success = false;
+				orderSubmittedEventArgs.Message = msg;
 				return orderSubmittedEventArgs;
 			}
 
 			string een = res?.engine_result;
 
 			if (een == null) {
+				string msg = "engine_result null\n";
+
 
 #if DEBUG
 				if (DebugIhildaWallet.OrderSubmitter) {
-					Logging.WriteLog ("engine_result null");
+					Logging.WriteLog (msg);
 				}
 #endif
 
 				if (!paralell) {
 					VerifyEventArgs verifyR = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface, token);
 					if (verifyR.Success) {
+						
 						orderSubmittedEventArgs.Success = true;
+						orderSubmittedEventArgs.Message = msg;
 						return orderSubmittedEventArgs;
 					}
 
@@ -853,6 +917,8 @@ namespace IhildaWallet
 				}
 
 				orderSubmittedEventArgs.Success = false;
+				orderSubmittedEventArgs.Message = msg;
+
 				return orderSubmittedEventArgs;
 			}
 
@@ -863,10 +929,16 @@ namespace IhildaWallet
 				//ter = (Ter)Ter.Parse (typeof(Ter), een, true);
 
 			} catch (ArgumentNullException exc) {
+				StringBuilder stringBuilder = new StringBuilder ();
+
+				stringBuilder.Append (nameof (ArgumentNullException));
+				stringBuilder.AppendLine (" : ");
+				stringBuilder.Append (exc?.Message ?? "");
+				stringBuilder.Append (exc?.StackTrace ?? "");
 #if DEBUG
 				if (DebugIhildaWallet.OrderSubmitter) {
 					Logging.ReportException (method_sig, exc);
-					Logging.WriteLog ("null exception");
+					Logging.WriteLog (stringBuilder.ToString ());
 				}
 #endif
 
@@ -874,6 +946,7 @@ namespace IhildaWallet
 					var verRes = VerifyTx (orderSubmittedEventArgs.RippleOfferTransaction, networkInterface, token);
 					if (verRes.Success) {
 						orderSubmittedEventArgs.Success = true;
+						orderSubmittedEventArgs.Message = stringBuilder.ToString ();
 						return orderSubmittedEventArgs;
 					}
 
@@ -884,6 +957,7 @@ namespace IhildaWallet
 
 				orderSubmittedEventArgs.Success = false;
 				orderSubmittedEventArgs.Unrecoverable = false;
+				orderSubmittedEventArgs.Message = stringBuilder.ToString ();
 				return orderSubmittedEventArgs;
 
 			} catch (OverflowException overFlowException) {
@@ -891,34 +965,64 @@ namespace IhildaWallet
 				if (DebugIhildaWallet.OrderSubmitter) {
 					Logging.ReportException (method_sig, overFlowException);
 				}
+
 #endif
-				Logging.WriteLog ("Overflow Exception");
+
+				StringBuilder stringBuilder = new StringBuilder ();
+				stringBuilder.Append ("Overflow Exception\n");
+				Logging.WriteLog (stringBuilder.ToString());
+
+				stringBuilder.AppendLine (overFlowException?.Message ?? "");
+				stringBuilder.AppendLine (overFlowException?.StackTrace ?? "");
+
 				orderSubmittedEventArgs.Success = false;
 				orderSubmittedEventArgs.Unrecoverable = true;
+				orderSubmittedEventArgs.Message = stringBuilder.ToString ();
 				return orderSubmittedEventArgs;
 			} catch (ArgumentException argumentException) {
+
+				StringBuilder stringBuilder = new StringBuilder ();
+				stringBuilder.Append ("Argument Exception");
+
 #if DEBUG
 				if (DebugIhildaWallet.OrderSubmitter) {
-					Logging.WriteLog ("Argument Exception");
+					Logging.WriteLog (stringBuilder.ToString ());
 					Logging.ReportException (method_sig, argumentException);
 				}
 #endif
 
+				stringBuilder.Append (argumentException?.Message ?? "");
+
+				stringBuilder.Append (argumentException?.StackTrace ?? "");
+
 				orderSubmittedEventArgs.Success = false;
 				orderSubmittedEventArgs.Unrecoverable = false;
+				orderSubmittedEventArgs.Message = stringBuilder.ToString ();
 				return orderSubmittedEventArgs;
 			} catch (Exception e) {
+
+				StringBuilder stringBuilder = new StringBuilder ();
+				stringBuilder.Append ("Unknown Exception");
 #if DEBUG
 				if (DebugIhildaWallet.OrderSubmitter) {
-					Logging.WriteLog ("Unknown Exception");
+					Logging.WriteLog (stringBuilder.ToString ());
 					Logging.ReportException (method_sig, e);
 				}
 #endif
+
+				stringBuilder.AppendLine (e?.Message ?? "");
+				stringBuilder.AppendLine (e?.StackTrace ?? "");
 				orderSubmittedEventArgs.Success = false;
 				orderSubmittedEventArgs.Unrecoverable = true;
+				orderSubmittedEventArgs.Message = stringBuilder.ToString ();
 				return orderSubmittedEventArgs;
 			}
 
+			StringBuilder messageBuilder = new StringBuilder ();
+			messageBuilder.AppendLine (res.engine_result);
+			messageBuilder.AppendLine (res.engine_result_message);
+
+			orderSubmittedEventArgs.Message = messageBuilder.ToString ();
 
 			VerifyEventArgs verifyResult = null;
 			switch (ter) {
@@ -935,6 +1039,7 @@ namespace IhildaWallet
 				// not actually a failure so we are continuing 
 				orderSubmittedEventArgs.Success = true;
 				orderSubmittedEventArgs.Unrecoverable = false;
+
 				return orderSubmittedEventArgs;
 
 			case Ter.terQUEUED:
@@ -1416,12 +1521,29 @@ namespace IhildaWallet
 		    			token
 		    		);
 
-				uint? led = LedgerTracker.GetRecentLedgerOrNull ();
 
-				if (led == null) {
-					Tuple<string, uint> tuple = ServerInfo.GetFeeAndLedgerSequence (networkInterface, token);
-					led = tuple?.Item2;
-				}
+				Task<uint?> ledgerTask = Task.Run (
+					delegate {
+
+						for (int attempt = 0; attempt < 5; attempt++) {
+							uint? led = LedgerTracker.GetRecentLedgerOrNull ();
+
+							if (led == null) {
+
+								FeeAndLastLedgerResponse feeResp = ServerInfo.GetFeeAndLedgerSequence (networkInterface, token);
+								led = feeResp?.LastLedger;
+
+
+							}
+							if (led != null) {
+								return led;
+							}
+						}
+
+						return null;
+					}
+				);
+
 
 				if (task == null) {
 					// TODO Debug
@@ -1469,14 +1591,17 @@ namespace IhildaWallet
 
 				}
 
-				End:
-					
-				
-				
-				//
+			End:
 
+				if (ledgerTask != null) {
+					ledgerTask.Wait (1000 * 60 * 2, token);
+				}
+
+
+				//
+				uint? ledger = ledgerTask?.Result;
 				
-				if ( led != null && led > offerTransaction.LastLedgerSequence) {
+				if ( ledger != null && ledger > offerTransaction.LastLedgerSequence) {
 
 					verifyEventArgs.Message = "failed to validate before LastLedgerSequence exceeded\n";
 					Logging.WriteLog (verifyEventArgs.Message);
@@ -1485,13 +1610,13 @@ namespace IhildaWallet
 				}
 
 
-				verifyEventArgs.Message = "Tx " + offerTransaction.hash + " not validated yet\n";
-				Logging.WriteLog (verifyEventArgs.Message);
+				verifyEventArgs.Message = "Tx " + (string)(offerTransaction?.hash ?? "(null hash)") + " not validated yet\n";
+				Logging.WriteLog (verifyEventArgs?.Message);
 
 			}
 
 
-			Logging.WriteLog ("Tx " + offerTransaction.hash + " Max validation attempts exceeded\n");
+			Logging.WriteLog ("Tx " + (string)(offerTransaction?.hash ?? "(null hash)") + " Max validation attempts exceeded\n");
 			return verifyEventArgs;
 
 		}
@@ -1540,7 +1665,10 @@ namespace IhildaWallet
 			set;
 		}
 
-		
+		public OrderSubmittedEventArgs TroubleResponse {
+			get;
+			set;
+		}
 
 
 	}

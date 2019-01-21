@@ -510,30 +510,31 @@ namespace IhildaWallet.Util
 
 
 			ResponseType r = ResponseType.None;
+			using (ManualResetEvent ev = new ManualResetEvent (false)) {
+				Application.Invoke (
+					(object sender, EventArgs e) => {
 
-			ManualResetEvent ev = new ManualResetEvent (false);
-			Application.Invoke (
-				( object sender, EventArgs e ) => {
-
-					using ( FreeTrialAlertDialog ftad = new FreeTrialAlertDialog () ) {
-						ftad.HideAcceptButton ();
-						ftad.SetMessageString ( rw, amnt.ToString () );
-
-
-						r = ( ResponseType ) ftad.Run ();
-						ftad.Destroy ();
-						ev.Set ();
+						using (FreeTrialAlertDialog ftad = new FreeTrialAlertDialog ()) {
+							ftad.HideAcceptButton ();
+							ftad.SetMessageString (rw, amnt.ToString ());
 
 
+							r = (ResponseType)ftad.Run ();
+							ftad.Destroy ();
+							ev.Set ();
 
-					}
+
+
+						}
 
 
 
 				});
 
-			//ev.WaitOne ();
-			WaitHandle.WaitAny ( new [] { ev, token.WaitHandle } );
+				//ev.WaitOne ();
+				WaitHandle.WaitAny (new [] { ev, token.WaitHandle });
+			}
+
 			if ( r == ResponseType.Cancel ) {
 				return false;
 			}

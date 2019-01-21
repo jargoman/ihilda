@@ -103,25 +103,24 @@ namespace IhildaWallet
 					return;
 				}
 
-				ManualResetEvent mre = new ManualResetEvent (false);
+				using (ManualResetEvent mre = new ManualResetEvent (false)) {
+					Gtk.Application.Invoke (delegate {
 
+						cur = this?.combobox?.ActiveText;
 
+						// TODO uncomment
+						// Decimal d = AccountLines.getCurrencyTotal(cur, rw.getStoredReceiveAddress());
+						//String val = Base58.truncateTrailingZerosFromString(d.ToString());
+						//this.label2.Text = val;
 
-				Gtk.Application.Invoke (delegate {
+						mre.Set ();
+					});
 
-					cur = this?.combobox?.ActiveText;
+					mre.WaitOne ();
 
-					// TODO uncomment
-					// Decimal d = AccountLines.getCurrencyTotal(cur, rw.getStoredReceiveAddress());
-					//String val = Base58.truncateTrailingZerosFromString(d.ToString());
-					//this.label2.Text = val;
+					WaitHandle.WaitAny (new [] { mre, token.WaitHandle });
+				}
 
-					mre.Set ();
-				});
-
-				mre.WaitOne ();
-
-				WaitHandle.WaitAny (new [] { mre, token.WaitHandle});
 				if (token.IsCancellationRequested) {
 					return;
 				}

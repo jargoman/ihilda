@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Codeplex.Data;
+using RippleLibSharp.Commands.Server;
 using RippleLibSharp.Commands.Subscriptions;
 using RippleLibSharp.Network;
 using RippleLibSharp.Util;
@@ -225,41 +226,67 @@ namespace IhildaWallet
 			FileHelper.SaveConfig (settingsPath, conf);
 		}
 
-		public static Tuple<UInt32, UInt32> ParseFee (
+		public static ParsedFeeAndLedgerResp ParseFee (
 			NetworkInterface ni, 
 			CancellationToken token
 		) {
-
-			Tuple<string, UInt32> tupe = null;
-
+			ParsedFeeAndLedgerResp parsed = new ParsedFeeAndLedgerResp ();
+			//Tuple<string, UInt32> tupe = null;
+			FeeAndLastLedgerResponse feeResp = null;
 			if (token.IsCancellationRequested) {
-				throw new TaskCanceledException ( nameof(FeeSettings) + " : " + nameof (ParseFee) + " : Task Cancelation recieved");
+				throw new TaskCanceledException ( nameof(FeeSettings) + " : " + nameof (ParseFee) + " : Task Cancelation recieved\n");
 			}
 			// try to retrieve from last server state subscribe response
-			tupe = LedgerTracker.GetFeeAndLastLedger (token);
+			feeResp = LedgerTracker.GetFeeAndLastLedger (token);
 
-			if (tupe == null) {
+			if (feeResp == null) {
 				// explicitly poll the server if subscribe is not working
-				tupe = RippleLibSharp.Commands.Server.ServerInfo.GetFeeAndLedgerSequence (ni, token);
+				parsed.ErrorMessage += "Fee resp null\n";
+				parsed.ErrorMessage += "Explicitly polling fee and last ledger\n";
+				feeResp = ServerInfo.GetFeeAndLedgerSequence (ni, token);
+			} else if (feeResp.HasError) {
+				// explicitly poll the server if subscribe is not working
+
+
+				parsed.ErrorMessage += feeResp.ErrorMessage;
+				parsed.ErrorMessage += "Explicitly polling fee and last ledger\n";
+				feeResp = ServerInfo.GetFeeAndLedgerSequence (ni, token);
 			}
 
-			if (tupe == null) {
-				return null;
+			if (feeResp == null) {
+				parsed.ErrorMessage += feeResp.ErrorMessage;
+				parsed.ErrorMessage += "Parse fee : feeResp == null\n";
+				parsed.HasError = true;
+				return parsed;
 			}
 
-			if (!UInt32.TryParse (tupe.Item1, out uint f)) {
+			if (feeResp.HasError) {
+				parsed.HasError = true;
+				parsed.ErrorMessage += feeResp.ErrorMessage;
+				return parsed;
+			}
+
+			parsed.LastLedger = feeResp.LastLedger;
+
+
+			bool success = UInt32.TryParse (feeResp.Fee, out uint f);
+
+			if (!success) {
 				// TODO debug
 				var x = new InvalidCastException ();
-				//x.Message = "fee returned from network can not be parsed to an int";
+				//x.Message = ;
 				//throw x;
-
-				return null;
+				parsed.ErrorMessage += "Fee returned from network can not be parsed to an int\n";
+				parsed.HasError = true;
+				return parsed;
 			}
 
-			return new Tuple<UInt32, UInt32>(f, tupe.Item2);
+			parsed.Fee = f;
+
+			return parsed;
 		}
 
-		public Tuple<UInt32,UInt32> GetFeeAndLastLedgerFromSettings (NetworkInterface ni, CancellationToken token, UInt32? lastFee = null) {
+		public ParsedFeeAndLedgerResp GetFeeAndLastLedgerFromSettings (NetworkInterface ni, CancellationToken token, UInt32? lastFee = null) {
 
 			/*
 			if (Settings == null) {
@@ -271,7 +298,7 @@ namespace IhildaWallet
 
 			int feeRetry = 0;
 		START:
-			Tuple<UInt32, UInt32> fs = ParseFee (ni, token);
+			ParsedFeeAndLedgerResp fs = ParseFee (ni, token);
 
 
 			if (fs == null) {
@@ -281,6 +308,10 @@ namespace IhildaWallet
 				goto START;
 			}
 
+			if (fs.HasError) {
+				return fs;
+			}
+
 
 			if (this.Specify != null) {
 				//var tupe = parseFee (ni);
@@ -288,9 +319,8 @@ namespace IhildaWallet
 
 				// we already know the last fee was explicitly specified so we blindly increase it by the retry factor
 				fs = this.RetryFactor != null && lastFee != null
-					? new Tuple<uint, uint> ((uint)(this.Specify * this.RetryFactor), fs.Item2)
-					: new Tuple<uint, uint> ((uint)this.Specify, fs.Item2);
-
+					? new ParsedFeeAndLedgerResp () { Fee = (uint)(this.Specify * this.RetryFactor), LastLedger = fs.LastLedger }
+					: new ParsedFeeAndLedgerResp () { Fee = (uint)this.Specify, LastLedger = fs.LastLedger};
 				// we are going to wait for the lowest fee specified 
 				goto Wait;
 
@@ -313,8 +343,8 @@ namespace IhildaWallet
 
 				//f *= (int)settings.multiplier;
 
-				fs = new Tuple<uint, uint> (fs.Item1 * (UInt32)this.Multiplier, fs.Item2);
-
+				//fs = new Tuple<uint, uint> (, fs.Item2);
+				fs = new ParsedFeeAndLedgerResp () { Fee = fs.Fee * (UInt32)this.Multiplier, LastLedger = fs.LastLedger };
 
 			}
 
@@ -324,7 +354,7 @@ namespace IhildaWallet
 					UInt32 lastAmountFactored = (UInt32)lastFee * (UInt32)this.RetryFactor;
 					 
 
-					UInt32 newSuggestedAmount = fs.Item1 * (UInt32)this.RetryFactor;
+					UInt32 newSuggestedAmount = (UInt32)fs.Fee * (UInt32)this.RetryFactor;
 
 					bool newSuggestionIshigher = lastAmountFactored > newSuggestedAmount ;
 
@@ -336,21 +366,23 @@ namespace IhildaWallet
 						// if the suggestion is less than wait limit
 						if (highestSuggestion < this.Wait) {
 							// I think we should fasttrack it
-							fs = new Tuple<uint, uint> (highestSuggestion, fs.Item2);
+							//fs = new Tuple<uint, uint> (highestSuggestion, fs.LastLedger);
+							fs = new ParsedFeeAndLedgerResp () { Fee = highestSuggestion, LastLedger = fs.LastLedger };
 							goto Fasttrack;
 						}
 
 						if (lowestSuggestion < this.Wait) {
 
 							if (lowestSuggestion > lastFee) {
-								fs = new Tuple<uint, uint> (lowestSuggestion, fs.Item2);
+								
+								fs = new ParsedFeeAndLedgerResp () { Fee = lowestSuggestion, LastLedger = fs.LastLedger };
 								goto Fasttrack;
 							}
 
 						}
 
 						if (feeRetry > 20) {
-							fs = new Tuple<uint, uint> ((UInt32)this.Wait, fs.Item2);
+							fs = new ParsedFeeAndLedgerResp () { Fee = (UInt32)this.Wait, LastLedger = fs.LastLedger };
 							goto Fasttrack;
 						}
 						goto START;
@@ -366,9 +398,11 @@ namespace IhildaWallet
 			Wait:
 			if (this.Wait != null) {
 
-				if ( fs.Item1 > this.Wait ) {
+				if ( fs.Fee > this.Wait ) {
 					if (feeRetry++ == MAX_FEE_RETRY_ATTEMPTS) {
-						return null;
+						fs.HasError = true;
+						fs.ErrorMessage += "max retry attemps reached";
+						return fs;
 					}
 
 
@@ -410,16 +444,19 @@ namespace IhildaWallet
 
 
 
-				if (fs.Item1 > this.Warn ) {
+				if (fs.Fee > this.Warn ) {
 					var v = 
 						AreYouSure.AskQuestionNonGuiThread (
 							"Approve High Fee", 
 							"The current fee is " + 
-							fs.Item1.ToString() + 
+							fs.Fee.ToString() + 
 							" drops. Do you wish to submit the transaction anyway?" );
 
 					if (!v) {
-						return null;
+
+						fs.HasError = true;
+						fs.ErrorMessage += "User declined high fee\n";
+						return fs;
 					}
 				}
 			}
@@ -457,13 +494,53 @@ namespace IhildaWallet
 			set;
 		}
 
-		public Tuple< uint,uint >  FeeAndLastLedger {
+		public ParsedFeeAndLedgerResp FeeAndLastLedger {
 			get;
 			set;
 		}
 
 
 	}
+
+	public class ParsedFeeAndLedgerResp
+	{
+		public UInt32 Fee {
+			get;
+			set;
+		}
+
+		public UInt32 LastLedger {
+			get;
+			set;
+		}
+
+		public string Message {
+			get;
+			set;
+		}
+
+		public string ErrorMessage {
+			get;
+			set;
+		}
+
+		public bool HasError {
+			get {
+				if (ErrorMessage != null) {
+					return true;
+				}
+
+				
+				return _hasError;
+			}
+			set {
+				_hasError = value;
+			}
+
+		}
+
+		private bool _hasError = false;
+	} 
 
 	public enum FeeSleepState
 	{

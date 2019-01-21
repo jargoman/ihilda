@@ -16,21 +16,21 @@ namespace IhildaWallet
 		{
 
 			ResponseType response = ResponseType.None;
+			using (ManualResetEvent manualResetEvent = new ManualResetEvent (false)) {
+				manualResetEvent.Reset ();
 
-			ManualResetEvent manualResetEvent = new ManualResetEvent (false);
-			manualResetEvent.Reset ();
+				Application.Invoke ((object sender, EventArgs e) => {
+					WalletConfirmDialog walletConfirmDialog = new WalletConfirmDialog (message) {
+						Title = title
+					};
 
-			Application.Invoke ((object sender, EventArgs e) => { 
-				WalletConfirmDialog walletConfirmDialog = new WalletConfirmDialog (message) {
-					Title = title
-				};
+					response = (ResponseType)walletConfirmDialog.Run ();
+					manualResetEvent.Set ();
 
-				response = (ResponseType)walletConfirmDialog.Run ();
-				manualResetEvent.Set ();
-			
-			});
+				});
 
-			manualResetEvent.WaitOne ();
+				manualResetEvent.WaitOne ();
+			}
 
 			return response;
 		}

@@ -119,43 +119,43 @@ namespace IhildaWallet
 				string method_sig = clsstr + nameof (InitGUI) + DebugRippleLibSharp.both_parentheses;
 				#endif
 				WalletManagerWindow wmw = null;
-				EventWaitHandle wh = new ManualResetEvent(false);
-				wh.Reset();
-				Gtk.Application.Invoke ( delegate {
-					try {
-						#if DEBUG
-						if (DebugIhildaWallet.WalletManagerWindow) {
-							Logging.WriteLog ( method_sig + "Invoking "+ nameof (WalletManagerWindow) + " creation thread : Thread priority = " + Thread.CurrentThread.Priority);
+				using (ManualResetEvent wh = new ManualResetEvent (false)) {
+					wh.Reset ();
+					Gtk.Application.Invoke (delegate {
+						try {
+#if DEBUG
+							if (DebugIhildaWallet.WalletManagerWindow) {
+								Logging.WriteLog (method_sig + "Invoking " + nameof (WalletManagerWindow) + " creation thread : Thread priority = " + Thread.CurrentThread.Priority);
+							}
+#endif
+							wmw = new WalletManagerWindow ();
+							wmw.Hide ();
+							//wmw.ShowAll();
+#if DEBUG
+							if (DebugIhildaWallet.WalletManagerWindow) {
+								Logging.WriteLog (method_sig + "t9 complete");
+							}
+#endif
+							//wh.Set ();
 						}
-						#endif
-						wmw = new WalletManagerWindow ();
-						wmw.Hide ();
-						//wmw.ShowAll();
-						#if DEBUG
-						if (DebugIhildaWallet.WalletManagerWindow) {
-							Logging.WriteLog(method_sig + "t9 complete");
+
+#pragma warning disable 0168
+						catch (Exception e) {
+#pragma warning restore 0168
+
+#if DEBUG
+							if (DebugIhildaWallet.WalletManagerWindow) {
+								Logging.ReportException (method_sig, e);
+							}
+#endif
+						} finally {
+							wh.Set ();
 						}
-						#endif
-						wh.Set();	
-					}
 
-					#pragma warning disable 0168
-					catch (Exception e) {
-					#pragma warning restore 0168
+					});
+					wh.WaitOne ();
+				}
 
-						#if DEBUG
-						if (DebugIhildaWallet.WalletManagerWindow) {
-							Logging.ReportException(method_sig, e);
-						}
-						#endif
-					}
-
-					finally  {
-						wh.Set();
-					}
-
-				});
-				wh.WaitOne();
 				return wmw;
 
 			});

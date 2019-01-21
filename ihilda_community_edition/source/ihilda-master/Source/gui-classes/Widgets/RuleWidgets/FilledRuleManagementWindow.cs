@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Gtk;
 using IhildaWallet.Networking;
 using IhildaWallet.Util;
-using RippleLibSharp.Commands.Server;
 using RippleLibSharp.Keys;
 using RippleLibSharp.Network;
 using RippleLibSharp.Util;
@@ -623,7 +622,7 @@ namespace IhildaWallet
 
 				lines.Add (message);
 
-				if (lines.Count > 2000) {
+				if (lines.Count > 1000) {
 					lines.RemoveAt (0);
 				}
 
@@ -640,9 +639,11 @@ namespace IhildaWallet
 					
 				}
 
+				/*
 				if (scrolledwindow1 != null) {
 					scrolledwindow1.Vadjustment.Value = scrolledwindow1.Vadjustment.Upper;
 				}
+				*/
 			});
 		}
 
@@ -988,50 +989,49 @@ namespace IhildaWallet
 				var finalTask = Task.Run (delegate {
 
 					OrderSubmitWindow win = null;
-
-					ManualResetEvent manualResetEvent = new ManualResetEvent (false);
-					manualResetEvent.Reset ();
-
-					Application.Invoke (delegate {
-
-						/*
-						LicenseType licenseT = Util.LicenseType.MARKETBOT;
-						if (LeIceSense.IsLicenseExempt (tuple.Item2.ElementAt (0).taker_gets) || LeIceSense.IsLicenseExempt (tuple.Item2.ElementAt (0).taker_pays)) {
-							licenseT = LicenseType.NONE;
-						}
-						*/
-
-						win = new OrderSubmitWindow (rw, LicenseType.MARKETBOT) {
-							Visible = false
-						};
-
-						manualResetEvent.Set ();
-					});
-
-					token.WaitHandle.WaitOne (100); // sleep a second
-					manualResetEvent.WaitOne (1000 * 60 * 5);
-
-					WaitHandle.WaitAny (new WaitHandle [] { manualResetEvent, token.WaitHandle });
-
-					if (!token.IsCancellationRequested) {
+					using (ManualResetEvent manualResetEvent = new ManualResetEvent (false)) {
 						manualResetEvent.Reset ();
-					} else {
-						win?.Destroy ();
-						win = null;
-						this.SetIsRunningUI (false);
+
+						Application.Invoke (delegate {
+
+							/*
+							LicenseType licenseT = Util.LicenseType.MARKETBOT;
+							if (LeIceSense.IsLicenseExempt (tuple.Item2.ElementAt (0).taker_gets) || LeIceSense.IsLicenseExempt (tuple.Item2.ElementAt (0).taker_pays)) {
+							    licenseT = LicenseType.NONE;
+							}
+							*/
+
+							win = new OrderSubmitWindow (rw, LicenseType.MARKETBOT) {
+								Visible = false
+							};
+
+							manualResetEvent.Set ();
+						});
+
+						token.WaitHandle.WaitOne (100); // sleep a second
+						manualResetEvent.WaitOne (1000 * 60 * 5);
+
+						WaitHandle.WaitAny (new WaitHandle [] { manualResetEvent, token.WaitHandle });
+
+						if (!token.IsCancellationRequested) {
+							manualResetEvent.Reset ();
+						} else {
+							win?.Destroy ();
+							win = null;
+							this.SetIsRunningUI (false);
+						}
+
+						win.SetOrders (tuple.Item2);
+
+						Application.Invoke (delegate {
+							win.Show ();
+							manualResetEvent.Set ();
+						});
+
+						token.WaitHandle.WaitOne (100); // sleep a second
+						manualResetEvent.WaitOne (1000 * 60 * 5);
+						WaitHandle.WaitAny (new WaitHandle [] { manualResetEvent, token.WaitHandle });
 					}
-
-					win.SetOrders (tuple.Item2);
-
-					Application.Invoke (delegate {
-						win.Show ();
-						manualResetEvent.Set ();
-					});
-
-					token.WaitHandle.WaitOne (100); // sleep a second
-					manualResetEvent.WaitOne (1000 * 60 * 5);
-					WaitHandle.WaitAny ( new WaitHandle [] { manualResetEvent, token.WaitHandle });
-
 				});
 
 
@@ -1204,29 +1204,31 @@ namespace IhildaWallet
 			}
 
 			bool cont = false;
-			ManualResetEvent manualResetEvent = new ManualResetEvent (false);
-			manualResetEvent.Reset ();
+			using (ManualResetEvent manualResetEvent = new ManualResetEvent (false)) {
+				manualResetEvent.Reset ();
 
-			Gtk.Application.Invoke (
-				delegate {
-					// TODO more explicit warning
+				Gtk.Application.Invoke (
+				    delegate {
+			    // TODO more explicit warning
 
-					progressbar1?.Pulse ();
-					cont = AreYouSure.AskQuestion (
-						"Warning !!!",
+			    progressbar1?.Pulse ();
+					    cont = AreYouSure.AskQuestion (
+				"Warning !!!",
 
-						"<markup><span foreground=\"red\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>"
-						+ rw.GetStoredReceiveAddress ()
-						+ "</b></markup>");
-					progressbar1?.Pulse ();
-					manualResetEvent.Set ();
-
-
-				}
-			);
+				"<markup><span foreground=\"red\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>"
+				+ rw.GetStoredReceiveAddress ()
+				+ "</b></markup>");
+					    progressbar1?.Pulse ();
+					    manualResetEvent.Set ();
 
 
-			manualResetEvent.WaitOne ();
+				    }
+				);
+
+
+				manualResetEvent.WaitOne ();
+			}
+
 			if (!cont) {
 				//shouldContinue = false;
 				return;
@@ -1248,8 +1250,8 @@ namespace IhildaWallet
 					case FeeSleepState.Begin:
 						this.WriteToInfoBox (
 							"Fee " +
-							e?.FeeAndLastLedger?.Item1.ToString () ?? "null" +
-							    " is too high, waiting on lower fee"
+							(string)(e?.FeeAndLastLedger?.Fee.ToString () ?? "null") +
+							" is too high, waiting on lower fee"
 			    			);
 						break;
 
@@ -1284,8 +1286,8 @@ namespace IhildaWallet
 
 					stringBuilder.Append ("Hash : ");
 					stringBuilder.AppendLine (e?.RippleOfferTransaction?.hash ?? "");
-					
 
+					stringBuilder.AppendLine (e.Message);
 
 
 					Application.Invoke (
@@ -1597,7 +1599,7 @@ namespace IhildaWallet
 						progressbar1?.Pulse ();
 					});
 
-					//Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> tupleResp = null;
+			
 					MultipleOrdersSubmitResponse responses = null;
 
 					bool parallelSubmit = Program.parallelVerify;
@@ -1620,7 +1622,7 @@ namespace IhildaWallet
 					if (responses == null) {
 						// 
 
-						if (settings.HasOnAutomateFail && settings.OnAutomateFail != null) {
+						if (settings != null && settings.HasOnAutomateFail && settings.OnAutomateFail != null) {
 
 							Task.Run (delegate {
 
@@ -1631,17 +1633,28 @@ namespace IhildaWallet
 							});
 
 						}
-						MessageDialog.ShowMessage ("Scripting error", "Application behaved unexpectedly");
+
+						string unexpected = "Application behaved unexpectedly";
+						MessageDialog.ShowMessage ("Scripting error", unexpected);
+						WriteToInfoBox (unexpected);
 						return;
 					}
+		    			/*
+					if (responses.) {
+
+					}
+					*/	    
+		    			
 					success = responses.Succeeded;
 					if (!success) {
 						string errMess = "Error submitting orders\n";
 						this.WriteToInfoBox (errMess);
-						this.WriteToInfoBox (responses.Message);
+						this.WriteToInfoBox (responses?.Message ?? "null");
+						this.WriteToInfoBox (responses?.TroubleResponse?.Message ?? "null");
+						//this.WriteToInfoBox (responses?.TroubleResponse?.);
 						//shouldContinue = false;
 
-						if (settings.HasOnAutomateFail && settings.OnAutomateFail != null) {
+						if (settings != null && settings.HasOnAutomateFail && settings.OnAutomateFail != null) {
 
 							Task.Run (delegate {
 

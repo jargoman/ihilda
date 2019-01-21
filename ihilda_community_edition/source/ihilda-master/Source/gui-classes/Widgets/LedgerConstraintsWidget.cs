@@ -50,18 +50,18 @@ namespace IhildaWallet
 
 		public int? GetLimit ()
 		{
-			ManualResetEvent mre = new ManualResetEvent (false);
-			mre.Reset ();
 			string s = null;
+			using (ManualResetEvent mre = new ManualResetEvent (false)) {
+				mre.Reset ();
 
-			Application.Invoke (delegate {
-				s = this.comboboxentry4.Entry.Text;
-				mre.Set ();
-			});
+				Application.Invoke (delegate {
+					s = this.comboboxentry4.Entry.Text;
+					mre.Set ();
+				});
 
 
-			mre.WaitOne ();
-
+				mre.WaitOne ();
+			}
 
 			bool b = int.TryParse (s, out int i);
 			if (!b) {
@@ -73,20 +73,17 @@ namespace IhildaWallet
 
 		public Int32? GetStartFromLedger ()
 		{
-
-			ManualResetEvent mre = new ManualResetEvent (false);
-			mre.Reset ();
 			string s = null;
+			using (ManualResetEvent mre = new ManualResetEvent (false)) {
+				mre.Reset ();
 
-			Application.Invoke ((sender, e) => {
-				s = this.comboboxentry6.Entry.Text;
-				mre.Set ();
-			});
+				Application.Invoke ((sender, e) => {
+					s = this.comboboxentry6.Entry.Text;
+					mre.Set ();
+				});
 
-			mre.WaitOne ();
-
-
-
+				mre.WaitOne ();
+			}
 
 			bool b = Int32.TryParse (s, out int st);
 
@@ -101,21 +98,18 @@ namespace IhildaWallet
 
 		public Int32? GetEndLedger ()
 		{
-
-			ManualResetEvent mre = new ManualResetEvent (false);
-			mre.Reset ();
-			string s = null;
-
-			Application.Invoke ((sender, e) => {
-				s = this.comboboxentry5.Entry.Text;
-				mre.Set ();
-			});
-
-
-			mre.WaitOne ();
+			string s;
+			using (ManualResetEvent mre = new ManualResetEvent (false)) {
+				mre.Reset ();
+				s = null;
+				Application.Invoke ((sender, e) => {
+					s = this.comboboxentry5.Entry.Text;
+					mre.Set ();
+				});
 
 
-
+				mre.WaitOne ();
+			}
 
 			bool b = Int32.TryParse (s, out int st);
 
@@ -151,15 +145,17 @@ namespace IhildaWallet
 
 		public bool? GetForward ()
 		{
-			ManualResetEvent mre = new ManualResetEvent (false);
-			mre.Reset ();
 			bool? b = null;
-			Application.Invoke ((sender, e) => {
-				b = checkbutton1.Active;
-				mre.Set ();
-			});
+			using (ManualResetEvent mre = new ManualResetEvent (false)) {
+				mre.Reset ();
 
-			mre.WaitOne ();
+				Application.Invoke ((sender, e) => {
+					b = checkbutton1.Active;
+					mre.Set ();
+				});
+
+				mre.WaitOne ();
+			}
 
 			return b;
 		}

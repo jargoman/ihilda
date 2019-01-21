@@ -185,20 +185,13 @@ namespace IhildaWallet
 
 #endif
 
-			//ManualResetEvent ev = new ManualResetEvent(false);
+
 			String currency = GetBaseCurrency();
 			String issuer = null;
 
-			//Application.Invoke (
-			//	delegate {
 
 			issuer = this.baseissuercombobox.ActiveText;
 
-			//	ev.Set();
-			//	}
-
-			//);
-			//ev.WaitOne();
 
 			// todo verify issuer ect
 
@@ -300,12 +293,10 @@ namespace IhildaWallet
 
 #endif
 
-			//ManualResetEvent ev = new ManualResetEvent(false);
 			String currency = null;
 			String issuer = null;
 
-			//Application.Invoke (
-			//	delegate {
+
 			currency = GetCounterCurrency ();
 			issuer = this.countercurrencycombobox1.ActiveText;
 			if (currency == null || currency.Equals ("")) {
@@ -317,13 +308,7 @@ namespace IhildaWallet
 				return null;
 			}
 
-			//	ev.Set();
-			//	}
-
-			//);
-			//ev.WaitOne();
-
-			// 
+			
 
 			if (currency.Equals (RippleCurrency.NativeCurrency)) {
 

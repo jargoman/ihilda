@@ -61,7 +61,7 @@ namespace RippleLibSharp.Result
 		public string hash { get; set; }
 		public int reserve_base_xrp { get; set; }
 		public int reserve_inc_xrp { get; set; }
-		public UInt32 seq { get; set; }
+		public uint seq { get; set; }
 	}
 
 	public class LastClose
@@ -77,7 +77,7 @@ namespace RippleLibSharp.Result
 		public string hash { get; set; }
 		public int reserve_base_xrp { get; set; }
 		public int reserve_inc_xrp { get; set; }
-		public int seq { get; set; }
+		public uint seq { get; set; }
 	}
 
 	public class Connected

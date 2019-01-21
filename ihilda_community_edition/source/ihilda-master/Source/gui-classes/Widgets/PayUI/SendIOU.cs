@@ -465,48 +465,48 @@ namespace IhildaWallet
 
 			string cur = null;
 			RippleAddress issuer = null;
+			using (ManualResetEvent mre = new ManualResetEvent (false)) {
+				mre.Reset ();
 
-			ManualResetEvent mre = new ManualResetEvent (false);
-			mre.Reset ();
+				Gtk.Application.Invoke (
 
-			Gtk.Application.Invoke (
+				    delegate {
 
-				delegate {
+					    if (this.currencycomboboxentry == null) {
+				    // TODO bug
 
-					if (this.currencycomboboxentry == null) {
-						// TODO bug
+				    return;
+					    }
+					    try {
+						    cur = this.currencycomboboxentry.ActiveText;
 
-						return;
-					}
-					try {
-						cur = this.currencycomboboxentry.ActiveText;
-
-					}
-
-#pragma warning disable 0168
-					catch (Exception e) {
-#pragma warning restore 0168
-						cur = null;
-						mre.Set ();
-						return;
-					}
-
-					try {
-						issuer = this.issuerentry.ActiveText;
-					}
+					    }
 
 #pragma warning disable 0168
-					catch (Exception e) {
+		    catch (Exception e) {
 #pragma warning restore 0168
-						issuer = null;
-					}
-					mre.Set ();
-				} // end delegate
+				    cur = null;
+						    mre.Set ();
+						    return;
+					    }
 
-			);  // end invoke
+					    try {
+						    issuer = this.issuerentry.ActiveText;
+					    }
 
-			mre.WaitOne ();
-			WaitHandle.WaitAny (new [] { mre, token.WaitHandle });
+#pragma warning disable 0168
+		    catch (Exception e) {
+#pragma warning restore 0168
+				    issuer = null;
+					    }
+					    mre.Set ();
+				    } // end delegate
+
+				);  // end invoke
+
+				WaitHandle.WaitAny (new [] { mre, token.WaitHandle });
+			}
+
 			if (cur == null) {
 				return;
 			}
@@ -560,27 +560,25 @@ namespace IhildaWallet
 				return;
 			}
 
-			ManualResetEvent manualResetEvent = new ManualResetEvent (false);
-			manualResetEvent.Reset ();
 			String cur = null;
-			Gtk.Application.Invoke (delegate {
-				if (ni == null) {
-					return;
-				}
+			using (ManualResetEvent manualResetEvent = new ManualResetEvent (false)) {
+				manualResetEvent.Reset ();
 
-				cur = this.currencycomboboxentry.ActiveText;
-				manualResetEvent.Set ();
+				Gtk.Application.Invoke (delegate {
+					if (ni == null) {
+						return;
+					}
+
+					cur = this.currencycomboboxentry.ActiveText;
+					manualResetEvent.Set ();
+
+
+				});
 
 
 
-
-
-
-			});
-
-			//manualResetEvent.WaitOne ();
-
-			WaitHandle.WaitAny (new [] { manualResetEvent, token.WaitHandle });
+				WaitHandle.WaitAny (new [] { manualResetEvent, token.WaitHandle });
+			}
 
 			if (cur == null) {
 				return;

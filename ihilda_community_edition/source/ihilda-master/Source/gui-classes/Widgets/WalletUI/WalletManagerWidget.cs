@@ -1,22 +1,14 @@
 using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
-
-using RippleLibSharp.Network;
 using Gtk;
-using RippleLibSharp.Keys;
-
 using IhildaWallet.Splashes;
 using IhildaWallet.Util;
-using RippleLibSharp.Util;
-using QRCoder;
-using System.Drawing;
-using System.IO;
-using System.Drawing.Imaging;
-using Pango;
-using System.Text;
 using RippleLibSharp.Commands.Subscriptions;
+using RippleLibSharp.Keys;
+using RippleLibSharp.Network;
+using RippleLibSharp.Util;
 
 namespace IhildaWallet
 {
@@ -609,6 +601,7 @@ namespace IhildaWallet
 
 			RippleWallet rw = WalletManager.GetRippleWallet ();
 			if (rw == null) {
+				MessageDialog.ShowMessage ("Select a wallet to encrypt", "You must select the wallet you would like to encrypt");
 				return;
 			}
 
@@ -931,18 +924,18 @@ namespace IhildaWallet
 			}
 
 			Task t1 = Task.Run (delegate {
-				EventWaitHandle wh = new ManualResetEvent (true);
-				wh.Reset ();
-				Gtk.Application.Invoke (
-					delegate {
-						loadingwin = new LoadingWindow ();
-						loadingwin.Show ();
-						wh.Set ();
+				using (EventWaitHandle wh = new ManualResetEvent (true)) {
+					wh.Reset ();
+					Gtk.Application.Invoke (
+					    delegate {
+						    loadingwin = new LoadingWindow ();
+						    loadingwin.Show ();
+						    wh.Set ();
 
-					}
-				);
-				wh.WaitOne ();
-
+					    }
+					);
+					wh.WaitOne ();
+				}
 			});
 
 			/*

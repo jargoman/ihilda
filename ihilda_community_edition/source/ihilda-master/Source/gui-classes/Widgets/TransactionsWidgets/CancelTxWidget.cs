@@ -118,19 +118,24 @@ namespace IhildaWallet
 						return;
 					}
 
-					Tuple<UInt32, UInt32> tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, token);
+					ParsedFeeAndLedgerResp tupe = feeSettings.GetFeeAndLastLedgerFromSettings (ni, token);
 					if (tupe == null) {
 						WriteToInfoBox ("Failed to retrieve fee and last ledger");
+						return;
+					}
+
+					if (tupe.HasError) {
+						WriteToInfoBox (tupe.ErrorMessage);
 						return;
 					}
 
 
 					SignOptions opts = SignOptions.LoadSignOptions ();
 
-					tx.fee = (tupe.Item1 * 2).ToString ();
+					tx.fee = ((UInt32)tupe.Fee * 2).ToString ();
 
 					tx.Sequence = se; // 
-					tx.LastLedgerSequence = tupe.Item2 + (opts?.LastLedgerOffset ?? SignOptions.DEFAUL_LAST_LEDGER_SEQ);
+					tx.LastLedgerSequence = (UInt32)tupe.LastLedger + (opts?.LastLedgerOffset ?? SignOptions.DEFAUL_LAST_LEDGER_SEQ);
 
 					tx.Account = rw.GetStoredReceiveAddress ();
 
