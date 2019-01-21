@@ -36,8 +36,21 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 		public override string GetJsonTx ()
 		{
+
+
 			StringBuilder stringBuilder = new StringBuilder ();
-			stringBuilder.Append ("'{\"TransactionType\": \"SetRegularKey\",");
+			stringBuilder.Append ("'");
+			stringBuilder.Append (GetJsonTxDotNet ());
+			stringBuilder.Append ("'");
+
+			return stringBuilder.ToString ();
+		}
+
+
+		public override string GetJsonTxDotNet ()
+		{
+			StringBuilder stringBuilder = new StringBuilder ();
+			stringBuilder.Append ("{\"TransactionType\": \"SetRegularKey\",");
 			stringBuilder.Append ("\"Account\": \"" + Account + "\",");
 			stringBuilder.Append ("\"Fee\": " + fee.ToJsonString () + ",");
 			//stringBuilder.Append ("\"Flags\": " + flags.ToString () + ",");
@@ -56,7 +69,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 			stringBuilder.Append ("\"RegularKey\": \"" + RegularKey.ToString () + "\"");
 
 
-			stringBuilder.Append ("}'");
+			stringBuilder.Append ("}");
 
 
 

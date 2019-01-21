@@ -227,7 +227,7 @@ namespace IhildaWallet
 				//
 				this.SetStatus (_index.ToString (), "Queued", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
-				Tuple<RippleTransaction [], bool []> payTupe = _tx_tuple;
+				//Tuple<RippleTransaction [], bool []> payTupe = _tx_tuple;
 
 			retry:
 				RippleTransaction tx = _tx_tuple.Item1 [_index];
@@ -373,7 +373,7 @@ namespace IhildaWallet
 #endif
 
 
-						this.SetResult (_index.ToString (), "Exception while signing transaction using RippleDotNet", Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+						this.SetResult (_index.ToString (), "Exception while signing transaction using RippleDotNet\n" + (string)(e.Message ?? ""), Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 						return false;
 					}
 					this.SetStatus (_index.ToString (), "Signed with RippleDotNet", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
@@ -573,7 +573,7 @@ namespace IhildaWallet
 				}
 #endif
 
-				this.SetResult (_index.ToString (), "EXception Thrown in code", TextHighlighter.RED);
+				this.SetResult (_index.ToString (), "Exception Thrown in code\n" + (string)(e?.Message ?? "{null message}" + "\n" + (string)(e?.StackTrace ?? "")), Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 				return false;
 				//return false;
 			}

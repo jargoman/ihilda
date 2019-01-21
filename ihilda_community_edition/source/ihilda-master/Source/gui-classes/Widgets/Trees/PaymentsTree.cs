@@ -49,10 +49,10 @@ namespace IhildaWallet
 		}
 
 
-		public bool SubmitOrderAtIndex ( int index , uint sequence, NetworkInterface ni, CancellationToken token, RippleIdentifier rsa) {
+		public bool SubmitPaymentAtIndex ( int index , uint sequence, NetworkInterface ni, CancellationToken token, RippleIdentifier rsa) {
 
 			#if DEBUG
-			string method_sig = clsstr + nameof (SubmitOrderAtIndex) + DebugRippleLibSharp.both_parentheses;
+			string method_sig = clsstr + nameof (SubmitPaymentAtIndex) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.PaymentWindow) {
 				Logging.WriteLog( method_sig + DebugRippleLibSharp.beginn );
 			}
@@ -382,7 +382,7 @@ namespace IhildaWallet
 				}
 				#endif
 
-				this.SetResult (index.ToString (), "EXception Thrown in code", TextHighlighter.RED);
+				this.SetResult (index.ToString (), "Exception Thrown in code\n" + (string)(e?.Message ?? "{null message}"), TextHighlighter.RED);
 				return false;
 				//return false;
 			}

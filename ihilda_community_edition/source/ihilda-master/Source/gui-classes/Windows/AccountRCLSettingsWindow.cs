@@ -47,7 +47,7 @@ namespace IhildaWallet
 
 			comboboxentry2.Model = treeStore;
 
-			button405.Clicked += (object sender, EventArgs exceptio) => {
+			setregularkeybutton.Clicked += (object sender, EventArgs exceptio) => {
 
 
 #if DEBUG
@@ -87,6 +87,71 @@ namespace IhildaWallet
 				TransactionSubmitWindow transactionSubmitWindow = new TransactionSubmitWindow (signingWallet, Util.LicenseType.NONE);
 				transactionSubmitWindow.SetTransactions (setRegKeyTx);
 
+			};
+
+			accountsetbutton.Clicked += (object sender, EventArgs e) => {
+
+				RippleWallet signingWallet = walletswitchwidget1.GetRippleWallet ();
+
+				RippleAccountSetTransaction accountSetTransaction = new RippleAccountSetTransaction ();
+
+				accountSetTransaction.Account = signingWallet.GetStoredReceiveAddress ();
+
+				if (setcheckbutton.Active) {
+					bool b  = uint.TryParse (setflagentry.Text, out uint set);
+					if (b) {
+						accountSetTransaction.SetFlag = set;
+					} else {
+						return;
+					}
+
+		    			
+				}
+
+				if (clearflagcheckbox.Active) {
+					bool b = uint.TryParse (clearflagentry.Text, out uint clear);
+					if (b) {
+						accountSetTransaction.ClearFlag = clear;
+					} else {
+						return;
+					}
+				}
+
+				if (domaincheckbutton.Active) {
+					accountSetTransaction.Domain = domainentry.Text;
+				}
+
+
+				if (transferratecheckbutton.Active) {
+					bool b = uint.TryParse (clearflagentry.Text, out uint rate);
+					if (b) {
+						accountSetTransaction.TransferRate = rate;
+					} else {
+						return;
+					}
+					
+				}
+
+				if (emailhashcheckbutton.Active) {
+					accountSetTransaction.EmailHash = emailhashentry.Text;
+				}
+
+				if (messagekeycheckbutton.Active) {
+					accountSetTransaction.MessageKey = messagekeyentry.Text;
+				}
+				if (ticksizecheckbutton.Active) {
+					bool b = byte.TryParse (ticksizeentry.Text, out byte tick);
+					if (b) {
+						accountSetTransaction.TickSize = tick;
+					} else {
+						return;
+					}
+
+				}
+
+				TransactionSubmitWindow transactionSubmitWindow = new TransactionSubmitWindow (signingWallet, Util.LicenseType.NONE);
+
+				transactionSubmitWindow.SetTransactions (accountSetTransaction);
 			};
 		}
 

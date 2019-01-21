@@ -1,15 +1,73 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default" NuGet.AddPackagesDialog.IncludePrerelease="True">
   <MonoDevelop.Ide.ItemProperties.RippleLibSharp PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../../RippleLibSharp/RippleLibSharp/Source/Transactions/TxTypes/RippleAccountSetTransaction.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/Program.cs">
     <Files>
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Transactions/TxTypes/RippleAccountSetTransaction.cs" Line="24" Column="3" />
+      <File FileName="Source/gui-classes/Widgets/OptionSettingsWidget/FeeOptionsWidget.cs" Line="414" Column="50" />
+      <File FileName="Source/NotificationSystem/NotificationThread.cs" Line="241" Column="6" />
+      <File FileName="Source/gui-classes/Windows/AccountRCLSettingsWindow.cs" Line="98" Column="78" />
+      <File FileName="Source/gui-classes/Windows/PaymentSubmitWindow.cs" Line="1" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/PaymentPreviewSubmitWidget.cs" Line="160" Column="55" />
+      <File FileName="Source/gui-classes/Widgets/Trees/PaymentsTree.cs" Line="385" Column="43" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Commands/Server/ServerInfo.cs" Line="157" Column="8" />
+      <File FileName="Source/gui-classes/Widgets/WalletUI/TransactionSubmitWidget.cs" Line="279" Column="1" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Transactions/TxTypes/RippleTransaction.cs" Line="415" Column="1" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Third-Party/ripple-dot-net-master/Ripple.TxSigning/TxSigner.cs" Line="64" Column="25" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Transactions/TxTypes/RippleOfferTransaction.cs" Line="100" Column="41" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Transactions/TxTypes/IOUPaymentTransaction.cs" Line="1" Column="1" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Transactions/TxTypes/RippleAccountSetTransaction.cs" Line="47" Column="41" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Transactions/TxTypes/RippleSetRegularKey.cs" Line="72" Column="28" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Third-Party/ripple-dot-net-master/vendor/chaos/Chaos.NaCl.Benchmark32/Program.cs" Line="1" Column="1" />
+      <File FileName="Source/Program.cs" Line="43" Column="49" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Ihilda" expanded="True">
+            <Node name="IhildaWallet" expanded="True">
+              <Node name="Source" expanded="True">
+                <Node name="gui-classes" expanded="True">
+                  <Node name="Widgets" expanded="True">
+                    <Node name="OptionSettingsWidget" expanded="True" />
+                    <Node name="Trees" expanded="True" />
+                    <Node name="WalletUI" expanded="True" />
+                  </Node>
+                  <Node name="Windows" expanded="True" />
+                </Node>
+                <Node name="NotificationSystem" expanded="True" />
+                <Node name="Program.cs" selected="True" />
+              </Node>
+            </Node>
+            <Node name="RippleLibSharp" expanded="True">
+              <Node name="Source" expanded="True">
+                <Node name="Commands" expanded="True">
+                  <Node name="Server" expanded="True" />
+                </Node>
+                <Node name="Third-Party" expanded="True">
+                  <Node name="ripple-dot-net-master" expanded="True">
+                    <Node name="Ripple.TxSigning" expanded="True" />
+                    <Node name="vendor" expanded="True">
+                      <Node name="chaos" expanded="True">
+                        <Node name="Chaos.NaCl.Benchmark32" expanded="True" />
+                      </Node>
+                    </Node>
+                  </Node>
+                </Node>
+                <Node name="Transactions" expanded="True">
+                  <Node name="TxTypes" expanded="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/Source/Unit-Testing/RLSTest.cs" line="263" column="1" />
+      <Breakpoint file="/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/Source/gui-classes/Widgets/WalletUI/TransactionSubmitWidget.cs" relfile="Source/gui-classes/Widgets/WalletUI/TransactionSubmitWidget.cs" line="576" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MultiItemStartupConfigurations />

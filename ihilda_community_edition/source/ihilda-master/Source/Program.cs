@@ -40,7 +40,7 @@ namespace IhildaWallet
 		//static extern bool SetDllDirectory (string lpPathName);
 
 		public static readonly string appname = "ihilda";
-		public static readonly string version = "1.0.1";
+		public static readonly string version = "1.0.2";
 		public static readonly string verboseName = appname + "_community_edition_" + version;
 
 		public static bool showPopUps = true;

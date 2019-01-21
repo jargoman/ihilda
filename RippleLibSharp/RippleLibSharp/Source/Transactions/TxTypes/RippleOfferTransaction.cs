@@ -87,28 +87,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 
 		public override string GetJsonTx () {
-			/*
-			StringBuilder stringBuilder = new StringBuilder ();
-			stringBuilder.Append ("'{\"TransactionType\": \"OfferCreate\",");
-			stringBuilder.Append ("\"Account\": \"" + Account + "\",");
-			stringBuilder.Append ("\"Fee\": " + fee.ToJsonString () + ",");
-			stringBuilder.Append ("\"Flags\": " + flags.ToString () + ",");
 
-			if (LastLedgerSequence != 0) {
-				stringBuilder.Append ("\"LastLedgerSequence\": " + this.LastLedgerSequence.ToString () + ",");
-			}
-			stringBuilder.Append ("\"Sequence\": " + Sequence.ToString () + ",");
-
-			if (this.Memos != null) {
-				stringBuilder.Append ("\"Memos\": " + DynamicJson.Serialize (this.Memos) + ",");
-			}
-
-			stringBuilder.Append ("\"TakerGets\": " + TakerGets.ToJsonString () + ",");
-			stringBuilder.Append ("\"TakerPays\": " + TakerPays.ToJsonString () + "");
-
-			stringBuilder.Append ("}'");
-
-				*/
 
 			StringBuilder stringBuilder = new StringBuilder ();
 			stringBuilder.Append("'");

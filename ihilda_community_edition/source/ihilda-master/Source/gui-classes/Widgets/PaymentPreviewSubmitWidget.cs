@@ -157,7 +157,7 @@ namespace IhildaWallet
 				}
 
 
-				bool suceeded = this.paymentstree1.SubmitOrderAtIndex (index, se++, ni, token, rsa);
+				bool suceeded = this.paymentstree1.SubmitPaymentAtIndex (index, se++, ni, token, rsa);
 				if (!suceeded) {
 
 					if (settings.HasOnTxFail && settings.OnTxFail != null) {

@@ -288,12 +288,9 @@ namespace IhildaWallet
 
 		public ParsedFeeAndLedgerResp GetFeeAndLastLedgerFromSettings (NetworkInterface ni, CancellationToken token, UInt32? lastFee = null) {
 
-			/*
-			if (Settings == null) {
 
-				return ParseFee (ni);
-			}
-			*/
+
+			
 			int nullFeeCount = 0;
 
 			int feeRetry = 0;
@@ -413,23 +410,21 @@ namespace IhildaWallet
 					feeSleepEventArgs.State = FeeSleepState.Begin;
 
 					OnFeeSleep?.Invoke (this, feeSleepEventArgs);
-					using (Task threeseconds = Task.Run (delegate {
 
-			    			feeSleepEventArgs.State = FeeSleepState.PumpUI;
-						for (int i = 0; i < 3; i++) {
-					    		OnFeeSleep?.Invoke (this, feeSleepEventArgs);
-				 	   		token.WaitHandle.WaitOne (1000);
-				    			//LedgerTracker.ServerStateEv
-			    			}
-			    			return;
-			    		})) {
-						using (Task ledgerTask = Task.Run (delegate {
+					//LedgerTracker.ServerStateEvent.WaitOne ();
 
-							WaitHandle.WaitAny (new WaitHandle [] { LedgerTracker.LedgerResetEvent, LedgerTracker.ServerStateEvent, token.WaitHandle });
-						})) {
-							Task.WaitAny (new Task [] { threeseconds, ledgerTask });
-						}
-					}
+
+						
+					//feeSleepEventArgs.State = FeeSleepState.PumpUI;
+					//for (int i = 0; i < 3; i++) {
+					//	OnFeeSleep?.Invoke (this, feeSleepEventArgs);
+					//	token.WaitHandle.WaitOne (1000);
+						//LedgerTracker.ServerStateEv
+					//}
+					WaitHandle.WaitAny (new WaitHandle [] { LedgerTracker.LedgerResetEvent, LedgerTracker.ServerStateEvent, token.WaitHandle }, 3000);
+
+						
+					
 
 					feeSleepEventArgs.State = FeeSleepState.Wake;
 					OnFeeSleep?.Invoke (this, feeSleepEventArgs);
@@ -527,7 +522,7 @@ namespace IhildaWallet
 		public bool HasError {
 			get {
 				if (ErrorMessage != null) {
-					return true;
+				//	return true;
 				}
 
 				

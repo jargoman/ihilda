@@ -154,7 +154,7 @@ namespace RippleLibSharp.Commands.Server
 		{
 			get {
 				if (ErrorMessage != null) {
-					return true;
+					//return true;
 				}
 
 				if (Fee == null) {

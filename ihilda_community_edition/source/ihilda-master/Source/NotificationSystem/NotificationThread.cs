@@ -50,7 +50,7 @@ namespace IhildaWallet
 
 				// TODO error handling 
 				NetworkInterface ni = NetworkController.CurrentInterface;
-				if (ni == null || !ni.IsConnected()) {
+				if (ni == null || !ni.IsConnected ()) {
 					NetworkController.AutoConnect ();
 					return;
 				}
@@ -75,7 +75,7 @@ namespace IhildaWallet
 					return;
 				}
 
-				
+
 
 
 				IEnumerable<RippleWallet> wal = wallets.Values.AsEnumerable ();
@@ -144,14 +144,15 @@ namespace IhildaWallet
 							rw.Notification = mess;
 							WalletManager.currentInstance?.UpdateUI ();
 						}
-						
+
 					}
 
-					
+
 
 					if (rw?.LastKnownLedger == null || rw.LastKnownLedger == 0) {
 
-						rw.Notification = "<span fgcolor=\"blue\">Newly added wallet</span>";
+
+						rw.Notification = "<span fgcolor=\"" + (string)(Program.darkmode ? "lightblue" : "blue") + "\">Newly added wallet</span>";
 						rw.LastKnownLedger = ledger;
 						rw.Save ();
 						WalletManager.currentInstance?.UpdateUI ();
@@ -161,7 +162,7 @@ namespace IhildaWallet
 
 
 
-					Tuple<uint, IEnumerable<AutomatedOrder>> tuple = DoOfferLogic (rw, ni);
+					DoLogicResponse tuple = DoOfferLogic (rw, ni);
 
 					if (tuple == null) {
 						rw.Notification = "<span fgcolor=\"red\">Failed to retrieve newly filled orders.</span>";
@@ -173,10 +174,26 @@ namespace IhildaWallet
 
 					}
 
-					IEnumerable<AutomatedOrder> totalFilled = tuple.Item2;
+					if (tuple.HasError) {
+						rw.Notification = tuple.ErrorMessage;
+
+						if (tuple.ErrorCode == 55) {
+							rw.LastKnownLedger = 0;
+							rw.Save ();
+						}
+
+
+
+						WalletManager.currentInstance?.UpdateUI ();
+						continue;
+					}
+
+		    			
+
+					IEnumerable<AutomatedOrder> totalFilled = tuple.FilledOrders;
 
 					if (totalFilled == null) {
-						rw.LastKnownLedger = tuple.Item1;
+						rw.LastKnownLedger = tuple.LastLedger;
 						rw.Save ();
 						continue;
 					}
@@ -184,7 +201,7 @@ namespace IhildaWallet
 					int c = totalFilled.Count ();
 
 					if (c == 0) {
-						rw.LastKnownLedger = tuple.Item1;
+						rw.LastKnownLedger = tuple.LastLedger;
 						rw.Save ();
 						continue;
 					}
@@ -217,9 +234,9 @@ namespace IhildaWallet
 						this.PlayNotification ();
 					}
 
-		    
 
-					rw.LastKnownLedger = tuple.Item1;
+
+					rw.LastKnownLedger = tuple.LastLedger;
 					rw.Save ();
 
 					continue;
@@ -318,15 +335,27 @@ namespace IhildaWallet
 					}
 
 
-					Tuple<uint, IEnumerable<AutomatedOrder>> tuple = DoOfferLogic (rw, ni);
+					DoLogicResponse tuple = DoOfferLogic (rw, ni);
 					if (tuple == null) {
 						continue;
 						//return;
 					}
 
-					IEnumerable<AutomatedOrder> totalFilled = tuple.Item2;
+					if (tuple.HasError) {
+						if (tuple.ErrorCode == 55 ) {
+							rw.LastKnownLedger = 0;
+							rw.Save ();
+						}
+
+						
+						continue;
+					}
+
+		    			
+
+					IEnumerable<AutomatedOrder> totalFilled = tuple.FilledOrders;
 					if (totalFilled == null) {
-						rw.LastKnownLedger = tuple.Item1;
+						rw.LastKnownLedger = tuple.LastLedger;
 						rw.Save ();
 						continue;
 					}
@@ -335,7 +364,7 @@ namespace IhildaWallet
 					int c = totalFilled.Count ();
 
 					if (c == 0) {
-						rw.LastKnownLedger = tuple.Item1;
+						rw.LastKnownLedger = tuple.LastLedger;
 						rw.Save ();
 						continue;
 					}
@@ -348,7 +377,7 @@ namespace IhildaWallet
 					rw.Notification = message2;
 
 
-					rw.LastKnownLedger = tuple.Item1;
+					rw.LastKnownLedger = tuple.LastLedger;
 					rw.Save ();
 
 					count += c;
@@ -425,7 +454,7 @@ namespace IhildaWallet
 			}
 
 
-			
+
 
 
 
@@ -600,7 +629,7 @@ namespace IhildaWallet
 
 			try {
 				SystemSounds.Asterisk.Play ();
-				
+
 			} catch (Exception e) {
 
 #if DEBUG
@@ -616,14 +645,15 @@ namespace IhildaWallet
 
 		}
 
-		public Tuple<uint, IEnumerable<AutomatedOrder>> DoOfferLogic (RippleWallet wallet, NetworkInterface networkInterface)
+		public DoLogicResponse DoOfferLogic (RippleWallet wallet, NetworkInterface networkInterface)
 		{
 
 #if DEBUG
 			string method_sig = clsstr + nameof (DoOfferLogic) + DebugRippleLibSharp.left_parentheses + nameof (wallet) + DebugRippleLibSharp.comma + nameof (NetworkInterface) + DebugRippleLibSharp.right_parentheses;
 #endif
 
-
+			DoLogicResponse logicResponse = new DoLogicResponse ();
+			 
 			string ledgerMax = (-1).ToString ();
 			string ledgerMin = wallet.LastKnownLedger.ToString ();
 
@@ -644,7 +674,11 @@ namespace IhildaWallet
 					);
 				if (task == null) {
 					//return null;
-					throw new NullReferenceException ();
+
+					logicResponse.HasError = true;
+					logicResponse.ErrorMessage += "Get account tx returned null\n";
+					return logicResponse;
+					//throw new NullReferenceException ();
 				}
 
 
@@ -669,22 +703,38 @@ namespace IhildaWallet
 
 				MessageDialog.ShowMessage (stringBuilder.ToString ());
 
-				return null;
+				logicResponse.HasError = true;
+				logicResponse.ErrorMessage += stringBuilder.ToString ();
+				return logicResponse;
+
+
 			}
 
 			FullTxResponse fullTx = task.Result;
 			if (fullTx == null) {
-				return null;
+
+				logicResponse.HasError = true;
+				logicResponse.ErrorMessage += "Fetch task returned null\n";
+				return logicResponse;
+
 			}
 
 			if (fullTx.HasError) {
-				return null;
+				logicResponse.HasError = true;
+				logicResponse.ErrorMessage += fullTx.ErrorMessage;
+
+				logicResponse.ErrorCode = fullTx.TroubleResponse.error_code;
+
+				return logicResponse;
+				
 			}
 
 			IEnumerable<Response<AccountTxResult>> res = fullTx.Responses;
 
 			if (res == null) {
-				return null;
+				logicResponse.HasError = true;
+				logicResponse.ErrorMessage += "Account tx response is null\n";
+				return logicResponse;
 			}
 
 			IEnumerable<AccountTxResult> results =
@@ -692,13 +742,15 @@ namespace IhildaWallet
 				where r != null
 				&& r.result != null
 				select r.result;
-			
+
 			if (
 				results == null
 				//|| results.Count() == 0
 				|| !results.Any ()
 			) {
-				return null;
+
+
+				return logicResponse;
 			}
 
 			//List<RippleTxStructure> list = new List<RippleTxStructure> ();
@@ -715,7 +767,7 @@ namespace IhildaWallet
 
 			uint max_ledger = results.Max (x => (uint)x.ledger_index_max);
 			lastKnownLedger = max_ledger;
-			IEnumerable<RippleTxStructure> txList = results.SelectMany(a => a.transactions);
+			IEnumerable<RippleTxStructure> txList = results.SelectMany (a => a.transactions);
 
 
 			IEnumerable<RippleTxStructure> payments =
@@ -746,13 +798,62 @@ namespace IhildaWallet
 				}
 #endif
 				MessageDialog.ShowMessage ("Exception processing tx's\n" + e.ToString () + e.StackTrace);
-				return null;
+
+				logicResponse.HasError = true;
+				logicResponse.ErrorMessage += "Excption thrown";
+				logicResponse.ErrorMessage += e.Message;
+				logicResponse.ErrorMessage += e.StackTrace;
+
+				return logicResponse;
 			}
 
+			logicResponse.LastLedger = lastKnownLedger;
+			logicResponse.FilledOrders = total;
 
+			return logicResponse;
 
-			return new Tuple<uint, IEnumerable<AutomatedOrder>> (lastKnownLedger, total); 
-				
+		}
+
+		public class DoLogicResponse {
+			public IEnumerable<AutomatedOrder> FilledOrders {
+				get;
+				set;
+			}
+
+			public uint? LastLedger {
+				get;
+				set;
+			}
+
+			public string ErrorMessage {
+				get;
+				set;
+
+			}
+
+			private string _err_mess = null;
+
+			public int ErrorCode {
+				get;
+				set;
+			}
+
+			public bool HasError {
+				get {
+					if (
+						_err_mess != null
+					) {
+						return true;
+					}
+
+					return hasErr;
+				 }
+
+				set {
+					hasErr = value;
+				}
+			}
+			private bool hasErr = false;
 		}
 
 
