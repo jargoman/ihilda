@@ -1,8 +1,10 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default" NuGet.AddPackagesDialog.IncludePrerelease="True">
   <MonoDevelop.Ide.ItemProperties.RippleLibSharp PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/Program.cs">
     <Files>
       <File FileName="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs" Line="632" Column="16" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Third-Party/ripple-dot-net-master/vendor/chaos/Chaos.NaCl.Benchmark32/Program.cs" Line="1" Column="1" />
+      <File FileName="Source/Program.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
