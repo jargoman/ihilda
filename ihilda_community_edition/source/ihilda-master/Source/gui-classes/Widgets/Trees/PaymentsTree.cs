@@ -103,6 +103,12 @@ namespace IhildaWallet
 					return false;
 				}
 
+				/* always false
+				if (tupe.Fee == null) {
+					this.SetResult (index.ToString (), "null fee", TextHighlighter.RED);
+					return false;
+				}
+				*/
 				
 				//UInt32 f = tupe.Item1; 
 				UInt32 f = (UInt32)tupe.Fee;
@@ -480,11 +486,25 @@ namespace IhildaWallet
 						obj
 					);
 
-				string Destination = o?.Destination;
+				string Destination = o?.Destination ?? "(null destination)";
+
+
+
+				if (o?.DestinationTag != null) {
+					Destination = Destination + "\nDestination Tag : " + o?.DestinationTag.ToString ();
+				}
+
+
 				RippleCurrency Amount = o?.Amount;
 				RippleCurrency Sendmax = o?.SendMax;
 
-				listStore.AppendValues (isSelectDefault, i + 1, Destination ?? "", Amount?.ToString() ?? "", Sendmax?.ToString() ?? "");
+				listStore.AppendValues (
+					isSelectDefault, 
+					(i + 1).ToString (), 
+		    			Destination, 
+		    			Amount?.ToString() ?? "", 
+					Sendmax?.ToString() ?? ""
+				);
 
 				//o.selected = true;
 

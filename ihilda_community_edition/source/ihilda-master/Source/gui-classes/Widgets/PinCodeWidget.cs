@@ -76,7 +76,7 @@ namespace IhildaWallet
 
 			string str = this.entry.Text;
 			if (string.IsNullOrWhiteSpace (str)) {
-				this.label13.Markup = "<span fgcolor=\"red\">Pincode can not be blank</span>";
+				this.label13.Markup = Program.darkmode ? "<span fgcolor=\"#FFAABB\">Pincode can not be blank</span>" : "<span fgcolor=\"red\">Pincode can not be blank</span>";
 				this.label13.Show ();
 			};
 			return str;

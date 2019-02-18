@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Media;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Codeplex.Data;
 using Gtk;
 using IhildaWallet.Networking;
 using IhildaWallet.Util;
+using RippleLibSharp.Commands.Subscriptions;
 using RippleLibSharp.Keys;
 using RippleLibSharp.Network;
 using RippleLibSharp.Util;
@@ -82,6 +85,10 @@ namespace IhildaWallet
 
 			CellRendererToggle toggleCell = new CellRendererToggle {
 				Radio = false
+			};
+
+			forcewakebutton.Clicked += (object sender, EventArgs e) => {
+				WakeTokenSource?.Cancel ();
 			};
 
 
@@ -540,8 +547,73 @@ namespace IhildaWallet
 
 			};
 
+			savesleepbutton.Clicked += (object sender, EventArgs e) => {
+				BotSleepSettings settings = ParseSleepSettings ();
+				string address = walletswitchwidget1.GetRippleWallet ().GetStoredReceiveAddress ();
+
+				if (address == null) {
+					// todo
+					return;
+				}
+
+				if (settings != null) {
+					BotSleepSettings.Save (address, settings);
+				}
+			};
+
 			this.DeleteEvent += OnDeleteEvent;
+
+			
+
+
 		}
+
+		public BotSleepSettings ParseSleepSettings ()
+		{
+
+			String parseError = "Parse Error";
+
+			BotSleepSettings botSleepSettings = new BotSleepSettings ();
+
+			string secondsStr = this.sleepsecentry.Text;
+			string ledgerWaitStr = this.waitledgeentry.Text;
+
+			bool hasSleep = this.sleepseccheckbutton.Active;
+			bool hasLedge = this.sleepledgecheckbutton.Active;
+
+			if (!string.IsNullOrWhiteSpace(secondsStr)) {
+				bool validSeconds = UInt32.TryParse (secondsStr, out uint seconds);
+				if (!validSeconds) {
+					// TODO
+					// 
+
+					MessageDialog.ShowMessage (parseError, "Could not parse number of seconds");
+					return null;
+				}
+
+				botSleepSettings.SleepSeconds = seconds;
+			}
+
+			if (!string.IsNullOrEmpty (ledgerWaitStr)) {
+
+				bool validWait = UInt32.TryParse (ledgerWaitStr, out uint waitLedger);
+				if (!validWait) {
+					MessageDialog.ShowMessage (parseError, "Could not parse number of ledgers to wait for. ");
+					return null;
+				}
+
+				botSleepSettings.LedgerWait = waitLedger;
+			}
+
+			botSleepSettings.HasSleepSeconds = hasSleep;
+			botSleepSettings.HasLedgerWait = hasLedge;
+
+			
+
+			return botSleepSettings;
+
+		}
+
 
 		protected void OnDeleteEvent (object sender, DeleteEventArgs a)
 		{
@@ -564,7 +636,7 @@ namespace IhildaWallet
 				+
 				(string)(isRunning ?
 				    (Program.darkmode ? "<span fgcolor=\"chartreuse\">Running</span>" : "<span fgcolor=\"green\">Running</span>") :
-					(Program.darkmode ? "<span fgcolor=\"#FFAABB\">Stopped</span>" : " < span fgcolor=\"red\">Stopped</span>"))
+					(Program.darkmode ? "<span fgcolor=\"#FFAABB\">Stopped</span>" : " <span fgcolor=\"red\">Stopped</span>"))
 		    		+
 		    		"</span>"
 			;
@@ -584,25 +656,56 @@ namespace IhildaWallet
 
 		private void SetRippleWallet (RippleWallet rw)
 		{
+
+			string account = rw.GetStoredReceiveAddress ();
 			Task.Run (delegate {
 
 
-				string account = rw.GetStoredReceiveAddress ();
+
 
 				var ruleManager = new RuleManager (account);
 				RuleManagerObj = ruleManager;
 				ruleManager.LoadRules ();
 
-				SentimentManagerObject = new SentimentManager (account);
-				SentimentManagerObject.LoadSentiments ();
 
-				this.ledgerconstraintswidget1.SetLastKnownLedger (ruleManager.LastKnownLedger.ToString ());
+
 
 				SetRules (ruleManager.RulesList);
-				SetSentiments (this.SentimentManagerObject.SentimentList);
+
 
 			});
 
+			Task.Run (
+				delegate {
+					SentimentManagerObject = new SentimentManager (account);
+					SentimentManagerObject.LoadSentiments ();
+					SetSentiments (this.SentimentManagerObject.SentimentList);
+				}
+			);
+
+			Task.Run (delegate {
+				LedgerSave ledgerSave = LedgerSave.LoadLedger (rw?.BotLedgerPath);
+
+				this.ledgerconstraintswidget1.SetLastKnownLedger (ledgerSave.Ledger.ToString ());
+
+
+			});
+
+			Task.Run ( delegate {
+
+				BotSleepSettings settings = BotSleepSettings.Load (account);
+
+				if (settings == null) {
+					return;
+				}
+
+				sleepseccheckbutton.Active = settings.HasSleepSeconds ?? false;
+				sleepledgecheckbutton.Active = settings.HasLedgerWait ?? false;
+
+				sleepsecentry.Text = settings.SleepSeconds?.ToString () ?? "";
+				waitledgeentry.Text = settings.LedgerWait?.ToString () ?? "";
+
+			});
 		}
 
 		StringBuilder infoBoxBuffer = new StringBuilder ();
@@ -799,7 +902,7 @@ namespace IhildaWallet
 
 
 
-		private int? previousStartLedger = null;
+		private long? previousStartLedger = null;
 		public void DoLogicClicked ()
 		{
 
@@ -849,7 +952,7 @@ namespace IhildaWallet
 
 				Robotics robot = new Robotics (this.RuleManagerObj);
 
-				Int32? strt = this.ledgerconstraintswidget1.GetStartFromLedger ();
+				long? strt = this.ledgerconstraintswidget1.GetStartFromLedger ();
 
 				if (strt != null) {
 					if (strt == previousStartLedger) {
@@ -872,22 +975,24 @@ namespace IhildaWallet
 
 				}
 
-				Int32? endStr = this.ledgerconstraintswidget1.GetEndLedger ();
+				long? endStr = this.ledgerconstraintswidget1.GetEndLedger ();
 
 				int? lim = this.ledgerconstraintswidget1.GetLimit ();
 
 
 				this.WriteToInfoBox ("Polling data for " + (rw?.GetStoredReceiveAddress () ?? "null") + "\n");
-				int last = RuleManagerObj.LastKnownLedger;
+
+				LedgerSave ledgerSave = LedgerSave.LoadLedger (rw?.BotLedgerPath);
+				uint? lastSavedLedger = ledgerSave?.Ledger;
 				if (strt != null) {
 					this.WriteToInfoBox ("\nStarting from ledger " + (strt?.ToString () ?? "null") + "\n");
 				} else {
 
 
-					this.WriteToInfoBox ("\nStarting ledger is null\n Using last known ledger " + last + "\n");
+					this.WriteToInfoBox ("\nStarting ledger is null\n Using last known ledger " + lastSavedLedger + "\n");
 				}
 
-				if (last == 0) {
+				if (lastSavedLedger == 0) {
 					bool b = AreYouSure.AskQuestionNonGuiThread (
 						"Process entire transaction history?",
 						"You haven't specified a starting ledger and no previous lastledger value has been saved. " +
@@ -934,7 +1039,7 @@ namespace IhildaWallet
 					return;
 				}
 
-				Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = task?.Result;
+				DoLogicResponse tuple = task?.Result;
 
 
 
@@ -951,7 +1056,7 @@ namespace IhildaWallet
 					WriteToInfoBox (message);
 				} else
 
-				if (tuple?.Item1 == null) {
+				if (tuple.LastLedger == null) {
 					message = "Filled orders error\n";
 					MessageDialog.ShowMessage (title, message);
 					WriteToInfoBox (message);
@@ -960,25 +1065,25 @@ namespace IhildaWallet
 				} else
 				
 
-				if (tuple.Item2 == null || !tuple.Item2.Any ()) {
+				if (tuple.FilledOrders == null || !tuple.FilledOrders.Any ()) {
 					message = "There are no new filled orders\n";
 					MessageDialog.ShowMessage (title, message);
 					WriteToInfoBox (message);
 					//return;
 				} else {
 
-					int num = tuple.Item2.Count ();
+					int num = tuple.FilledOrders.Count ();
 
 					message = num + " suggested orders\n";
 					WriteToInfoBox (message);
 				}
 
 				Application.Invoke (delegate {
-					this.ledgerconstraintswidget1.SetLastKnownLedger (tuple.Item1.ToString ()); //this.label9.Text = 
+					this.ledgerconstraintswidget1.SetLastKnownLedger (tuple.LastLedger.ToString ()); //this.label9.Text = 
 				});
 
 
-				if (tuple?.Item2?.FirstOrDefault () == null) {
+				if (tuple?.FilledOrders?.FirstOrDefault () == null) {
 					this.SetIsRunningUI (false);
 					return;
 				}
@@ -1021,7 +1126,7 @@ namespace IhildaWallet
 							this.SetIsRunningUI (false);
 						}
 
-						win.SetOrders (tuple.Item2);
+						win.SetOrders (tuple.FilledOrders);
 
 						Application.Invoke (delegate {
 							win.Show ();
@@ -1214,8 +1319,10 @@ namespace IhildaWallet
 			    progressbar1?.Pulse ();
 					    cont = AreYouSure.AskQuestion (
 				"Warning !!!",
+				(string)(Program.darkmode ?
+				"<markup><span foreground=\"red\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>" :
+				"<markup><span foreground=\"#FFAABB\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>" )
 
-				"<markup><span foreground=\"red\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>"
 				+ rw.GetStoredReceiveAddress ()
 				+ "</b></markup>");
 					    progressbar1?.Pulse ();
@@ -1388,9 +1495,9 @@ namespace IhildaWallet
 					this.WriteToInfoBox (e?.Message);
 				};
 
-				Int32? strt = this.ledgerconstraintswidget1.GetStartFromLedger ();
+				Int64? strt = this.ledgerconstraintswidget1.GetStartFromLedger ();
 
-				if (strt != null) {
+				if (strt != null && strt > 0) {
 					if (strt == previousStartLedger) {
 						StringBuilder stringBuilder = new StringBuilder ();
 						stringBuilder.Append ("You've supplied the same starting ledger twice consecutively. ");
@@ -1406,21 +1513,21 @@ namespace IhildaWallet
 						}
 					}
 
-					previousStartLedger = strt;
+					previousStartLedger = (int?)strt;
 
 				}
 
 
 
 
-				Int32? endStr = this.ledgerconstraintswidget1.GetEndLedger ();
+				long? endStr = this.ledgerconstraintswidget1.GetEndLedger ();
 
 				int? lim = this.ledgerconstraintswidget1.GetLimit ();
 
 				bool success = false;
 
 				RippleIdentifier rippleSeedAddress = rw.GetDecryptedSeed ();
-				while (rippleSeedAddress.GetHumanReadableIdentifier () == null && !token.IsCancellationRequested && !StopWhenConvenient) {
+				while (rippleSeedAddress?.GetHumanReadableIdentifier () == null && !token.IsCancellationRequested && !StopWhenConvenient) {
 					bool shou = AreYouSure.AskQuestionNonGuiThread (
 					"Invalid password",
 					"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
@@ -1434,9 +1541,23 @@ namespace IhildaWallet
 				}
 
 
+				BotSleepSettings botSleepSettings = null;
 
 
 				while (!token.IsCancellationRequested && !StopWhenConvenient) {
+					ManualResetEvent manualResetEvent = new ManualResetEvent (false);
+					manualResetEvent.Reset ();
+
+					Gtk.Application.Invoke ( delegate {
+
+						botSleepSettings = ParseSleepSettings ();
+						manualResetEvent.Set ();
+					} );
+
+
+
+
+					WaitHandle.WaitAny ( new WaitHandle [] { manualResetEvent, token.WaitHandle }, 5000); // after 5 seconds it's probably hung and sleep time is not a critical error
 
 					if (endStr != null) {
 						if (strt > endStr) {
@@ -1462,16 +1583,19 @@ namespace IhildaWallet
 						+ "\n");
 
 
+					LedgerSave ledgersave = LedgerSave.LoadLedger (rw.BotLedgerPath);
 
-					int last = RuleManagerObj.LastKnownLedger;
+
+
+					uint? last = ledgersave?.Ledger;
 					if (strt != null) {
 						this.WriteToInfoBox ("\nStarting from ledger " + (strt?.ToString () ?? "null") + "\n");
 					} else {
 
 
-						this.WriteToInfoBox ("\nStarting ledger is null\n Using last known ledger " + last + "\n");
-						if (last == 0) {
-							bool b = AreYouSure.AskQuestion (
+
+						if (last == null || last == 0) {
+							bool b = AreYouSure.AskQuestionNonGuiThread (
 								"Process entire transaction history?",
 								"You haven't specified a starting ledger and no previous lastledger value has been saved. " +
 								"This will cause the automation to process all transaction history and may not be what you intended" +
@@ -1483,6 +1607,8 @@ namespace IhildaWallet
 								return;
 							}
 						}
+
+						this.WriteToInfoBox ("\nStarting ledger is null\n Using last known ledger " + last + "\n");
 					}
 
 
@@ -1490,9 +1616,9 @@ namespace IhildaWallet
 
 
 
-
-
-					Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = null;
+					
+		    			
+					DoLogicResponse tuple = null;
 
 					do {
 						tuple = robot.DoLogic (rw, ni, strt, endStr, lim, token);
@@ -1515,7 +1641,7 @@ namespace IhildaWallet
 					if (tuple == null) {
 
 
-						if (settings.HasOnAutomateFail && settings.OnAutomateFail != null) {
+						if (settings != null && settings.HasOnAutomateFail && settings.OnAutomateFail != null) {
 
 							Task.Run (delegate {
 
@@ -1539,53 +1665,51 @@ namespace IhildaWallet
 
 					Application.Invoke (
 					delegate {
-						this.ledgerconstraintswidget1.SetLastKnownLedger (tuple.Item1?.ToString ());
+						
+						this.ledgerconstraintswidget1.SetLastKnownLedger (tuple?.LastLedger?.ToString ());
 						progressbar1.Pulse ();
 					}
 					);
 
-					strt = tuple.Item1 + 1;
+					strt = tuple.LastLedger + 1;
 
 
-					IEnumerable<AutomatedOrder> orders = tuple.Item2;
+					IEnumerable<AutomatedOrder> orders = tuple.FilledOrders;
 					if (orders == null || !orders.Any ()) {
+						if (botSleepSettings == null || (botSleepSettings.HasSleepSeconds != true && botSleepSettings.HasLedgerWait != true)) {
 
-						int seconds = 60;
+							uint seconds = 60;
 
-						string infoMessage = "Sleeping for " + seconds + " seconds";
+							DoSleep (seconds, token);
 
-#if DEBUG
-						if (DebugIhildaWallet.FilledRuleManagementWindow) {
-							Logging.WriteLog (infoMessage);
-						}
-
-#endif
-
-						
-
-						this.WriteToInfoBox (infoMessage);
-
-						try {
-							for (int sec = 0; sec < seconds && !token.IsCancellationRequested && !StopWhenConvenient; sec++) {
+						} else if (botSleepSettings.HasLedgerWait == true && botSleepSettings.HasSleepSeconds == true) {
+							uint seconds = botSleepSettings.SleepSeconds ?? 60;
 
 
-								if (sec % 5 == 0) {
-									this.WriteToInfoBox (".");
+							var tempToken = new CancellationTokenSource ();
+							var token2 = tempToken.Token;
+							var task = Task.Run ( 
+								delegate {
+									var w = botSleepSettings.LedgerWait ?? 10;
+									DoLedgerWait (w, token2);
 								}
-								token.WaitHandle.WaitOne (1000);
-								//Task.Delay (250).Wait ();
-								Application.Invoke (delegate {
-									progressbar1?.Pulse ();
 
-								});
-								//}
+							, token);
+
+							task.Wait ((int)seconds * 1000, token);
+							tempToken.Cancel ();
 
 
-							}
-						} catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException) {
-							return;
-						} finally {
-							this.WriteToInfoBox ("\n");
+						} else if (botSleepSettings.HasLedgerWait == true) {
+
+							uint w = botSleepSettings.LedgerWait ?? 10;
+							DoLedgerWait (w, token);
+
+						} else {
+
+							uint seconds = botSleepSettings.SleepSeconds ?? 60;
+
+							DoSleep (seconds, token);
 						}
 						//success = true;
 						continue;
@@ -1609,7 +1733,7 @@ namespace IhildaWallet
 								orders, rw, rippleSeedAddress, ni, token
 							);
 					} else {
-						responses = orderSubmitter.SubmitOrdersParallel (
+						responses = orderSubmitter.SubmitOrdersParallelImproved (
 								orders, rw, rippleSeedAddress, ni, token
 							);
 					}
@@ -1697,7 +1821,7 @@ namespace IhildaWallet
 				this.WriteToInfoBox (e.Message);
 
 				//SoundSettings settings = SoundSettings.LoadSoundSettings ();
-				if (settings.HasOnAutomateFail && settings.OnAutomateFail != null) {
+				if (settings != null && settings.HasOnAutomateFail && settings.OnAutomateFail != null) {
 
 					Task.Run (delegate {
 
@@ -1736,6 +1860,77 @@ namespace IhildaWallet
 		}
 
 
+		private void DoLedgerWait (uint ledgers, CancellationToken token)
+		{
+
+			string infoMessage = "Waiting for " + ledgers + " ledgers ";
+			this.WriteToInfoBox (infoMessage + "\n");
+
+			WakeTokenSource?.Cancel ();
+			WakeTokenSource = new CancellationTokenSource ();
+			var wakeToken = WakeTokenSource.Token;
+			for (int i = 0; i < ledgers && !token.IsCancellationRequested && !wakeToken.IsCancellationRequested && !StopWhenConvenient; i++) {
+				Gtk.Application.Invoke (
+					delegate {
+						progressbar1?.Pulse ();
+
+					}
+				);
+				// TODO set max max sleep time. Example 60 seconds or 
+				WaitHandle.WaitAny ( new WaitHandle [] { LedgerTracker.LedgerResetEvent, token.WaitHandle, wakeToken.WaitHandle });
+				this.WriteToInfoBox (infoMessage + i.ToString () + "\n");
+
+				
+			}
+		}
+
+
+		private void DoSleep (uint seconds, CancellationToken token)
+		{
+
+
+			string infoMessage = "Sleeping for " + seconds + " seconds";
+
+#if DEBUG
+			if (DebugIhildaWallet.FilledRuleManagementWindow) {
+				Logging.WriteLog (infoMessage);
+			}
+
+#endif
+
+
+
+			this.WriteToInfoBox (infoMessage);
+
+			try {
+				WakeTokenSource?.Cancel ();
+				WakeTokenSource = new CancellationTokenSource ();
+				var wakeToken = WakeTokenSource.Token;
+				for (int sec = 0; sec < seconds && !token.IsCancellationRequested && !wakeToken.IsCancellationRequested && !StopWhenConvenient; sec++) {
+
+
+					if (sec % 5 == 0) {
+						this.WriteToInfoBox (".");
+					}
+					
+
+					WaitHandle.WaitAny ( new WaitHandle [] { token.WaitHandle, wakeToken.WaitHandle }, 1000 );
+					//Task.Delay (250).Wait ();
+					Application.Invoke (delegate {
+						progressbar1?.Pulse ();
+
+					});
+					//}
+
+
+				}
+			} catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException) {
+				return;
+			} finally {
+				this.WriteToInfoBox ("\n");
+			}
+		}
+
 		private bool StopWhenConvenient;
 
 
@@ -1768,9 +1963,92 @@ namespace IhildaWallet
 		}
 
 
+		private CancellationTokenSource WakeTokenSource = new CancellationTokenSource ();
+
 #if DEBUG
 		private const string clsstr = nameof (FilledRuleManagementWindow) + DebugRippleLibSharp.colon;
 #endif
+
+	}
+
+
+
+	public class BotSleepSettings
+	{
+		public bool? HasSleepSeconds {
+			get;
+			set;
+		}
+
+		public bool? HasLedgerWait {
+			get;
+			set;
+		}
+
+		public uint? SleepSeconds {
+			get;
+			set;
+		}
+
+		public uint? LedgerWait {
+			get;
+			set;
+		}
+
+		public static void Save (string address, BotSleepSettings settings)
+		{
+
+			try {
+				string path = Path.Combine (FileHelper.WALLET_TRACK_PATH, address + ".slp");
+
+				string serialized = DynamicJson.Serialize (settings);
+
+				File.WriteAllText (path, serialized);
+			} catch (Exception e) {
+
+			}
+		}
+
+		public static BotSleepSettings Load (string address)
+		{
+			string path  = Path.Combine (FileHelper.WALLET_TRACK_PATH, address + ".slp");
+
+			return LoadSettings (path);
+		}
+
+		public static BotSleepSettings LoadSettings (String path)
+		{
+#if DEBUG
+			string method_sig = nameof (BotSleepSettings) + DebugRippleLibSharp.colon + nameof (LoadSettings);
+
+			if (DebugIhildaWallet.FilledRuleManagementWindow) {
+				Logging.WriteLog (method_sig + path + DebugRippleLibSharp.beginn);
+			}
+
+#endif
+
+			try {
+
+				Logging.WriteLog ("Looking for sleep settings at " + path + "\n");
+
+				if (File.Exists (path)) { // 
+					Logging.WriteLog ("Settings found!\n");
+
+					String wah = File.ReadAllText (path, Encoding.UTF8);
+
+					BotSleepSettings settings = DynamicJson.Parse (wah);
+					return settings;
+				}
+
+
+			} catch (Exception e) {
+				Logging.WriteLog (e.Message);
+			}
+
+			return null;
+
+
+		}
 
 	}
 }

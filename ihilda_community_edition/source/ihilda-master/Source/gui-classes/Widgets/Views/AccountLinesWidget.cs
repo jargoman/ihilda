@@ -517,7 +517,11 @@ namespace IhildaWallet
 							return;
 						}
 						// TODO
-						this.infoBarLabel.Markup = "<span fgcolor=\"red\">Unkown Error</span>";
+						if (Program.darkmode) {
+							this.infoBarLabel.Markup = "<span fgcolor=\"#FFAABB\">Unkown Error</span>";
+						} else {
+							this.infoBarLabel.Markup = "<span fgcolor=\"red\">Unkown Error</span>";
+						}
 						this.infoBarLabel.Show ();
 					}
 				);
@@ -545,7 +549,12 @@ namespace IhildaWallet
 						}
 
 						System.Text.StringBuilder sb = new StringBuilder ();
-						sb.Append ("<span fgcolor=\"red\">");
+
+						if (Program.darkmode) {
+							sb.Append ("<span fgcolor=\"#FFAABB\">");
+						} else {
+							sb.Append ("<span fgcolor=\"red\">");
+						}
 						//sb.Append(res.error_code);
 						sb.Append (res?.error_message);
 						sb.Append ("</span>");
@@ -569,7 +578,11 @@ namespace IhildaWallet
 						if (token.IsCancellationRequested) {
 							return;
 						}
-						this.infoBarLabel.Markup = "<span fgcolor=\"red\">This account has no trustlines</span>";
+						if (!Program.darkmode) {
+							this.infoBarLabel.Markup = "<span fgcolor=\"red\">This account has no trustlines</span>";
+						} else {
+							this.infoBarLabel.Markup = "<span fgcolor=\"#FFAABB\">This account has no trustlines</span>";
+						}
 						//this.infoBarLabel.Markup = "This account has no trustlines";
 						this.infoBarLabel.Show ();
 					}

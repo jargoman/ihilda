@@ -71,10 +71,10 @@ namespace IhildaWallet
 			return i;
 		}
 
-		public Int32? GetStartFromLedger ()
+		public Int64? GetStartFromLedger ()
 		{
 			string s = null;
-			using (ManualResetEvent mre = new ManualResetEvent (false)) {
+			using ( ManualResetEvent mre = new ManualResetEvent (false) ) {
 				mre.Reset ();
 
 				Application.Invoke ((sender, e) => {
@@ -85,7 +85,15 @@ namespace IhildaWallet
 				mre.WaitOne ();
 			}
 
-			bool b = Int32.TryParse (s, out int st);
+			if (string.IsNullOrWhiteSpace (s)) {
+				return null;
+			}
+
+			if ("current" == s.ToLower ()) {
+				return -1;
+			}
+
+			bool b = long.TryParse (s, out long st);
 
 			if (!b) {
 
@@ -96,7 +104,7 @@ namespace IhildaWallet
 
 		}
 
-		public Int32? GetEndLedger ()
+		public long? GetEndLedger ()
 		{
 			string s;
 			using (ManualResetEvent mre = new ManualResetEvent (false)) {
@@ -111,7 +119,15 @@ namespace IhildaWallet
 				mre.WaitOne ();
 			}
 
-			bool b = Int32.TryParse (s, out int st);
+			if (string.IsNullOrWhiteSpace (s)) {
+				return null;
+			}
+
+			if ("current" == s.ToLower ()) {
+				return -1;
+			}
+
+			bool b = long.TryParse (s, out long st);
 
 			if (!b) {
 				return null;

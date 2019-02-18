@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 //using RippleLibSharp.Network;
 using IhildaWallet.Networking;
+using RippleLibSharp.Commands.Subscriptions;
 using RippleLibSharp.Network;
 using RippleLibSharp.Result;
 using RippleLibSharp.Transactions;
@@ -39,17 +40,38 @@ namespace IhildaWallet
 			}
 
 
-			orderbooktablewidget1.SetTitle(OrderBookTableWidget.bidTitles);
+			
+	    		
+			
 
-			orderbooktablewidget2.SetTitle(OrderBookTableWidget.askTitles);
+			if (Program.darkmode) {
+				label26.Markup = "<b><span fgcolor=\"chartreuse\" font_size=\"xx-large\">Buy Order Bids</span></b>";
 
+			}
+			
+		}
+
+		public void InitRefreshTask ()
+		{
+#if DEBUG
+			string method_sig = clsstr + nameof (InitRefreshTask) + DebugRippleLibSharp.both_parentheses;
+#endif
 
 			Task.Factory.StartNew (async () => {
 
-				while (!tokenSource.IsCancellationRequested) {
+				var token = tokenSource.Token;
+
+				while (!token.IsCancellationRequested) {
 					try {
-						await Task.Delay (6000, tokenSource.Token);
-						ResyncNetwork (tokenSource.Token);
+
+						for (int i = 0; i < (this.ledgerDelay ?? 1); i++) {
+							WaitHandle.WaitAny (new WaitHandle [] {
+								LedgerTracker.LedgerResetEvent,
+			    					token.WaitHandle
+							}, 8000);
+						}
+						//await Task.Delay (6000, tokenSource.Token);
+						ResyncNetwork (token);
 					} catch (Exception e) {
 #if DEBUG
 						if (DebugIhildaWallet.OrderBookWidget) {
@@ -61,11 +83,6 @@ namespace IhildaWallet
 			}
 			);
 
-			if (Program.darkmode) {
-				label26.Markup = "<b><span fgcolor=\"chartreuse\" font_size=\"xx-large\">Buy Order Bids</span></b>";
-
-			}
-			
 		}
 
 		public void SetToolTips (TradePair tradePair)
@@ -134,6 +151,16 @@ namespace IhildaWallet
 					+ "/"
 					+ (tp?.Currency_Counter?.currency ?? "")
 					+ " </u></b>";
+
+			string [] askTitles = { "<b><u>Ask Price</u></b>", "<b><u>Size " + (tp?.Currency_Base?.currency ?? "") + "</u></b>", "<b><u>Sum " + (tp?.Currency_Base?.currency ?? "") + "</u></b>" };
+			string [] bidTitles = { "<b><u>Sum " + (tp?.Currency_Counter?.currency ?? "") + "</u></b>", "<b><u>Size" + (tp?.Currency_Counter?.currency ?? "") + "</u></b>", "<b><u>Bid Price</u></b>" };
+
+
+			orderbooktablewidget1.SetTitle ( bidTitles );
+
+			orderbooktablewidget2.SetTitle ( askTitles );
+
+
 
 			this.SetToolTips (tp);
 
@@ -213,25 +240,61 @@ namespace IhildaWallet
 			Task<Response<BookOfferResult>> buyTask =
 			limit == null ?
 				RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (counter_currency, cur_base, ni, token)
-	   			: RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (counter_currency, cur_base, limit, ni, token);
+	   			: RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (counter_currency, cur_base, limit + 1, ni, token);
 			;
 
 			var btask = buyTask.ContinueWith((arg) => {
 
-				Offer [] buys = arg.Result.result.offers; //buyTask?.Result?.result?.offers;
+				Offer [] buys = null;
+				Offer [] res = arg?.Result?.result?.offers;
+				if (res == null) {
+					// TODO
+					return;
+				}
+
+				if (limit != null) {
+					buys = new Offer [(int)limit];
+
+
+
+
+					Array.Copy (res, buys, (int)limit);
+				} else {
+					buys = res;
+				}
+
 				IEnumerable<AutomatedOrder> buyoffers = AutomatedOrder.ConvertFromIEnumerableOrder (buys);
 				this.orderbooktablewidget1.SetBids (buyoffers.ToArray ());  // .ToArray()
-
+				//buyoffers.
 			});
 
 
 			Task< Response<BookOfferResult>> sellTask = 
 			limit == null ?
 				RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (cur_base, counter_currency, ni, token)
-	   	 		: RippleLibSharp.Commands.Stipulate.BookOffers.GetResult(cur_base, counter_currency, limit, ni, token);
+	   	 		: RippleLibSharp.Commands.Stipulate.BookOffers.GetResult(cur_base, counter_currency, limit + 1, ni, token);
 
 			var stask = sellTask.ContinueWith ((arg) => {
-				Offer [] sells = arg?.Result?.result?.offers;
+
+				Offer [] sells = null;
+				var res = arg?.Result?.result?.offers;
+				if (res == null) {
+					// TODO
+					return;
+				}
+
+				if (limit != null) {
+					sells = new Offer [(int)limit];
+
+
+
+
+					Array.Copy (res, sells, (int)limit);
+
+				} else {
+					sells = res;
+				}
+
 				IEnumerable<AutomatedOrder> selloffers = AutomatedOrder.ConvertFromIEnumerableOrder (sells);
 				this.orderbooktablewidget2.SetAsk (selloffers.ToArray ());  // .ToArray()
 			});

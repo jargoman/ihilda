@@ -49,7 +49,7 @@ namespace IhildaWallet
 		}
 
 		//public byte[] encrypt (byte[] message, String password) 
-		public byte[] Encrypt ( RippleSeedAddress seed, byte[] salt )
+		public byte[] Encrypt ( RippleIdentifier identifier, byte[] salt )
 		{
 
 			// Note: we aren't using the seed to encrypt, we are using the password to encrypt the seed and the ripple address as salt
@@ -85,7 +85,7 @@ namespace IhildaWallet
 							
 
 								//byte[] encode = Encoding.ASCII.GetBytes(seed.ToString());
-								byte[] encode = seed.GetBytes();
+								byte[] encode = identifier.GetBytes();
 									cryptostream.Write(encode,0,encode.Length);
 									cryptostream.Close();
 									memorystream.Flush ();

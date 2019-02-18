@@ -24,7 +24,7 @@ namespace IhildaWallet
 			switch (wallettype) {
 			case RippleWalletTypeEnum.Master:
 				this.Seed = new RippleSeedAddress (secret);
-				this.Account = Seed.GetPublicRippleAddress ().ToString ();
+				this.Account = Seed.GetPublicRippleAddress ()?.ToString ();
 				break;
 			case RippleWalletTypeEnum.Regular:
 				this.Regular_Seed = new RippleSeedAddress (secret);
@@ -32,7 +32,7 @@ namespace IhildaWallet
 				break;
 			case RippleWalletTypeEnum.MasterPrivateKey:
 				this.PrivateKey = new RipplePrivateKey (secret);
-				this.Account = PrivateKey.GetPublicKey ().GetAddress ();
+				this.Account = PrivateKey.GetPublicKey ()?.GetAddress ();
 				break;
 			}
 
@@ -148,6 +148,13 @@ namespace IhildaWallet
 				return Encryption_Type;
 			}
 
+
+			if (Regular_Key_Encryption_Type != null) {
+				return Regular_Key_Encryption_Type;
+			}
+
+
+	                // these functions should only be called After determining both encryption types has failed. 
 			if (Encrypted_Wallet == null && Seed != null) {
 				return nameof(EncryptionType.Plaintext);
 
@@ -157,9 +164,7 @@ namespace IhildaWallet
 				return nameof (EncryptionType.Plaintext);
 			}
 
-			if (Regular_Key_Encryption_Type != null) {
-				return Regular_Key_Encryption_Type;
-			}
+			
 
 			if (Encrypted_Regular_Wallet == null && Regular_Seed != null) {
 				return nameof (EncryptionType.Plaintext);
@@ -264,7 +269,7 @@ namespace IhildaWallet
 
 
 
-		public uint? LastKnownLedger {
+		public uint? NotificationLedger {
 			get;
 			set;
 		}
@@ -274,12 +279,36 @@ namespace IhildaWallet
 			set;
 		}
 
+
+		public string BotLedgerPath {
+			get {
+				return Path.Combine (FileHelper.WALLET_TRACK_PATH, WalletName + ".bot");
+			}
+		}
+
+		public string NotificationLadgerPath {
+			get {
+				return Path.Combine (FileHelper.WALLET_TRACK_PATH, WalletName + ".led");
+			}
+			
+		}
+
 		public string Notification {
 			get;
 			set;
 		}
 
 		public RippleCurrency LastKnownNativeBalance {
+			get;
+			set;
+		}
+
+		public string BalanceNote {
+			get;
+			set;
+		}
+
+		public byte CouldNotUpdateBalanceCount {
 			get;
 			set;
 		}
@@ -388,9 +417,9 @@ namespace IhildaWallet
 				// TODO alert user, nothing to be done.
 				return;
 			case EncryptionType.Rijndaelio:
-				ie = new Rijndaelio ();
-
-				ie.Password = Rijndaelio.GetPasswordCreateInput ();
+				ie = new Rijndaelio {
+					Password = Rijndaelio.GetPasswordCreateInput ()
+				};
 
 				break;
 
@@ -442,8 +471,9 @@ namespace IhildaWallet
 				Encrypted_Wallet = Base58.Encode (enc);
 
 				Encryption_Type = ie.Name;
-
+				Regular_Key_Encryption_Type = null;
 				Seed = null;
+				Regular_Seed = null;
 				break;
 			case RippleWalletTypeEnum.Regular:
 
@@ -451,13 +481,21 @@ namespace IhildaWallet
 
 				Encrypted_Regular_Wallet = Base58.Encode (enc);
 
+				
 				Regular_Key_Encryption_Type = ie.Name;
-
+				Encryption_Type = null;
+				Seed = null;
 				Regular_Seed = null;
 				break;
 			case RippleWalletTypeEnum.MasterPrivateKey:
+				enc = ie.Encrypt (PrivateKey, salty);
 				Encrypted_PrivateKey = Base58.Encode (enc);
 				Encryption_Type = ie.Name;
+
+				Seed = null;
+				Regular_Seed = null;
+				Regular_Key_Encryption_Type = null;
+
 				break;
 
 			}
@@ -552,7 +590,7 @@ namespace IhildaWallet
 				case EncryptionType.Rijndaelio:
 
 					Rijndaelio rijndaelio = RememberRijndaelio ?? Rijndaelio.GetPasswordInput();
-					if (rijndaelio.RememberPassword) {
+					if ( rijndaelio != null && rijndaelio.RememberPassword) {
 						RememberRijndaelio = rijndaelio;
 					}
 					ie = rijndaelio;
@@ -561,7 +599,7 @@ namespace IhildaWallet
 				case EncryptionType.TrippleEntente:
 
 					TrippleEntente tripple = RememberedEntente ?? TrippleEntenteDialog.DoDialog ();
-					if (tripple.RememberPassword) {
+					if (tripple != null && tripple.RememberPassword) {
 						RememberedEntente = tripple;
 					}
 
@@ -596,7 +634,13 @@ namespace IhildaWallet
 				if (AccountType == RippleWalletTypeEnum.Master || AccountType == RippleWalletTypeEnum.Regular) {
 					try {
 						decryptedSeed = new RippleSeedAddress (decrypted);
+						if (decryptedSeed != null && AccountType == RippleWalletTypeEnum.Regular && Regular_Key_Account == null) {
+							Regular_Key_Account = decryptedSeed?.GetPublicRippleAddress ();
+						}
+
 					} catch (Exception e) {
+						RememberRijndaelio = null;
+						RememberedEntente = null;
 						MessageDialog.ShowMessage ("Invalid password. Unable to decrypt seed.");
 #if DEBUG
 						if (DebugIhildaWallet.RippleWallet) {
@@ -614,6 +658,9 @@ namespace IhildaWallet
 						decryptedPrivateKey = new RipplePrivateKey (decrypted);
 
 					} catch (Exception e) {
+						RememberRijndaelio = null;
+						RememberedEntente = null;
+
 						MessageDialog.ShowMessage ("Invalid password. Unable to decrypt private key.");
 
 						#if DEBUG
@@ -638,15 +685,24 @@ namespace IhildaWallet
 			catch (Exception e) {
 #pragma warning restore 0168
 
+				RememberRijndaelio = null;
+				RememberedEntente = null;
+
 #if DEBUG
 				if (DebugIhildaWallet.RippleWallet) {
 					Logging.ReportException (method_sig, e);
 				}
 #endif
-				return null;
+				throw e;
 			}
 		}
 
+
+		public void ForgetPasswords ()
+		{
+			RememberedEntente = null;
+			RememberRijndaelio = null;
+		}
 		private Rijndaelio RememberRijndaelio = null;
 		private TrippleEntente RememberedEntente = null; 
 
@@ -661,7 +717,7 @@ namespace IhildaWallet
 				}
 
 				if (Encrypted_Wallet == null) {
-					throw new NullReferenceException ();
+					throw new NullReferenceException (nameof (Encrypted_Wallet) + " is null");
 				}
 				break;
 			case RippleWalletTypeEnum.Regular:
@@ -670,7 +726,7 @@ namespace IhildaWallet
 				}
 
 				if (Encrypted_Regular_Wallet == null) {
-					throw new NullReferenceException ();
+					throw new NullReferenceException (nameof (Encrypted_Wallet) + " is null");
 				}
 				break;
 
@@ -680,7 +736,7 @@ namespace IhildaWallet
 				}
 
 				if (Encrypted_PrivateKey == null) {
-					throw new NullReferenceException ();
+					throw new NullReferenceException (nameof (Encrypted_Wallet) + " is null");
 				}
 				break;
 			}
@@ -718,7 +774,7 @@ namespace IhildaWallet
 
 		public void ClearSensitiveIfEncrypted ()
 		{
-
+			// TODO
 		}
 
 		public bool ForgetDialog ()
@@ -875,65 +931,45 @@ namespace IhildaWallet
 
 
 				//dynamic d = new DynamicJson ();
-				JsonWallet jw = new JsonWallet ();
-				/*
-				if (seed != null) {
-					string s = seed.ToString ();
-					jw.secret = s;
-					RippleAddress r = seed.getPublicRippleAddress ();
-					if (r != null) {
-						jw.Account = r.ToString ();
-					} else {
-						// todo debug
-					}
+				JsonWallet jw = new JsonWallet {
+					Secret = Seed?.ToString (),
+
+
+					Account = this.Account,
+
+
+
+					//jw.network = this.
+					Encrypted_Wallet = this.Encrypted_Wallet,
+
+					Encryption_Type = this.Encryption_Type,
+					Name = this.WalletName,
+					Salt = this.Salt,
+
+					//LastKnownLedger = LastKnownLedger,
+
+					AccountType = this.AccountType.ToString (),
+
+					Regular_Key_Secret = this.Regular_Seed?.ToString (),
+
+					Regular_Key_Account = this.Regular_Key_Account,
+
+
+
+
+					Encrypted_Regular_Wallet = this.Encrypted_Regular_Wallet,
+					Regular_Key_Encryption_Type = this.Regular_Key_Encryption_Type,
+
+					Private_Key_Master_Secret = this.PrivateKey?.ToString ()
+				};
+
+				if (jw.Regular_Key_Account == null && this.Regular_Seed != null) {
+					jw.Regular_Key_Account = Regular_Seed?.GetPublicRippleAddress ();
 				}
 
-				if (Account != null) {
-					jw.Account = this.Account;
+				if (jw.Account == null && Seed != null) {
+					jw.Account = Seed?.GetPublicRippleAddress ();
 				}
-
-				if (encrypted_wallet != null) {
-					jw.encrypted_wallet = encrypted_wallet;
-
-					if (encryption_type!=null) {
-						jw.encryption_type = encryption_type;
-					}
-
-				} else {
-					if (seed!=null && seed.ToString()!=null) {
-						jw.secret = seed.ToString();
-					}
-				}
-
-				if (walletname!=null) {
-					jw.name = walletname;
-				}
-				*/
-
-
-
-				jw.Secret = Seed?.ToString ();
-
-
-				jw.Account = this.Account;
-				//jw.network = this.
-				jw.Encrypted_Wallet = this.Encrypted_Wallet;
-
-				jw.Encryption_Type = this.Encryption_Type;
-				jw.Name = this.WalletName;
-				jw.Salt = this.Salt;
-
-				jw.LastKnownLedger = LastKnownLedger;
-
-				jw.AccountType = this.AccountType.ToString();
-
-				jw.Regular_Key_Secret = this.Regular_Seed?.ToString ();
-
-				jw.Regular_Key_Account = this.Regular_Key_Account;
-				jw.Encrypted_Regular_Wallet = this.Encrypted_Regular_Wallet;
-				jw.Regular_Key_Encryption_Type = this.Regular_Key_Encryption_Type;
-
-				jw.Private_Key_Master_Secret = this.PrivateKey?.ToString ();
 
 
 				string st = DynamicJson.Serialize (jw);
@@ -993,6 +1029,7 @@ namespace IhildaWallet
 
 
 		public static object fileLock = new object ();
+		public static object ledgerFileLock = new object ();
 
 		public bool Save (String path)
 		{
@@ -1035,6 +1072,7 @@ namespace IhildaWallet
 
 					if (!File.Exists (path)) {
 						File.WriteAllText (path, json, Encoding.UTF8);
+						
 						return true;
 					}
 
@@ -1091,6 +1129,107 @@ namespace IhildaWallet
 		}
 
 
+		public bool SaveBotLedger (uint? ledger, string path)
+		{
+
+			//string path = BotLedgerPath;
+
+			StringBuilder sb = new StringBuilder ();
+#if DEBUG
+
+			if (DebugIhildaWallet.RippleWallet) {
+
+				sb.Append ("RippleWallet : saveBotLedger ( ");
+				sb.Append (path ?? "null");
+				sb.Append (" ) : ");
+				String method_sig = sb.ToString ();
+				sb.Append (DebugRippleLibSharp.beginn);
+				Logging.WriteLog (sb.ToString ());
+				sb.Clear ();
+			}
+#endif
+
+			if (path == null) {
+				// todo debug
+				return false;
+			}
+
+
+			LedgerSave ledgerSave = new LedgerSave {
+				Ledger = ledger
+			};
+			String json = DynamicJson.Serialize (ledgerSave);
+
+			if (string.IsNullOrWhiteSpace (json)) {
+				MessageDialog.ShowMessage ("hey, the developer wants to see this error ( String json = ToJsonString(); // json == null)  in RippleWallet save");
+
+				return false;
+			}
+
+
+
+			try {
+
+				lock (ledgerFileLock) {
+
+					if (!File.Exists (path)) {
+						File.WriteAllText (path, json, Encoding.UTF8);
+
+						return true;
+					}
+
+					sb.Clear ();
+
+					sb.Append (path);
+					sb.Append (FileHelper.TEMP_EXTENTION);
+					string tempPath = sb.ToString ();
+
+
+					sb.Clear ();
+					sb.Append (path);
+					sb.Append (FileHelper.BACKUP_EXT);
+					string backup = sb.ToString ();
+
+
+
+					byte [] data = Encoding.UTF8.GetBytes (json);
+
+
+					if (File.Exists (backup)) {
+						File.Delete (backup);
+					}
+
+					using (var tempFile = File.Create (tempPath, 1024, FileOptions.WriteThrough)) {
+						tempFile.Write (data, 0, data.Length);
+					}
+
+					File.Replace (tempPath, path, backup);
+
+
+
+				}
+				return true;
+			} catch (Exception e) {
+				//Logging.writeLog(method_sig + "Exception thrown, " + e.Message);
+#if Debug
+				Logging.reportException(method_sig, e);
+					
+#endif
+
+				sb.Clear ();
+				sb.Append ("hey, the developer wants to see this error\n\n");
+				sb.Append (e.Message);
+				sb.Append ("\n\n");
+				sb.Append (e.StackTrace);
+
+				MessageDialog.ShowMessage (sb.ToString ());
+				return false;
+			}
+
+
+
+		}
+
 		private Gdk.Pixbuf _Pixbuf = null;
 		public Gdk.Pixbuf GetQrCode ()
 		{
@@ -1138,6 +1277,50 @@ namespace IhildaWallet
 #if DEBUG
 		private const string clsstr = nameof (RippleWallet) + DebugRippleLibSharp.colon;
 #endif
+	}
+
+
+
+	public class LedgerSave {
+		public UInt32? Ledger {
+			get;
+			set;
+		}
+
+
+		public static LedgerSave LoadLedger (String path)
+		{
+#if DEBUG
+			string method_sig = nameof (LedgerSave) + DebugRippleLibSharp.colon + nameof (LoadLedger);
+
+			if (DebugIhildaWallet.WalletManager) {
+				Logging.WriteLog (method_sig + path + DebugRippleLibSharp.beginn);
+			}
+
+#endif
+
+			try {
+
+				Logging.WriteLog ("Looking for wallet at " + path + "\n");
+
+				if (File.Exists (path)) { // 
+					Logging.WriteLog ("Wallet " + path + " Exists!\n");
+
+					String wah = File.ReadAllText (path, Encoding.UTF8);
+
+					LedgerSave ledge = DynamicJson.Parse (wah);
+					return ledge;
+				}
+
+
+			} catch (Exception e) {
+				Logging.WriteLog (e.Message);
+			}
+
+			return null;
+
+
+		}
 	}
 }
 

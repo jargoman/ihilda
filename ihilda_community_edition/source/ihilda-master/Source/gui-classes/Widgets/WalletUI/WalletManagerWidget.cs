@@ -54,7 +54,7 @@ namespace IhildaWallet
 					string str = e?.ledger_index.ToString ();
 
 					if (str == null) {
-						ledgerlabel.Markup = "<span fgcolor=\"red\">null</span>";
+						ledgerlabel.Markup = Program.darkmode ? "<span fgcolor=\"#FFAABB\">null</span>" : "<span fgcolor=\"red\">null</span>";
 					}
 
 					ledgerlabel.Markup = 
@@ -92,8 +92,10 @@ namespace IhildaWallet
 
 				Gtk.Application.Invoke ( delegate {
 
+					label10.TooltipText = message;
+					ledgerlabel.TooltipText = message;
 
-					eventbox9.TooltipText = message;
+					//eventbox9.TooltipText = message;
 
 
 				});
@@ -327,7 +329,7 @@ namespace IhildaWallet
 
 
 			if (Program.network) {
-				this.eventbox5.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
+				this.eventbox9.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
 					NetworkSettingsDialog.ShowDialog ();
 				};
 			}
@@ -401,9 +403,9 @@ namespace IhildaWallet
 			pixmap.DrawLayout (gc, 25, 25, layout);
 	*/
 
+			/*
 
-
-			eventbox8.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
+			eventbox5.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
 
 				RippleWallet rippleWallet = WalletSelectDialog.DoDialog ();
 
@@ -413,7 +415,7 @@ namespace IhildaWallet
 				
 			};
 
-			
+			*/
 
 		}
 
@@ -1049,7 +1051,7 @@ namespace IhildaWallet
 		public void UpdateWalletUI (RippleWallet rippleWallet)
 		{
 
-			label3.Visible = true;
+			//label3.Visible = true;
 
 			this.eventbox1.ModifyBg ( StateType.Normal, new Gdk.Color ( 255, 255, 255 ) );
 			this.image1.Pixbuf = rippleWallet.GetQrCode ();

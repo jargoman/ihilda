@@ -306,12 +306,20 @@ namespace RippleLibSharp.Binary
 
 		public static string StringToHex ( string str)
 		{
+			if (str == null) {
+				return null;
+			}
+
 			return ByteArrayToHexString ( Encoding.ASCII.GetBytes (str) );
 
 		}
 
 		public static string HexToAscii ( string hex )
 		{
+			if (hex == null) {
+				return null;
+			}
+
 			byte [] bytes = StringToByteArray (hex);
 
 			return Encoding.ASCII.GetString (bytes);

@@ -23,6 +23,10 @@ namespace IhildaWallet
 			checkbutton1.Clicked += (sender, e) => {
 				RememberPassword = checkbutton1.Active;
 			};
+
+			checkbutton2.Clicked += (object sender, EventArgs e) => {
+				entry1.Visibility = checkbutton2.Active;
+			};
 		}
 
 		public string GetPassword () {

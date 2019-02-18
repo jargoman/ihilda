@@ -826,7 +826,7 @@ namespace IhildaWallet
 							Logging.WriteLog (method_sig + "Account is NOT defined\n");
 						}
 #endif
-						//return false; // don't return. account does not need to be defined
+						
 					}
 
 					if (jwallet.Encrypted_Regular_Wallet != null) {
@@ -1017,14 +1017,21 @@ namespace IhildaWallet
 				}
 
 				rw.Salt = jwallet.Salt;
-				rw.LastKnownLedger = jwallet.LastKnownLedger;
 
-				//rw.Regular_Key_Account = jwallet.Regular_Key_Account;
+
+				if (rw.Regular_Key_Account == null) {
+					rw.Regular_Key_Account = rw?.Regular_Seed?.GetPublicRippleAddress ();
+				}
+
+				
 				//rw.Regular_Seed = jwallet.Regular_Key_Secret;
 				//rw.Encrypted_Regular_Wallet = jwallet.Encrypted_Regular_Wallet;
 				//rw.Regular_Key_Encryption_Type = jwallet.Regular_Key_Encryption_Type;
 
 				rw.AccountType = walletTypeEnum;
+
+				rw.NotificationLedger = LedgerSave.LoadLedger (rw?.NotificationLadgerPath)?.Ledger;
+
 				return rw;
 
 

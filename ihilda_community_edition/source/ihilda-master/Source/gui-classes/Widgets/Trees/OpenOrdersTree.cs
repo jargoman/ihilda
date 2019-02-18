@@ -13,6 +13,7 @@ using RippleLibSharp.Result;
 using RippleLibSharp.Transactions;
 using RippleLibSharp.Transactions.TxTypes;
 using RippleLibSharp.Util;
+using System.Text;
 
 namespace IhildaWallet
 {
@@ -605,14 +606,34 @@ namespace IhildaWallet
 
 					Decimal price = o.TakerGets.GetNativeAdjustedPriceAt (o.TakerPays);
 					Decimal cost = o.TakerPays.GetNativeAdjustedPriceAt (o.TakerGets);
-
+					price = Math.Round (price, 15);
+					cost = Math.Round (cost, 15);
 					this._offers [index++] = o;
+
+					StringBuilder paysbuilder = new StringBuilder ();
+					StringBuilder getsbuilder = new StringBuilder ();
+
+					paysbuilder.Append (o?.TakerPays?.currency ?? "null currency");
+					paysbuilder.Append (" ");
+					paysbuilder.AppendLine (o?.TakerPays?.amount.ToString() ?? "null amount");
+
+					if (o?.taker_pays?.issuer != null) {
+						paysbuilder.Append (o?.taker_pays?.issuer);
+					}
+
+					getsbuilder.Append (o?.TakerGets?.currency ?? "null currency");
+					getsbuilder.Append (" ");
+					getsbuilder.AppendLine (o.taker_gets.amount.ToString() ?? "");
+
+					if (o?.TakerGets?.issuer != null) {
+						getsbuilder.Append (o?.taker_gets.issuer);
+					}
 
 					listStore.AppendValues (
 						(index).ToString (),
 						o.Selected,
-						o.TakerPays.ToString (),
-						o.TakerGets.ToString (),
+						paysbuilder.ToString(),
+						getsbuilder.ToString(),
 						price.ToString (),
 						cost.ToString (),
 						o.BotMarking ?? "",

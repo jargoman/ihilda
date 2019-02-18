@@ -83,11 +83,12 @@ namespace IhildaWallet
 			set;
 		}
 
+		/*
 		public uint? LastKnownLedger {
 			get;
 			set;
 		}
-
+	*/
 		public string AccountType { 
 			get; 
 			set; 

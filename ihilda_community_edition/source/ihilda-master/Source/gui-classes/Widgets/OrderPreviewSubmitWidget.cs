@@ -404,7 +404,7 @@ namespace IhildaWallet
 			bool succeed = this.SubmitOrderAtIndex ((int)index, se, opts, ni, token, rsa);
 
 			if (succeed) {
-				if (settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
+				if ( settings != null && settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
 
 					Task.Run (delegate {
 
@@ -415,7 +415,7 @@ namespace IhildaWallet
 
 				}
 			} else {
-				if (settings.HasOnTxFail && settings.OnTxFail != null) {
+				if ( settings != null && settings.HasOnTxFail && settings.OnTxFail != null) {
 
 					Task.Run (delegate {
 
@@ -556,6 +556,13 @@ namespace IhildaWallet
 		{
 
 
+
+			AutomatedOrder [] orders = _offers;
+
+			for (int i = 0; i < orders.Length; i++) {
+
+			}
+			
 		}
 
 		void ApplyRuleButtonClicked (object sender, EventArgs e)
@@ -692,7 +699,7 @@ namespace IhildaWallet
 
 				// gui invoke may be needed for timing rather than being on the right thread
 				
-				string message = "<span fgcolor=\"red\">Conflicting orders. Trading with self</span>";
+				string message = Program.darkmode ? "<span fgcolor=\"#FFAABB\">Conflicting orders. Trading with self</span>" : "<span fgcolor=\"red\">Conflicting orders. Trading with self</span>";
 				SetInfoBar (message);
 			}
 			//SetOffers (_offers);
@@ -812,7 +819,9 @@ namespace IhildaWallet
 
 			Liststore.Clear ();
 			if (offers == null) {
-				string messge = "<span fgcolor=\"red\">Error null offer list\n</span>";
+				
+				string messge = Program.darkmode ? "<span fgcolor=\"#FFAABB\">Error null offer list\n</span>" : "<span fgcolor=\"red\">Error null offer list\n</span>";
+
 				SetInfoBar (messge);
 				return;
 			}
@@ -1244,8 +1253,8 @@ namespace IhildaWallet
 
 
 					MemoIndice memoIndice = Program.GetClientMemo ();
-
-					off.AddMemo (memoIndice);
+					tx.AddMemo (memoIndice);
+					//off.AddMemo (memoIndice);
 
 					#endregion
 
@@ -1260,8 +1269,8 @@ namespace IhildaWallet
 								MemoData = Base58.StringToHex (off?.BotMarking ?? "")
 							}
 						};
-
-						off.AddMemo (markIndice);
+						tx.AddMemo (markIndice);
+						//off.AddMemo (markIndice);
 					}
 
 					#endregion
@@ -2989,187 +2998,200 @@ namespace IhildaWallet
 
 
 			bool ShouldContinue = false;
-			uint sequence;
-			RippleIdentifier rsa;
-			SignOptions signOptions;
-			using (var contTask = Task.Run (
-				delegate {
-					ShouldContinue = LeIceSense.LastDitchAttempt (rw, _licenseType);
+			uint sequence = 0;
+			RippleIdentifier rsa = null;
+			SignOptions signOptions = null;
+			Task contTask = null;
+			Task<SignOptions> signOptionsTask = null;
+			Task seqTask = null;
+			try {
+				contTask = Task.Run (
+					delegate {
+						ShouldContinue = LeIceSense.LastDitchAttempt (rw, _licenseType);
 
 
-				}
-			)) {
+					}
+				);
+
 				sequence = 0;
-				using (var seqTask = Task.Run (delegate {
+				seqTask = Task.Run (delegate {
 					sequence =
 					Convert.ToUInt32 (
 					    AccountInfo.GetSequence (
-					    	rw.GetStoredReceiveAddress (),
-					    	ni,
+						    rw.GetStoredReceiveAddress (),
+						    ni,
 						token
-			    			)
+						    )
 					);
 
-				})) {
-					using (Task<SignOptions> signOptionsTask = Task.Run (
-						delegate {
+				});
+				signOptionsTask = Task.Run (
+					delegate {
 
-				   			return LoadSignOptions (token);
-				   		}
-		       			)) {
-						//int? f = FeeSettings.getFeeFromSettings (ni);
-						//if (f == null) {
-						//	return;
-						//}
+						return LoadSignOptions (token);
+					});
+			
+
+				contTask?.Wait (token);
 
 
-						contTask?.Wait (token);
+				if (!ShouldContinue) {
+
+					string messg =
+						Program.darkmode ? "<span fgcolor=\"#FFAABB\">Insufficient " : "<span fgcolor=\"red\">Insufficient "
+		    				+ LeIceSense.LICENSE_CURRENCY
+		    				+ "Requires "
+		    				+ _licenseType.ToString ()
+		    				+ "</span>";
+
+					SetInfoBar (messg);
+					return;
+				}
+
+				if (Program.darkmode) {
+					SetInfoBar ("<span fgcolor=\"chartreuse>\">Requesting password</span>");
+				} else {
+					SetInfoBar ("<span fgcolor=\"green\">Requesting password</span>");
+				}
+
+				Application.Invoke (delegate {
 
 
-						if (!ShouldContinue) {
+					if (progressbar3 == null) {
+						return;
+					}
+					this.progressbar3.Fraction = 0.02;
 
-							string messg = 
-								"<span fgcolor=\"red\">Insufficient "
-				    				+ LeIceSense.LICENSE_CURRENCY
-				    				+ "Requires "
-				    				+ _licenseType.ToString ()
-				    				+ "</span>";
+				});
 
-							SetInfoBar (messg);
-						    	return;
-						}
+				token.WaitHandle.WaitOne (10);
+				rsa = rw.GetDecryptedSeed ();
 
-						if (Program.darkmode) {
-							SetInfoBar ( "<span fgcolor=\"chartreuse>\">Requesting password</span>" );
-						} else {
-							SetInfoBar ("<span fgcolor=\"green\">Requesting password</span>");
-						}
+				Application.Invoke (delegate {
 
+					if (progressbar3 == null) {
+						return;
+					}
+					progressbar3.Fraction = 0.03;
+				});
+
+
+				while (rsa?.GetHumanReadableIdentifier () == null) {
+
+					if (Program.darkmode) {
+						SetInfoBar ("<span fgcolor=\"chartreuse\">Invalid password</span>");
+					} else {
+						SetInfoBar ("<span fgcolor=\"green\">Invalid password</span>");
+					}
+
+					Application.Invoke (delegate {
+
+						progressbar3?.Pulse ();
+					});
+
+					bool should = AreYouSure.AskQuestionNonGuiThread (
+				    		"Invalid password",
+				    		"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+				    	);
+
+
+
+					if (!should) {
 						Application.Invoke (delegate {
-
-
 							if (progressbar3 == null) {
 								return;
 							}
-							this.progressbar3.Fraction = 0.02;
-
+							progressbar3.Fraction = 0.04;
 						});
+						return;
+					}
 
-						token.WaitHandle.WaitOne (10);
-						rsa = rw.GetDecryptedSeed ();
+					rsa = rw.GetDecryptedSeed ();
+				}
 
-						Application.Invoke (delegate {
+				try {
+					StringBuilder stringBuilder = new StringBuilder ();
 
-							if (progressbar3 == null) {
-								return;
-							}
-							progressbar3.Fraction = 0.03;
-						});
+					string frontspan =
+				    	Program.darkmode
+				    	? "<span fgcolor=\"chartreuse\">Preparing Orders"
+				    	: "<span fgcolor=\"green\">Preparing Orders";
+
+					string backspan = "</span>";
+
+					stringBuilder.Append (frontspan);
+					//stringBuilder.Append (frontspan);
+					stringBuilder.Append (backspan);
+
+					string msg = stringBuilder.ToString ();
+
+					SetInfoBar (msg);
+
+					Application.Invoke (delegate {
+
+						if (progressbar3 == null) {
+							return;
+						}
+						this.progressbar3.Fraction = 0.05;
+
+					});
 
 
-						while (rsa.GetHumanReadableIdentifier () == null) {
+					for (
+					    	int i = 0;
 
-							if (Program.darkmode) {
-								SetInfoBar ("<span fgcolor=\"chartreuse\">Invalid password</span>");
-							} else {
-								SetInfoBar ("<span fgcolor=\"green\">Invalid password</span>");
-							}
+				     		((seqTask != null && !seqTask.IsCanceled && !seqTask.IsCompleted && !seqTask.IsFaulted)
+						|| (signOptionsTask != null && !signOptionsTask.IsCanceled && !signOptionsTask.IsCompleted && !signOptionsTask.IsFaulted))
+		    				&& !token.IsCancellationRequested;
 
-							Application.Invoke (delegate {
+						 i++
 
-								progressbar3?.Pulse ();
-							});
-
-							bool should = AreYouSure.AskQuestionNonGuiThread (
-						    		"Invalid password",
-						    		"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
-						    	);
-
-
-
-							if (!should) {
-								Application.Invoke (delegate {
-									if (progressbar3 == null) {
-										return;
-									}
-									progressbar3.Fraction = 0.04;
-								});
-								return;
-							}
-
-							rsa = rw.GetDecryptedSeed ();
+				    	) {
+						if (i == 10) {
+							i = 0;
 						}
 
-						try {
-							StringBuilder stringBuilder = new StringBuilder ();
+						Task.WaitAll (new [] { seqTask, signOptionsTask }, 1000, token);
 
-							string frontspan =
-						    	Program.darkmode
-						    	? "<span fgcolor=\"chartreuse\">Preparing Orders"
-						    	: "<span fgcolor=\"green\">Preparing Orders";
-
-							string backspan = "</span>";
-
-							stringBuilder.Append (frontspan);
-							//stringBuilder.Append (frontspan);
-							stringBuilder.Append (backspan);
-
-							string msg = stringBuilder.ToString ();
-
-							SetInfoBar (msg);
-
-							Application.Invoke (delegate {
-
-								if (progressbar3 == null) {
-									return;
-								}
-								this.progressbar3.Fraction = 0.05;
-
-							});
+						stringBuilder.Clear ();
+						stringBuilder.Append (frontspan);
 
 
-							for (
-							    	int i = 0;
+						stringBuilder.Append (new String ('.', i));
 
-						     		((seqTask != null && !seqTask.IsCanceled && !seqTask.IsCompleted && !seqTask.IsFaulted)
-								|| (signOptionsTask != null && !signOptionsTask.IsCanceled && !signOptionsTask.IsCompleted && !signOptionsTask.IsFaulted))
-				    				&& !token.IsCancellationRequested;
-								
-							 	i++
+						stringBuilder.Append (backspan);
 
-						    	) {
-								if (i == 10) {
-									i = 0;
-								}
+						SetInfoBar (stringBuilder.ToString ());
 
-								Task.WaitAll (new [] { seqTask, signOptionsTask }, 1000, token);
+					}
 
-								stringBuilder.Clear ();
-								stringBuilder.Append (frontspan);
-
-
-								stringBuilder.Append (new String ('.', i));
-
-								stringBuilder.Append (backspan);
-
-								SetInfoBar (stringBuilder.ToString ());
-							
-							}
-
-						} catch (Exception e) {
+				} catch (Exception e) {
 
 #if DEBUG
-							if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
-								Logging.ReportException (method_sig, e);
-							}
+					if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
+						Logging.ReportException (method_sig, e);
+					}
 #endif
 
-						}
-						signOptions = signOptionsTask?.Result;
+					throw e;
 
-					} // end using sign options task
-				}  // end using seq
-			} // end cont task
+				}
+				signOptions = signOptionsTask?.Result;
+			} catch (Exception e) {
+#if DEBUG
+				if (DebugIhildaWallet.OrderPreviewSubmitWidget) {
+					Logging.ReportException (method_sig, e);
+				}
+#endif
+			} finally {
+				contTask?.Dispose ();
+				signOptionsTask?.Dispose ();
+				seqTask?.Dispose ();
+
+			}
+				//	} // end using sign options task
+				//}  // end using seq
+			//} // end cont task
 
 
 			if (signOptions == null) {
@@ -3254,9 +3276,11 @@ namespace IhildaWallet
 
 			var offs = _offers;
 			if (offs == null) {
-
-				SetInfoBar ("<span fgcolor=\"red\">Unable to verify selected orders. _offer == null</span>");
-
+				if (Program.darkmode) {
+					SetInfoBar ("<span fgcolor=\"#FFAABB\">Unable to verify selected orders. _offer == null</span>");
+				} else {
+					SetInfoBar ("<span fgcolor=\"red\">Unable to verify selected orders. _offer == null</span>");
+				}
 				return;
 			}
 

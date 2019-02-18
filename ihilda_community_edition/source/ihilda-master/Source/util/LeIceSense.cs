@@ -226,6 +226,14 @@ namespace IhildaWallet.Util
 				return true;
 			}
 
+#if DEBUG
+			if (
+			    (LeIceSense.LICENSE_CURRENCY == rippleCurrency?.currency) && (LeIceSense.LICENSE_ISSUER_TESTNET == rippleCurrency?.issuer)
+		    	) {
+				return true;
+			}
+
+#endif
 			return false;
 
 		}
@@ -633,7 +641,12 @@ namespace IhildaWallet.Util
 
 
 		public static string LICENSE_ISSUER = "r4H3F9dDaYPFwbrUsusvNAHLz2sEZk4wE5";
-		//public static string LICENSE_ISSUER = "rGtH6UM2k76QMXav6GGGxXczP9ghq5kwCW";
+
+
+#if DEBUG
+		public static string LICENSE_ISSUER_TESTNET = "rGtH6UM2k76QMXav6GGGxXczP9ghq5kwCW";
+#endif
+
 		//public const decimal LICENSE_FEE = ;
 
 		//public const string warningMessage = "";

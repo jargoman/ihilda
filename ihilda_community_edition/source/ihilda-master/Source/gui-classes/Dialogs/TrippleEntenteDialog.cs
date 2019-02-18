@@ -45,7 +45,7 @@ namespace IhildaWallet
 			var v = this.prismwidget1.CollectPrisms ();
 			if (v == null) {
 				
-				label6.Markup = "<span fgcolor=\"red\">Invalid Prism Values</span>";
+				label6.Markup = Program.darkmode ? "<span fgcolor=\"#FFAABB\">Invalid Prism Values</span>" : "<span fgcolor=\"red\">Invalid Prism Values</span>";
 				this.label6.Show ();
 
 				return null;

@@ -168,7 +168,12 @@ namespace RippleLibSharp.Network
 						}
 						if (responsesConsumer == null) {
 							bool successfull = ticketCache.TryRemove (ticket, out TicketStub tempStub);
-							tempStub.Handle.Close ();
+							try {
+								tempStub?.Handle?.Set ();
+							} catch (Exception ex) {
+
+							}
+							tempStub?.Handle?.Close ();
 
 						}
 
@@ -243,7 +248,12 @@ namespace RippleLibSharp.Network
 						LedgerTracker.SetLedger (ledger);
 
 					} catch ( Exception e ) {
-						// TODO
+#if DEBUG
+						if (DebugRippleLibSharp.NetworkRequestTask) {
+							Logging.ReportException (method_sig, e);
+						}
+#endif
+
 					}
 					return;
 				}
@@ -254,6 +264,11 @@ namespace RippleLibSharp.Network
 						LedgerTracker.SetServerState (serverState);
 					} catch (Exception e) {
 						//TODO
+#if DEBUG
+						if (DebugRippleLibSharp.NetworkRequestTask) {
+							Logging.ReportException (method_sig, e);
+						}
+#endif
 					}
 					return;
 				}
@@ -400,8 +415,15 @@ namespace RippleLibSharp.Network
 			} finally {
 				if (ticketstub != null) {
 					ticketstub.HasResponse = true;
-					ticketstub.Handle?.Set ();
+					try {
 
+						ticketstub.Handle?.Set ();
+					} catch ( Exception e) {
+						if (DebugRippleLibSharp.NetworkRequestTask) {
+							Logging.ReportException (method_sig, e);
+						}
+						
+					}
 					ticketstub.FireConsumer (response);
 				}
 			}

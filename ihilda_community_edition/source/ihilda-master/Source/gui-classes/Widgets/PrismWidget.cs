@@ -107,7 +107,7 @@ namespace IhildaWallet
 
 			bool hasError = false;
 
-			StringBuilder stringBuilder = new StringBuilder ("<span fgcolor=\"red\">");
+			StringBuilder stringBuilder = new StringBuilder (Program.darkmode ? "<span fgcolor=\"FFAABB\">" : "<span fgcolor=\"red\">");
 			Gdk.Color orchid = new Gdk.Color (218, 112, 214);
 			ColorCrypts color = default(ColorCrypts);
 			try {

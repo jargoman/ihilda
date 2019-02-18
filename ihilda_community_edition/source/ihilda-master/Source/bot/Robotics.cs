@@ -28,31 +28,39 @@ namespace IhildaWallet
 
 		}
 
-		public Tuple<Int32?, IEnumerable<AutomatedOrder>> DoLogic (
+		public DoLogicResponse DoLogic (
 			RippleWallet wallet,
 			NetworkInterface ni,
-			Int32? ledgerstart,
-			Int32? ledgerend,
+			Int64? ledgerstart,
+			Int64? ledgerend,
 			Int32? limit,
 			CancellationToken cancelationToken
 		)
 		{
-			SoundSettings settings = SoundSettings.LoadSoundSettings ();
+
 
 #if DEBUG
 			string method_sig = clsstr + nameof (DoLogic) + DebugRippleLibSharp.both_parentheses;
 #endif
-			OrderManagementBot omb = null;
 
+			DoLogicResponse logicResponse = new DoLogicResponse ();
+
+			OrderManagementBot omb = null;
 			var ombTask = Task.Run (delegate {
 				omb = new OrderManagementBot (wallet, ni, cancelationToken);
 
 				omb.OnMessage += (object sender, MessageEventArgs e) => {
-					OnMessage?.Invoke (this, new MessageEventArgs () { Message = e.Message });
+					OnMessage?.Invoke (this, new MessageEventArgs () { Message = e?.Message });
 				};
 			}, cancelationToken);
 
+			SoundSettings settings = SoundSettings.LoadSoundSettings ();
+
+
+			LedgerSave ledgerSave = LedgerSave.LoadLedger (wallet.BotLedgerPath);
+
 			if (cancelationToken.IsCancellationRequested) {
+
 				return null;
 			}
 
@@ -65,11 +73,13 @@ namespace IhildaWallet
 
 			if (ledgerMin == null) {
 
-				if (RuleManagerObj?.LastKnownLedger == null) {
-					// TODO
+				if (ledgerSave.Ledger == null) {
+					// TODO it might not be an error. What if they are running 
+					//logicResponse.HasError = true;
+					//logicResponse.ErrorMessage = "";
 				}
-				int lastRuleLedger = ((int)(RuleManagerObj?.LastKnownLedger));
-				ledgerMin = lastRuleLedger.ToString ();
+				uint? lastRuleLedger = ledgerSave.Ledger;
+				ledgerMin = lastRuleLedger?.ToString ();
 
 			}
 
@@ -114,12 +124,12 @@ namespace IhildaWallet
 				int minutes = 4;
 				int maxSeconds = 60 * minutes; // 
 				int seconds;
-				for (seconds = 0;  !task.IsCompleted && !task.IsFaulted && !task.IsCanceled && !cancelationToken.IsCancellationRequested && seconds < maxSeconds && !StopWhenConvenient;  ) {
+				for (seconds = 0; task != null && !task.IsCompleted && !task.IsFaulted && !task.IsCanceled && !cancelationToken.IsCancellationRequested && seconds < maxSeconds && !StopWhenConvenient;  ) {
 					try {
 						OnMessage?.Invoke (this, new MessageEventArgs { Message = "Waiting on network" });
 						for (int i = 0; i < 10 && !task.IsCompleted && !cancelationToken.IsCancellationRequested; i++, seconds++) {  // seconds are incremented where a second actually occurs and not in it's own loop. It's going to be ok. 
 							OnMessage?.Invoke (this, new MessageEventArgs () { Message = "." });
-							task.Wait (1000, cancelationToken);
+							task?.Wait (1000, cancelationToken);
 						}
 					} catch (Exception e) {
 
@@ -296,16 +306,16 @@ namespace IhildaWallet
 
 			IEnumerable<RippleTxStructure> structures = null;
 
-			int lastledger = 0;
+			uint lastledger = 0;
 			if (!Program.preferLinq) {
 
 				List<RippleTxStructure> txStructures = new List<RippleTxStructure> ();
 
 
 
-				foreach (Response<AccountTxResult> res in responses) {
+				foreach ( Response<AccountTxResult> res in responses ) {
 
-					AccountTxResult accTxResult = res.result;
+					AccountTxResult accTxResult = res?.result;
 
 					if (accTxResult == null) {
 						return null;
@@ -329,7 +339,7 @@ namespace IhildaWallet
 
 					txStructures.AddRange (txs);
 
-					lastledger = Math.Max (accTxResult.ledger_index_max, lastledger);
+					lastledger = (uint)Math.Max (accTxResult.ledger_index_max, lastledger);
 
 					structures = txStructures;
 				}
@@ -337,9 +347,9 @@ namespace IhildaWallet
 
 			} else {
 
-				var results = from x in responses where x?.result != null select x.result;
+				IEnumerable<AccountTxResult> results = from x in responses where x?.result != null select x.result;
 
-				lastledger = results.Max (arg => arg.ledger_index_max);
+				lastledger = (uint)results.Max (arg => arg.ledger_index_max);
 
 				var txStructuresLinq = results
 				.Where (result => result.transactions != null)
@@ -350,7 +360,7 @@ namespace IhildaWallet
 				structures = txStructuresLinq;
 			}
 
-			if (!ombTask.IsCompleted && !ombTask.IsCanceled && !ombTask.IsFaulted) {
+			if (!ombTask.IsCompleted && !ombTask.IsCanceled && !ombTask.IsFaulted && !cancelationToken.IsCancellationRequested) {
 				try {
 
 					OnMessage?.Invoke (
@@ -360,7 +370,7 @@ namespace IhildaWallet
 
 
 					cancelationToken.WaitHandle.WaitOne (1000);
-					while (!ombTask.IsCompleted && !ombTask.IsCanceled && !ombTask.IsFaulted) {
+					while (!ombTask.IsCompleted && !ombTask.IsCanceled && !ombTask.IsFaulted && !cancelationToken.IsCancellationRequested) {
 						OnMessage?.Invoke (this, new MessageEventArgs () { Message = "." });
 						cancelationToken.WaitHandle.WaitOne (1000);
 					}
@@ -459,12 +469,14 @@ namespace IhildaWallet
 
 
 			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Saving lastledger to rule list\n" });
-			RuleManagerObj.LastKnownLedger = lastledger;
-			RuleManagerObj.SaveRules ();
+			//RuleManagerObj.LastKnownLedger = lastledger;
+			//RuleManagerObj.SaveRules ();
+			wallet.SaveBotLedger (lastledger, wallet.BotLedgerPath);
 
-			Tuple<Int32?, IEnumerable <AutomatedOrder>> tuple = new Tuple<int?, IEnumerable <AutomatedOrder>> (lastledger, orders);
+			logicResponse.LastLedger = (uint?)lastledger;
+			logicResponse.FilledOrders = orders;
 
-			return tuple;
+			return logicResponse;
 
 
 		}
@@ -513,6 +525,38 @@ namespace IhildaWallet
 			get;
 			set;
 		}
+	}
+
+	public class DoLogicResponse
+	{
+		public IEnumerable<AutomatedOrder> FilledOrders {
+			get;
+			set;
+		}
+
+		public uint? LastLedger {
+			get;
+			set;
+		}
+
+		public string ErrorMessage {
+			get;
+			set;
+		}
+
+		private string _err_mess = null;
+
+		public int ErrorCode {
+			get;
+			set;
+		}
+
+		public bool HasError {
+			get;
+			set;
+		}
+
+		private bool hasErr = false;
 	}
 
 }

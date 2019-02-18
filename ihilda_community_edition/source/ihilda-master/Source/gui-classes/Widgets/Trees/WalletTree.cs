@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Gtk;
@@ -49,8 +50,10 @@ namespace IhildaWallet
 				Radio = true
 			};
 
-			CellRendererText renderer = new CellRendererText ();
 
+
+			CellRendererText renderer = new CellRendererText ();
+			
 
 
 			treeview2.AppendColumn ("", tog, "active", 0);
@@ -62,6 +65,8 @@ namespace IhildaWallet
 			//treeview2.AppendColumn ("Notifications", renderer, "markup", 4);
 
 			currentInstance = this;
+
+
 
 
 			treeview2.EnterNotifyEvent += (object o, EnterNotifyEventArgs args) => {
@@ -603,9 +608,11 @@ namespace IhildaWallet
 
 				RippleWallet rippleWallet = WalletManager.GetRippleWallet ();
 
-
-				foreach (RippleWallet rw in wallets) {
+				for (int i = 0; i < wallets.Count (); i++) {
+					//foreach (RippleWallet rw in wallets) {
 					//TODO there might be a cleaner way to do this. by index for example/ the name is used for the filename and is therefore unique
+					RippleWallet rw = wallets.ElementAt (i);
+
 					bool b = false;
 
 					if (rippleWallet?.WalletName != null) {
@@ -752,6 +759,12 @@ namespace IhildaWallet
 					);
 
 
+					//treeview2.ro
+					//Gtk.Tooltips tooltips = new Tooltips ();
+					//tooltips.
+					//var win = new Gtk.Window (WindowType.Popup);
+					//treeview2.SetTooltipRow (new Gtk.Tooltip (), new Gtk.TreePath(i.ToString ()));
+
 				}
 
 
@@ -762,6 +775,8 @@ namespace IhildaWallet
 #endif
 
 				treeview2.Model = store;
+				
+				
 
 			});
 		}

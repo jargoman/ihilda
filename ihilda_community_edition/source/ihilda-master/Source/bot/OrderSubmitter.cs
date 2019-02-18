@@ -21,11 +21,186 @@ namespace IhildaWallet
 {
 	public class OrderSubmitter
 	{
-
+		
 		//private IEnumerable<AutomatedOrder> orders = null;
 
 
+
+		public MultipleOrdersSubmitResponse SubmitOrdersParallelImproved (
+			IEnumerable<AutomatedOrder> orders,
+			RippleWallet rw,
+	    		RippleIdentifier rippleIdentifier,
+		    	NetworkInterface networkInterface,
+			CancellationToken token
+		)
+		{
+
+
+			IEnumerable<IGrouping<string, AutomatedOrder>> books = 
+				orders.OrderBy(ord => ord.TakerGets.GetNativeAdjustedPriceAt(ord.TakerPays)).GroupBy (
+				(AutomatedOrder arg) => {
+
+					var keys = new [] { arg.TakerGets.currency, arg.TakerPays.currency }.OrderBy ((String s) => s);
+					return (string)(keys.ElementAt (0) + keys.ElementAt (1));
+					},
+				(AutomatedOrder arg) => arg
+			);
+			/*
+			IEnumerable<IEnumerable<IGrouping<String, AutomatedOrder>>> markets = books.Select (
+				(IGrouping<IOrderedEnumerable<string>, AutomatedOrder> arg) => 
+					arg.GroupBy(
+						(AutomatedOrder order) => order.TakerGets.currency,
+						(AutomatedOrder order) => order)
+						
+			).ToArray (); */
+
+			var markets = books
+				.Select (
+					(IGrouping<string, AutomatedOrder> arg) => 
+						arg.GroupBy(
+							(AutomatedOrder a) => a.taker_gets.currency) );
+
+
+			foreach (var market in markets) {
+
+
+				var side1 = market.ElementAt (0);
+				var first = side1.FirstOrDefault ();
+
+				var task = RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (
+					first.TakerPays,
+		    			first.TakerGets,
+					10,
+					networkInterface,
+		    			token
+					);
+
+
+
+				switch (market.Count () - 1) {
+				case 0:
+					break;
+				case 1:
+					var side2 = market.ElementAt (1);
+
+					int x = 0, y = 0;
+
+					foreach (var order in side1) {
+
+
+						y = 0;
+						foreach (var order2 in side2) {
+							y++;
+
+							if (y > x) {
+
+								if (!order.taker_gets.currency.Equals (order2.TakerPays.currency)) {
+									continue;
+								}
+
+								if (!order.TakerPays.currency.Equals (order2.TakerGets.currency)) {
+									continue;
+								}
+
+								bool shouldCont;
+								do {
+									shouldCont = false;
+									decimal price = order.TakerPays.GetNativeAdjustedPriceAt (order.TakerGets);
+									//	decimal pricej = _offers [j].TakerPays.GetNativeAdjustedPriceAt (_offers [j].TakerGets);
+
+									//	decimal cost = _offers [i].TakerPays.GetNativeAdjustedCostAt (_offers [i].TakerGets);
+
+									decimal costj = order2.TakerPays.GetNativeAdjustedCostAt (order2.TakerGets);
+
+
+									decimal spread = 1.009m;
+
+									decimal resaleEstimate = price * spread;
+
+
+									// 
+									bool spreadTooSmall = resaleEstimate > costj;
+									if (spreadTooSmall) {
+										shouldCont = true;
+										order.TakerGets /= 1.005m;
+										order.TakerPays *= 1.005m;
+
+										order2.TakerGets /= 1.005m;
+										order2.TakerPays *= 1.005m;
+
+									}
+
+								} while (shouldCont);
+							}
+						}
+
+						task.Wait ();
+
+						var orderbook = task?.Result?.result?.offers?.Where((arg) => arg.Account == first.Account);
+
+						if (orderbook != null && orderbook.Any ()) {
+							foreach (Offer order2 in orderbook) {
+								bool shouldCont;
+								do {
+									shouldCont = false;
+									decimal price = order.TakerPays.GetNativeAdjustedPriceAt (order.TakerGets);
+									//	decimal pricej = _offers [j].TakerPays.GetNativeAdjustedPriceAt (_offers [j].TakerGets);
+
+									//	decimal cost = _offers [i].TakerPays.GetNativeAdjustedCostAt (_offers [i].TakerGets);
+
+									decimal costj = order2.TakerPays.GetNativeAdjustedCostAt (order2.TakerGets);
+
+
+									decimal spread = 1.009m;
+
+									decimal resaleEstimate = price * spread;
+
+
+									// 
+									bool spreadTooSmall = resaleEstimate > costj;
+									if (spreadTooSmall) {
+										shouldCont = true;
+										order.TakerGets /= 1.005m;
+										order.TakerPays *= 1.005m;
+
+										//order2.TakerGets /= 1.005m;
+										//order2.TakerPays *= 1.005m;
+
+									}
+
+								} while (shouldCont);
+							}
+
+						}
+
+						x++;
+					}
+					break;
+				default:
+					throw new OverflowException ();
+				}
+			}
+
+			return _SubmitOrdersParallel (orders, rw, rippleIdentifier, networkInterface, token);
+		}
+
 		public MultipleOrdersSubmitResponse SubmitOrdersParallel (
+			IEnumerable<AutomatedOrder> orders,
+			RippleWallet rw,
+	    		RippleIdentifier rippleIdentifier,
+			NetworkInterface networkInterface,
+			CancellationToken token
+		)
+		{
+
+			ApplyRuleToNonProfitableOrders (orders);
+
+			return _SubmitOrdersParallel (orders, rw, rippleIdentifier, networkInterface, token);
+
+		}
+
+
+		public MultipleOrdersSubmitResponse _SubmitOrdersParallel (
 			IEnumerable<AutomatedOrder> orders, 
 			RippleWallet rw, 
 	    		RippleIdentifier rippleIdentifier, 
@@ -37,10 +212,19 @@ namespace IhildaWallet
 
 
 #if DEBUG
-			string method_sig = nameof (SubmitOrdersParallel) + DebugRippleLibSharp.left_parentheses + nameof (orders) + DebugRippleLibSharp.comma + nameof (rw) + DebugRippleLibSharp.comma + nameof (networkInterface) + DebugRippleLibSharp.right_parentheses;
+			string method_sig = 
+				nameof (SubmitOrdersParallel) + 
+				DebugRippleLibSharp.left_parentheses + 
+				nameof (orders) + 
+				DebugRippleLibSharp.comma + 
+				nameof (rw) + 
+				DebugRippleLibSharp.comma + 
+				nameof (networkInterface) + 
+				DebugRippleLibSharp.right_parentheses;
 #endif
 
-			ApplyRuleToNonProfitableOrders (orders);
+
+
 
 
 			// TODO these are functions for splitting orders into smaller chhunks and spreading them out a bit. 
@@ -282,7 +466,7 @@ namespace IhildaWallet
 				SoundPlayer OnTxSubmitPlayer = null;
 				SoundPlayer OnTxFailPlayer = null;
 
-				if (settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
+				if (settings != null && settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
 
 					Task.Run (delegate {
 
@@ -293,7 +477,7 @@ namespace IhildaWallet
 
 				}
 
-				if (settings.HasOnTxFail && settings.OnTxFail != null) {
+				if (settings != null && settings.HasOnTxFail && settings.OnTxFail != null) {
 
 					Task.Run (delegate {
 
@@ -343,7 +527,7 @@ namespace IhildaWallet
 						//return new Tuple<bool, IEnumerable<OrderSubmittedEventArgs>> (false, events);
 					}
 					
-					if (settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
+					if (settings != null && settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
 
 						Task.Run ((System.Action)OnTxSubmitPlayer.Play);
 
@@ -1409,6 +1593,8 @@ namespace IhildaWallet
 		private void ApplyRuleToNonProfitableOrders (IEnumerable<AutomatedOrder> orders)
 		{
 
+
+
 			AutomatedOrder [] _offers = orders.ToArray ();
 
 
@@ -1428,9 +1614,10 @@ namespace IhildaWallet
 					do {
 						shouldCont = false;
 						decimal price = _offers [i].TakerPays.GetNativeAdjustedPriceAt (_offers [i].TakerGets);
-						decimal pricej = _offers [j].TakerPays.GetNativeAdjustedPriceAt (_offers [j].TakerGets);
+					//	decimal pricej = _offers [j].TakerPays.GetNativeAdjustedPriceAt (_offers [j].TakerGets);
 
-						decimal cost = _offers [i].TakerPays.GetNativeAdjustedCostAt (_offers [i].TakerGets);
+					//	decimal cost = _offers [i].TakerPays.GetNativeAdjustedCostAt (_offers [i].TakerGets);
+
 						decimal costj = _offers [j].TakerPays.GetNativeAdjustedCostAt (_offers [j].TakerGets);
 
 

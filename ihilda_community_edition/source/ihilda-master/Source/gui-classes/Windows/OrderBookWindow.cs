@@ -34,15 +34,21 @@ namespace IhildaWallet
 			orderbookwidget1.autoRefresh = opts.AutoRefresh;
 
 
+			if (opts?.AutoRefresh != null && opts.AutoRefresh) {
+				button316.Hide ();
+				orderbookwidget1?.InitRefreshTask ();
+				
+				
+			} else {
+				button316.Clicked += delegate {
+					Task.Run (delegate {
 
-			button316.Clicked += delegate {
-				Task.Run ( delegate {
+						ResyncNetworkManual (new CancellationToken ());
 
-					ResyncNetworkManual (new CancellationToken ());
+					});
 
-				});
-
-			};
+				};
+			}
 		}
 
 		public void SetTradePair (TradePair tp) {

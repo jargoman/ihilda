@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using RippleLibSharp.Transactions;
-
-using RippleLibSharp.Transactions.TxTypes;
-
-using RippleLibSharp.Nodes;
-
-using RippleLibSharp.Keys;
-using RippleLibSharp.Binary;
-using System.Text;
 using System.Linq;
-using System.Threading;
+using System.Text;
+using RippleLibSharp.Binary;
+using RippleLibSharp.Nodes;
+using RippleLibSharp.Transactions;
+using RippleLibSharp.Transactions.TxTypes;
 
 namespace IhildaWallet
 {
@@ -76,8 +71,7 @@ namespace IhildaWallet
 
 		}
 
-
-
+		/*
 		public void AddClientMemo ()
 		{
 			AddMemo (Program.GetClientMemo ());
@@ -97,7 +91,8 @@ namespace IhildaWallet
 
 			memos.Add (memoIndice);
 			this.Memos = memos.ToArray ();
-		}
+		} */
+
 
 		public override string ToString ()
 		{
@@ -381,7 +376,7 @@ namespace IhildaWallet
 			}
 	    		*/
 			var list = input.Select ((arg) => new AutomatedOrder (arg));
-			//IEnumerable<AutomatedOrder> ret = list;
+
 
 			return list;
 		}

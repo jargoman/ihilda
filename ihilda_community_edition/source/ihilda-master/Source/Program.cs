@@ -4,32 +4,23 @@
 
 
 using System;
-using System.Reflection;
+using System.Collections.Generic;
+using System.Linq;
 //using Mono;
 using System.Text;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-
-using System.Runtime.InteropServices;
-
 using Gtk;
 //using Gdk;
 
 using IhildaWallet.Networking;
-
-using RippleLibSharp.Transactions.TxTypes;
+using RippleLibSharp.Binary;
+using RippleLibSharp.Commands.Accounts;
 using RippleLibSharp.Keys;
 using RippleLibSharp.Network;
-
-using System.Media;
-using RippleLibSharp.Util;
 using RippleLibSharp.Transactions;
-using RippleLibSharp.Binary;
-using System.Collections.Generic;
-using System.Linq;
-using RippleLibSharp.Commands.Accounts;
-using RippleLibSharp.Commands.Subscriptions;
+using RippleLibSharp.Util;
+using static IhildaWallet.MemoCreateDialog;
 
 namespace IhildaWallet
 {
@@ -40,7 +31,7 @@ namespace IhildaWallet
 		//static extern bool SetDllDirectory (string lpPathName);
 
 		public static readonly string appname = "ihilda";
-		public static readonly string version = "1.0.2";
+		public static readonly string version = "1.0.3";
 		public static readonly string verboseName = appname + "_community_edition_" + version;
 
 		public static bool showPopUps = true;
@@ -55,9 +46,9 @@ namespace IhildaWallet
 
 		//public static Task walletTask = null;
 
-		public static MemoIndice GetClientMemo ()
+		public static SelectableMemoIndice GetClientMemo ()
 		{
-			MemoIndice indice = new MemoIndice () {
+			SelectableMemoIndice indice = new SelectableMemoIndice () {
 				Memo = new RippleMemo () {
 					MemoType = Base58.StringToHex ("client"),
 					MemoFormat = Base58.StringToHex (Program.appname),
@@ -71,7 +62,7 @@ namespace IhildaWallet
 		}
 
 		private static Thread thr = new Thread (
-			new ThreadStart (ThreadRoutine)
+			new ThreadStart ( ThreadRoutine )
 		);
 
 
@@ -354,7 +345,7 @@ namespace IhildaWallet
 			bool success = false;
 
 			// Keeps track of where the next start ledger will be
-			int? projectedStart = null;
+			uint? projectedStart = null;
 
 			if (!keepRunning) {
 				string exitingMessage = "Quit request received\n";
@@ -386,7 +377,15 @@ namespace IhildaWallet
 					+ (string)(rippleWallet?.GetStoredReceiveAddress () ?? "null")
 					+ "\n");
 
-				int last = RuleManagerObj.LastKnownLedger;
+
+				LedgerSave ledgerSave = LedgerSave.LoadLedger (rippleWallet.BotLedgerPath);
+				
+
+				uint? last = ledgerSave?.Ledger;
+				if (last == null || last == 0) {
+					// TODO warning
+				}
+
 
 				if (Program.ledger != 0) {
 					Logging.WriteLog ("\nStarting from ledger " + (string)Program.ledger.ToString () + "\n");
@@ -404,7 +403,7 @@ namespace IhildaWallet
 
 
 
-				Tuple<Int32?, IEnumerable<AutomatedOrder>> tuple = null;
+				DoLogicResponse tuple = null;
 
 				tuple = robot.DoLogic (rippleWallet, ni, last, Program.endledger == 0 ? -1 : Program.endledger, null, token);
 
@@ -413,11 +412,11 @@ namespace IhildaWallet
 					return;
 				}
 
-				projectedStart = tuple.Item1 + 1;
+				projectedStart = tuple.LastLedger + 1;
 
 
 
-				IEnumerable<AutomatedOrder> orders = tuple.Item2;
+				IEnumerable<AutomatedOrder> orders = tuple.FilledOrders;
 				if (orders == null || !orders.Any ()) {
 					int seconds = 60;
 

@@ -242,7 +242,7 @@ namespace IhildaWallet
 					MessageDialog.ShowMessage (messg);
 #endif
 
-					infoBarLabel.Text = "<span fgcolor=\"red\">" + messg + "</span>";
+					infoBarLabel.Text = Program.darkmode ? "<span fgcolor=\"#FFAABB\">" : " < span fgcolor=\"red\">" + messg + "</span>";
 					infoBarLabel.Visible = true;
 
 					SpinWaitObj.Hide ();
@@ -265,7 +265,7 @@ namespace IhildaWallet
 					MessageDialog.ShowMessage (messg);
 #endif
 
-					infoBarLabel.Markup = "<span fgcolor=\"red\">" + messg + "</span>";
+					infoBarLabel.Markup = Program.darkmode ? "<span fgcolor=\"#FFAABB\">" : "<span fgcolor=\"red\">" + messg + "</span>";
 					infoBarLabel.Visible = true;
 
 					SpinWaitObj.Hide ();
@@ -404,8 +404,8 @@ namespace IhildaWallet
 					return;
 				}
 
-				int? min = ledgerconstraintswidget3.GetStartFromLedger ();
-				int? max = ledgerconstraintswidget3.GetEndLedger ();
+				long? min = ledgerconstraintswidget3.GetStartFromLedger ();
+				long? max = ledgerconstraintswidget3.GetEndLedger ();
 
 				Gtk.Application.Invoke (
 					delegate {
@@ -720,7 +720,12 @@ namespace IhildaWallet
 
 				Gtk.Application.Invoke (
 					(object sender, EventArgs event_args) => {
-						this.infoBarLabel.Text = "<span fgcolor=\"red\">Bug: AccountTx Task returned null value</span>";
+						if (Program.darkmode) {
+							this.infoBarLabel.Text = "<span fgcolor=\"#FFAABB\">Bug: AccountTx Task returned null value</span>";
+						} else {
+							this.infoBarLabel.Text = "<span fgcolor=\"red\">Bug: AccountTx Task returned null value</span>";
+
+						}
 						this.infoBarLabel.Show ();
 						this.progressbar2.Fraction = 0;
 					}
@@ -774,7 +779,11 @@ namespace IhildaWallet
 
 
 				StringBuilder message = new StringBuilder (110); // set to a few bytes larger than the string 104 chars
-				message.Append ("<span fgcolor=\"red\"> account ");
+				if (Program.darkmode) {
+					message.Append ("<span fgcolor=\"#FFAABB\"> account ");
+				} else {
+					message.Append ("<span fgcolor=\"red\"> account ");
+				}
 				message.Append (account);
 				message.Append (" has not been funded with ");
 				message.Append (RippleCurrency.NativeCurrency);

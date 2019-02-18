@@ -61,7 +61,7 @@ namespace IhildaWallet
 
 			OrderFilledRule [] rls = jsconf.Rules;
 
-			this.LastKnownLedger = jsconf.LastKnownLedger;
+			//this.LastKnownLedger = jsconf.LastKnownLedger;
 
 			RulesList.Clear ();
 
@@ -84,9 +84,7 @@ namespace IhildaWallet
 #endif
 
 			try {
-				ConfStruct rs = new ConfStruct (RulesList) {
-					LastKnownLedger = this.LastKnownLedger
-				};
+				ConfStruct rs = new ConfStruct (RulesList);
 
 				string conf = DynamicJson.Serialize (rs);
 				return !string.IsNullOrWhiteSpace (conf) && FileHelper.SaveConfig(path, conf);
@@ -220,7 +218,14 @@ namespace IhildaWallet
 			return null;
 		}
 
-		public int LastKnownLedger {
+		/*
+		public uint? LastKnownLedger {
+			get;
+			set;
+		}*/
+
+
+		public uint? BotLedger {
 			get;
 			set;
 		}

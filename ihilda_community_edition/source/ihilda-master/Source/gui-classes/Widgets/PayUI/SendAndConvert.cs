@@ -21,6 +21,8 @@ using RippleLibSharp.Result;
 using System.Threading;
 using System.Linq;
 using IhildaWallet.Util;
+using static IhildaWallet.MemoCreateDialog;
+using RippleLibSharp.Commands.Subscriptions;
 
 namespace IhildaWallet
 {
@@ -41,7 +43,7 @@ namespace IhildaWallet
 
 			//this.issuerentry.enActivated += new EventHandler (this.OnIssuerEntryActivated);
 
-			this.comboboxentry.Changed += this.OnComboboxentryChanged;
+			this.sendcurrencyentry.Changed += this.OnComboboxentryChanged;
 
 			this.issuerentry.Entry.Activated += this.OnIssuerEntryActivated;
 			this.issuerentry.SelectionReceived += this.OnIssuerSelection;
@@ -53,9 +55,96 @@ namespace IhildaWallet
 			this.receiveamountentry.Activated += this.OnReceiveAmountEntryActivated;
 
 			this.sendbutton.Clicked += this.OnSendButtonClicked;
+			this.addmemobutton.Clicked += (object sender, EventArgs e) => {
 
+				SelectableMemoIndice createdMemo = null;
+				using (MemoCreateDialog memoCreateDialog = new MemoCreateDialog ()) {
+					try {
+						ResponseType resp = (ResponseType)memoCreateDialog.Run ();
+
+
+						if (resp != ResponseType.Ok) {
+
+							return;
+						}
+						createdMemo = memoCreateDialog.GetMemoIndice ();
+						this.AddMemo (createdMemo);
+					} catch (Exception ee) {
+						throw ee;
+					} finally {
+						memoCreateDialog?.Destroy ();
+					}
+				}
+
+
+				Task.Factory.StartNew (() => {
+					var token = TokenSource.Token;
+					while (!token.IsCancellationRequested) {
+						if (TokenSource == null) {
+							return;
+						}
+
+						for (int i = 0; i < 5; i++) {
+							WaitHandle.WaitAny (
+								new WaitHandle [] {
+								LedgerTracker.LedgerResetEvent,
+								token.WaitHandle
+								},
+								6000
+							    );
+						}
+						UpdateCurrencies ();
+						//await Task.Delay (30000, token);
+						
+					}
+				}
+			);
+
+			};
+
+			clearmemobutton.Clicked += (object sender, EventArgs e) => {
+				ListStore.Clear ();
+
+				Memos = null;
+
+			};
+
+			CellRendererToggle rendererToggle = new CellRendererToggle () {
+				Activatable = true
+			};
+
+			CellRendererText cellRendererText = new CellRendererText ();
+
+			treeview1.AppendColumn ("Enabled", rendererToggle, "active", 0);
+			treeview1.AppendColumn ("MemoType", cellRendererText, "text", 1);
+			treeview1.AppendColumn ("MemoFormat", cellRendererText, "text", 2);
+			treeview1.AppendColumn ("MemoData", cellRendererText, "text", 3);
+
+			ListStore = new ListStore (
+					typeof (bool),
+					typeof (string),
+		    			typeof (string),
+					typeof (string)
+				);
+
+
+			var memo = Program.GetClientMemo ();
+			this.AddMemo (memo);
 			//currentInstance = this;
 		}
+
+		Gtk.ListStore ListStore {
+			get;
+			set;
+		}
+
+		~SendAndConvert ()
+		{
+			TokenSource?.Cancel ();
+			TokenSource = null;
+		}
+
+		private CancellationTokenSource TokenSource = new CancellationTokenSource ();
 
 		public void SetCurrencies (String [] currencies)
 		{
@@ -106,7 +195,7 @@ namespace IhildaWallet
 					}
 				}
 
-				comboboxentry.Model = store;
+				sendcurrencyentry.Model = store;
 
 
 			});
@@ -204,6 +293,48 @@ namespace IhildaWallet
 
 		} // end public void updateBalance
 		*/
+
+		private IEnumerable<SelectableMemoIndice> Memos {
+			get;
+			set;
+		}
+
+
+		public void AddMemo (SelectableMemoIndice indice)
+		{
+			List<SelectableMemoIndice> memoIndices = Memos?.ToList () ?? new List<SelectableMemoIndice> ();
+			indice.IsSelected = true;
+			memoIndices.Add (indice);
+
+			SetMemos (memoIndices);
+
+		}
+
+
+
+		public void SetMemos (IEnumerable<SelectableMemoIndice> Memos)
+		{
+			Gtk.Application.Invoke (
+				delegate {
+					ListStore.Clear ();
+
+					foreach (SelectableMemoIndice memoIndice in Memos) {
+						ListStore.AppendValues (
+							memoIndice.IsSelected,
+							memoIndice?.GetMemoTypeAscii (),
+							memoIndice?.GetMemoFormatAscii (),
+							memoIndice?.GetMemoDataAscii ()
+						);
+					}
+
+					this.Memos = Memos;
+					this.treeview1.Model = ListStore;
+
+				}
+			);
+
+		}
+
 
 		protected void OnComboboxentryChanged (object sender, EventArgs e)
 		{
@@ -307,7 +438,7 @@ namespace IhildaWallet
 						}
 
 
-						this.comboboxentry2.Model = store;
+						this.destCurrencyEntry.Model = store;
 
 					});
 
@@ -358,14 +489,16 @@ namespace IhildaWallet
 
 
 			String destination = this.destinationentry.Text;
+			String destinationTag = destinationTagcomboboxentry?.ActiveText;
 
-			String amount = this.receiveamountentry.Text;
+
+			String receiveamount = this.receiveamountentry.Text;
 
 
-			String currency = this.comboboxentry2.ActiveText;
+			String sendcurrency = this.sendcurrencyentry.ActiveText;
 			String sendmax = this.sendmaxentry.Text;
 
-			String receiveCurrency = this.comboboxentry.ActiveText;
+			String receiveCurrency = this.destinationentry.Text;
 
 
 			/* // Maybe I should allow self payments?? // yes allow self payments for self converting payments/. 
@@ -377,50 +510,26 @@ namespace IhildaWallet
 
 
 #pragma warning disable 0168
+
+			decimal max = 0;
+			decimal receiveamountd = 0;
 			try {
 
-				decimal amountd = Convert.ToDecimal (amount);
+				receiveamountd = Convert.ToDecimal (receiveamount);
 
-				if (amountd < 0) {
+				if (receiveamountd < 0) {
 					MessageDialog.ShowMessage ("Sending negative amounts is not supported. Please enter a valid amount");
 					return;
 				}
 
-				decimal max = 0;
+				
 
-				if (!("".Equals (sendmax.Trim ()))) { // if sendmax is not blank
-
-					try {
-						max = Convert.ToDecimal (sendmax); //Convert.ToDouble (sendmax);  // and is a valid number
-
-
-					} catch (FormatException ex) {
-#if DEBUG
-						if (DebugIhildaWallet.SendAndConvert) {
-							Logging.WriteLog (method_sig + "FormatException\n");
-							Logging.WriteLog (ex.Message);
-						}
-#endif
-						MessageDialog.ShowMessage ("SendMax is fomated incorrectly for sending an IOU. It must be a valid decimal number or left blank");
-						return;
-
-					} catch (OverflowException ex) {
-						MessageDialog.ShowMessage ("SendMax is greater than a double? No one's got that much money");
-						return;
-					} catch (Exception ex) {
-						MessageDialog.ShowMessage ("Amount is fomated incorrectly for sending an IOU. It must be a valid decimal number or left blank");
-						return;
-					}
-
-
-				} else {
-					max = amountd;
-				}
+				
 
 
 
 
-				this.SendConvertPayment (destination, amountd, currency, issuer, max, receiveCurrency);
+				
 
 			} catch (FormatException ex) {
 
@@ -435,21 +544,75 @@ namespace IhildaWallet
 				return;
 			}
 
+
+	    		if (!string.IsNullOrWhiteSpace(sendmax)) {
+				sendmax = sendmax.Trim ();
+				try {
+					max = Convert.ToDecimal (sendmax); //Convert.ToDouble (sendmax);  // and is a valid number
+
+
+				} catch (FormatException ex) {
+#if DEBUG
+					if (DebugIhildaWallet.SendAndConvert) {
+						Logging.WriteLog (method_sig + "FormatException\n");
+						Logging.WriteLog (ex.Message);
+					}
+#endif
+					MessageDialog.ShowMessage ("SendMax is fomated incorrectly for sending an IOU. It must be a valid decimal number or left blank");
+					return;
+
+				} catch (OverflowException ex) {
+					MessageDialog.ShowMessage ("SendMax is greater than a double? No one's got that much money");
+					return;
+				} catch (Exception ex) {
+					MessageDialog.ShowMessage ("SendMax is fomated incorrectly for sending an IOU. It must be a valid decimal number or left blank");
+					return;
+				}
+
+
+			}
+
+			uint? DestTag = null;
+			UInt32 res = 0;
+
+			if (!string.IsNullOrWhiteSpace (destinationTag)) {
+				destinationTag = destinationTag.Trim ();
+				bool hasDest = UInt32.TryParse (destinationTag, out res);
+				if (!hasDest) {
+					return;
+				}
+
+				if (res == 0) {
+					string msg = "<span fgcolor>You've specified a destination tag of zero</span>. A destination tag is used by the recipiant to distinguisg payments from one another. Ask your recepient what destination tag if any to use\nWould you like to continue with a destination tag of zero?";
+					bool b = AreYouSure.AskQuestion ("destination tag is zero", msg);
+
+					if (!b) {
+						return;
+					}
+				}
+				DestTag = new uint? (res);
+
+			}
+
+
+
+			this.SendConvertPayment (destination, DestTag, receiveamountd, sendcurrency, issuer, max, receiveCurrency);
+
 #pragma warning restore 0168
 
 		}
 
-		protected void SendConvertPayment (String destination, decimal amount, String currency, String issuer, decimal sendmax, String destcurrency)
+		protected void SendConvertPayment (String destination, uint? DestTag, decimal receiveamount, String sendcurrency, String sendissuer, decimal sendmax, String destcurrency)
 		{
 #if DEBUG
 			string method_sig = clsstr + nameof (SendConvertPayment) + DebugRippleLibSharp.both_parentheses;
 			string method_sig_long = method_sig +
 
 				", destination=" + DebugIhildaWallet.ToAssertString (destination) +
-				", amount=" + DebugIhildaWallet.ToAssertString (amount) +
+				", receiveamount=" + DebugIhildaWallet.ToAssertString (receiveamount) +
 
-				", currency=" + DebugIhildaWallet.ToAssertString (currency) +
-				", issuer=," + DebugIhildaWallet.ToAssertString (issuer) +
+				", sendcurrency=" + DebugIhildaWallet.ToAssertString (sendcurrency) +
+				", sendissuer=," + DebugIhildaWallet.ToAssertString (sendissuer) +
 				" sendmax=," + DebugIhildaWallet.ToAssertString (sendmax) +
 				" destcurrency=" + DebugIhildaWallet.ToAssertString (destcurrency) +
 				" ) : ";
@@ -474,7 +637,7 @@ namespace IhildaWallet
 			RippleCurrency SendMax = null;
 
 			// if the sending curreny is XRP
-			if (RippleCurrency.NativeCurrency.Equals (currency)) {
+			if (RippleCurrency.NativeCurrency.Equals (sendcurrency)) {
 
 
 				// if xrp to xrp transaction
@@ -483,7 +646,7 @@ namespace IhildaWallet
 					return;
 				}
 
-				decimal amnt = amount * 1000000m;
+				decimal amnt = sendmax * 1000000m;
 
 				decimal floored = Math.Floor (amnt);
 
@@ -494,16 +657,16 @@ namespace IhildaWallet
 				}
 
 
-				Amount = new RippleCurrency (amnt);
+				SendMax = new RippleCurrency (amnt);
 
 			} else {
 
-				Amount = new RippleCurrency (amount, new RippleAddress (issuer), currency);
+				SendMax = new RippleCurrency (sendmax, new RippleAddress (sendissuer), sendcurrency);
 			}
 
 
 			if (RippleCurrency.NativeCurrency == destcurrency) {
-				decimal snd = sendmax * 1000000m;
+				decimal snd = receiveamount * 1000000m;
 				decimal floor = Math.Floor (snd);
 
 				if (!(snd.Equals (floor))) {
@@ -512,12 +675,12 @@ namespace IhildaWallet
 				}
 
 
-				SendMax = new RippleCurrency (snd);
+				Amount = new RippleCurrency (snd);
 
 			} else {
 
 
-				SendMax = new RippleCurrency (sendmax, rw.GetStoredReceiveAddress (), destcurrency);
+				Amount = new RippleCurrency (receiveamount, rw.GetStoredReceiveAddress (), destcurrency);
 			}
 
 
@@ -536,10 +699,10 @@ namespace IhildaWallet
 				new RippleAddress (destination),
 				Amount,
 				SendMax
-			);
-
-
-
+			) {
+				DestinationTag = DestTag,
+				Memos = Memos?.Where ((SelectableMemoIndice arg1) => arg1.IsSelected).ToArray ()
+			};
 
 
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
@@ -618,7 +781,7 @@ namespace IhildaWallet
 							}
 #endif
 
-							cur = this.comboboxentry.ActiveText;
+							cur = this.sendcurrencyentry.ActiveText;
 
 
 							if (RippleCurrency.NativeCurrency == cur) {
@@ -817,13 +980,13 @@ namespace IhildaWallet
 
 				    delegate {
 
-					    if (this.comboboxentry == null) {
+					    if (this.sendcurrencyentry == null) {
 				    // TODO bug
 
 				    return;
 					    }
 					    try {
-						    cur = this.comboboxentry.ActiveText;
+						    cur = this.sendcurrencyentry.ActiveText;
 
 					    }
 

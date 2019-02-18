@@ -18,6 +18,7 @@ using Ripple.TxSigning;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using RippleLibSharp.Commands.Server;
+using System.Collections.Generic;
 
 namespace RippleLibSharp.Transactions.TxTypes
 {
@@ -186,7 +187,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 			set;
 		}
 
-		public UInt32 DestinationTag {
+		public UInt32? DestinationTag {
 			get;
 			set;
 		}
@@ -551,6 +552,23 @@ namespace RippleLibSharp.Transactions.TxTypes
 			return s;
 		}
 
+
+
+		public void AddMemo (MemoIndice memoIndice)
+		{
+
+			if (memoIndice == null) {
+				return;
+			}
+			List<MemoIndice> memos = new List<MemoIndice> ();
+			if (this.Memos != null) {
+				memos.AddRange (this.Memos);
+			}
+
+
+			memos.Add (memoIndice);
+			this.Memos = memos.ToArray ();
+		}
 
 
 #if DEBUG

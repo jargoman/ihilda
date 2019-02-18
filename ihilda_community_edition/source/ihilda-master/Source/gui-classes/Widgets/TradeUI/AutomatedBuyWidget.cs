@@ -337,6 +337,8 @@ namespace IhildaWallet
 			RippleIdentifier seed = rw.GetDecryptedSeed ();
 
 			while (seed.GetHumanReadableIdentifier() == null) {
+
+				rw.Forget ();
 				bool should = AreYouSure.AskQuestion (
 				"Invalid password", 
 				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"

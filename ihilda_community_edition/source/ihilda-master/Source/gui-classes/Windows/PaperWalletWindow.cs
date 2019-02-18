@@ -29,6 +29,9 @@ namespace IhildaWallet
 			this.button138.Clicked += Button138_Clicked;
 
 			//eventbox1.ModifyBg (Gtk.StateType.Normal, new Gdk.Color (255, 255, 255);
+
+			addresslabel.Selectable = true;
+			secretlabel.Selectable = true;
 		}
 
 		void Button138_Clicked (object sender, EventArgs e)

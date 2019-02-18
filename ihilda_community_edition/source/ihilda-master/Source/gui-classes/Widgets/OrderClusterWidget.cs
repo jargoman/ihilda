@@ -29,7 +29,7 @@ namespace IhildaWallet
 
 			Gdk.Color orchid = new Gdk.Color (218, 112, 214);
 
-			TextHighlighter.Highlightcolor = "\"red\"";
+			TextHighlighter.Highlightcolor = Program.darkmode ? "\"#FFAABB\"" : "\"red\"";
 			string orders = ordersentry.ActiveText;
 			if (string.IsNullOrWhiteSpace(orders)) {
 				label8.Markup = TextHighlighter.Highlight ("Please specify a number orders per side");

@@ -76,6 +76,9 @@ namespace IhildaWallet
 			WALLET_FOLDER_PATH = Path.Combine (DATA_FOLDER_PATH, DATA_FOLDER, WALLET_FOLDER);
 			AssureDirectory (WALLET_FOLDER_PATH);
 
+			WALLET_TRACK_PATH = Path.Combine (DATA_FOLDER_PATH, DATA_FOLDER, WALLET_TRACK_FOLDER);
+			AssureDirectory (WALLET_TRACK_PATH);
+
 			CLASS_FOLDER_PATH = Path.Combine (DATA_FOLDER_PATH, DATA_FOLDER, CLASS_FOLDER);
 			AssureDirectory (CLASS_FOLDER_PATH);
 
@@ -383,6 +386,9 @@ namespace IhildaWallet
 
 		public static string WALLET_FOLDER = "wallets";
 		public static string WALLET_FOLDER_PATH = null;
+
+		public static string WALLET_TRACK_FOLDER = "wallet_tracking";
+		public static string WALLET_TRACK_PATH = null;
 
 		public static string CLASS_FOLDER = "classes";
 		public static string CLASS_FOLDER_PATH = null;

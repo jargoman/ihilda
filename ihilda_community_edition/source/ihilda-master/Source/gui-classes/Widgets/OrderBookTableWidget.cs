@@ -61,7 +61,7 @@ namespace IhildaWallet
 
 			table = new Table ((uint)(MAX_ORDERS + 1u), 3u, false);
 			table.Show ();
-
+			
 			vbox.Add (infoBarLabel);
 			vbox.Add (table);
 
@@ -95,11 +95,21 @@ namespace IhildaWallet
 
 
 
+
 #if DEBUG
-							string event_sig = method_sig + nameof (OrderBookLabel) + DebugRippleLibSharp.space_char + nameof (ButtonReleaseEvent) + DebugRippleLibSharp.colon;
+
+							string event_sig = 
+								method_sig 
+								+ nameof (OrderBookLabel) 
+								+ DebugRippleLibSharp.space_char 
+								+ nameof (ButtonReleaseEvent) 
+								+ DebugRippleLibSharp.colon;
+
+
 							if (DebugIhildaWallet.OrderBookTableWidget) {
 								Logging.WriteLog (event_sig + DebugRippleLibSharp.begin);
 							}
+
 #endif
 
 							if (!(o is EventBox)) {
@@ -176,7 +186,7 @@ namespace IhildaWallet
 							menu.Add (mainBuyMenu);
 
 
-							Gtk.MenuItem mainSellMenu = new MenuItem ("<span fgcolor=\"red\" font_size=\"xx-large\"><b>Sell</b></span>");
+							Gtk.MenuItem mainSellMenu = new MenuItem (Program.darkmode ? "<span fgcolor=\"#FFAABB\" font_size=\"xx - large\"><b>Sell</b></span>"  : "<span fgcolor=\"red\" font_size=\"xx-large\"><b>Sell</b></span>");
 							Label labe = (Label)mainSellMenu.Child;
 							labe.UseMarkup = true;
 
@@ -346,7 +356,7 @@ namespace IhildaWallet
 
 
 							#region sell
-							Gtk.MenuItem sell = new MenuItem ("<b>Prepare a <span fgcolor=\"red\">sell</span> order at this price</b>");
+							Gtk.MenuItem sell = new MenuItem (Program.darkmode ? "<b>Prepare a <span fgcolor=\"#FFAABB\">sell</span> order at this price</b>" : "<b>Prepare a <span fgcolor=\"red\">sell</span> order at this price</b>");
 							sell.Show ();
 							sellMenu.Add (sell);
 
@@ -377,7 +387,7 @@ namespace IhildaWallet
 
 							#region casssell
 
-							Gtk.MenuItem casssell = new MenuItem ("<b>Cascade <span fgcolor=\"red\">sell</span> orders begining at this price</b>");
+							Gtk.MenuItem casssell = new MenuItem (Program.darkmode ? "<b>Cascade <span fgcolor=\"#FFAABB\">sell</span> orders begining at this price</b>" : "<b>Cascade <span fgcolor=\"red\">sell</span> orders begining at this price</b>");
 							casssell.Show ();
 							sellMenu.Add (casssell);
 
@@ -410,7 +420,7 @@ namespace IhildaWallet
 
 							#region autosell 
 
-							Gtk.MenuItem autosell = new MenuItem ("<b>Prepare an automated <span fgcolor=\"red\">sell</span> order at this price</b>");
+							Gtk.MenuItem autosell = new MenuItem (Program.darkmode ? "<b>Prepare an automated <span fgcolor=\"#FFAABB\">sell</span> order at this price</b>" : "<b>Prepare an automated <span fgcolor=\"red\">sell</span> order at this price</b>");
 							autosell.Show ();
 							sellMenu.Add (autosell);
 							menulabel = (Label)autosell.Child;
@@ -425,9 +435,10 @@ namespace IhildaWallet
 
 								TradeWindow tradeWin = ShowTradeWindow (rw);
 								if (offerType == OrderEnum.BID) {
-									AutomatedOrder automatedOrder = new AutomatedOrder (off);
-									automatedOrder.taker_gets = off.taker_pays.DeepCopy ();
-									automatedOrder.taker_pays = off.taker_gets.DeepCopy ();
+									AutomatedOrder automatedOrder = new AutomatedOrder (off) {
+										taker_gets = off.taker_pays.DeepCopy (),
+										taker_pays = off.taker_gets.DeepCopy ()
+									};
 									tradeWin.SetAutomatedSellOffer (automatedOrder);
 								} else {
 									tradeWin.SetAutomatedSellOffer (off);
@@ -659,7 +670,10 @@ namespace IhildaWallet
 
 					for (int row = 0; row < 3; row++) {
 						Label label = this.labels [row, index];
-						if (label != null) label.Text = "";
+						if (label != null) {
+							label.Text = "";
+							label.Hide ();
+						};
 
 					}
 				}
@@ -672,11 +686,23 @@ namespace IhildaWallet
 
 
 #if DEBUG
-			String method_sig = clsstr + nameof (SetAsk) + DebugRippleLibSharp.left_parentheses + nameof (AutomatedOrder) + DebugRippleLibSharp.array_brackets  + nameof(asks) + DebugRippleLibSharp.right_parentheses;
+			String method_sig = 
+				clsstr 
+				+ nameof (SetAsk) 
+				+ DebugRippleLibSharp.left_parentheses 
+				+ nameof (AutomatedOrder) 
+				+ DebugRippleLibSharp.array_brackets  
+				+ nameof(asks) 
+				+ DebugRippleLibSharp.right_parentheses;
+
+
+
 			if (DebugIhildaWallet.OrderBookTableWidget) {
 				Logging.WriteLog(method_sig + DebugRippleLibSharp.begin);
 			}
+
 #endif
+
 			lock (orderLock) {
 				this.offerType = OrderEnum.ASK;
 				offers = asks.ToArray ();
@@ -695,7 +721,14 @@ namespace IhildaWallet
 
 				decimal sum = 0; // cumalative sum of base currency for each order
 
-				for (int y = 0; y < num; y++) {
+				for (int y = 0; y < MAX_ORDERS; y++) {
+
+					if (y >= num) {
+						
+						ClearTable (y);
+						continue;
+
+					}
 #if DEBUG
 					if (DebugIhildaWallet.OrderBookWidget) {
 						Logging.WriteLog (method_sig + "y = " + y.ToString ());
@@ -867,18 +900,40 @@ namespace IhildaWallet
 
 				labels [0, index].Markup = prce;
 				labels [0, index].TooltipText = ask?.Account ?? "";
+				labels [0, index].Show ();
 
 				labels [1, index].Markup = amt;
 				labels [1, index].TooltipText = ask?.Account ?? "";
+				labels [1, index].Show ();
 
 				labels [2, index].Markup = sm;
 				labels [2, index].TooltipText = ask?.Account ?? "";
-
+				labels [2, index].Show ();
 
 
 			});
 
 		}
+
+		/* already implemented
+		public void ClearIndex (int index)
+		{
+
+			Gtk.Application.Invoke (delegate {
+
+				labels [0, index].Markup = "";
+				labels [0, index].TooltipText = "";
+				labels [0, index].Hide ();
+
+				labels [1, index].Markup = "";
+				labels [1, index].TooltipText = "";
+				labels [1, index].Hide ();
+
+				labels [2, index].Markup = "";
+				labels [2, index].TooltipText = "";
+				labels [2, index].Hide ();
+			});
+		}*/
 
 		public void SetBid (AutomatedOrder bid, int index, decimal sum)
 		{
@@ -965,12 +1020,15 @@ namespace IhildaWallet
 #endif
 				labels [0, index].Markup = sm;
 				labels [0, index].TooltipText = bid?.Account ?? "";
+				labels [0, index].Show ();
 
 				labels [1, index].Markup = amt;
 				labels [1, index].TooltipText = bid?.Account ?? "";
+				labels [1, index].Show ();
 
 				labels [2, index].Markup = prce;
 				labels [2, index].TooltipText = bid.Account ?? "";
+				labels [2, index].Show ();
 			});
 
 
@@ -995,7 +1053,13 @@ namespace IhildaWallet
 
 				int num = (bids.Length < MAX_ORDERS) ? bids.Length : MAX_ORDERS;
 				decimal sum = 0;
-				for (int y = 0; y < num; y++) {
+				for (int y = 0; y < MAX_ORDERS; y++) {
+
+					if (y >= num) {
+						ClearTable (y);
+						continue;
+					}
+
 					decimal sumad = bids [y].taker_gets.amount;
 					if (bids [y].taker_gets.IsNative) {
 						sumad = sumad / 1000000;
@@ -1065,8 +1129,6 @@ namespace IhildaWallet
 		public object orderLock = new object ();
 		public Offer [] offers = null;
 
-		public static string [] askTitles = { "<b><u>Ask Price</u></b>", "<b><u>Size</u></b>", "<b><u>Sum</u></b>" };
-		public static string [] bidTitles = { "<b><u>Sum</u></b>", "<b><u>Size</u></b>", "<b><u>Bid Price</u></b>" };
 
 		private static readonly int MAX_ORDERS = 200; // the number of orders to show as top of orderbook
 

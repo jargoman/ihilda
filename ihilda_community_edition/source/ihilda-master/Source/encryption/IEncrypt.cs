@@ -10,7 +10,7 @@ namespace IhildaWallet
 
 		//byte[] decrypt ( byte [] cipher, String password );
 
-		byte[] Encrypt ( RippleSeedAddress seed, byte[] salt );
+		byte[] Encrypt ( RippleIdentifier identifier, byte[] salt );
 
 		byte[] Decrypt ( byte [] cipher, byte[] salt, RippleAddress ra );
 

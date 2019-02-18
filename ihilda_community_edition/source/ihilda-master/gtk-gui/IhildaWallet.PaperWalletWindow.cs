@@ -118,6 +118,7 @@ namespace IhildaWallet
 			this.GtkScrolledWindow.ShadowType = ((global::Gtk.ShadowType)(1));
 			// Container child GtkScrolledWindow.Gtk.Container+ContainerChild
 			this.textview3 = new global::Gtk.TextView();
+			this.textview3.TooltipMarkup = "Any text typed in this box will be printed to the paper wallet";
 			this.textview3.CanFocus = true;
 			this.textview3.Name = "textview3";
 			this.GtkScrolledWindow.Add(this.textview3);

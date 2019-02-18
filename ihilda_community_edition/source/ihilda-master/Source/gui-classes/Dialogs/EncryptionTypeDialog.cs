@@ -47,7 +47,11 @@ namespace IhildaWallet
 			string boxtext = this.comboboxentry1.Entry.Text;
 			if (string.IsNullOrWhiteSpace (boxtext) || boxtext == nameof ( EncryptionType.Plaintext )) {
 
-				this.label1.Markup = "<span fgcolor=\"red\">Please choose an encryption type</span>";
+				if (!Program.darkmode) {
+					this.label1.Markup = "<span fgcolor=\"red\">Please choose an encryption type</span>";
+				} else {
+					this.label1.Markup = "<span fgcolor=\"#FFAABB\">Please choose an encryption type</span>";
+				}
 				this.label1.Show ();
 				return EncryptionType.None;
 

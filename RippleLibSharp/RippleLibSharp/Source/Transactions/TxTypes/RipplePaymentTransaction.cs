@@ -89,6 +89,11 @@ namespace RippleLibSharp.Transactions.TxTypes
 				}
 			}
 
+			object destTagOb = serObj.GetField (BinaryFieldType.DestinationTag);
+			if (destTagOb != null) {
+				DestinationTag = (UInt32?)destTagOb;
+			}
+
 
 			object objamount = serObj.GetField (BinaryFieldType.Amount);
 			if (objamount != null) {
@@ -145,7 +150,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 			rbo.PutField(BinaryFieldType.Destination, this.Destination);
 
 
-
+			rbo.PutField (BinaryFieldType.DestinationTag, this.DestinationTag);
 
 
 
@@ -176,6 +181,11 @@ namespace RippleLibSharp.Transactions.TxTypes
 				var pth = DynamicJson.Serialize (Paths);
 				stringBuilder.Append ("\"Paths\": " + pth + ",");
 			}
+
+			if (DestinationTag != null) {
+				stringBuilder.Append ("\"DestinationTag\": " + DestinationTag.ToString () + ",");
+			}
+
 			stringBuilder.Append ("\"Destination\": \"" + this.Destination + "\"");
 			stringBuilder.Append ("}");
 
@@ -209,6 +219,12 @@ namespace RippleLibSharp.Transactions.TxTypes
 				var pth = DynamicJson.Serialize (Paths);
 				stringBuilder.Append ("\"Paths\": " + pth + ",");
 			}
+
+			if (DestinationTag != null) {
+				stringBuilder.Append ("\"DestinationTag\": " + DestinationTag.ToString () + ",");
+			}
+
+
 			stringBuilder.Append ("\"Destination\": \"" + this.Destination + "\"");
 			stringBuilder.Append ("}'");
 

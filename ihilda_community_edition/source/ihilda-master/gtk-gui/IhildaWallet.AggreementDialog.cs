@@ -23,7 +23,6 @@ namespace IhildaWallet
 			global::Stetic.Gui.Initialize(this);
 			// Widget IhildaWallet.AggreementDialog
 			this.Name = "IhildaWallet.AggreementDialog";
-			this.Title = global::Mono.Unix.Catalog.GetString("window1");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Internal child IhildaWallet.AggreementDialog.VBox
 			global::Gtk.VBox w1 = this.VBox;

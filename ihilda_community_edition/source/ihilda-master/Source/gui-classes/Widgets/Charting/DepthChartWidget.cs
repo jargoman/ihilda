@@ -86,7 +86,7 @@ namespace IhildaWallet
 			};
 
 			orderclusterwidget1.OnClusterChanged += (object sender, ClusterChangedEventArgs e) => {
-				var pointframe = this.GetPointFrame ();
+				var pointframe = _pointFrame;
 
 				decimal price = pointframe.midprice;
 
@@ -100,7 +100,7 @@ namespace IhildaWallet
 			};
 
 			darkmodecheckbox.Clicked += (object sender, EventArgs e) => {
-				var pointframe = this.GetPointFrame ();
+				var pointframe = _pointFrame;
 				this.DrawChartToPixMap (pointframe);
 				this.CopyBuffer ();
 			};
@@ -116,6 +116,10 @@ this.CopyBuffer ();
 			this.hscale2.Digits = 0;
 
 			this.hscale1.ValueChanged += (object sender, EventArgs e) => {
+
+				CreateSkeleton ();
+				CreatePointFrame ();
+
 				max_bids = (int)hscale1.Value;
 				scaleChanged = true;
 				PointFrame pointFrame = _pointFrame;
@@ -127,6 +131,10 @@ this.CopyBuffer ();
 			};
 
 			this.hscale2.ValueChanged += (object sender, EventArgs e) => {
+
+				CreateSkeleton ();
+				CreatePointFrame ();
+
 				max_asks = (int)hscale2.Value;
 				scaleChanged = true;
 				//DrawChart (_pointFrame);
@@ -143,6 +151,7 @@ this.CopyBuffer ();
 			this.drawingarea1.EnterNotifyEvent += (object o, EnterNotifyEventArgs args) => {
 				scaleChanged = true;
 			};
+
 			Task.Factory.StartNew (async () => {
 
 				while (!token.IsCancellationRequested) {
@@ -374,7 +383,7 @@ this.CopyBuffer ();
 
 			#region sell_menus
 
-			Gtk.MenuItem sell = new MenuItem ("Prepare a <span fgcolor=\"red\">sell</span> order at this price");
+			Gtk.MenuItem sell = new MenuItem (Program.darkmode ? "Prepare a <span fgcolor=\"#FFAABB\">sell</span> order at this price" : "Prepare a <span fgcolor=\"red\">sell</span> order at this price");
 			sell.Show ();
 			menu.Add (sell);
 
@@ -395,7 +404,7 @@ this.CopyBuffer ();
 			};
 
 			Gtk.MenuItem casssell = new MenuItem (
-				"Cascade <span fgcolor=\"red\">sell</span> orders begining at "
+				(string)(Program.darkmode ? "Cascade <span fgcolor=\"#FFAABB\">sell</span> orders begining at " : "Cascade <span fgcolor=\"red\">sell</span> orders begining at ")
 				+ price.ToString ()
 				+ " "
 				+ tradePair.Currency_Counter.currency
@@ -421,7 +430,7 @@ this.CopyBuffer ();
 
 			Gtk.MenuItem autosell = new MenuItem (
 
-				"Prepare an automated <span fgcolor=\"red\">sell</span> order at "
+				Program.darkmode ? "Prepare an automated <span fgcolor=\"#FFAABB\">sell</span> order at " : "Prepare an automated <span fgcolor=\"red\">sell</span> order at "
 				+ price.ToString ()
 				+ " "
 				+ tradePair.Currency_Counter.currency
@@ -754,17 +763,18 @@ this.CopyBuffer ();
 
 
 
-			//Gdk.Window gwin = this.drawingarea1.GdkWindow;
-			//gwin.GetSize(out int width, out int height);
-			//gwin.Clear ();
+			
 			PointFrame pointFrame = _pointFrame;
-			//DrawChart (_pointFrame);
+		
 			this.chartBufferImage = DrawChartToPixMap (pointFrame);
 			CopyBuffer ( /*pointFrame*/ );
 		}
 
 		void Drawingarea1_SizeAllocated (object o, SizeAllocatedArgs args)
 		{
+			CreateSkeleton ();
+			CreatePointFrame ();
+
 			PointFrame pointFrame = _pointFrame;
 			//DrawChart (_pointFrame);
 			this.chartBufferImage = DrawChartToPixMap (pointFrame);
@@ -799,16 +809,10 @@ this.CopyBuffer ();
 				return;
 			}
 
-			//r.Width;
-			//r.Height;
-
 
 			Gdk.Window gwin = this.drawingarea1.GdkWindow;
 			gwin.GetSize(out int gwinwidth, out int gwinheight);
 
-
-
-			//this.Drawingarea1_ExposeEvent (null,null);
 
 			int x = (int)args.Event.X;
 			int y = (int)args.Event.Y;
@@ -820,11 +824,6 @@ this.CopyBuffer ();
 			if (chartBufferImage == null) {
 				chartBufferImage = DrawChartToPixMap (pointFrame);
 			}
-
-
-
-			//Gdk.Image img = buff.GetImage (0, 0, pointFrame.width, pointFrame.height);
-			//gwin.DrawImage (gc, img, 0, 0, 0, 0, pointFrame.width, pointFrame.height);
 
 			CopyBuffer ( /* pointFrame */);
 
@@ -899,7 +898,7 @@ this.CopyBuffer ();
 			//gwin.DrawLine (gc, x
 
 
-			gc?.Dispose ();
+			//gc?.Dispose ();
 
 		}
 
@@ -1023,7 +1022,8 @@ this.CopyBuffer ();
 
 			ResetProgressBar ();
 
-
+			CreateSkeleton ();
+			CreatePointFrame ();
 
 			Application.Invoke ( delegate {
 				if (drawingarea1 == null) {
@@ -1075,42 +1075,36 @@ this.CopyBuffer ();
 			);
 		}
 
-		public PointFrame GetPointFrame ()
+		public void CreatePointFrame ()
 		{
 
 
-			int numAsk = 0;
-			int numBid = 0;
+			if (SkeletonFrame == null) {
+				return;
+			}
 
-			if (asks != null) {
+			PointFrame frame = new PointFrame {
+				bids = SkeletonFrame.bids,
+				asks = SkeletonFrame.asks,
+				numAsks = SkeletonFrame.numAsks,
+				numBids = SkeletonFrame.numBids,
+				height = SkeletonFrame.height,
+				width = SkeletonFrame.width,
+				highestxpoint = SkeletonFrame.highestxpoint,
+				highestypoint = SkeletonFrame.highestypoint,
+				bidsum = SkeletonFrame.bidsum,
+				asksum = SkeletonFrame.asksum,
+				lowestxpoint = SkeletonFrame.lowestxpoint,
+				lowestypoint = SkeletonFrame.lowestypoint,
+				localbidsum = SkeletonFrame.localbidsum,
+				localasksum = SkeletonFrame.localasksum,
+				rawxWidth = SkeletonFrame.rawxWidth,
 				
-				numAsk = asks.Length < max_asks ? asks.Length : max_asks;
-			}
-
-			if (bids != null) {
-				numBid = bids.Length < max_bids ? bids.Length : max_bids;
-			}
-
-			if (numAsk == 0 && numBid == 0) {
-				return null;
-			}
-
-
-			// TODO is linq faster? is this too much copying?
-			PointFrame pointFrame = new PointFrame {
-				numAsks = numAsk,
-				numBids = numBid,
-
-				asks = asks,
-				bids = bids
 			};
 
+			CalculatePoints ( frame );
 
-
-			CalculateBidSums (pointFrame);
-			CalculatePoints (pointFrame);
-
-			return pointFrame;
+			_pointFrame = frame;
 		}
 
 		public IEnumerable<AutomatedOrder> UpdateBids (NetworkInterface ni, TradePair tp, CancellationToken token)
@@ -1322,7 +1316,45 @@ this.CopyBuffer ();
 			pointFrame.rawxWidth = pointFrame.highestxpoint - pointFrame.lowestxpoint; // full spread
 		}
 
+		public void CreateSkeleton () {
+			int numAsk = 0;
+			int numBid = 0;
 
+			if (asks != null) {
+
+				numAsk = asks.Length < max_asks ? asks.Length : max_asks;
+			}
+
+			if (bids != null) {
+				numBid = bids.Length < max_bids ? bids.Length : max_bids;
+			}
+
+			if (numAsk == 0 && numBid == 0) {
+				return;
+			}
+
+
+			// TODO is linq faster? is this too much copying?
+			PointFrame pointFrame = new PointFrame {
+				numAsks = numAsk,
+				numBids = numBid,
+
+				asks = asks,
+				bids = bids
+			};
+
+
+
+			CalculateBidSums (pointFrame);
+
+			SkeletonFrame = pointFrame;
+		}
+
+		public PointFrame SkeletonFrame {
+			get;
+			set;
+
+		}
 
 		public void Drawingarea1_ExposeEvent (object sender, ExposeEventArgs args)
 		{
@@ -1686,7 +1718,8 @@ this.CopyBuffer ();
 		}
 
 		private PointFrame _pointFrame {
-			get { return GetPointFrame (); }
+			get;
+			set;
 
 		}
 

@@ -17,7 +17,7 @@ namespace IhildaWallet
 		}
 		*/
 
-		public byte[] Encrypt ( RippleSeedAddress seed,  byte[] salt ) {
+		public byte[] Encrypt ( RippleIdentifier identifier,  byte[] salt ) {
 			if (salt == null)  {
 				throw new ArgumentNullException ();
 			}
@@ -34,13 +34,23 @@ namespace IhildaWallet
 			}
 
 			string third = Password;
-
-			RippleAddress ra = seed.GetPublicRippleAddress ();
-
-			byte[] address_salt = ra.GetBytes ();
+			RippleAddress rippleAddress;
 
 
-			byte[] cypherone = DoEncryption (seed.GetBytes(), first, salt);
+			if (identifier is RipplePrivateKey priv) {
+				rippleAddress = priv.GetPublicKey ().GetAddress ();
+			} else if (identifier is RippleSeedAddress rippleSeed) {
+				rippleAddress = rippleSeed.GetPublicRippleAddress ();
+			} else {
+				throw new NotSupportedException ();
+			}
+
+			//RippleAddress ra = identifier.GetPublicRippleAddress ();
+
+			byte[] address_salt = rippleAddress.GetBytes ();
+
+
+			byte[] cypherone = DoEncryption (identifier.GetBytes(), first, salt);
 			byte[] cyphertwo = DoEncryption (cypherone, second, address_salt);
 			byte[] cypherthree = DoEncryption (cyphertwo, third, salt);
 

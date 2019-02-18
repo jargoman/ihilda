@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Gtk;
@@ -13,6 +14,9 @@ using RippleLibSharp.Result;
 using IhildaWallet.Util;
 using RippleLibSharp.Util;
 using RippleLibSharp.Commands.Accounts;
+using System.Collections.Generic;
+using static IhildaWallet.MemoCreateDialog;
+using RippleLibSharp.Commands.Subscriptions;
 
 namespace IhildaWallet
 {
@@ -29,30 +33,102 @@ namespace IhildaWallet
 
 			this.sendNativeButton.Clicked += OnSendNativeButtonClicked;
 
-			Task.Factory.StartNew (async () => {
+			this.addmemobutton.Clicked += (object sender, EventArgs e) => {
 
-				while (TokenSource?.IsCancellationRequested != true) {
+				SelectableMemoIndice createdMemo = null;
+				using (MemoCreateDialog memoCreateDialog = new MemoCreateDialog ()) {
+					try {
+						ResponseType resp = (ResponseType)memoCreateDialog.Run ();
+
+
+						if (resp != ResponseType.Ok) {
+
+							return;
+						}
+						createdMemo = memoCreateDialog.GetMemoIndice ();
+						this.AddMemo (createdMemo);
+					} catch (Exception ee) {
+						throw ee;
+					} finally {
+						memoCreateDialog?.Destroy ();
+					}
+				}
+
+				
+				
+				
+			};
+
+
+			clearmemobutton.Clicked += (object sender, EventArgs e) => {
+				ListStore.Clear ();
+
+				Memos = null;
+
+			};
+
+			Task.Factory.StartNew ( () => {
+				var token = TokenSource.Token;
+				while (!token.IsCancellationRequested) {
 					if (TokenSource == null) {
 						return;
 					}
-					await Task.Delay ( 30000, TokenSource.Token);
+
+					for (int i = 0; i < 5; i++) {
+						WaitHandle.WaitAny (
+							new WaitHandle [] { 
+								LedgerTracker.LedgerResetEvent, 
+								token.WaitHandle 
+							}, 
+							6000
+			    			);
+					}
+
+					//await Task.Delay (30000, token);
 					Sync ();
 				}
 			}
 			);
 
+			CellRendererToggle rendererToggle = new CellRendererToggle () { 
+				Activatable = true
+			};
+
+			CellRendererText cellRendererText = new CellRendererText ();
+
+			treeview1.AppendColumn ("Enabled", rendererToggle, "active", 0);
+			treeview1.AppendColumn ("MemoType", cellRendererText, "text", 1);
+			treeview1.AppendColumn ("MemoFormat", cellRendererText, "text", 2);
+			treeview1.AppendColumn ("MemoData", cellRendererText, "text", 3);
+
+			ListStore = new ListStore (
+					typeof (bool),
+					typeof (string),
+		    			typeof (string),
+					typeof (string)
+				);
+
+
+			var memo = Program.GetClientMemo ();
+			this.AddMemo (memo);
+		}
+
+		Gtk.ListStore ListStore {
+			get;
+			set;
 		}
 
 		~SendRipple ()
 		{
 			TokenSource?.Cancel ();
+			TokenSource = null;
 		}
 
-		private CancellationTokenSource TokenSource = null;
+		private CancellationTokenSource TokenSource = new CancellationTokenSource();
 
 		//String unsynced = "   --   unsynced   --   ";
 
-		public void SendNativePayment (String destination, Decimal nativeamount)
+		public void SendNativePayment (String destination, UInt32? DestTag, Decimal nativeamount)
 		{
 
 			nativeamount = nativeamount * 1000000m; // convert to drops
@@ -70,7 +146,7 @@ namespace IhildaWallet
 #if DEBUG
 				if (DebugIhildaWallet.SendRipple) {
 					string message = "OverflowException : can't convert " + RippleCurrency.NativeCurrency + " to " + RippleCurrency.NativePip + " because value can't fit inside unsigned long";
-					Logging.ReportException(message, ex);
+					Logging.ReportException (message, ex);
 				}
 #endif
 
@@ -85,7 +161,7 @@ namespace IhildaWallet
 
 #if DEBUG
 				if (DebugIhildaWallet.SendRipple) {
-					Logging.WriteLog("Exception thrown while converting to drops : " + ex.Message);
+					Logging.WriteLog ("Exception thrown while converting to drops : " + ex.Message);
 				}
 #endif
 
@@ -94,14 +170,14 @@ namespace IhildaWallet
 			}
 
 
-			SendPipsPayment (destination, (Decimal)lamount);
+			SendPipsPayment (destination, DestTag, (Decimal)lamount);
 
 
 
 		}
 
 
-		private static void SendPipsUsingPaymentManager (RippleWallet rw, string destination, Decimal dropsamount)
+		private static void SendPipsUsingPaymentManager (RippleWallet rw, string destination, UInt32? DestTag, Decimal dropsamount, IEnumerable<MemoIndice> memoIndices)
 		{
 
 			RippleAddress payee = new RippleAddress (destination);
@@ -114,7 +190,10 @@ namespace IhildaWallet
 					payee,
 					amnt,
 					null
-				);
+				) {
+					DestinationTag = DestTag,
+		    			Memos = memoIndices?.ToArray()
+				};
 
 			RipplePaymentTransaction [] arr = { tx };
 
@@ -128,11 +207,11 @@ namespace IhildaWallet
 			);
 		}
 
-		public void SendPipsPayment (String destination, Decimal dropsamount)
+		public void SendPipsPayment (String destination, UInt32? DestTag, Decimal dropsamount)
 		{
 #if DEBUG
 			if (DebugIhildaWallet.SendRipple) {
-				Logging.WriteLog("send drops payment of " + dropsamount.ToString() + " drops");
+				Logging.WriteLog ("send drops payment of " + dropsamount.ToString () + " drops");
 			}
 #endif
 
@@ -142,7 +221,9 @@ namespace IhildaWallet
 				return;
 			}
 
-			SendPipsUsingPaymentManager (rw, destination, dropsamount);
+
+	    		IEnumerable <MemoIndice> memoIndices = Memos?.Where((SelectableMemoIndice arg) => arg.IsSelected);
+			SendPipsUsingPaymentManager (rw, destination, DestTag, dropsamount, memoIndices);
 
 			/*
 			if (rw.seed == null) {
@@ -243,10 +324,40 @@ namespace IhildaWallet
 				return;
 			}
 
+			string destinationTag = destinationTagcomboboxentry?.ActiveText;
+
+			//uint? res = 0;
+			uint? notDestTag = null;
+
+
+			if (!string.IsNullOrWhiteSpace (destinationTag)) {
+				destinationTag = destinationTag.Trim ();
+				//bool hasDest = uint.TryParse (destinationTag, out res);
+
+				notDestTag = uint.TryParse (destinationTag, out uint resul) ? new uint? (resul) : null;
+
+				if (notDestTag == null) {
+					MessageDialog.ShowMessage ("Invalid DestTag", "Could not parse destination tag. Must be an integer");
+					return;
+				}
+
+				if (notDestTag == 0) {
+					string msg = "<span fgcolor>You've specified a destination tag of zero</span>. A destination tag is used by the recipiant to distinguisg payments from one another. Ask your recepient what destination tag if any to use\nWould you like to continue with a destination tag of zero?";
+					bool b = AreYouSure.AskQuestion ("destination tag is zero", msg);
+
+					if (!b) {
+						return;
+					}
+				}
+
+				//notDestTag = new uint? (res); // NECESSARY !!! wouldn't implicitly cast
+
+			}
+
 
 #if DEBUG
 			if (DebugIhildaWallet.SendRipple) {
-				Logging.WriteLog("SendRipple.OnSendNativeButtonClicked : destination = " + destination);
+				Logging.WriteLog ("SendRipple.OnSendNativeButtonClicked : destination = " + destination);
 			}
 #endif
 
@@ -255,7 +366,7 @@ namespace IhildaWallet
 
 			String units = this.unitsSelectBox.ActiveText;
 
-			ThreadParam tp = new ThreadParam (amount, destination, units);
+			ThreadParam tp = new ThreadParam (amount, destination, notDestTag, units);
 
 			th.Start (tp);
 
@@ -263,13 +374,15 @@ namespace IhildaWallet
 
 		private class ThreadParam
 		{
-			public ThreadParam (String amount, String destination, String units)
+			public ThreadParam (String amount, String destination, uint? destinationTag, String units)
 			{
 				this.amount = amount;
 				this.destination = destination;
 
 
 				this.units = units;
+
+				this.DestTag = destinationTag;
 			}
 
 			public String amount;
@@ -277,6 +390,46 @@ namespace IhildaWallet
 
 
 			public String units;
+
+			public uint? DestTag;
+		}
+
+		public void SetMemos (IEnumerable<SelectableMemoIndice> Memos)
+		{
+			Gtk.Application.Invoke (
+				delegate {
+					ListStore.Clear ();
+
+					foreach (SelectableMemoIndice memoIndice in Memos) {
+						ListStore.AppendValues (
+							memoIndice.IsSelected,
+							memoIndice?.GetMemoTypeAscii(),
+							memoIndice?.GetMemoFormatAscii(),
+							memoIndice?.GetMemoDataAscii()
+						);
+					}
+
+					this.Memos = Memos;
+					this.treeview1.Model = ListStore;
+
+				}
+			);
+
+		}
+
+		private IEnumerable<SelectableMemoIndice> Memos {
+			get;
+			set;
+		}
+
+		public void AddMemo (SelectableMemoIndice indice)
+		{
+			List<SelectableMemoIndice> memoIndices = Memos?.ToList() ?? new List<SelectableMemoIndice>();
+			indice.IsSelected = true;
+			memoIndices.Add (indice);
+
+			SetMemos (memoIndices);
+
 		}
 
 		private void SendThread (object param)
@@ -326,7 +479,7 @@ namespace IhildaWallet
 
 
 
-					SendPipsPayment (tp.destination, (decimal)amountl);
+					SendPipsPayment (tp.destination, tp.DestTag,(decimal)amountl);
 				} else {
 					MessageDialog.ShowMessage ("Amount of " + RippleCurrency.NativePip + " is formatted incorrectly \n");
 				}
@@ -341,7 +494,7 @@ namespace IhildaWallet
 				Decimal? amountd = RippleCurrency.ParseDecimal (tp.amount);
 				if (amountd != null) {
 
-					SendNativePayment (tp.destination, (Decimal)amountd);
+					SendNativePayment (tp.destination, tp.DestTag, (Decimal)amountd);
 				} else {
 					MessageDialog.ShowMessage ("Amount Entered is formatted incorrectly\n");
 				}
@@ -535,6 +688,8 @@ namespace IhildaWallet
 #endif
 
 	}
+
+
 
 
 }

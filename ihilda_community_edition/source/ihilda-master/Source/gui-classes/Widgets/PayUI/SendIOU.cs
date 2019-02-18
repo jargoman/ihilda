@@ -3,21 +3,22 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Gtk;
-using System.Collections.Generic;
-using Codeplex.Data;
+using IhildaWallet.Networking;
+using IhildaWallet.Util;
+using RippleLibSharp.Commands.Accounts;
+using RippleLibSharp.Commands.Subscriptions;
 using RippleLibSharp.Keys;
+using RippleLibSharp.Network;
+using RippleLibSharp.Result;
 using RippleLibSharp.Transactions;
 using RippleLibSharp.Transactions.TxTypes;
-using RippleLibSharp.Network;
-using IhildaWallet.Networking;
-using RippleLibSharp.Result;
-using RippleLibSharp.Commands.Accounts;
 using RippleLibSharp.Util;
-using IhildaWallet.Util;
-using System.Linq;
+using static IhildaWallet.MemoCreateDialog;
 
 namespace IhildaWallet
 {
@@ -58,34 +59,145 @@ namespace IhildaWallet
 			this.issuerentry.Changed += this.OnCurrencycomboboxentryChanged;
 			//this.issuerentry.Changed
 			this.amountentry.Activated += this.OnAmountentryActivated;
-			this.sendMaxEntry.Activated += this.OnSendMaxEntryActivated;
+
 			this.destinationentry.Activated += this.OnDestinationentryActivated;
 
 			this.sendIOUButton.Clicked += this.OnSendIOUButtonClicked;
 			//this.ChooseButton.Clicked += new EventHandler(this.OnChooseButtonClicked);
 
+			this.addmemobutton.Clicked += (object sender, EventArgs e) => {
+
+				SelectableMemoIndice createdMemo = null;
+				using (MemoCreateDialog memoCreateDialog = new MemoCreateDialog ()) {
+					try {
+						ResponseType resp = (ResponseType)memoCreateDialog.Run ();
+
+
+						if (resp != ResponseType.Ok) {
+
+							return;
+						}
+						createdMemo = memoCreateDialog.GetMemoIndice ();
+						this.AddMemo (createdMemo);
+					} catch (Exception ee) {
+						throw ee;
+					} finally {
+						memoCreateDialog?.Destroy ();
+					}
+				}
 
 
 
-			Task.Factory.StartNew (async () => {
 
-				while (!tokenSource.IsCancellationRequested) {
-					await Task.Delay (30000, tokenSource.Token);
+			};
+
+			clearmemobutton.Clicked += (object sender, EventArgs e) => {
+				ListStore.Clear ();
+
+				Memos = null;
+
+			};
+
+			Task.Factory.StartNew ( () => {
+				var token = TokenSource.Token;
+				while (!token.IsCancellationRequested) {
+					if (TokenSource == null) {
+						return;
+					}
+
+					for (int i = 0; i < 5; i++) {
+						WaitHandle.WaitAny (
+							new WaitHandle [] {
+								LedgerTracker.LedgerResetEvent,
+								token.WaitHandle
+							},
+							6000
+			    			);
+					}
+
+					//await Task.Delay (30000, token);
 					Update ();
-				};
+
+				}
 			}
 			);
 
+			CellRendererToggle rendererToggle = new CellRendererToggle () {
+				Activatable = true
+			};
+
+			CellRendererText cellRendererText = new CellRendererText ();
+
+			treeview1.AppendColumn ("Enabled", rendererToggle, "active", 0);
+			treeview1.AppendColumn ("MemoType", cellRendererText, "text", 1);
+			treeview1.AppendColumn ("MemoFormat", cellRendererText, "text", 2);
+			treeview1.AppendColumn ("MemoData", cellRendererText, "text", 3);
+
+			ListStore = new ListStore (
+					typeof (bool),
+					typeof (string),
+		    			typeof (string),
+					typeof (string)
+				);
+
+
+			var memo = Program.GetClientMemo ();
+			this.AddMemo (memo);
+
 
 		}
+
+		private IEnumerable<SelectableMemoIndice> Memos {
+			get;
+			set;
+		}
+
+		public void AddMemo (SelectableMemoIndice indice)
+		{
+			List<SelectableMemoIndice> memoIndices = Memos?.ToList () ?? new List<SelectableMemoIndice> ();
+			indice.IsSelected = true;
+			memoIndices.Add (indice);
+
+			SetMemos (memoIndices);
+
+		}
+
+		public void SetMemos (IEnumerable<SelectableMemoIndice> Memos)
+		{
+			Gtk.Application.Invoke (
+				delegate {
+					ListStore.Clear ();
+
+					foreach (SelectableMemoIndice memoIndice in Memos) {
+						ListStore.AppendValues (
+							memoIndice.IsSelected,
+							memoIndice?.GetMemoTypeAscii (),
+							memoIndice?.GetMemoFormatAscii (),
+							memoIndice?.GetMemoDataAscii ()
+						);
+					}
+
+					this.Memos = Memos;
+					this.treeview1.Model = ListStore;
+
+				}
+			);
+
+		}
+
+		Gtk.ListStore ListStore {
+			get;
+			set;
+		}
+
 
 		~SendIOU ()
 		{
-			tokenSource.Cancel ();
-			tokenSource.Dispose ();
+			TokenSource.Cancel ();
+			TokenSource.Dispose ();
 		}
 
-		private CancellationTokenSource tokenSource = new CancellationTokenSource();
+		private CancellationTokenSource TokenSource = new CancellationTokenSource();
 
 
 //#pragma warning disable RECS0122 // Initializing field with default value is redundant
@@ -96,7 +208,7 @@ namespace IhildaWallet
 
 
 
-		public void SendIOUPayment (String destination, decimal amount, String currency, String issuer, decimal sendmax)
+		public void SendIOUPayment (String destination, UInt32? DestTag, decimal amount, String currency, String issuer)
 		{
 #if DEBUG
 			if (DebugIhildaWallet.SendIOU) {
@@ -184,10 +296,15 @@ namespace IhildaWallet
 			if (part) {
 				tx.flags |= tx.tfPartialPayment;
 			}
+			tx.DestinationTag = DestTag;
 
+			tx.Memos = Memos?.Where ((SelectableMemoIndice arg) =>
+				arg.IsSelected
+			).ToArray();
 			//RipplePaymentTransaction[] arr = new RipplePaymentTransaction[] { tx } ;
 
 			LicenseType licenseT = Util.LicenseType.PAYMENT;
+
 			if (LeIceSense.IsLicenseExempt (amnt) ) {
 				licenseT = LicenseType.NONE;
 			}
@@ -277,7 +394,7 @@ namespace IhildaWallet
 
 			String currency = currencycomboboxentry.ActiveText;
 
-			String sendmax = this.sendMaxEntry.Text;
+
 
 
 
@@ -287,6 +404,34 @@ namespace IhildaWallet
 				return;
 			}
 			destination = destination.Trim ();
+
+
+
+			string destinationTag = destinationTagcomboboxentry?.ActiveText;
+
+			uint? DestTag = null;
+			UInt32 res = 0;
+
+			if (!string.IsNullOrWhiteSpace (destinationTag)) {
+				destinationTag = destinationTag.Trim ();
+				bool hasDest = UInt32.TryParse (destinationTag, out res);
+				if (!hasDest) {
+					return;
+				}
+
+				if (res == 0) {
+					string msg = "<span fgcolor>You've specified a destination tag of zero</span>. A destination tag is used by the recipiant to distinguisg payments from one another. Ask your recepient what destination tag if any to use\nWould you like to continue with a destination tag of zero?";
+					bool b = AreYouSure.AskQuestion ("destination tag is zero", msg);
+
+					if (!b) {
+						return;
+					}
+				}
+				DestTag = new uint? (res);
+
+			}
+
+
 
 			if (currency == null || currency.Trim ().Equals ("")) {
 				MessageDialog.ShowMessage ("Please choose a currency to send");
@@ -306,6 +451,9 @@ namespace IhildaWallet
 			}
 			*/
 
+
+
+
 #if DEBUG
 			if (DebugIhildaWallet.SendIOU) {
 				Logging.WriteLog (
@@ -315,15 +463,14 @@ namespace IhildaWallet
 					"\n\tdestination = " + DebugIhildaWallet.ToAssertString (destination) +
 					"\n\tamount = " + DebugIhildaWallet.ToAssertString (amount) +
 					"\n\tcurrency = " + DebugIhildaWallet.ToAssertString (currency) +
-					"\n\tissuer = " + DebugIhildaWallet.ToAssertString (issuer) +
-					"\n\tsendmax = " + DebugIhildaWallet.ToAssertString (sendmax) + "\n"
+					"\n\tissuer = " + DebugIhildaWallet.ToAssertString (issuer) + "\n"
 					);
 			}
 #endif
 
 			Thread th = new Thread (new ParameterizedThreadStart (SendIOUThread));
 
-			ThreadParam par = new ThreadParam (amount, destination, currency, issuer, sendmax);
+			ThreadParam par = new ThreadParam (amount, destination, DestTag, currency, issuer);
 
 			th.Start (par);
 
@@ -385,58 +532,39 @@ namespace IhildaWallet
 				return;
 			}
 
-			if (tp.sendmax == null) {
-				tp.sendmax = "";
-#if DEBUG
-				if (DebugIhildaWallet.SendIOU) {
-					Logging.WriteLog ("Setting sendmax to blank value because it was null");
-				}
-#endif
-			}
-
-			if (!("".Equals (tp.sendmax.Trim ()))) { // if sendmax is not blank
-
-
-				Decimal? m = RippleCurrency.ParseDecimal (tp.sendmax.Trim ());  // and is a valid number
-				MessageDialog.ShowMessage ("SendMax is formatted incorrectly");
-
-				if (m == null) {
-					return;
-				}
-
-				max = (Decimal)m;
-
-			} else {
-				max = amountd;
-			}
+			
 
 
 
 
 
-			SendIOUPayment (tp.destination, amountd, tp.currency, tp.issuer, max);
+			SendIOUPayment (tp.destination, tp.DestTag, amountd, tp.currency, tp.issuer);
 
 		}
 
 		private class ThreadParam
 		{
-			public ThreadParam (String amount, String destination, String currency, String issuer, String sendmax)
+			public ThreadParam (String amount, String destination, uint? DestTag, String currency, String issuer)
 			{
 				this.amount = amount;
 				this.destination = destination;
 
 
 				this.currency = currency;
-				this.sendmax = sendmax;
+
 				this.issuer = issuer;
+
+				this.DestTag = DestTag;
 			}
 
 			public String amount;
 			public String destination;
 
 			public String currency;
-			public String sendmax;
+
 			public String issuer;
+
+			public uint? DestTag;
 		}
 
 
@@ -457,7 +585,7 @@ namespace IhildaWallet
 		public void UpdateBalance (string address)
 		{
 
-			CancellationToken token = tokenSource.Token;
+			CancellationToken token = TokenSource.Token;
 
 			if (address == null) {
 				return;
@@ -547,7 +675,7 @@ namespace IhildaWallet
 		private void UpdateCurrencyIssuers (RippleAddress rippleAddress)
 		{
 
-			CancellationToken token = tokenSource.Token;
+			CancellationToken token = TokenSource.Token;
 
 			//RippleWallet rw = _rippleWallet;
 			string address = rippleAddress;
@@ -676,12 +804,12 @@ namespace IhildaWallet
 
 		protected void OnAmountentryActivated (object sender, EventArgs e)
 		{
-			if (sendMaxEntry==null) {
+			if (destinationentry==null) {
 				// TODO
 				return;
 			}
 
-			this.sendMaxEntry.GrabFocus ();
+			this.destinationentry.GrabFocus ();
 		}
 
 		protected void OnDestinationentryActivated (object sender, EventArgs e)
@@ -783,7 +911,7 @@ namespace IhildaWallet
 		private void UpdateCurrencies ()
 		{
 
-			CancellationToken token = tokenSource.Token;
+			CancellationToken token = TokenSource.Token;
 			string account = _rippleWallet?.GetStoredReceiveAddress ();
 			if (account == null) {
 				return;

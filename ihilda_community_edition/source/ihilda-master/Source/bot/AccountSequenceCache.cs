@@ -40,12 +40,11 @@ namespace IhildaWallet
 					return null;
 				}
 
-				if (CacheManager.ContainsKey (account)) {
-					bool success = CacheManager.TryGetValue (account, out AccountSequenceCache accountSequenceCache);
-					if (success) {
-						return accountSequenceCache;
-					}
+				bool success = CacheManager.TryGetValue (account, out AccountSequenceCache accountSequenceCache);
+				if (success) {
+					return accountSequenceCache;
 				}
+				
 
 				accountSequence = new AccountSequenceCache (account);
 
@@ -437,7 +436,7 @@ namespace IhildaWallet
 				jsconf = DynamicJson.Parse (str);
 
 			} catch (Exception e) {
-				Logging.WriteLog (e.Message + e.StackTrace);
+				Logging.WriteLog (e?.Message + e?.StackTrace);
 				return null;
 			}
 
@@ -445,25 +444,39 @@ namespace IhildaWallet
 				return null;
 			}
 
-			AutomatedOrder [] ords = jsconf?.Orders;
+			IEnumerable<AutomatedOrder> ords = jsconf?.Orders;
 
 			if (ords == null || !ords.Any ()) {
 				return null;
 			}
 
-	    		
-			Dictionary<String, AutomatedOrder> orderDict = new Dictionary<string, AutomatedOrder> (ords.Length);
 
-			//orderDict.Clear ();
-			foreach (AutomatedOrder order in ords) {
-				string key = order.Bot_ID;
+			Dictionary<String, AutomatedOrder> orderDict = null;
 
-				if (key != null) {
-					//orderDict.TryAdd (key, order);
-					orderDict.Add (key, order);
+			if (Program.preferLinq) {
+				orderDict = ords.ToDictionary ((AutomatedOrder arg) => arg.Bot_ID, (AutomatedOrder arg) => arg);
+
+			} else {
+				orderDict = new Dictionary<String, AutomatedOrder> ();
+				foreach (AutomatedOrder order in ords) {
+					string key = order.Bot_ID;
+
+					if (key != null) {
+						//orderDict.TryAdd (key, order);
+						orderDict.Add (key, order);
+					}
 				}
 			}
 
+			//KeyValuePair<String, AutomatedOrder> valuePair = 
+
+
+
+
+
+			/*
+				   
+			*/
 			return orderDict;
 
 			//lock (lockSeq) {
@@ -491,7 +504,7 @@ namespace IhildaWallet
 				if (ords == null) {
 					return;
 				}
-
+				Orders = ords;
 				this.Orders = ords.ToArray ();
 
 				/*
@@ -519,7 +532,7 @@ namespace IhildaWallet
 			}
 
 
-			public AutomatedOrder [] Orders {
+			public IEnumerable <AutomatedOrder> Orders {
 				get;
 				set;
 			}
@@ -572,7 +585,9 @@ namespace IhildaWallet
 			
 		}
 
-		private readonly object lockSeq = new object ();
+#pragma warning disable IDE0044 // Add readonly modifier
+		private object lockSeq = new object ();
+#pragma warning restore IDE0044 // Add readonly modifier
 
 		public event EventHandler<OrderCachedEventArgs> OnOrderCacheEvent;
 

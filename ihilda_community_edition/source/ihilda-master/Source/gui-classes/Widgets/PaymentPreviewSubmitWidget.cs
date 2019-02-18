@@ -34,11 +34,14 @@ namespace IhildaWallet
 				hbox1.Add (walletswitchwidget1);
 			}
 
+			infoBarlabel.Text = "";
+
 			walletswitchwidget1.WalletChangedEvent += (source, eventArgs) => {
 
 				RippleWallet rippleWallet = eventArgs.GetRippleWallet ();
 				string acc = rippleWallet?.GetStoredReceiveAddress ();
 				if (acc == null) {
+					this.SetInfoBox ("Invalid wallet account\n");
 					return;
 				}
 
@@ -108,6 +111,7 @@ namespace IhildaWallet
 				}
 #endif
 
+				this.SetInfoBox ("No wallet selected\n");
 				// 
 				return;
 			}
@@ -115,6 +119,7 @@ namespace IhildaWallet
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
 			if (ni == null) {
 				// TODO network interface
+				this.SetInfoBox ("No network");
 				return;
 			}
 
@@ -160,7 +165,7 @@ namespace IhildaWallet
 				bool suceeded = this.paymentstree1.SubmitPaymentAtIndex (index, se++, ni, token, rsa);
 				if (!suceeded) {
 
-					if (settings.HasOnTxFail && settings.OnTxFail != null) {
+					if (settings != null && settings.HasOnTxFail && settings.OnTxFail != null) {
 
 						Task.Run (delegate {
 
@@ -174,7 +179,7 @@ namespace IhildaWallet
 					return;
 				} else {
 
-					if ( settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
+					if ( settings != null && settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
 
 						Task.Run (delegate {
 							SoundPlayer player = new SoundPlayer (settings.OnTxSubmit);
@@ -192,10 +197,18 @@ namespace IhildaWallet
 
 		}
 
+		public void SetInfoBox (string markup)
+		{
+			Gtk.Application.Invoke (
+				delegate {
+					infoBarlabel.Markup = markup;
+					infoBarlabel.Visible = true;
+				}	
+			);
+		}
 
 
-
-		public void SetPayments (IEnumerable <RipplePaymentTransaction> payments)
+		public void SetPayments ( IEnumerable <RipplePaymentTransaction> payments )
 		{
 			SetPayments (payments, false);
 		}

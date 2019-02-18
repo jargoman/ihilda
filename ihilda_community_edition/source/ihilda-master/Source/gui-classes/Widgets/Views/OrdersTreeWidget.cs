@@ -58,7 +58,7 @@ namespace IhildaWallet
 				string addr = this.comboboxentry1.ActiveText;
 
 				if (string.IsNullOrWhiteSpace(addr)) {
-					infoBarLabel.Markup = "<span fgcolor=\"red\">No address specified</span>";
+					infoBarLabel.Markup = Program.darkmode ? "<span fgcolor=\"#FFAABB\">No address specified</span>" : " < span fgcolor=\"red\">No address specified</span>";
 					infoBarLabel.Visible = true;
 					return;
 				}
@@ -322,7 +322,7 @@ namespace IhildaWallet
 				Gtk.Application.Invoke (
 					delegate {
 
-						infoBarLabel.Markup = "<span fgcolor=\"red\">" + mess + "</span>";
+						infoBarLabel.Markup = Program.darkmode ? "<span fgcolor=\"#FFAABB\">" : "<span fgcolor=\"red\">" + mess + "</span>";
 						infoBarLabel.Visible = true;
 
 						progressbar1.Fraction = 0;
@@ -405,8 +405,8 @@ namespace IhildaWallet
 				Gtk.Application.Invoke (
 					delegate {
 						string DEFAULT_ERROR = "Error";
-						this.infoBarLabel.Markup = "" +
-							"<span fgcolor=\"red\">" + (first?.error_message ?? DEFAULT_ERROR) + "</span>";
+						this.infoBarLabel.Markup = 
+							(string)(Program.darkmode ? "<span fgcolor=\"#FFAABB\">" : "<span fgcolor=\"red\">") + (first?.error_message ?? DEFAULT_ERROR) + "</span>";
 						this.infoBarLabel.Show();
 
 						progressbar1.Fraction = 0;
@@ -436,7 +436,7 @@ namespace IhildaWallet
 				Gtk.Application.Invoke (
 					delegate {
 						this.infoBarLabel.Markup = 
-							"<span fgcolor=\"red\">Server returned no orders for account " 
+							Program.darkmode ? "<span fgcolor=\"#FFAABB\">Server returned no orders for account "  : "<span fgcolor=\"red\">Server returned no orders for account " 
 							+ (ra?.ToString() ?? "")
 							+ "</span>";
 						this.infoBarLabel.Show ();
