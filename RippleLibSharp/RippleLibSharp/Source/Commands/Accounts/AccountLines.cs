@@ -213,7 +213,7 @@ namespace RippleLibSharp.Commands.Accounts
 			IEnumerable<RippleCurrency> balances = GetCurrencyBalances (address, cur, ni, token);
 			if (Configuration.Config.PreferLinq) {
 
-				balances.Where ((RippleCurrency currency) => issuer.ToString ().Equals (currency?.issuer));
+				balances = balances.Where ((RippleCurrency currency) => issuer.ToString ().Equals (currency?.issuer));
 				return balances.FirstOrDefault ();
 			} else {
 			

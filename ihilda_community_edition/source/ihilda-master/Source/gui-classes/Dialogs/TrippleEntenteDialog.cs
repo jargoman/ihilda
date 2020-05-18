@@ -45,7 +45,7 @@ namespace IhildaWallet
 			var v = this.prismwidget1.CollectPrisms ();
 			if (v == null) {
 				
-				label6.Markup = Program.darkmode ? "<span fgcolor=\"#FFAABB\">Invalid Prism Values</span>" : "<span fgcolor=\"red\">Invalid Prism Values</span>";
+				label6.Markup = ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">Invalid Prism Values</span>" : "<span fgcolor=\"red\">Invalid Prism Values</span>";
 				this.label6.Show ();
 
 				return null;
@@ -104,10 +104,10 @@ namespace IhildaWallet
 		{
 
 			Logging.WriteLog ("Please enter your password : ");
-			string password = Program.GetPassword ();
+			string password = ConsoleMain.GetPassword ();
 
 			Logging.WriteLog ("Please enter your pin code");
-			string pin = Program.GetPassword ();
+			string pin = ConsoleMain.GetPassword ();
 
 			TrippleEntente entente = new TrippleEntente {
 				ColorCrypt = GetEnumConsole<ColorCrypts> (),
@@ -131,7 +131,7 @@ namespace IhildaWallet
 				TEnum ret = default(TEnum);
 				Logging.WriteLog ("Enter your " + ret.GetType().ToString() + " : ");
 
-				string pass = Program.GetPassword ();
+				string pass = ConsoleMain.GetPassword ();
 
 				bool success = Enum.TryParse (pass, out ret);
 
@@ -148,7 +148,7 @@ namespace IhildaWallet
 		public static TrippleEntente DoDialog ()
 		{
 
-			if ( Program.botMode != null ) {
+			if (ProgramVariables.botMode != null ) {
 				return DoDialogConsole ();
 			}
 

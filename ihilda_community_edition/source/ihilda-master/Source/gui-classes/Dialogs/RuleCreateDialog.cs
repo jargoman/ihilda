@@ -1,7 +1,13 @@
 ﻿
 using System;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Gtk;
+using IhildaWallet.Networking;
+using RippleLibSharp.Commands.Accounts;
+using RippleLibSharp.Keys;
+using System.Linq;
 
 namespace IhildaWallet
 {
@@ -59,9 +65,18 @@ namespace IhildaWallet
 
 		}
 
+		public RuleCreateDialog (RippleAddress address) : this()
+		{
+			if (address != null) {
+				tradepairentrywidget1.SetAddress (address);
+			}
+		}
+
+
+
 		public void SetToolTips ()
 		{
-			if (!Program.showPopUps) {
+			if (!ProgramVariables.showPopUps) {
 
 				return;
 			}
@@ -197,7 +212,23 @@ namespace IhildaWallet
 		public static OrderFilledRule DoDialog (OrderFilledRule filledRule = null) {
 
 			RuleCreateDialog rcd = new RuleCreateDialog ();
+
+			return _DoDialog (rcd, filledRule);
+
+		}
+
+		public static OrderFilledRule DoDialog (RippleWallet wallet, OrderFilledRule filledRule = null)
+		{
+			RuleCreateDialog rcd = new RuleCreateDialog (wallet?.GetStoredReceiveAddress());
+			return _DoDialog (rcd, filledRule);
+		}
+
+		private static OrderFilledRule _DoDialog (RuleCreateDialog rcd, OrderFilledRule filledRule = null)
+		{
+
+
 			rcd.SetRule (filledRule);
+
 			OrderFilledRule ret = null;
 
 			do {
@@ -213,7 +244,7 @@ namespace IhildaWallet
 					break;
 				}
 
-				ret = rcd.GetRule();
+				ret = rcd.GetRule ();
 
 
 			} while (ret == null);

@@ -83,38 +83,38 @@ namespace RippleLibSharp.Network
 
 		public static string Get(string uri, CancellationToken token)
 		{
+			int maxattempts = 3;
+			int attempt = 0;
+			while (attempt++ != maxattempts) {
+				DoThrottlingWait (token);
 
-			DoThrottlingWait (token);
+				//System.Security.Cryptography.AesCryptoServiceProvider b = new System.Security.Cryptography.AesCryptoServiceProvider(); 
+				try {
+					HttpWebRequest request = (HttpWebRequest)WebRequest.Create (uri);
 
-			//System.Security.Cryptography.AesCryptoServiceProvider b = new System.Security.Cryptography.AesCryptoServiceProvider(); 
-			try {
-				HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+					//request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+					//ServicePointManager.ServerCertificateValidationCallback = MyRemoteCertificateValidationCallback;
+					//ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
+					//ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(AcceptAllCertifications);
+					//ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls;//Tls12;
 
-				//request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-				//ServicePointManager.ServerCertificateValidationCallback = MyRemoteCertificateValidationCallback;
-				//ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
-				//ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(AcceptAllCertifications);
-				//ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls;//Tls12;
+					using (HttpWebResponse response = (HttpWebResponse)request.GetResponse ())
+					using (Stream stream = response.GetResponseStream ())
+					using (StreamReader reader = new StreamReader (stream)) {
+						return reader.ReadToEnd ();
+					}
+		    		// TODO better thread api support
+				} catch (System.Net.WebException we) {
+					// TODO certmanager
+					Thread.Sleep (1000 * 60);
+					//throw we;
 
-				using(HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-				using(Stream stream = response.GetResponseStream())
-				using(StreamReader reader = new StreamReader(stream))
-				{
-					return reader.ReadToEnd();
+				} catch (Exception e) {
+					Thread.Sleep (1000 * 60);
+					//throw e;
 				}
 			}
-
-			catch (System.Net.WebException we) {
-				// TODO certmanager
-				throw we;
-
-			}
-
-			catch (Exception e) {
-				throw e;
-			}
-
-			//return null;
+			throw new WebException("Could not retrieve data api info");
 		}
 
 		private static DateTime last_call_time = default (DateTime);

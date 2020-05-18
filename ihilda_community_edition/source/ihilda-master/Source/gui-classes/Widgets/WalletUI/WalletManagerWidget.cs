@@ -1,13 +1,19 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Gtk;
+using IhildaWallet.Networking;
 using IhildaWallet.Splashes;
 using IhildaWallet.Util;
+using RippleLibSharp.Commands.Accounts;
+using RippleLibSharp.Commands.Server;
 using RippleLibSharp.Commands.Subscriptions;
 using RippleLibSharp.Keys;
 using RippleLibSharp.Network;
+using RippleLibSharp.Result;
+using RippleLibSharp.Transactions;
 using RippleLibSharp.Util;
 
 namespace IhildaWallet
@@ -27,6 +33,8 @@ namespace IhildaWallet
 
 			this.Build ();
 
+			this.table4.Visible = false;
+
 			if (this.wallettree1 == null) {
 				this.wallettree1 = new WalletTree ();
 				this.wallettree1.Show ();
@@ -35,7 +43,7 @@ namespace IhildaWallet
 
 	    		
 
-			this.SetActions ();
+			//this.SetActions ();
 
 #if DEBUG
 
@@ -54,12 +62,12 @@ namespace IhildaWallet
 					string str = e?.ledger_index.ToString ();
 
 					if (str == null) {
-						ledgerlabel.Markup = Program.darkmode ? "<span fgcolor=\"#FFAABB\">null</span>" : "<span fgcolor=\"red\">null</span>";
+						ledgerlabel.Markup = ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">null</span>" : "<span fgcolor=\"red\">null</span>";
 					}
 
 					ledgerlabel.Markup = 
 						(string)
-						(Program.darkmode ? "<span fgcolor=\"chartreuse\">" : "<span fgcolor=\"green\">") 
+						(ProgramVariables.darkmode ? "<span fgcolor=\"chartreuse\">" : "<span fgcolor=\"green\">") 
 						+ str 
 	    					+ "</span>";
 				});
@@ -94,16 +102,18 @@ namespace IhildaWallet
 
 					label10.TooltipText = message;
 					ledgerlabel.TooltipText = message;
-
+					feelabel.Text = fee;
 					//eventbox9.TooltipText = message;
 
 
 				});
 			};
 
+			
 
 
-			this.button91.Clicked += (object sender, EventArgs e) => {
+
+			this.debugbutton.Clicked += (object sender, EventArgs e) => {
 				DebuggingOptionsDialogWindow debuggingWindow = new DebuggingOptionsDialogWindow {
 					Modal = true
 				};
@@ -260,9 +270,8 @@ namespace IhildaWallet
 
 			};
 
-			this.button67.Clicked += (sender, e) => Task.Run ((System.Action)EncryptWallet);
-
-			this.button66.Clicked += (sender, e) => Task.Run ((System.Action)DecryptWallet);
+			this.encryptbutton.Clicked += (sender, e) => Task.Run ((System.Action)EncryptWallet);
+			this.decryptbutton.Clicked += (sender, e) => Task.Run ((System.Action)DecryptWallet);
 
 
 			this.rclAccountButton.Clicked += (object sender, EventArgs e) => {
@@ -278,7 +287,7 @@ namespace IhildaWallet
 			this.paperWalletButton.Clicked += PaperWalletButton_Clicked;
 
 
-			this.button134.Clicked += (object sender, EventArgs e) => {
+			this.rmbackupbutton.Clicked += (object sender, EventArgs e) => {
 
 				bool sure = AreYouSure.AskQuestion
 						      ("Delete Backups?",
@@ -300,7 +309,40 @@ namespace IhildaWallet
 				);
 			};
 
-			this.eventbox1.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
+
+			#region community
+
+			youtubebutton.Clicked += (sender, e) => {
+				List<WebLinkItem> list = new List<WebLinkItem> ();
+
+				list.Add (
+					new WebLinkItem ("Ckj Crypto News", "https://www.youtube.com/channel/UCmexsZ6pFvmXa9hOnnyRz5A")
+				);
+
+				WebLinksWindow linksWindow = new WebLinksWindow (list);
+				linksWindow.Show ();
+				
+			};
+
+			blogsbutton.Clicked += (sender, e) => { 
+			
+			};
+
+			thirdpartybutton.Clicked += (sender, e) => { 
+			
+			};
+
+			toolsbutton.Clicked += (sender, e) => { 
+			
+			};
+
+			chartsbutton.Clicked += (sender, e) => { 
+			
+			};
+
+			#endregion
+
+			this.eventboxWallet.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
 				var pix = image1.Pixbuf;
 
 				FileChooserDialog fcd = new FileChooserDialog ("Export Wallet",
@@ -327,8 +369,11 @@ namespace IhildaWallet
 			};
 
 
+			this.eventboxfee.ButtonReleaseEvent += Eventboxfee_ButtonReleaseEvent;
+			this.eventboxfee2.ButtonReleaseEvent += Eventboxfee_ButtonReleaseEvent;
 
-			if (Program.network) {
+
+			if (ProgramVariables.network) {
 				this.eventbox9.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
 					NetworkSettingsDialog.ShowDialog ();
 				};
@@ -368,11 +413,11 @@ namespace IhildaWallet
 			SetHelpPopups ();
 
 
-			if (Program.darkmode) {
+			if (ProgramVariables.darkmode) {
 				DarkMode ();
 			}
 
-			this.eventbox1.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
+			this.eventboxWallet.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
 			eventbox6.ModifyBg (StateType.Normal, new Gdk.Color (0, 0, 0));
 			eventbox6.ModifyBase (StateType.Normal, new Gdk.Color (0, 0, 0));
 
@@ -428,6 +473,7 @@ namespace IhildaWallet
 			label5.UseMarkup = true;
 			label6.UseMarkup = true;
 			label9.UseMarkup = true;
+			label1.UseMarkup = true;
 
 			StringBuilder stringBuilder = new StringBuilder ();
 
@@ -456,8 +502,16 @@ namespace IhildaWallet
 			stringBuilder.Append ("><b> Options </b></span>");
 			label9.Markup = stringBuilder.ToString();
 			stringBuilder.Clear ();
+
+			stringBuilder.Append ("<span size=\"x-large\" fgcolor=\"orchid\"");
+			//stringBuilder.Append ("bgcolor=\"black\"");
+			stringBuilder.Append ("><b> Community </b></span>");
+			label1.Markup = stringBuilder.ToString ();
+			stringBuilder.Clear ();
+
 			//this.eventbox5.ModifyBg (StateType.Normal, new Gdk.Color (218, 112, 214));
-			
+
+
 
 			eventbox3.ModifyBase (StateType.Normal, new Gdk.Color (55, 55, 55));
 			eventbox3.ModifyBg (StateType.Normal, new Gdk.Color (55, 55, 55));
@@ -470,6 +524,16 @@ namespace IhildaWallet
 
 
 		}
+
+		void Eventboxfee_ButtonReleaseEvent (object o, ButtonReleaseEventArgs args)
+		{
+			OptionsWindow opswin = new OptionsWindow ();
+			opswin.Show ();
+
+			opswin.GotoFee ();
+
+		}
+
 
 		void PaperWalletButton_Clicked (object sender, EventArgs e)
 		{
@@ -531,7 +595,7 @@ namespace IhildaWallet
 		public void SetHelpPopups ()
 		{
 
-			if (!Program.showPopUps) {
+			if (!ProgramVariables.showPopUps) {
 				return;
 			}
 
@@ -543,20 +607,22 @@ namespace IhildaWallet
 
 			newbutton.TooltipMarkup = "Create a new random keypair\nUse an existing secret to create a wallet\nUse a script to make a vanity wallet";
 			editButton.TooltipMarkup = "Edit the selected wallet";
-			button67.TooltipMarkup = "Encrypt the selected wallet";
-			button66.TooltipMarkup = "Decrypt selected wallet";
+			encryptbutton.TooltipMarkup = "Encrypt the selected wallet";
+			decryptbutton.TooltipMarkup = "Decrypt selected wallet";
 			deleteButton.TooltipMarkup = "Delete selected wallet";
 
+			// TODO 
 			upgradebutton.TooltipMarkup = "";
+
 			importButton.TooltipMarkup = "Import wallet to .ice file";
 			exportButton.TooltipMarkup = "Export wallet to .ice file";
 			paperWalletButton.TooltipMarkup = "Prepare a printable document for offline wallet storage";
-			button134.TooltipMarkup = "Remove automatically generated wallet backupfiles\nDeleting a wallet does not remove it's backup";
+			rmbackupbutton.TooltipMarkup = "Remove automatically generated wallet backupfiles\nDeleting a wallet does not remove it's backup";
 			networkbutton1.TooltipMarkup = "Change network settings\nConnect to network\nView Server information";
 			rclAccountButton.TooltipMarkup = "Administer wallet account settings\n<span fgcolor=\"red\">Advanced users only</span>";
 			optionsbutton1.TooltipMarkup = "Wallet Options and Settings";
 			consolebutton1.TooltipMarkup = "Open command line interface";
-			button91.TooltipMarkup = "Manaage debbugger output";
+			debugbutton.TooltipMarkup = "Manaage debbugger output";
 
 			image1.TooltipMarkup = "Select a wallet to view it's balances";
 
@@ -565,6 +631,7 @@ namespace IhildaWallet
 			walletswitchwidget1.TooltipMarkup = "Switch wallets";
 		}
 
+		/*
 		public void SetActions ()
 		{
 			this.NewAction.Activated += (sender, e) => New_Wallet_Wizard ();
@@ -596,7 +663,7 @@ namespace IhildaWallet
 			this.ManageTrustAction.Activated += (sender, e) => Task.Run ((System.Action)Trust);
 
 		}
-
+		*/
 		public void EncryptWallet ()
 		{
 
@@ -1040,9 +1107,76 @@ namespace IhildaWallet
 				string qrtooltip = "Click to create QR code for address\n" + rippleWallet.GetStoredReceiveAddress () + "\nand save to image file";
 				image1.TooltipMarkup = qrtooltip;
 
+				//table4.Visible = false;
+				this.label12.Text = "";
+				this.label14.Text = "";
+				this.label13.Text = "";
+				this.label15.Text = "";
+
+
+
 			});
 
+			string acc = rippleWallet.GetStoredReceiveAddress ();
+			Task.Run (delegate {
+				NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
 
+				CancellationTokenSource tokenSource = new CancellationTokenSource ();
+				CancellationToken token = tokenSource.Token;
+
+				Task<Response<AccountInfoResult>> task =
+					AccountInfo.GetResult (acc, ni, token);
+
+				task.Wait (token);
+
+				Response<AccountInfoResult> resp = task.Result;
+				AccountInfoResult res = resp.result;
+
+				var task2 = ServerInfo.GetResult (ni, token);
+
+				task2.Wait (token);
+
+				Response<ServerInfoResult> resp2 = task2.Result;
+
+				if (resp2 == null) {
+					return;
+				}
+
+				if (resp2.HasError ()) {
+					return;
+				}
+
+				ServerInfoResult res2 = resp2.result;
+
+
+				Info info = res2.info;
+
+				var validated = info.validated_ledger;
+
+				var ownerCount = res.account_data.OwnerCount;
+				var reserv = validated.reserve_inc_xrp;
+				var bse = validated.reserve_base_xrp;
+
+				var am = bse + (reserv * ownerCount);
+
+
+
+				RippleCurrency rippleCurrency = new RippleCurrency (res.account_data.Balance);
+
+
+				Gtk.Application.Invoke (
+					delegate {
+						table4.Visible = true;
+						this.label12.Text = rippleCurrency.ToString();
+						this.label14.Text = ownerCount.ToString ();
+						this.label13.Text = am.ToString();
+						this.label15.Text = res.account_data.Sequence.ToString ();
+
+					}
+				);
+
+
+			});
 
 
 
@@ -1053,19 +1187,20 @@ namespace IhildaWallet
 
 			//label3.Visible = true;
 
-			this.eventbox1.ModifyBg ( StateType.Normal, new Gdk.Color ( 255, 255, 255 ) );
+			this.eventboxWallet.ModifyBg ( StateType.Normal, new Gdk.Color ( 255, 255, 255 ) );
 			this.image1.Pixbuf = rippleWallet.GetQrCode ();
 			this.balancetab1.SetAddress ( rippleWallet.GetStoredReceiveAddress () );
 
 
-			this.button67.Visible = !rippleWallet.IsEncrypted ();
+			this.encryptbutton.Visible = !rippleWallet.IsEncrypted ();
 
-			this.button66.Visible = rippleWallet.IsEncrypted ();
+			this.decryptbutton.Visible = rippleWallet.IsEncrypted ();
 
-			if (Program.network) {
+			if (ProgramVariables.network) {
 				this.scrolledwindow1.Visible = false;
 				this.balancetab1.Visible = true;
 			}
+
 			this.UpdateUI ();
 
 		}
@@ -1103,6 +1238,7 @@ namespace IhildaWallet
 
 				}
 
+				/* Keep payments free
 				bool ShouldContinue = LeIceSense.DoTrialDialog (rw, LicenseType.PAYMENT);
 
 				if (!ShouldContinue) {
@@ -1115,8 +1251,8 @@ namespace IhildaWallet
 
 
 					});*/
-					return;
-				}
+					//return;
+				//}
 				/*
 				if (WalletManagerWindow.currentInstance!=null) {
 					#if DEBUG
@@ -1866,8 +2002,12 @@ namespace IhildaWallet
 				this.connecteddisplaywidget1.SetDisConnected ();
 
 			}
+	    		
+	    		Gtk.Application.Invoke ((sender, e) => {
+				    this.connecteddisplaywidget1.Show ();
+	    		});
 
-			this.connecteddisplaywidget1.Show ();
+
 
 			return serverUrl;
 		}

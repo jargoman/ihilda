@@ -268,6 +268,28 @@ namespace IhildaWallet
 				});
 			};
 
+			button13.Clicked += (sender, e) => {
+				var pairing = PairingDialog.DoPairingDialog ();
+
+				Task.Run ( delegate {
+
+					ApiResult r = PairingDialog.DoPairing (pairing);
+
+					string error = r.message;
+					string stat = r.status;
+
+					Gtk.Application.Invoke ( delegate {
+
+						if (r.status == "error") {
+							label19.Text = r.message;
+						} else {
+							label19.Text = r.status;
+						}
+					});
+
+				});
+			};
+
 			OnOrderFilledLabel.Text = "";
 			OnPaymentReceivedLabel.Text = "";
 			OnTxSubmitLabel.Text = "";
@@ -283,6 +305,12 @@ namespace IhildaWallet
 				}
 				SetSoundUI (soundSettings);
 			});
+		}
+
+
+		public void GotoFee ()
+		{
+			notebook1.Page = 1;
 		}
 
 		public void SetSoundUI (SoundSettings soundSettings)

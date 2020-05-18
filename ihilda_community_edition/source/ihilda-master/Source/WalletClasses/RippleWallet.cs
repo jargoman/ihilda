@@ -15,7 +15,7 @@ using RippleLibSharp.Util;
 
 namespace IhildaWallet
 {
-	public class RippleWallet
+	public class RippleWallet : RippleWalletVariables
 	{
 		public RippleWallet (String secret, RippleWalletTypeEnum wallettype)
 		{
@@ -203,140 +203,26 @@ namespace IhildaWallet
 				if (Account != null) {
 					return Account;
 				}
-
-				if (Regular_Seed != null) {
-					return Regular_Seed.GetPublicRippleAddress ().ToString ();
+				/*
+				if (Seed != null) {
+					return Seed.GetPublicRippleAddress ().ToString ();
 				}
 
 				if (Regular_Key_Account != null) {
 					return Regular_Key_Account;
-				}
+				}*/
+
+				this._hasError = true;
+				this.WalletError = "missing receive address\n";
+				//throw new Exception ();
 			}
 
-			return "";
-		}
-		public string WalletName {
-			get;
-			set;
-		}
-
-		private RippleSeedAddress Seed {
-			get;
-			set;
-		}
-
-		private RipplePrivateKey PrivateKey {
-			get;
-			set;
-		}
-
-		public String Encrypted_PrivateKey {
-			get;
-			set;
-		}
-
-		public int NextTransactionSequenceNumber {
-			get;
-			set;
-		}
-
-
-		public String Encrypted_Wallet {
-			get;
-			set;
-		}// encryptes bytes encoded as ripple Identifier
-
-		public String Encryption_Type {
-			get;
-			set;
-		}
-
-		public String Account {
-			get;
-			set;
-		}
-
-		public RippleWalletTypeEnum AccountType {
-			get;
-			set;
-		}
-
-
-		public String Salt {
-			get;
-			set;
+			return null;
 		}
 
 
 
-		public uint? NotificationLedger {
-			get;
-			set;
-		}
 
-		public string WalletPath {
-			get;
-			set;
-		}
-
-
-		public string BotLedgerPath {
-			get {
-				return Path.Combine (FileHelper.WALLET_TRACK_PATH, WalletName + ".bot");
-			}
-		}
-
-		public string NotificationLadgerPath {
-			get {
-				return Path.Combine (FileHelper.WALLET_TRACK_PATH, WalletName + ".led");
-			}
-			
-		}
-
-		public string Notification {
-			get;
-			set;
-		}
-
-		public RippleCurrency LastKnownNativeBalance {
-			get;
-			set;
-		}
-
-		public string BalanceNote {
-			get;
-			set;
-		}
-
-		public byte CouldNotUpdateBalanceCount {
-			get;
-			set;
-		}
-
-
-#region regularkey
-
-		public RippleSeedAddress Regular_Seed {
-			get;
-			set;
-		}
-
-		public string Regular_Key_Account {
-			get;
-			set;
-		}
-
-		public string Encrypted_Regular_Wallet {
-			get;
-			set;
-		}
-
-		public string Regular_Key_Encryption_Type {
-			get;
-			set;
-		}
-
-#endregion
 
 
 
@@ -1155,7 +1041,7 @@ namespace IhildaWallet
 			}
 
 
-			LedgerSave ledgerSave = new LedgerSave {
+			WalletLedgerSave ledgerSave = new WalletLedgerSave {
 				Ledger = ledger
 			};
 			String json = DynamicJson.Serialize (ledgerSave);
@@ -1281,46 +1167,6 @@ namespace IhildaWallet
 
 
 
-	public class LedgerSave {
-		public UInt32? Ledger {
-			get;
-			set;
-		}
 
-
-		public static LedgerSave LoadLedger (String path)
-		{
-#if DEBUG
-			string method_sig = nameof (LedgerSave) + DebugRippleLibSharp.colon + nameof (LoadLedger);
-
-			if (DebugIhildaWallet.WalletManager) {
-				Logging.WriteLog (method_sig + path + DebugRippleLibSharp.beginn);
-			}
-
-#endif
-
-			try {
-
-				Logging.WriteLog ("Looking for wallet at " + path + "\n");
-
-				if (File.Exists (path)) { // 
-					Logging.WriteLog ("Wallet " + path + " Exists!\n");
-
-					String wah = File.ReadAllText (path, Encoding.UTF8);
-
-					LedgerSave ledge = DynamicJson.Parse (wah);
-					return ledge;
-				}
-
-
-			} catch (Exception e) {
-				Logging.WriteLog (e.Message);
-			}
-
-			return null;
-
-
-		}
-	}
 }
 

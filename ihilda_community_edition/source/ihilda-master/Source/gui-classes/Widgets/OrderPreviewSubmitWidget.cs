@@ -180,6 +180,8 @@ namespace IhildaWallet
 
 			progressbar3.PulseStep = 0.5;
 
+
+			this.ruleToSelectedbutton.Clicked += RuleToSelectedbutton_Clicked;
 		}
 
 		private void Combine_Clicked (object sender, EventArgs e)
@@ -562,10 +564,20 @@ namespace IhildaWallet
 			for (int i = 0; i < orders.Length; i++) {
 
 			}
-			
+
+		}
+
+		void RuleToSelectedbutton_Clicked (object sender, EventArgs e)
+		{
+			ApplyRuleImplementation (true);
 		}
 
 		void ApplyRuleButtonClicked (object sender, EventArgs e)
+		{
+			ApplyRuleImplementation (false);
+		}
+
+		void ApplyRuleImplementation (bool selected)
 		{
 
 			string acc = walletswitchwidget1.GetRippleWallet ().Account;
@@ -575,7 +587,8 @@ namespace IhildaWallet
 
 
 			for (int i = 0; i < _offers.Length; i++) {
-				bool b = _offers [i].Red;
+
+				bool b = selected ? _offers[i].Selected : _offers[i].Red;
 				if (b) {
 
 					string getsCur = _offers [i].taker_pays.currency; // opposite is intended
@@ -699,7 +712,7 @@ namespace IhildaWallet
 
 				// gui invoke may be needed for timing rather than being on the right thread
 				
-				string message = Program.darkmode ? "<span fgcolor=\"#FFAABB\">Conflicting orders. Trading with self</span>" : "<span fgcolor=\"red\">Conflicting orders. Trading with self</span>";
+				string message = ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">Conflicting orders. Trading with self</span>" : "<span fgcolor=\"red\">Conflicting orders. Trading with self</span>";
 				SetInfoBar (message);
 			}
 			//SetOffers (_offers);
@@ -820,7 +833,7 @@ namespace IhildaWallet
 			Liststore.Clear ();
 			if (offers == null) {
 				
-				string messge = Program.darkmode ? "<span fgcolor=\"#FFAABB\">Error null offer list\n</span>" : "<span fgcolor=\"red\">Error null offer list\n</span>";
+				string messge = ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">Error null offer list\n</span>" : "<span fgcolor=\"red\">Error null offer list\n</span>";
 
 				SetInfoBar (messge);
 				return;
@@ -1096,7 +1109,7 @@ namespace IhildaWallet
 			FeeSettings feeSettings = FeeSettings.LoadSettings ();
 			if (feeSettings == null) {
 
-				string message = Program.darkmode ? "<span fgcolor=\"#FFAABB\">" : "<span fgcolor=\"red\">" +
+				string message = ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">" : "<span fgcolor=\"red\">" +
 							"Could not load xrp fee preferences. " +
 							"Configure fee settings at : " +
 							"{wallet manager > Options Tab > Options > XRP fee options}" +
@@ -1129,7 +1142,7 @@ namespace IhildaWallet
 			string txAtIndexStr =  stringBuilder.ToString();
 
 			stringBuilder.Clear ();
-			if (Program.darkmode) {
+			if (ProgramVariables.darkmode) {
 				stringBuilder.Append ("<span fgcolor=\"chartreuse\">Submitting ");
 			} else {
 				stringBuilder.Append ("<span fgcolor=\"green\">Submitting ");
@@ -1167,7 +1180,7 @@ namespace IhildaWallet
 
 				string feeReq = "Requesting Fee";
 				stringBuilder.Clear ();
-				if (Program.darkmode) {
+				if (ProgramVariables.darkmode) {
 					stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
 				} else {
 					stringBuilder.Append ("<span fgcolor=\"green\">");
@@ -1180,8 +1193,8 @@ namespace IhildaWallet
 
 				this.SetStatus (
 					index.ToString (), 
-					feeReq, 
-		    			Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					feeReq,
+		    			ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 				this.SetInfoBar (ms3);
 
@@ -1223,7 +1236,7 @@ namespace IhildaWallet
 							this.SetResult (
 								indexStr,
 								feestr,
-								    Program.darkmode ? TextHighlighter.YELLOW : TextHighlighter.BLACK);
+								    ProgramVariables.darkmode ? TextHighlighter.YELLOW : TextHighlighter.BLACK);
 
 							sb.Clear ();
 							if (txAtIndexStr != null) {
@@ -1290,11 +1303,11 @@ namespace IhildaWallet
 
 
 						string canstr = "Aborted";
-						this.SetResult (index.ToString (), canstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+						this.SetResult (index.ToString (), canstr, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 						stringBuilder.Clear ();
 
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 						} else {
 							stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -1320,7 +1333,7 @@ namespace IhildaWallet
 
 
 						stringBuilder.Clear ();
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
 						} else {
 							stringBuilder.Append ("<span fgcolor=\"green\">");
@@ -1333,7 +1346,7 @@ namespace IhildaWallet
 						this.SetStatus (
 							index.ToString (),
 							feeReq2.ToString (),
-							Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN
+							ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN
 						);
 
 						this.SetInfoBar (mssg);
@@ -1349,7 +1362,7 @@ namespace IhildaWallet
 				if (tupe == null) {
 
 					string feeEr = "Error retrieving fee and last ledger sequence";
-					this.SetResult (index.ToString (), feeEr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), feeEr, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 					stringBuilder.Append (txAtIndexStr);
@@ -1366,7 +1379,7 @@ namespace IhildaWallet
 					
 					string feeEr = "Error retrieving fee and last ledger sequence";
 
-					this.SetResult (index.ToString (), feeEr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), feeEr, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 					stringBuilder.Append (txAtIndexStr);
@@ -1404,10 +1417,10 @@ namespace IhildaWallet
 				if (tx.fee.amount == 0) {
 
 					string invstr = "Invalid Fee";
-					this.SetResult (index.ToString (), invstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), invstr, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -1428,11 +1441,11 @@ namespace IhildaWallet
 				if (tx.Sequence == 0) {
 
 					string invstr = "Invalid Sequence";
-					this.SetResult (index.ToString (), invstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), invstr, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -1453,13 +1466,13 @@ namespace IhildaWallet
 					stringBuilder.Append ("Signing using rpc");
 
 
-					this.SetStatus (index.ToString (), stringBuilder.ToString (), Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), stringBuilder.ToString (), ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 					string rpsStr = stringBuilder.ToString ();
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"green\">");
@@ -1485,11 +1498,11 @@ namespace IhildaWallet
 
 							string rpcErr = "Error signing over rpc. Is rippled running?";
 
-							this.SetStatus (index.ToString (), rpcErr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+							this.SetStatus (index.ToString (), rpcErr, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 							stringBuilder.Clear ();
 
-							if (Program.darkmode) {
+							if (ProgramVariables.darkmode) {
 								stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 							} else {
 								stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -1520,10 +1533,10 @@ namespace IhildaWallet
 
 							token.WaitHandle.WaitOne (1000);
 
-							this.SetStatus (index.ToString (), stbuild.ToString (), Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+							this.SetStatus (index.ToString (), stbuild.ToString (), ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 							stringBuilder.Clear ();
-							if (Program.darkmode) {
+							if (ProgramVariables.darkmode) {
 								stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
 							} else {
 								stringBuilder.Append ("<span fgcolor=\"green\">");
@@ -1544,9 +1557,9 @@ namespace IhildaWallet
 					
 
 					string rpcStr = "Signed rpc";
-					this.SetStatus (index.ToString (), rpsStr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), rpsStr, ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"green\">");
@@ -1561,11 +1574,11 @@ namespace IhildaWallet
 				case "RippleLibSharp":
 					string rlsstr = "Signing using RippleLibSharp";
 
-					this.SetStatus (index.ToString (), rlsstr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), rlsstr, ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"green\">");
@@ -1589,10 +1602,10 @@ namespace IhildaWallet
 #endif
 
 						string errrls = "Error signing using RippleLibSharp";
-						this.SetStatus (index.ToString (), errrls, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+						this.SetStatus (index.ToString (), errrls, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 						stringBuilder.Clear ();
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 						} else {
 							stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -1608,10 +1621,10 @@ namespace IhildaWallet
 					}
 
 					string sgnstr = "Signed RippleLibSharp";
-					this.SetStatus (index.ToString (), sgnstr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), sgnstr, ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"green\">");
@@ -1626,11 +1639,11 @@ namespace IhildaWallet
 				case "RippleDotNet":
 					string rlsstr2 = "Signing using RippleDotNet";
 
-					this.SetStatus (index.ToString (), rlsstr2, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), rlsstr2, ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"green\">");
@@ -1654,10 +1667,10 @@ namespace IhildaWallet
 #endif
 
 						string errrls = "Error signing using RippleDotNet";
-						this.SetStatus (index.ToString (), errrls, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+						this.SetStatus (index.ToString (), errrls, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 						stringBuilder.Clear ();
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 						} else {
 							stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -1673,10 +1686,10 @@ namespace IhildaWallet
 					}
 
 					string signstr = "Signed RippleDotNet";
-					this.SetStatus (index.ToString (), signstr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), signstr, ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"green\">");
@@ -1693,10 +1706,10 @@ namespace IhildaWallet
 				if (tx.GetSignedTxBlob () == null) {
 
 					string errstr = "Error signing transaction";
-					this.SetResult (index.ToString (), errstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), errstr, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span = fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -1717,12 +1730,12 @@ namespace IhildaWallet
 				if (token.IsCancellationRequested) {
 
 					string abostr = "Aborted";
-					this.SetResult (index.ToString (), abostr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), abostr, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span = fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -1747,11 +1760,11 @@ namespace IhildaWallet
 					task = NetworkController.UiTxNetworkSubmit (tx, ni, token);
 
 					string subWit = "Submitted via websocket";
-					this.SetStatus (index.ToString (), subWit, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), subWit, ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"green\">");
@@ -1781,11 +1794,11 @@ namespace IhildaWallet
 						stringBuilder.Append (new string ('.', x));
 
 						string tmpstr = stringBuilder.ToString ();
-						this.SetResult (index.ToString (), tmpstr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+						this.SetResult (index.ToString (), tmpstr, ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 						stringBuilder.Clear ();
 
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
 						} else {
 							stringBuilder.Append ("<span fgcolor=\"green\">");
@@ -1811,7 +1824,7 @@ namespace IhildaWallet
 #endif
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span = fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -1830,7 +1843,7 @@ namespace IhildaWallet
 
 					// TODO catch actual net exception
 					Logging.WriteLog (e.Message);
-					this.SetResult (index.ToString (), "Network Error", Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), "Network Error", ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					return false;
 				}
 
@@ -1846,10 +1859,10 @@ namespace IhildaWallet
 				if (response == null) {
 
 					string warningMessage = "Order submit returned null. response == null";
-					this.SetResult (index.ToString (), warningMessage, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), warningMessage, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"green\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
@@ -1882,10 +1895,10 @@ namespace IhildaWallet
 
 					string hasErrstr = stringBuilder.ToString ();
 
-					this.SetResult (index.ToString (), hasErrstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), hasErrstr, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -1913,11 +1926,11 @@ namespace IhildaWallet
 
 				if (res == null) {
 					string bugstr = "res == null, Bug?";
-					this.SetResult (index.ToString (), bugstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), bugstr, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -1942,11 +1955,11 @@ namespace IhildaWallet
 
 					string engnull = "engine_result null";
 
-					this.SetStatus (index.ToString (), engnull, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), engnull, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -1976,11 +1989,11 @@ namespace IhildaWallet
 #endif
 
 					string argnull = "null exception";
-					this.SetStatus (index.ToString (), argnull, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), argnull, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2007,7 +2020,7 @@ namespace IhildaWallet
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2020,7 +2033,7 @@ namespace IhildaWallet
 					string ms20 = stringBuilder.ToString ();
 
 					this.SetInfoBar (ms20);
-					this.SetStatus (index.ToString (), flowstr, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), flowstr, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					return false;
 
 				} catch (ArgumentException argumentException) {
@@ -2031,11 +2044,11 @@ namespace IhildaWallet
 #endif
 					string argexc = "Argument Exception";
 
-					this.SetStatus (index.ToString (), argexc, Program.darkmode ? TextHighlighter.LIGHT_RED: TextHighlighter.RED);
+					this.SetStatus (index.ToString (), argexc, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED: TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2057,11 +2070,11 @@ namespace IhildaWallet
 #endif
 					string unkexc = "Unknown Exception";
 
-					this.SetStatus (index.ToString (), unkexc, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), unkexc, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2078,11 +2091,11 @@ namespace IhildaWallet
 				switch (ter) {
 
 				case Ter.tefALREADY:
-					this.SetStatus ( index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN );
-					this.SetResult ( index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN );
+					this.SetStatus ( index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN );
+					this.SetResult ( index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN );
 
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"green\">");
@@ -2113,10 +2126,10 @@ namespace IhildaWallet
 					goto case Ter.tesSUCCESS;
 
 				case Ter.tesSUCCESS:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.CHARTREUSE  : TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE  : TextHighlighter.GREEN);
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"chartreuse\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"green\">");
@@ -2137,12 +2150,12 @@ namespace IhildaWallet
 				case Ter.terPRE_SEQ:
 				case Ter.tefPAST_SEQ:
 				case Ter.tefMAX_LEDGER:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2196,11 +2209,11 @@ namespace IhildaWallet
 					}
 
 					//Thread.Sleep (6000);
-					this.SetStatus (index.ToString (), res.engine_result + " retrying", Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result + " retrying", ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2218,12 +2231,12 @@ namespace IhildaWallet
 
 
 				case Ter.temBAD_AMOUNT:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2242,12 +2255,12 @@ namespace IhildaWallet
 
 				case Ter.tecNO_ISSUER:
 				case Ter.temBAD_ISSUER:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2263,12 +2276,12 @@ namespace IhildaWallet
 					return false;
 
 				case Ter.tecUNFUNDED_OFFER:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2290,11 +2303,11 @@ namespace IhildaWallet
 				case Ter.tecINSUFFICIENT_RESERVE:
 				case Ter.tecNO_LINE_INSUF_RESERVE:
 
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2313,11 +2326,11 @@ namespace IhildaWallet
 				case Ter.temBAD_AUTH_MASTER:
 				case Ter.tefBAD_AUTH_MASTER:
 				case Ter.tefMASTER_DISABLED:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2333,11 +2346,11 @@ namespace IhildaWallet
 
 
 				case Ter.terNO_ACCOUNT:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2353,10 +2366,10 @@ namespace IhildaWallet
 
 				case Ter.tecNO_AUTH: // Not authorized to hold IOUs.
 				case Ter.tecNO_LINE:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2371,10 +2384,10 @@ namespace IhildaWallet
 					return false;
 
 				case Ter.tecFROZEN:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2390,11 +2403,11 @@ namespace IhildaWallet
 
 				case Ter.tefFAILURE:
 					// TODO what to do?
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2424,10 +2437,10 @@ namespace IhildaWallet
 				case Ter.temDISABLED:
 				case Ter.tecOWNERS:
 				case Ter.tecINVARIANT_FAILED:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2443,10 +2456,10 @@ namespace IhildaWallet
 					return false;
 
 				case Ter.tecPATH_DRY:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2461,12 +2474,12 @@ namespace IhildaWallet
 					return false;
 
 				case Ter.tecPATH_PARTIAL:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2482,11 +2495,11 @@ namespace IhildaWallet
 					return false;
 
 				case Ter.tecOVERSIZE:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
@@ -2501,11 +2514,11 @@ namespace IhildaWallet
 					return false;
 
 				case Ter.tefINTERNAL:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
 					} else {
 						stringBuilder.Append ("<spanvfgcolor=\"#FFAABB\">");
@@ -2520,11 +2533,11 @@ namespace IhildaWallet
 					return false;
 
 				case Ter.tefEXCEPTION:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2541,11 +2554,11 @@ namespace IhildaWallet
 
 				case Ter.tefBAD_LEDGER:
 					// report bug to ripple labs
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2561,11 +2574,11 @@ namespace IhildaWallet
 					return false;
 
 				case Ter.tecDIR_FULL:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2580,11 +2593,11 @@ namespace IhildaWallet
 					return false;
 
 				case Ter.tecCLAIM:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2599,12 +2612,12 @@ namespace IhildaWallet
 					return false;
 
 				case Ter.tecEXPIRED:
-					this.SetStatus (index.ToString (), res.engine_result, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
-					this.SetResult (index.ToString (), res.engine_result_message, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), res.engine_result, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetResult (index.ToString (), res.engine_result_message, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"#FFAABB\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
@@ -2627,7 +2640,7 @@ namespace IhildaWallet
 					stringBuilder.Append (" not imlemented");
 
 					string statstr = stringBuilder.ToString ();
-					this.SetStatus (index.ToString (), statstr , Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+					this.SetStatus (index.ToString (), statstr , ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 					stringBuilder.Clear ();
 					stringBuilder.Append (txAtIndexStr);
@@ -2681,7 +2694,7 @@ namespace IhildaWallet
 #endif
 
 				string mssg = "Operation cancelled";
-				this.SetResult (index.ToString (), mssg, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+				this.SetResult (index.ToString (), mssg, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 				this.SetInfoBar (mssg);
 
@@ -2699,7 +2712,7 @@ namespace IhildaWallet
 				}
 #endif
 				string mssg = "Exception Thrown in code";
-				this.SetResult ( index.ToString (), mssg, Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+				this.SetResult ( index.ToString (), mssg, ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 
 				this.SetInfoBar (mssg);
 
@@ -2743,7 +2756,7 @@ namespace IhildaWallet
 					stringBuilder.Append (" in ");
 					stringBuilder.Append (i);
 
-					this.SetStatus (index.ToString (), stringBuilder.ToString (), Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+					this.SetStatus (index.ToString (), stringBuilder.ToString (), ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 					token.WaitHandle.WaitOne (1000);
 				}
 
@@ -2751,7 +2764,7 @@ namespace IhildaWallet
 				//Thread.Sleep (1000);
 
 
-				this.SetStatus (index.ToString (), valStr, Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+				this.SetStatus (index.ToString (), valStr, ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 
 
 				for (int i = 0; i < 100; i++) {
@@ -2787,25 +2800,25 @@ namespace IhildaWallet
 
 					if (task == null) {
 						// TODO Debug
-						this.SetResult (index.ToString (), "Error : task == null", Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+						this.SetResult (index.ToString (), "Error : task == null", ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 						return;
 					}
 					task.Wait (token);
 
 					Response<RippleTransaction> response = task.Result;
 					if (response == null) {
-						this.SetResult (index.ToString (), "Error : response == null", Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+						this.SetResult (index.ToString (), "Error : response == null", ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 						return;
 					}
 					RippleTransaction transaction = response.result;
 
 					if (transaction == null) {
-						this.SetResult (index.ToString (), "Error : transaction == null", Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+						this.SetResult (index.ToString (), "Error : transaction == null", ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					}
 
 					if (transaction.validated != null && (bool)transaction.validated) {
 
-						this.SetResult (index.ToString (), "Validated", Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
+						this.SetResult (index.ToString (), "Validated", ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 						this._offers [index].IsValidated = true;
 
 						button209.Visible = true;
@@ -2829,7 +2842,7 @@ namespace IhildaWallet
 					uint? ledger = ledgerTask?.Result;
 
 					if (ledger != null && ledger > offerTransaction.LastLedgerSequence) {
-						this.SetResult (index.ToString (), "failed to validate before LastLedgerSequence exceeded", Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+						this.SetResult (index.ToString (), "failed to validate before LastLedgerSequence exceeded", ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					}
 
 					string str = "Not validated ";
@@ -2840,7 +2853,7 @@ namespace IhildaWallet
 					if (i < 2) {
 						this.SetResult (index.ToString (), stringBuilder.ToString (), TextHighlighter.ORANGE);
 					} else {
-						this.SetResult (index.ToString (), stringBuilder.ToString (), Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+						this.SetResult (index.ToString (), stringBuilder.ToString (), ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 					}
 					//Thread.Sleep (3000);
 					for (int ind = 0; ind < 1; ind++) {
@@ -2849,7 +2862,7 @@ namespace IhildaWallet
 						if (i < 2) {
 							this.SetResult (index.ToString (), stringBuilder.ToString (), TextHighlighter.ORANGE);
 						} else {
-							this.SetResult (index.ToString (), stringBuilder.ToString (), Program.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
+							this.SetResult (index.ToString (), stringBuilder.ToString (), ProgramVariables.darkmode ? TextHighlighter.LIGHT_RED : TextHighlighter.RED);
 						}
 					}
 				
@@ -2878,7 +2891,7 @@ namespace IhildaWallet
 
 
 
-			if (Program.darkmode) {
+			if (ProgramVariables.darkmode) {
 				
 				SetInfoBar ("<span fgcolor=\"chartreuse\">Submiting all</span>");
 			} else {
@@ -2936,7 +2949,7 @@ namespace IhildaWallet
 				}
 #endif
 
-				if (!Program.darkmode) {
+				if (!ProgramVariables.darkmode) {
 					SetInfoBar ("<span fgcolor=\"red\">No wallet selected.</span>");
 				} else {
 					SetInfoBar ("<span fgcolor=\"#FFAABB\">No wallet selected.</span>");
@@ -2961,7 +2974,7 @@ namespace IhildaWallet
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
 			if (ni == null) {
 				// TODO network interface
-				if (Program.darkmode) {
+				if (ProgramVariables.darkmode) {
 					SetInfoBar ("<span fgcolor=\"#FFAABB\">No network.</span>");
 				} else {
 					SetInfoBar ("<span fgcolor=\"red\">No network.</span>");
@@ -2981,7 +2994,7 @@ namespace IhildaWallet
 
 			//
 
-			if (Program.darkmode) {
+			if (ProgramVariables.darkmode) {
 				SetInfoBar ("<span fgcolor=\"chartreuse\">Verifying License</span>");
 				
 			} else {
@@ -3025,6 +3038,8 @@ namespace IhildaWallet
 					);
 
 				});
+
+				// TODO investigate possible "unable to load sign options due to incorrect password
 				signOptionsTask = Task.Run (
 					delegate {
 
@@ -3038,7 +3053,7 @@ namespace IhildaWallet
 				if (!ShouldContinue) {
 
 					string messg =
-						Program.darkmode ? "<span fgcolor=\"#FFAABB\">Insufficient " : "<span fgcolor=\"red\">Insufficient "
+						ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">Insufficient " : "<span fgcolor=\"red\">Insufficient "
 		    				+ LeIceSense.LICENSE_CURRENCY
 		    				+ "Requires "
 		    				+ _licenseType.ToString ()
@@ -3048,7 +3063,7 @@ namespace IhildaWallet
 					return;
 				}
 
-				if (Program.darkmode) {
+				if (ProgramVariables.darkmode) {
 					SetInfoBar ("<span fgcolor=\"chartreuse>\">Requesting password</span>");
 				} else {
 					SetInfoBar ("<span fgcolor=\"green\">Requesting password</span>");
@@ -3078,7 +3093,7 @@ namespace IhildaWallet
 
 				while (rsa?.GetHumanReadableIdentifier () == null) {
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						SetInfoBar ("<span fgcolor=\"chartreuse\">Invalid password</span>");
 					} else {
 						SetInfoBar ("<span fgcolor=\"green\">Invalid password</span>");
@@ -3113,7 +3128,7 @@ namespace IhildaWallet
 					StringBuilder stringBuilder = new StringBuilder ();
 
 					string frontspan =
-				    	Program.darkmode
+				    	ProgramVariables.darkmode
 				    	? "<span fgcolor=\"chartreuse\">Preparing Orders"
 				    	: "<span fgcolor=\"green\">Preparing Orders";
 
@@ -3195,7 +3210,7 @@ namespace IhildaWallet
 
 
 			if (signOptions == null) {
-				if (Program.darkmode) {
+				if (ProgramVariables.darkmode) {
 					SetInfoBar ("<span fgcolor=\"#FFAABB\">Unable to load sign options</span>");
 				} else {
 					SetInfoBar ("<span fgcolor=\"red\">Unable to load sign options</span>");
@@ -3212,7 +3227,7 @@ namespace IhildaWallet
 
 				if (token.IsCancellationRequested) {
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						SetInfoBar ("<span fgcolor=\"#FFAABB\">Submit all task has been cancelled</span>");
 					} else {
 						SetInfoBar ("<span fgcolor=\"red\">Submit all task has been cancelled</span>");
@@ -3251,7 +3266,7 @@ namespace IhildaWallet
 				}
 			}
 
-			if (Program.darkmode) {
+			if (ProgramVariables.darkmode) {
 				SetInfoBar ("<span fgcolor=\"chartreuse\">All orders have been submitted successfully</span>");
 			} else {
 				SetInfoBar ("<span fgcolor=\"green\">All orders have been submitted successfully</span>");
@@ -3276,7 +3291,7 @@ namespace IhildaWallet
 
 			var offs = _offers;
 			if (offs == null) {
-				if (Program.darkmode) {
+				if (ProgramVariables.darkmode) {
 					SetInfoBar ("<span fgcolor=\"#FFAABB\">Unable to verify selected orders. _offer == null</span>");
 				} else {
 					SetInfoBar ("<span fgcolor=\"red\">Unable to verify selected orders. _offer == null</span>");
@@ -3297,7 +3312,7 @@ namespace IhildaWallet
 				}
 				if (!v.Any (x => !x.IsValidated)) {
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						SetInfoBar ("<span fgcolor=\"chartreuse\">All selected orders have been validated</span>");
 					} else {
 						SetInfoBar ("<span fgcolor=\"green\">All selected orders have been validated</span>");
@@ -3313,7 +3328,7 @@ namespace IhildaWallet
 					return;
 				} else {
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						SetInfoBar("<span fgcolor=\"yellow\">All orders have not been validated yet</span>");
 					} else {
 						SetInfoBar ("<span fgcolor=\"orange\">All orders have not been validated yet</span>");

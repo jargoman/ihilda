@@ -10,6 +10,11 @@ namespace RippleLibSharp.Transactions.TxTypes
 {
 	public class RippleOfferTransaction : RippleTransaction
 	{
+		public RippleOfferTransaction ()
+		{
+
+		}
+
 		public RippleOfferTransaction (RippleAddress account, Offer off) 
 		{
 			
@@ -175,7 +180,17 @@ namespace RippleLibSharp.Transactions.TxTypes
 		}
 	*/
 
+		public override string ToString ()
+		{
+			StringBuilder stringBuilder = new StringBuilder ();
 
+			stringBuilder.Append ("Sell ");
+			stringBuilder.Append (TakerGets.ToString());
+			stringBuilder.Append (" for ");
+			stringBuilder.Append (TakerPays.ToString());
+
+			return stringBuilder.ToString ();
+		}
 
 
 	}

@@ -980,12 +980,13 @@ namespace IhildaWallet
 
 					rw = new RippleWallet (sec, walletTypeEnum);
 
-
+					/*
 					if (acc != null) {
 						if (!acc.Equals (rw.GetStoredReceiveAddress ())) {
 							// todo warn account does not match secret
 						}
 					}
+					*/	    
 
 				} else if (enc != null) { // I know, I know, if else madness!!!
 					rw = new RippleWallet (enc, typ, acc, walletTypeEnum);
@@ -1030,7 +1031,7 @@ namespace IhildaWallet
 
 				rw.AccountType = walletTypeEnum;
 
-				rw.NotificationLedger = LedgerSave.LoadLedger (rw?.NotificationLadgerPath)?.Ledger;
+				rw.NotificationLedger = WalletLedgerSave.LoadLedger (rw?.NotificationLadgerPath)?.Ledger;
 
 				return rw;
 

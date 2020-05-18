@@ -517,7 +517,7 @@ namespace IhildaWallet
 							return;
 						}
 						// TODO
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							this.infoBarLabel.Markup = "<span fgcolor=\"#FFAABB\">Unkown Error</span>";
 						} else {
 							this.infoBarLabel.Markup = "<span fgcolor=\"red\">Unkown Error</span>";
@@ -550,7 +550,7 @@ namespace IhildaWallet
 
 						System.Text.StringBuilder sb = new StringBuilder ();
 
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							sb.Append ("<span fgcolor=\"#FFAABB\">");
 						} else {
 							sb.Append ("<span fgcolor=\"red\">");
@@ -578,7 +578,7 @@ namespace IhildaWallet
 						if (token.IsCancellationRequested) {
 							return;
 						}
-						if (!Program.darkmode) {
+						if (!ProgramVariables.darkmode) {
 							this.infoBarLabel.Markup = "<span fgcolor=\"red\">This account has no trustlines</span>";
 						} else {
 							this.infoBarLabel.Markup = "<span fgcolor=\"#FFAABB\">This account has no trustlines</span>";

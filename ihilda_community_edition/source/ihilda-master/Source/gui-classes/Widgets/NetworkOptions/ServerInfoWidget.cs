@@ -153,7 +153,7 @@ namespace IhildaWallet
 
 					string server = connectInfo?.ServerUrl;
 
-					this.label26.Markup = Program.darkmode
+					this.label26.Markup = ProgramVariables.darkmode
 						? "<b>Server Info : <span fgcolor=\"chartreuse\">" + (string)(server ?? "null") + "</span></b>"
 						: "<b>Server Info : <span fgcolor=\"green\">" + (string)(server ?? "null") + "</span></b>";
 

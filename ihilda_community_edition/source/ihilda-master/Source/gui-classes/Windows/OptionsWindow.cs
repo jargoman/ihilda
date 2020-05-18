@@ -20,6 +20,10 @@ namespace IhildaWallet
 
 		}
 
+		public void GotoFee ()
+		{
+			this.optionswidget2.GotoFee ();
+		}
 
 
 	}

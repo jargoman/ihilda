@@ -220,7 +220,7 @@ namespace IhildaWallet
 
 
 
-			this.onErrorEvent += (SuperSocket.ClientEngine.ErrorEventArgs e) => {
+			this.onErrorEvent += (object sender, IhildaWebSocketError e) => {
 				if (
 					e.Exception.Message.Equals ("RemoteCertificateChainErrors")
 					|| e.Exception.Message.Equals ("RemoteCertificateNotAvailable")) {
@@ -311,7 +311,7 @@ namespace IhildaWallet
 			}
 #endif
 
-			if (!Program.network) {
+			if (!ProgramVariables.network) {
 				return null;
 			}
 
@@ -720,10 +720,10 @@ namespace IhildaWallet
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
 
-			ConnectionSettings conny;
+
 #endif
 
-
+			ConnectionSettings conny;
 			using (ManualResetEvent ev = new ManualResetEvent (false)) {
 				conny = new ConnectionSettings ();
 
@@ -784,8 +784,8 @@ namespace IhildaWallet
 			}
 #endif
 
-			if (!Program.network) {
-				MessageDialog.ShowMessage ("Network Disabled", "Networking has been disabled at the command line with parameter network=false\nTo enable networking restart " + Program.appname + " with parameter option network=true");
+			if (!ProgramVariables.network) {
+				MessageDialog.ShowMessage ("Network Disabled", "Networking has been disabled at the command line with parameter network=false\nTo enable networking restart " + ProgramVariables.appname + " with parameter option network=true");
 				return;
 			}
 

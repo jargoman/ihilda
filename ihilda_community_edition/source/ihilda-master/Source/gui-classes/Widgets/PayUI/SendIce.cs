@@ -119,6 +119,28 @@ namespace IhildaWallet
 
 			var memo = Program.GetClientMemo ();
 			this.AddMemo (memo);
+
+			button114.Clicked += PercentageClicked;
+			button115.Clicked += PercentageClicked;
+			button111.Clicked += PercentageClicked;
+			button112.Clicked += PercentageClicked;
+
+			button123.Clicked += PercentageClicked;
+			button113.Clicked += PercentageClicked;
+			button119.Clicked += PercentageClicked;
+
+			button116.Clicked += PercentageClicked;
+
+			button120.Clicked += PercentageClicked;
+
+			button117.Clicked += PercentageClicked;
+
+			button118.Clicked += PercentageClicked;
+
+			button121.Clicked += PercentageClicked;
+
+			button122.Clicked += PercentageClicked;
+			hscale2.ValueChanged += Hscale2_ValueChanged;
 		}
 
 		~SendIce ()
@@ -126,6 +148,83 @@ namespace IhildaWallet
 			TokenSource.Cancel ();
 			TokenSource.Dispose ();
 		}
+
+		void Hscale2_ValueChanged (object sender, EventArgs e)
+		{
+#if DEBUG
+			string method_sig = clsstr + nameof (Hscale2_ValueChanged) + DebugRippleLibSharp.colon;
+#endif
+			double val = hscale2.Value;
+
+
+
+			//String text2 = this.pricecomboboxentry.ActiveText;
+
+
+
+
+			Task.Run (delegate {
+				ScaleMethod (val);
+			});
+
+		}
+
+
+		public void ScaleMethod (double value)
+		{
+#if DEBUG
+			string method_sig = clsstr + nameof (ScaleMethod) + DebugRippleLibSharp.colon;
+
+#endif
+
+			string acc = _rippleWallet.Account;
+
+
+
+			NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
+
+			CancellationTokenSource tokenSource = new CancellationTokenSource ();
+			CancellationToken token = tokenSource.Token;
+
+
+			var cur = AccountLines.GetBalanceForIssuer
+				(
+					LeIceSense.LICENSE_CURRENCY,
+					LeIceSense.LICENSE_ISSUER,
+					acc,
+					ni,
+					token
+				);
+
+
+
+			double bal = (double)cur.amount;
+
+			double res = bal * value / 100;
+
+
+			var ss = res.ToString ();
+			Gtk.Application.Invoke (
+			delegate {
+
+				amountentry.Entry.Text = ss;
+			});
+
+
+
+		}
+
+
+		void PercentageClicked (object sender, EventArgs e)
+		{
+			if (sender is Button b) {
+				string s = b?.Label.TrimEnd ('%');
+				double d = Convert.ToDouble (s);
+
+				hscale2.Value = d;
+			}
+		}
+
 
 		private CancellationTokenSource TokenSource = new CancellationTokenSource ();
 
@@ -193,7 +292,7 @@ namespace IhildaWallet
 
 			string sendingAccount = rw.GetStoredReceiveAddress ();
 
-			string amount = amountentry?.Text;
+			string amount = amountentry?.Entry.Text;
 			string destination = destinationentry?.Text;
 
 			if (amount == null || amount.Trim().Equals("")) {
@@ -289,8 +388,8 @@ namespace IhildaWallet
 
 			RippleCurrency amnt = null;
 			try {
-				amnt = new RippleCurrency((Decimal)dee, destination, LeIceSense.LICENSE_CURRENCY);
-				sendMax = new RippleCurrency ((Decimal)dee, sendingAccount, LeIceSense.LICENSE_CURRENCY);
+				amnt = new RippleCurrency((Decimal)dee, destination ,LeIceSense.LICENSE_CURRENCY);
+				sendMax = new RippleCurrency ((Decimal)dee, LeIceSense.LICENSE_ISSUER, LeIceSense.LICENSE_CURRENCY);
 			}
 
 			#pragma warning disable 0168
@@ -301,7 +400,9 @@ namespace IhildaWallet
 				if (DebugIhildaWallet.SendIce) {
 					Logging.ReportException(method_sig, ex);
 				}
-				#endif
+#endif
+
+				throw ex;
 			}
 
 

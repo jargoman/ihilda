@@ -31,6 +31,7 @@ namespace RippleLibSharp.Commands.Accounts
 
 			//task.Wait ();
 
+			//task.Result.result.send_currencies
 			//return task.Result;
 			return task;
 		}

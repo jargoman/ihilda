@@ -73,21 +73,21 @@ namespace IhildaWallet
 				automatedbuywidget1 = new AutomatedBuyWidget ();
 				automatedbuywidget1.Show ();
 
-				if (label41 == null) {
-					label41 = new Label ("<b>Automated Buy</b>");
+				if (label45 == null) {
+					label45 = new Label ("<b>Automated Buy</b>");
 				}
 
-				buynotebook.AppendPage (automatedbuywidget1, label41);
+				buynotebook.AppendPage (automatedbuywidget1, label45);
 			}
 
 			if (sellwidget1 == null) {
 				sellwidget1 = new SellWidget ();
 				sellwidget1.Show ();
 
-				if (label74 == null) {
-					label74 = new Label ("<b>Sell</b>");
+				if (label75 == null) {
+					label75 = new Label ("<b>Sell</b>");
 				}
-				sellnotebook.AppendPage (sellwidget1, label74);
+				sellnotebook.AppendPage (sellwidget1, label75);
 			}
 
 			if (cascadedsellwidget1 == null) {
@@ -105,11 +105,11 @@ namespace IhildaWallet
 				automatedsellwidget1 = new AutomatedSellWidget ();
 				automatedsellwidget1.Show ();
 
-				if (label76 == null) {
-					label76 = new Label ("<b>Automated Sell</b>");
+				if (label99 == null) {
+					label99 = new Label ("<b>Automated Sell</b>");
 				}
 
-				sellnotebook.AppendPage (automatedsellwidget1, label76);
+				sellnotebook.AppendPage (automatedsellwidget1, label99);
 			}
 
 			this.SetTradePair (tradePair);
@@ -176,10 +176,47 @@ namespace IhildaWallet
 			walletswitchwidget2.SetRippleWallet (rippleWallet);
 
 
-			if (Program.darkmode) {
+			if (ProgramVariables.darkmode) {
 				label73.Markup = "<span fgcolor=\"chartreuse\"size=\"x-large\"><b>Buy</b></span>";
-				label77.Markup = "<span fgcolor = \"red\" size = \"x-large\"><b>Sell</b></span>";
+				label116.Markup = "<span fgcolor = \"red\" size = \"x-large\"><b>Sell</b></span>";
 			}
+
+	    		spreadwidget1.OnBid += Spreadwidget1_Clicked;
+
+			spreadwidget1.OnAsk += Spreadwidget1_Clicked;
+
+			spreadwidget1.OnSpread += Spreadwidget1_Clicked;
+
+			currencywidget1.OnLabelClicked += (cur) => {
+				// base
+				sellwidget1.SetAmountMax ();
+				automatedsellwidget1.SetAmountMax ();
+				cascadedsellwidget1.SetAmountMax ();
+			};
+
+			currencywidget2.OnLabelClicked += (cur) => {
+				// counter
+				buywidget1.SetAmountMax ();
+				automatedbuywidget1.SetAmountMax ();
+				cascadedbuywidget1.SetAmountMax ();
+			};
+
+		}
+
+		void Spreadwidget1_Clicked (decimal? price)
+		{
+			if (price == null) {
+				return;
+			}
+			Decimal p = (Decimal)price;
+			this.buywidget1.SetPrice (p);
+			sellwidget1.SetPrice (p);
+
+			cascadedbuywidget1.SetPrice (p);
+			cascadedsellwidget1.SetPrice (p);
+
+			automatedbuywidget1.SetPrice (p);
+			automatedsellwidget1.SetPrice (p);
 
 		}
 

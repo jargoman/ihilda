@@ -69,6 +69,8 @@ namespace IhildaWallet
 			this.Sequence = o.Sequence;
 			this.Memos = o.Memos; // TODO 
 
+			
+
 		}
 
 		/*
@@ -163,12 +165,7 @@ namespace IhildaWallet
 			set;
 		}
 
-		/*
-		public string NextBotMarking {
-			get;
-			set;
-		}
-		*/
+
 
 
 		public string Bot_ID => Account == null ? null : Account + Sequence.ToString ();
@@ -177,6 +174,8 @@ namespace IhildaWallet
 			get;
 			set;
 		}
+
+		public bool Succeeded { get; set; }
 
 		//public bool IsValidated { get; set; }
 
@@ -256,6 +255,7 @@ namespace IhildaWallet
 			if (node?.NewFields?.Memos != null) {
 				mems = from MemoIndice memo in node.NewFields.Memos where memo.GetMemoTypeAscii () == "ihildamark" select memo;
 			}
+
 			MemoIndice memoIndice = mems?.FirstOrDefault ();
 
 			string mark = memoIndice?.GetMemoDataAscii ();

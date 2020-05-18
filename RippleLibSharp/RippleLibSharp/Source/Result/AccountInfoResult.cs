@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Threading;
+using RippleLibSharp.Commands.Server;
+using RippleLibSharp.Network;
 using RippleLibSharp.Transactions;
 
 namespace RippleLibSharp.Result
@@ -18,6 +21,36 @@ namespace RippleLibSharp.Result
 			return new RippleCurrency (b);
 		}
 
+		public RippleCurrency GetReserveRequirements (NetworkInterface ni, CancellationToken token)
+		{
+
+			var task = ServerInfo.GetResult (ni, token);
+
+			task.Wait (token);
+
+			Response<ServerInfoResult> resp = task.Result;
+
+			if (resp == null) {
+				return null;
+			}
+
+			if (resp.HasError()) {
+				return null;
+			}
+
+			ServerInfoResult res = resp.result;
+
+
+			Info info = res.info;
+
+			ValidatedLedgerInfo val = info.validated_ledger;
+
+
+
+			int am = val.reserve_base_xrp + ( val.reserve_inc_xrp  * this.account_data.OwnerCount);
+			Decimal d = am * 1000000m;
+			return new RippleCurrency(d);
+		}
 	}
 
 	public class AccountData

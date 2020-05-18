@@ -32,18 +32,28 @@ namespace IhildaWallet
 			this.infoBarLabel.UseMarkup = true;
 			this.infoBarLabel.Hide ();
 
-			this.button74.Clicked += (object sender, EventArgs e) => {
+			this.stopButton.Clicked += (object sender, EventArgs e) => {
 				tokenSource.Cancel ();
 				tokenSource.Dispose ();
 				tokenSource = null;
 
-				button74.Visible = false;
+				stopButton.Visible = false;
 
-				cancelbutton.Visible = false;
+				//cancelbutton.Visible = false;
 				selectButon.Visible = false;
 
 			};
 
+			this.deselect.Clicked += (sender, e) => {
+				var offs = this.openorderstree1._offers;
+				foreach (AutomatedOrder order in offs) {
+					if (order.Succeeded) {
+						order.Selected = false;
+					}
+				}
+
+				this.openorderstree1.SetOffers (offs); 
+			};
 
 
 			this.syncbutton.Clicked += (object sender, EventArgs e) => {
@@ -58,7 +68,12 @@ namespace IhildaWallet
 				string addr = this.comboboxentry1.ActiveText;
 
 				if (string.IsNullOrWhiteSpace(addr)) {
-					infoBarLabel.Markup = Program.darkmode ? "<span fgcolor=\"#FFAABB\">No address specified</span>" : " < span fgcolor=\"red\">No address specified</span>";
+
+					infoBarLabel.Markup =
+						ProgramVariables.darkmode 
+						? "<span fgcolor=\"#FFAABB\">No address specified</span>" 
+						: " < span fgcolor=\"red\">No address specified</span>";
+
 					infoBarLabel.Visible = true;
 					return;
 				}
@@ -66,8 +81,8 @@ namespace IhildaWallet
 				infoBarLabel.Markup = "Retrieving orders for " + addr;
 				infoBarLabel.Visible = true;
 				selectButon.Visible = false;
-				cancelbutton.Visible = false;
-				button74.Visible = true;
+				//cancelbutton.Visible = false;
+				stopButton.Visible = true;
 
 				OAParam oap = new OAParam(addr);
 
@@ -81,6 +96,7 @@ namespace IhildaWallet
 			};
 
 			this.selectButon.Clicked += (object sender, EventArgs e) => {
+
 				#if DEBUG
 				string event_sig = clsstr + "selectButton.Clicked : ";
 				if (DebugIhildaWallet.OrdersTreeWidget) {
@@ -114,7 +130,8 @@ namespace IhildaWallet
 					ao.Selected = !allselected;
 				}
 
-				this.openorderstree1.SetOffers (offs);
+
+				this.openorderstree1.SetOffers (offs.ToArray());
 
 			};
 
@@ -126,8 +143,8 @@ namespace IhildaWallet
 				infoBarLabel.Markup = "<span>Cancelling selected orders</span>";
 				infoBarLabel.Visible = true;
 
-				button74.Visible = true;
-				cancelbutton.Visible = false;
+				stopButton.Visible = true;
+				//cancelbutton.Visible = false;
 				selectButon.Visible = false;
 
 				Task.Run((System.Action)CancelSelected);
@@ -141,8 +158,9 @@ namespace IhildaWallet
 			this._rippleWallet = rippleWallet;
 
 			this.comboboxentry1.Entry.Text = rippleWallet.GetStoredReceiveAddress ()?.ToString() ?? "";
-			button74.Visible = false;
+			stopButton.Visible = false;
 			selectButon.Visible = false;
+			deselect.Visible = false;
 			cancelbutton.Visible = false;
 
 			this.ClearGui ();
@@ -233,9 +251,9 @@ namespace IhildaWallet
 						infoBarLabel.Markup = "";
 						infoBarLabel.Visible = false;
 
-						cancelbutton.Visible = true;
+						//cancelbutton.Visible = true;
 						selectButon.Visible = true;
-						button74.Visible = false;
+						stopButton.Visible = false;
 					}
 				);
 
@@ -256,6 +274,29 @@ namespace IhildaWallet
 				}
 			);
 		}
+
+
+		public void ResetSync (string mess = null)
+		{
+			Gtk.Application.Invoke (
+				delegate {
+					if (mess == null) {
+						infoBarLabel.Markup = ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">" : "<span fgcolor=\"red\">" + mess + "</span>";
+						infoBarLabel.Visible = true;
+					} else {
+						infoBarLabel.Visible = false;
+					}
+
+					progressbar1.Fraction = 0;
+
+
+					cancelbutton.Visible = true;
+					selectButon.Visible = true;
+					stopButton.Visible = false;
+				});
+
+		}
+
 
 
 		private CancellationTokenSource tokenSource = null;
@@ -283,6 +324,9 @@ namespace IhildaWallet
 					Logging.WriteLog (method_sig + "addr == null, returning\n");
 				}
 #endif
+				ResetSync ("null address");
+				
+
 				return;
 			}
 
@@ -302,10 +346,16 @@ namespace IhildaWallet
 
 			#pragma warning disable 0168
 			catch (FormatException fe) {
-				#pragma warning restore 0168
+#pragma warning restore 0168
 
-				#if DEBUG
-				MessageDialog.ShowMessage(addr + " is not a properlay formatted ripple address\n" );
+				string mess = addr + " is not a properlay formatted ripple address\n";
+
+				ResetSync (mess);
+
+
+
+#if DEBUG
+				MessageDialog.ShowMessage( mess );
 				if (DebugIhildaWallet.OrdersTreeWidget) {
 					Logging.WriteLog(fe.Message);
 				}
@@ -319,21 +369,7 @@ namespace IhildaWallet
 
 				string mess = "Error processing ripple address";
 
-				Gtk.Application.Invoke (
-					delegate {
-
-						infoBarLabel.Markup = Program.darkmode ? "<span fgcolor=\"#FFAABB\">" : "<span fgcolor=\"red\">" + mess + "</span>";
-						infoBarLabel.Visible = true;
-
-						progressbar1.Fraction = 0;
-						
-
-						cancelbutton.Visible = true;
-						selectButon.Visible = true;
-						button74.Visible = false;
-					}
-				);
-
+				ResetSync (mess);
 
 #if DEBUG
 				MessageDialog.ShowMessage (mess);
@@ -357,12 +393,17 @@ namespace IhildaWallet
 				if (DebugIhildaWallet.OrdersTreeWidget) {
 					Logging.WriteLog (method_sig + nameof (ra) + DebugRippleLibSharp.equals + DebugRippleLibSharp.null_str + DebugRippleLibSharp.comma + DebugRippleLibSharp.returning);
 				}
-				#endif
+#endif
+
+				ResetSync ("address is null");
 				return;
 			}
 
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread (); //getNetworkInterfaceNonGuiThread();
-			if (ni == null) {
+			if (ni == null || !ni.IsConnected ()) {
+
+				ResetSync ("No network connectivity");
+
 				return;
 			}
 
@@ -393,29 +434,21 @@ namespace IhildaWallet
 			);
 
 			if (task == null) {
+				ResetSync ("task == null, network issues");
 				return;
 			}
 
 			IEnumerable <Response <AccountOffersResult>> responses = task.Result;
 			if (responses == null) {
+				ResetSync ("null response");
 				return;
 			}
 			Response<AccountOffersResult> first = responses.First ();
 			if (first.HasError()) {
-				Gtk.Application.Invoke (
-					delegate {
-						string DEFAULT_ERROR = "Error";
-						this.infoBarLabel.Markup = 
-							(string)(Program.darkmode ? "<span fgcolor=\"#FFAABB\">" : "<span fgcolor=\"red\">") + (first?.error_message ?? DEFAULT_ERROR) + "</span>";
-						this.infoBarLabel.Show();
 
-						progressbar1.Fraction = 0;
-
-						cancelbutton.Visible = false;
-						selectButon.Visible = false;
-						button74.Visible = false;
-					}
-				);
+				string DEFAULT_ERROR = "Error";
+				string mess = (string)(ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">" : "<span fgcolor=\"red\">") + (first?.error_message ?? DEFAULT_ERROR) + "</span>";
+				ResetSync (mess);
 				return;
 			}
 
@@ -426,34 +459,20 @@ namespace IhildaWallet
 					}
 				);
 
-			IEnumerable <Offer> firstOffs = first?.result?.offers;
-			if (firstOffs == null) {
-				
+			IEnumerable <AutomatedOrder> firstOffs = from Offer off in first?.result?.offers select new AutomatedOrder(off);
+			if (firstOffs == null || !firstOffs.Any()) {
+				string mess =
+					ProgramVariables.darkmode 
+					? "<span fgcolor=\"#FFAABB\">Server returned no orders for account " 
+		    			: "<span fgcolor=\"red\">Server returned no orders for account "
+					+ (ra?.ToString () ?? "")
+					+ "</span>";
+
+				ResetSync (mess);
 				return;
 			}
 
-			if (!firstOffs.Any()) {
-				Gtk.Application.Invoke (
-					delegate {
-						this.infoBarLabel.Markup = 
-							Program.darkmode ? "<span fgcolor=\"#FFAABB\">Server returned no orders for account "  : "<span fgcolor=\"red\">Server returned no orders for account " 
-							+ (ra?.ToString() ?? "")
-							+ "</span>";
-						this.infoBarLabel.Show ();
-
-						progressbar1.Fraction = 0;
-
-
-
-						cancelbutton.Visible = false;
-						selectButon.Visible = false;
-						button74.Visible = false;
-
-					}
-				);
-				return;
-			}
-
+			
 			Gtk.Application.Invoke (
 					delegate {
 
@@ -465,12 +484,15 @@ namespace IhildaWallet
 
 
 			//var offs_list = (from Response< AccountOffersResult > res in responses
-			                //where res?.result?.offers != null
-			                 //select res.result.offers).SelectMany(c => c);
+			//where res?.result?.offers != null
+			//select res.result.offers).SelectMany(c => c);
 
-			var offs_list = responses.Where (
+			IEnumerable<AutomatedOrder> offs_list = responses.Where (
 				res => res?.result?.offers != null
-			).SelectMany ( res => res.result.offers);
+			).SelectMany ( 
+				res => 
+					from Offer of in res.result.offers select new AutomatedOrder (of) 
+				);
 
 			/*
 			foreach (var offs in offs_list) {
@@ -513,7 +535,9 @@ namespace IhildaWallet
 			*/
 
 
-			this.openorderstree1.SetOffers ( offs_list );
+			this.openorderstree1.SetOffers ( 
+				offs_list 
+				);
 
 			Gtk.Application.Invoke (
 					delegate {
@@ -522,9 +546,9 @@ namespace IhildaWallet
 						infoBarLabel.Markup = "";
 						infoBarLabel.Visible = false;
 
-						cancelbutton.Visible = true;
+						//cancelbutton.Visible = true;
 						selectButon.Visible = true;
-						button74.Visible = false;
+						stopButton.Visible = false;
 					}
 				);
 

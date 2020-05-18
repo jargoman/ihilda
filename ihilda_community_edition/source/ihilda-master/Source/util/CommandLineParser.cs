@@ -32,7 +32,7 @@ namespace IhildaWallet
 
 
 			StringBuilder usage = new StringBuilder ();
-			usage.Append (Program.appname);
+			usage.Append (ProgramVariables.appname);
 			usage.AppendLine (" conf={path_to_config_folder}");
 			usage.Append ("Config folder defaults to ");
 			usage.AppendLine (FileHelper.DEFAULT_CONFIG_FOLDER_PATH);
@@ -77,7 +77,7 @@ namespace IhildaWallet
 
 #if DEBUG
 			usage.Clear ();
-			usage.Append (Program.appname);
+			usage.Append (ProgramVariables.appname);
 			usage.AppendLine (" debug=Class1,Class2");
 			usage.AppendLine ("List of c# classes to print debug information");
 			usage.AppendLine ("For testing and development");
@@ -125,7 +125,7 @@ namespace IhildaWallet
 			commands.Add (fab);
 
 			usage.Clear ();
-			usage.Append (Program.appname);
+			usage.Append (ProgramVariables.appname);
 			usage.AppendLine (" favorites=XRP,BTC,ETH,BCH,ADA");
 			usage.AppendLine ("Prefer to display information pertaining to these currencies");
 
@@ -140,7 +140,7 @@ namespace IhildaWallet
 			commands.Add (tooltip);
 
 			usage.Clear ();
-			usage.Append (Program.appname);
+			usage.Append (ProgramVariables.appname);
 			usage.AppendLine (" tooltips={true,false}");
 			usage.AppendLine ("Enable gui tooltips");
 
@@ -154,7 +154,7 @@ namespace IhildaWallet
 				param = param.ToLower ();
 
 
-				Program.showPopUps = !StringRepresentsFalse(param);
+				ProgramVariables.showPopUps = !StringRepresentsFalse(param);
 					
 
 
@@ -165,7 +165,7 @@ namespace IhildaWallet
 			Command usePager = new Command (usePagers);
 			commands.Add (usePager);
 			usage.Clear ();
-			usage.Append (Program.appname);
+			usage.Append (ProgramVariables.appname);
 			usage.AppendLine (" pager={true,false}");
 			usage.AppendLine ("Enable pager for tranaction history");
 
@@ -179,7 +179,7 @@ namespace IhildaWallet
 				param = param.ToLower ();
 
 
-				Program.usePager = StringRepresentsTrue (param);
+				ProgramVariables.usePager = StringRepresentsTrue (param);
 
 
 
@@ -190,7 +190,7 @@ namespace IhildaWallet
 			commands.Add (network);
 
 			usage.Clear ();
-			usage.Append (Program.appname);
+			usage.Append (ProgramVariables.appname);
 			usage.AppendLine (" networking={true,false}");
 			usage.AppendLine ("Enable or disable networking");
 			usage.AppendLine ("Defaults to true");
@@ -207,7 +207,7 @@ namespace IhildaWallet
 
 				if (StringRepresentsFalse (param)) {
 
-					Program.network = false;
+					ProgramVariables.network = false;
 					System.Console.WriteLine ("Networking disabled");
 					return;
 
@@ -220,7 +220,7 @@ namespace IhildaWallet
 			commands.Add (help);
 
 			usage.Clear ();
-			usage.Append (Program.appname);
+			usage.Append (ProgramVariables.appname);
 			usage.AppendLine (" help");
 			usage.AppendLine ("Print this help text");
 
@@ -232,11 +232,11 @@ namespace IhildaWallet
 			
 				System.Console.WriteLine (stringBuilder.ToString ());
 
-				stringBuilder.AppendLine (Program.appname);
+				stringBuilder.AppendLine (ProgramVariables.appname);
 				stringBuilder.AppendLine ();
 				stringBuilder.AppendLine ("Usage : ");
 				stringBuilder.Append ("./");
-				stringBuilder.Append (Program.appname);
+				stringBuilder.Append (ProgramVariables.appname);
 				stringBuilder.AppendLine (" {option1}={value} {option2}={value} {option3}={value} ...");
 
 				stringBuilder.AppendLine ("Options : \n");
@@ -267,7 +267,7 @@ namespace IhildaWallet
 			commands.Add (dark);
 
 			usage.Clear ();
-			usage.Append (Program.appname);
+			usage.Append (ProgramVariables.appname);
 			usage.AppendLine (" darkmode={true,false}");
 			usage.AppendLine ("Enable or disable darkmode");
 			usage.AppendLine ("Defaults to false"); 
@@ -279,7 +279,7 @@ namespace IhildaWallet
 
 			dark.launch += (string param) => {
 
-				Program.darkmode |= StringRepresentsTrue (param);
+				ProgramVariables.darkmode |= StringRepresentsTrue (param);
 
 			};
 
@@ -288,7 +288,7 @@ namespace IhildaWallet
 			commands.Add (linq);
 
 			usage.Clear ();
-			usage.Append (Program.appname);
+			usage.Append (ProgramVariables.appname);
 			usage.AppendLine (" linq={true,false}");
 			usage.AppendLine ("Enable or disable linq as the preferred algorithm.");
 			usage.AppendLine ("Defaults to false");
@@ -299,8 +299,8 @@ namespace IhildaWallet
 
 			linq.launch += (string param) => {
 
-				Program.preferLinq |= StringRepresentsTrue (param);
-				RippleLibSharp.Configuration.Config.PreferLinq = Program.preferLinq;
+				ProgramVariables.preferLinq |= StringRepresentsTrue (param);
+				RippleLibSharp.Configuration.Config.PreferLinq = ProgramVariables.preferLinq;
 
 			};
 
@@ -320,7 +320,7 @@ namespace IhildaWallet
 			parallel.UsageText = usage.ToString ();
 
 			parallel.launch += (string param) => {
-				Program.parallelVerify |= StringRepresentsTrue (param);
+				ProgramVariables.parallelVerify |= StringRepresentsTrue (param);
 			};
 
 			IEnumerable<string> bots = new String [] { "bot", "marketbot", "automate"};
@@ -328,7 +328,7 @@ namespace IhildaWallet
 			commands.Add (bot);
 
 			usage.Clear ();
-			usage.Append (Program.appname);
+			usage.Append (ProgramVariables.appname);
 			usage.AppendLine (" bot={walletname}");
 			usage.AppendLine ("Automate market bot in command line mode");
 			usage.AppendLine ("Must specify a valid walletname");
@@ -343,7 +343,7 @@ namespace IhildaWallet
 
 
 			usage.Clear ();
-			usage.Append (Program.appname);
+			usage.Append (ProgramVariables.appname);
 			usage.AppendLine (" startledger={int}");
 			usage.AppendLine ("In botmode start from ledger");
 			usage.AppendLine ("Must be a valid integer");
@@ -358,7 +358,7 @@ namespace IhildaWallet
 						// TODO error code number
 						System.Environment.Exit (-1);
 					}
-					Program.ledger = result;
+					ProgramVariables.ledger = result;
 				}
 			};
 
@@ -367,7 +367,7 @@ namespace IhildaWallet
 			commands.Add (endled);
 
 			usage.Clear ();
-			usage.Append (Program.appname);
+			usage.Append (ProgramVariables.appname);
 			usage.AppendLine (" stopledger={int}");
 			usage.AppendLine ("In botmode stop when ledger has been reached");
 			usage.AppendLine ("Must be a valid integer");
@@ -383,7 +383,7 @@ namespace IhildaWallet
 						// TODO error code number
 						System.Environment.Exit (-1);
 					}
-					Program.endledger = result;
+					ProgramVariables.endledger = result;
 				}
 			};
 		}
@@ -392,7 +392,7 @@ namespace IhildaWallet
 		void Bot_Launch (string param)
 		{
 
-			Program.botMode = param;
+			ProgramVariables.botMode = param;
 
 
 		}

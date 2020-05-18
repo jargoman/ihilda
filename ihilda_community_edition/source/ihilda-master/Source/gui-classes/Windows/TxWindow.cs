@@ -22,7 +22,7 @@ namespace IhildaWallet
 				}
 				notebook1.AppendPage (txviewwidget1, this.txtablabel);
 			}
-			if (Program.usePager) {
+			if (ProgramVariables.usePager) {
 				if (orderswidget1 == null) {
 					orderswidget1 = new OrdersWidget ();
 					orderswidget1.Show ();

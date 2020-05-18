@@ -55,7 +55,7 @@ namespace IhildaWallet
 			string acct = this.Wallet.GetStoredReceiveAddress ();
 
 
-			if (!Program.preferLinq) {
+			if (!ProgramVariables.preferLinq) {
 
 				#region modified
 				List<RippleNode> nodes = new List<RippleNode> ();
@@ -123,7 +123,7 @@ namespace IhildaWallet
 			}
 
 
-			if (!Program.preferLinq) {
+			if (!ProgramVariables.preferLinq) {
 
 				#region created
 
@@ -302,7 +302,7 @@ namespace IhildaWallet
 			SentimentManager sentimentManager = new SentimentManager (account);
 			sentimentManager.LoadSentiments ();
 
-			if (!Program.preferLinq) {
+			if (!ProgramVariables.preferLinq) {
 
 				List<AutomatedOrder> backs = new List<AutomatedOrder> ();
 
@@ -482,9 +482,11 @@ namespace IhildaWallet
 				}
 
 
-			} 
+			}
 
-
+			if (requestTask.Result == null) {
+				return null; 
+			}
 
 			Response<RippleTransaction> response = requestTask.Result;
 

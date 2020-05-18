@@ -33,7 +33,7 @@ namespace IhildaWallet
 			case SentimentRatingEnum.Bearish:
 			case SentimentRatingEnum.Very_Bearish:
 			case SentimentRatingEnum.Trash:
-				if (Program.darkmode) {
+				if (ProgramVariables.darkmode) {
 					return "<span fgcolor=\"#FFAABB\">" + Rating + "</span>";
 				} else {
 					return "<span fgcolor=\"red\">" + Rating + "</span>";
@@ -42,7 +42,7 @@ namespace IhildaWallet
 			case SentimentRatingEnum.Bullish:
 			case SentimentRatingEnum.Very_Bullish:
 			case SentimentRatingEnum.Mooning:
-				if (Program.darkmode) {
+				if (ProgramVariables.darkmode) {
 					return "<span fgcolor=\"chartreuse\">" + Rating + "</span>";
 				} else {
 					return "<span fgcolor=\"green\">" + Rating + "</span>";

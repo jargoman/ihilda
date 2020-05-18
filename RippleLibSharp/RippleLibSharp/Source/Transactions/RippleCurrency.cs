@@ -80,6 +80,8 @@ namespace RippleLibSharp.Transactions
 					}
 
 
+				} else if (value is int) {
+
 				}
 			}
 
@@ -1101,9 +1103,9 @@ namespace RippleLibSharp.Transactions
 		public void UpdateBalance (string account, NetworkInterface networkInterface)
 		{
 
-			if (tokenSource != null) {
-				tokenSource.Cancel();
-			}
+			//if (tokenSource != null) {
+			//	tokenSource.Cancel();
+			//}
 			tokenSource = new CancellationTokenSource ();
 
 			// How it's mother f'n done. 

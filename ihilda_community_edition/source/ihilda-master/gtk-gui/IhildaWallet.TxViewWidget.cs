@@ -154,6 +154,7 @@ namespace IhildaWallet
 			this.infoBarLabel.Name = "infoBarLabel";
 			this.infoBarLabel.LabelProp = global::Mono.Unix.Catalog.GetString("<span fgcolor=\"red\">This is an infobar</span>");
 			this.infoBarLabel.UseMarkup = true;
+			this.infoBarLabel.Selectable = true;
 			this.vbox3.Add(this.infoBarLabel);
 			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.infoBarLabel]));
 			w10.Position = 3;

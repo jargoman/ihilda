@@ -51,7 +51,7 @@ namespace IhildaWallet
 			this.issuerentry.Changed += this.OnComboboxentryChanged;
 			this.destinationentry.Activated += this.OnDestinationEntryActivated;
 			this.destinationentry.Changed += Destinationentry_Changed;
-			this.sendmaxentry.Activated += this.OnSendMaxEntryActivated;
+			this.sendmaxentry.Entry.Activated += this.OnSendMaxEntryActivated;
 			this.receiveamountentry.Activated += this.OnReceiveAmountEntryActivated;
 
 			this.sendbutton.Clicked += this.OnSendButtonClicked;
@@ -131,6 +131,147 @@ namespace IhildaWallet
 			var memo = Program.GetClientMemo ();
 			this.AddMemo (memo);
 			//currentInstance = this;
+
+			button114.Clicked += PercentageClicked;
+			button115.Clicked += PercentageClicked;
+			button111.Clicked += PercentageClicked;
+			button112.Clicked += PercentageClicked;
+
+			button123.Clicked += PercentageClicked;
+			button113.Clicked += PercentageClicked;
+			button119.Clicked += PercentageClicked;
+
+			button116.Clicked += PercentageClicked;
+
+			button120.Clicked += PercentageClicked;
+
+			button117.Clicked += PercentageClicked;
+
+			button118.Clicked += PercentageClicked;
+
+			button121.Clicked += PercentageClicked;
+
+			button122.Clicked += PercentageClicked;
+			hscale2.ValueChanged += Hscale2_ValueChanged;
+		}
+
+
+		void Hscale2_ValueChanged (object sender, EventArgs e)
+		{
+#if DEBUG
+			string method_sig = clsstr + nameof (Hscale2_ValueChanged) + DebugRippleLibSharp.colon;
+#endif
+			double val = hscale2.Value;
+
+			string cur = sendcurrencyentry?.Entry?.Text;
+
+			if (cur == null) {
+
+				string message = "Must set sending currency to use percentage shortcuts";
+				if (ProgramVariables.darkmode) {
+					sendcurrencyentry.ModifyBase (StateType.Normal, new Gdk.Color (0xff, 0xAA, 0xBB));
+
+					infobar.Text = "<span fgcolor=\"#FFAABB\">" + message + "</span>";
+					
+				} else {
+					sendcurrencyentry.ModifyBase (StateType.Normal, new Gdk.Color (0xFF, 0x00, 0x00));
+					infobar.Text = "<span fgcolor=\"#Red\">" + message + "</span>";
+				}
+				return;
+			}
+
+			
+
+			string issuer = issuerentry?.Entry?.Text;
+
+			if (!RippleCurrency.NativeCurrency.Equals (cur) && issuer == null) {
+
+				string message = "Must set issuer to use percentage shortcuts for non xrp currencies";
+				if (ProgramVariables.darkmode) {
+					issuerentry.ModifyBase (StateType.Normal, new Gdk.Color (0xff, 0xAA, 0xBB));
+
+					infobar.Text = "<span fgcolor=\"#FFAABB\">" + message + "</span>";
+
+				} else {
+					issuerentry.ModifyBase (StateType.Normal, new Gdk.Color (0xFF, 0x00, 0x00));
+					infobar.Text = "<span fgcolor=\"#Red\">" + message + "</span>";
+				}
+
+				return;
+			}
+
+
+			Task.Run (delegate {
+				ScaleMethod (val, cur, issuer);
+			});
+
+		}
+
+		public void ScaleMethod (double value, string currency, string issuer)
+		{
+#if DEBUG
+			string method_sig = clsstr + nameof (ScaleMethod) + DebugRippleLibSharp.colon;
+
+#endif
+
+			string acc = _rippleWallet.Account;
+
+
+
+			NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
+
+			CancellationTokenSource tokenSource = new CancellationTokenSource ();
+			CancellationToken token = tokenSource.Token;
+
+
+			if (!RippleCurrency.NativeCurrency.Equals (currency)) {
+				var cur = AccountLines.GetBalanceForIssuer
+				(
+					currency,
+					issuer,
+					acc,
+					ni,
+					token
+				);
+
+				double bal = (double)cur.amount;
+
+				double res = bal * value / 100;
+
+
+
+
+				var ss = res.ToString ();
+				Gtk.Application.Invoke (
+				delegate {
+
+					sendmaxentry.Entry.Text = ss;
+				});
+
+			} else {
+
+				Task<Response<AccountInfoResult>> task =
+					AccountInfo.GetResult (acc, ni, token);
+
+				task.Wait (token);
+
+				Response<AccountInfoResult> resp = task.Result;
+				AccountInfoResult res = resp.result;
+
+				RippleCurrency reserve = res.GetReserveRequirements (ni, token);
+
+				RippleCurrency rippleCurrency = new RippleCurrency (res.account_data.Balance);
+
+				double bal = (double)(rippleCurrency.amount - reserve.amount) / 1000000 * value / 100;
+
+				
+
+				string ss = bal.ToString ();
+				Gtk.Application.Invoke (delegate {
+					sendmaxentry.Entry.Text = ss;
+				});
+			}
+
 		}
 
 		Gtk.ListStore ListStore {
@@ -143,6 +284,17 @@ namespace IhildaWallet
 			TokenSource?.Cancel ();
 			TokenSource = null;
 		}
+
+		void PercentageClicked (object sender, EventArgs e)
+		{
+			if (sender is Button b) {
+				string s = b?.Label.TrimEnd ('%');
+				double d = Convert.ToDouble (s);
+
+				hscale2.Value = d;
+			}
+		}
+
 
 		private CancellationTokenSource TokenSource = new CancellationTokenSource ();
 
@@ -496,7 +648,7 @@ namespace IhildaWallet
 
 
 			String sendcurrency = this.sendcurrencyentry.ActiveText;
-			String sendmax = this.sendmaxentry.Text;
+			String sendmax = this.sendmaxentry.Entry.Text;
 
 			String receiveCurrency = this.destinationentry.Text;
 

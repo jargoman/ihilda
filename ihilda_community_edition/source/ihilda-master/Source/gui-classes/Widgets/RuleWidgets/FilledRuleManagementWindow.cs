@@ -188,7 +188,13 @@ namespace IhildaWallet
 			this.StopWhenConvenient = stopWhenConvenientCheckbutton.Active;
 
 			this.addbutton.Clicked += (object sender, EventArgs e) => {
-				OrderFilledRule rule = RuleCreateDialog.DoDialog ();
+
+				var walletSwitchWidget = this.walletswitchwidget1;
+
+				RippleWallet wallet = walletSwitchWidget?.GetRippleWallet ();
+
+
+				OrderFilledRule rule = RuleCreateDialog.DoDialog (wallet);
 
 				if (rule == null) {
 					return;
@@ -293,7 +299,7 @@ namespace IhildaWallet
 				if (tokenSource.auto) {
 					StringBuilder stringBuilder = new StringBuilder ();
 
-					if (!Program.darkmode) {
+					if (!ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"orchid\">");
@@ -381,7 +387,7 @@ namespace IhildaWallet
 
 							TextHighlighter.Highlightcolor =
 								ocev.GetSuccess ?
-								(Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN) :
+								(ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN) :
 								TextHighlighter.RED;
 
 							string message = TextHighlighter.Highlight (ocev.Message);
@@ -564,7 +570,13 @@ namespace IhildaWallet
 			this.DeleteEvent += OnDeleteEvent;
 
 			
-
+			this.delAllButton.Clicked += (object sender, EventArgs e) => {
+				var sure = AreYouSure.AskQuestion ("Delete All", "<span fgcolor=\"red\">Are you sure you want to DELETE ALL WALLETS?</span>");
+				if (sure) {
+					this.RuleManagerObj.ClearRules ();
+					this.SetRules (this.RuleManagerObj.RulesList);
+				}
+			};
 
 		}
 
@@ -635,8 +647,8 @@ namespace IhildaWallet
 			"<span font-size=\"large\"><b>Automation Status </b>: "
 				+
 				(string)(isRunning ?
-				    (Program.darkmode ? "<span fgcolor=\"chartreuse\">Running</span>" : "<span fgcolor=\"green\">Running</span>") :
-					(Program.darkmode ? "<span fgcolor=\"#FFAABB\">Stopped</span>" : " <span fgcolor=\"red\">Stopped</span>"))
+				    (ProgramVariables.darkmode ? "<span fgcolor=\"chartreuse\">Running</span>" : "<span fgcolor=\"green\">Running</span>") :
+					(ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">Stopped</span>" : " <span fgcolor=\"red\">Stopped</span>"))
 		    		+
 		    		"</span>"
 			;
@@ -684,7 +696,7 @@ namespace IhildaWallet
 			);
 
 			Task.Run (delegate {
-				LedgerSave ledgerSave = LedgerSave.LoadLedger (rw?.BotLedgerPath);
+				WalletLedgerSave ledgerSave = WalletLedgerSave.LoadLedger (rw?.BotLedgerPath);
 
 				this.ledgerconstraintswidget1.SetLastKnownLedger (ledgerSave.Ledger.ToString ());
 
@@ -699,11 +711,23 @@ namespace IhildaWallet
 					return;
 				}
 
-				sleepseccheckbutton.Active = settings.HasSleepSeconds ?? false;
-				sleepledgecheckbutton.Active = settings.HasLedgerWait ?? false;
+				bool sec = settings.HasSleepSeconds ?? false;
+				bool led = settings.HasLedgerWait ?? false;
+				string slp = settings.SleepSeconds?.ToString () ?? "";
+				string wt = settings.LedgerWait?.ToString () ?? "";
 
-				sleepsecentry.Text = settings.SleepSeconds?.ToString () ?? "";
-				waitledgeentry.Text = settings.LedgerWait?.ToString () ?? "";
+				Gtk.Application.Invoke (
+					(sender, e) => {
+						sleepseccheckbutton.Active = sec;
+						sleepledgecheckbutton.Active = led;
+
+						sleepsecentry.Text = slp;
+						waitledgeentry.Text = wt;
+					}
+				);
+
+
+
 
 			});
 		}
@@ -723,7 +747,7 @@ namespace IhildaWallet
 			Application.Invoke (delegate {
 
 
-				lines.Add (message);
+				lines.Add (msg);
 
 				if (lines.Count > 1000) {
 					lines.RemoveAt (0);
@@ -941,11 +965,15 @@ namespace IhildaWallet
 					return;
 				}
 
+				// Pro feature
 				bool ShouldContinue = LeIceSense.DoTrialDialog (rw, LicenseType.MARKETBOT);
+
+
 				//bool ShouldContinue = LeIceSense.LastDitchAttempt (rw, LicenseType.AUTOMATIC);
+
 				if (!ShouldContinue) {
 					// TODO print fee requirement
-					WriteToInfoBox ("Stopping  \n");
+					WriteToInfoBox ("This requires ihilda pro \n");
 					this.SetIsRunningUI (false);
 					return;
 				}
@@ -982,17 +1010,19 @@ namespace IhildaWallet
 
 				this.WriteToInfoBox ("Polling data for " + (rw?.GetStoredReceiveAddress () ?? "null") + "\n");
 
-				LedgerSave ledgerSave = LedgerSave.LoadLedger (rw?.BotLedgerPath);
+				WalletLedgerSave ledgerSave = WalletLedgerSave.LoadLedger (rw?.BotLedgerPath);
 				uint? lastSavedLedger = ledgerSave?.Ledger;
 				if (strt != null) {
 					this.WriteToInfoBox ("\nStarting from ledger " + (strt?.ToString () ?? "null") + "\n");
 				} else {
 
 
-					this.WriteToInfoBox ("\nStarting ledger is null\n Using last known ledger " + lastSavedLedger + "\n");
+					this.WriteToInfoBox ("\nStarting ledger is null\n Using last known ledger " + (lastSavedLedger?.ToString() ?? "null") + "\n");
 				}
 
-				if (lastSavedLedger == 0) {
+				
+
+				if ( lastSavedLedger == null || lastSavedLedger == 0) {
 					bool b = AreYouSure.AskQuestionNonGuiThread (
 						"Process entire transaction history?",
 						"You haven't specified a starting ledger and no previous lastledger value has been saved. " +
@@ -1319,7 +1349,7 @@ namespace IhildaWallet
 			    progressbar1?.Pulse ();
 					    cont = AreYouSure.AskQuestion (
 				"Warning !!!",
-				(string)(Program.darkmode ?
+				(string)(ProgramVariables.darkmode ?
 				"<markup><span foreground=\"red\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>" :
 				"<markup><span foreground=\"#FFAABB\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>" )
 
@@ -1443,7 +1473,7 @@ namespace IhildaWallet
 						stringBuilder.AppendLine (" Verified");
 
 
-						TextHighlighter.Highlightcolor = Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
+						TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 
 
 
@@ -1583,7 +1613,7 @@ namespace IhildaWallet
 						+ "\n");
 
 
-					LedgerSave ledgersave = LedgerSave.LoadLedger (rw.BotLedgerPath);
+					WalletLedgerSave ledgersave = WalletLedgerSave.LoadLedger (rw.BotLedgerPath);
 
 
 
@@ -1726,7 +1756,7 @@ namespace IhildaWallet
 			
 					MultipleOrdersSubmitResponse responses = null;
 
-					bool parallelSubmit = Program.parallelVerify;
+					bool parallelSubmit = ProgramVariables.parallelVerify;
 
 					if (!parallelSubmit) {
 						responses = orderSubmitter.SubmitOrders (

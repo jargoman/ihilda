@@ -57,7 +57,7 @@ namespace IhildaWallet
 			SoundSettings settings = SoundSettings.LoadSoundSettings ();
 
 
-			LedgerSave ledgerSave = LedgerSave.LoadLedger (wallet.BotLedgerPath);
+			WalletLedgerSave ledgerSave = WalletLedgerSave.LoadLedger (wallet.BotLedgerPath);
 
 			if (cancelationToken.IsCancellationRequested) {
 
@@ -86,10 +86,13 @@ namespace IhildaWallet
 			int lim = limit ?? 0;
 
 			int retry_count = 0;
-		RETRY:
-			if (retry_count++ > 3) {
-				return null;
-			}
+
+
+			IEnumerable<Response<AccountTxResult>> responses = null;
+		
+			while (retry_count++ < 3) {
+
+			
 
 			Task<FullTxResponse> task = null;
 
@@ -121,10 +124,10 @@ namespace IhildaWallet
 				}
 
 
-				int minutes = 4;
+				int minutes = 5;
 				int maxSeconds = 60 * minutes; // 
 				int seconds;
-				for (seconds = 0; task != null && !task.IsCompleted && !task.IsFaulted && !task.IsCanceled && !cancelationToken.IsCancellationRequested && seconds < maxSeconds && !StopWhenConvenient;  ) {
+				for (seconds = 0; task != null && !task.IsCompleted && !task.IsFaulted && !task.IsCanceled && !cancelationToken.IsCancellationRequested && (seconds < maxSeconds) && !StopWhenConvenient;) {
 					try {
 						OnMessage?.Invoke (this, new MessageEventArgs { Message = "Waiting on network" });
 						for (int i = 0; i < 10 && !task.IsCompleted && !cancelationToken.IsCancellationRequested; i++, seconds++) {  // seconds are incremented where a second actually occurs and not in it's own loop. It's going to be ok. 
@@ -147,7 +150,7 @@ namespace IhildaWallet
 					}
 
 					if (seconds > 60 && !StopWhenConvenient) {
-						if (Program.botMode == null) {
+						if (ProgramVariables.botMode == null) {
 							OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Retrieving tx list is taking longer than usual. \"Stop when convient\" will exit loop gracefully\n" });
 						} else {
 							OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Retrieving tx list is taking longer than usual.\n" });
@@ -167,7 +170,7 @@ namespace IhildaWallet
 
 				if (task.IsFaulted) {
 					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Network task faulted Retrying\n" });
-					if (settings.HasOnNetWorkFail && settings.OnNetWorkFail != null) {
+					if (settings != null && settings.HasOnNetWorkFail && settings.OnNetWorkFail != null) {
 
 						Task.Run (delegate {
 
@@ -179,28 +182,30 @@ namespace IhildaWallet
 
 					}
 
-		    			
-					goto RETRY;
+
+					continue;
 				}
 
 				if (!(seconds < maxSeconds)) {
 					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "No response after " + minutes + " minutes elapsed. Retrying \n" });
 
-					if (settings.HasOnNetWorkFail && settings.OnNetWorkFail != null) {
+					if (settings != null && settings.HasOnNetWorkFail && settings.OnNetWorkFail != null) {
 
 						Task.Run (delegate {
+							if (settings != null) {
+								SoundPlayer player =
+								new SoundPlayer (settings.OnNetWorkFail);
+								player.Load ();
+								player.Play ();
+							}
 
-							SoundPlayer player =
-							new SoundPlayer (settings.OnNetWorkFail);
-							player.Load ();
-							player.Play ();
 						});
 
 					}
 
 
 
-					goto RETRY;
+					continue;
 				}
 
 
@@ -211,18 +216,18 @@ namespace IhildaWallet
 				}
 #endif
 				throw ex;
-			}
+			} catch (Exception e) {
 
-			catch (Exception e) {
-
-				if (settings.HasOnNetWorkFail && settings.OnNetWorkFail != null) {
+				if (settings != null && settings.HasOnNetWorkFail && settings.OnNetWorkFail != null) {
 
 					Task.Run (delegate {
 
-						SoundPlayer player =
-						new SoundPlayer (settings.OnNetWorkFail);
-						player.Load ();
-						player.Play ();
+						if (settings != null) {
+							SoundPlayer player =
+							new SoundPlayer (settings.OnNetWorkFail);
+							player.Load ();
+							player.Play ();
+						}
 					});
 
 				}
@@ -246,8 +251,8 @@ namespace IhildaWallet
 				}
 
 				OnMessage?.Invoke (this, new MessageEventArgs () { Message = errorMessage.ToString () + "\n" });
-				Logging.WriteBoth (errorMessage.ToString());
-				MessageDialog.ShowMessage (errorMessage.ToString());
+				Logging.WriteBoth (errorMessage.ToString ());
+				MessageDialog.ShowMessage (errorMessage.ToString ());
 
 				return null;
 			}
@@ -275,39 +280,42 @@ namespace IhildaWallet
 			}
 
 
-			IEnumerable<Response<AccountTxResult>> responses = fullTx.Responses;  
+			responses = fullTx.Responses;
 
 
+				if (responses == null) {
+					OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Null response\n" });
+					if (settings.HasOnNetWorkFail && settings.OnNetWorkFail != null) {
 
-			if (responses == null) {
-				OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Null response\n" });
-				if (settings.HasOnNetWorkFail && settings.OnNetWorkFail != null) {
+						Task.Run (delegate {
 
-					Task.Run (delegate {
+							SoundPlayer player =
+							new SoundPlayer (settings.OnNetWorkFail);
+							player.Load ();
+							player.Play ();
+						});
 
-						SoundPlayer player =
-						new SoundPlayer (settings.OnNetWorkFail);
-						player.Load ();
-						player.Play ();
-					});
+					}
 
+					continue;
+					//return null;
 				}
 
-				goto RETRY;
-				//return null;
+
 			}
 
-	//		OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Received response from network\n" });
+
+			//		OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Received response from network\n" });
 
 
 
-			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Received response from server\n" });
+			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Received " + responses.Count().ToString() + " responses from server\n" });
 
 
 			IEnumerable<RippleTxStructure> structures = null;
 
 			uint lastledger = 0;
-			if (!Program.preferLinq) {
+			if (!ProgramVariables.preferLinq) {
 
 				List<RippleTxStructure> txStructures = new List<RippleTxStructure> ();
 
@@ -360,6 +368,8 @@ namespace IhildaWallet
 				structures = txStructuresLinq;
 			}
 
+			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Last processed ledger = " + lastledger.ToString() + "\n" });
+
 			if (!ombTask.IsCompleted && !ombTask.IsCanceled && !ombTask.IsFaulted && !cancelationToken.IsCancellationRequested) {
 				try {
 
@@ -392,7 +402,7 @@ namespace IhildaWallet
 
 			IEnumerable<AutomatedOrder> total = null;
 
-			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Processing transactions\n" });
+			OnMessage?.Invoke (this, new MessageEventArgs () { Message = "Processing " + structures.Count().ToString() + " transactions\n" });
 			try {
 
 				total = omb.UpdateTx (structures);
@@ -419,6 +429,7 @@ namespace IhildaWallet
 			}
 
 			//updateFilledOrders (total);
+			OnMessage?.Invoke (this, new MessageEventArgs () { Message = total.Count().ToString() + "transactions processed\n" });
 
 			IEnumerable<AutomatedOrder> orders = null;
 
@@ -546,7 +557,7 @@ namespace IhildaWallet
 
 		private string _err_mess = null;
 
-		public int ErrorCode {
+		public int? ErrorCode {
 			get;
 			set;
 		}

@@ -2,17 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Media;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using Codeplex.Data;
 using Gtk;
 using IhildaWallet.Networking;
+using IhildaWallet.Util;
+using Microsoft.AspNet.SignalR.Client;
 using RippleLibSharp.Commands.Accounts;
 using RippleLibSharp.Commands.Server;
 using RippleLibSharp.Network;
 using RippleLibSharp.Result;
 using RippleLibSharp.Transactions;
+using RippleLibSharp.Transactions.TxTypes;
 using RippleLibSharp.Util;
 
 namespace IhildaWallet
@@ -116,11 +121,15 @@ namespace IhildaWallet
 
 			SoundSettings settings = SoundSettings.LoadSoundSettings ();
 
-			foreach (RippleWallet rw in wallets) {
+			var accounts = wallets.Select((RippleWallet arg) => arg.GetStoredReceiveAddress()).Distinct();
 
-				string r = rw.GetStoredReceiveAddress ();
+			foreach (string account in accounts) {
 
 
+
+				//string r = rw.GetStoredReceiveAddress ();
+
+				var walletGroup = wallets.Where (x => x.GetStoredReceiveAddress() == account);
 
 
 				//rw.Notification = "Updating balance...";
@@ -128,122 +137,124 @@ namespace IhildaWallet
 
 				try {
 
-					RippleCurrency rippleCurrency = AccountInfo.GetNativeBalance (rw.GetStoredReceiveAddress (), ni, token);
+					RippleCurrency rippleCurrency = AccountInfo.GetNativeBalance (account, ni, token);
 
 					DateTime dateTime = DateTime.Now;
 
+					foreach (RippleWallet rw in walletGroup) {
 
-					if (rippleCurrency != null) {
-						rw.LastKnownNativeBalance = rippleCurrency;
-						rw.BalanceNote = "Balance updated as of " + dateTime.ToShortTimeString ();
-						WalletManager.currentInstance?.UpdateUI ();
-					} else {
-						string mess = "<span fgcolor=\"salmon\">Could not update balance</span>";
-
-						if (rw.CouldNotUpdateBalanceCount++ < 1) {
-							rw.Notification = mess;
+						if (rippleCurrency != null) {
+							rw.LastKnownNativeBalance = rippleCurrency;
+							rw.BalanceNote = "Balance updated as of " + dateTime.ToShortTimeString ();
 							WalletManager.currentInstance?.UpdateUI ();
-
 						} else {
-							rw.Notification = null;
-							rw.BalanceNote = mess;
+							string mess = "<span fgcolor=\"salmon\">Could not update balance</span>";
+
+							if (rw.CouldNotUpdateBalanceCount++ < 1) {
+								rw.Notification = mess;
+								WalletManager.currentInstance?.UpdateUI ();
+
+							} else {
+								rw.Notification = null;
+								rw.BalanceNote = mess;
+								WalletManager.currentInstance?.UpdateUI ();
+							}
+
+						}
+
+
+
+						if (rw?.NotificationLedger == null || rw?.NotificationLedger == 0) {
+
+
+							rw.Notification = "<span fgcolor=\"" + (string)(ProgramVariables.darkmode ? "lightblue" : "blue") + "\">Newly added wallet</span>";
+							rw.NotificationLedger = ledger;
+							rw.SaveBotLedger (ledger, rw.NotificationLadgerPath);
 							WalletManager.currentInstance?.UpdateUI ();
+							continue;
+							//return;
 						}
 
-					}
-
-		    			
-
-					if (rw?.NotificationLedger == null || rw?.NotificationLedger == 0) {
-
-
-						rw.Notification = "<span fgcolor=\"" + (string)(Program.darkmode ? "lightblue" : "blue") + "\">Newly added wallet</span>";
-						rw.NotificationLedger = ledger;
-						rw.SaveBotLedger (ledger, rw.NotificationLadgerPath);
-						WalletManager.currentInstance?.UpdateUI ();
-						continue;
-						//return;
-					}
-
-
-
-					DoLogicResponse tuple = DoOfferLogic (rw, ni);
-
-					if (tuple == null) {
-						rw.Notification = Program.darkmode ? "<span fgcolor=\"#FFAABB\">Failed to retrieve newly filled orders.</span>" : "<span fgcolor=\"red\">Failed to retrieve newly filled orders.</span>";
-
-						WalletManager.currentInstance?.UpdateUI ();
-						continue;
-
-						//return;
 
 					}
+					DoLogicResponse tuple = DoOfferLogic (walletGroup.First(), ni);
 
-					if (tuple.HasError) {
-						rw.Notification = tuple.ErrorMessage;
+					foreach (RippleWallet rw in walletGroup) {
+						if (tuple == null) {
+							rw.Notification = ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">Failed to retrieve newly filled orders.</span>" : "<span fgcolor=\"red\">Failed to retrieve newly filled orders.</span>";
 
-						if (tuple.ErrorCode == 55) {
-							rw.NotificationLedger = 0;
-							rw.SaveBotLedger (0, rw.NotificationLadgerPath);
+							WalletManager.currentInstance?.UpdateUI ();
+							continue;
+
+							//return;
+
+						}
+
+						if (tuple.HasError) {
+							rw.Notification = tuple.ErrorMessage;
+
+							if (tuple.ErrorCode == 55) {
+								rw.NotificationLedger = 0;
+								rw.SaveBotLedger (0, rw.NotificationLadgerPath);
+							}
+
+
+
+							WalletManager.currentInstance?.UpdateUI ();
+							continue;
 						}
 
 
 
-						WalletManager.currentInstance?.UpdateUI ();
-						continue;
-					}
+						IEnumerable<AutomatedOrder> totalFilled = tuple.FilledOrders;
 
-		    			
+						if (totalFilled == null) {
+							rw.NotificationLedger = tuple.LastLedger;
+							rw.SaveBotLedger (tuple.LastLedger, rw.NotificationLadgerPath);
+							continue;
+						}
 
-					IEnumerable<AutomatedOrder> totalFilled = tuple.FilledOrders;
+						int c = totalFilled.Count ();
 
-					if (totalFilled == null) {
+						if (c == 0) {
+							rw.NotificationLedger = tuple.LastLedger;
+							rw.SaveBotLedger (tuple.LastLedger, rw.NotificationLadgerPath);
+							continue;
+						}
+
+						string message =
+							account +
+							" has " +
+							c.ToString () +
+							" filled orders";
+
+						string message2 =
+							c.ToString () +
+							" new orders";
+
+						rw.Notification = message2;
+						this.ShowNotification (message, numberOfMenu++);
+
+
+						if (settings.HasOnOrderFilled && settings.OnOrderFilled != null) {
+
+							Task.Run (delegate {
+
+								SoundPlayer player =
+								new SoundPlayer (settings.OnOrderFilled);
+								player.Load ();
+								player.Play ();
+							});
+
+						} else if (settings.FallBack) {
+							this.PlayNotification ();
+						}
+
+
+
 						rw.NotificationLedger = tuple.LastLedger;
 						rw.SaveBotLedger (tuple.LastLedger, rw.NotificationLadgerPath);
-						continue;
 					}
-
-					int c = totalFilled.Count ();
-
-					if (c == 0) {
-						rw.NotificationLedger = tuple.LastLedger;
-						rw.SaveBotLedger (tuple.LastLedger, rw.NotificationLadgerPath);
-						continue;
-					}
-
-					string message =
-						r +
-						" has " +
-						c.ToString () +
-						" filled orders";
-
-					string message2 =
-						c.ToString () +
-						" new orders";
-
-					rw.Notification = message2;
-					this.ShowNotification (message, numberOfMenu++);
-
-
-					if (settings.HasOnOrderFilled && settings.OnOrderFilled != null) {
-
-						Task.Run (delegate {
-
-							SoundPlayer player =
-							new SoundPlayer (settings.OnOrderFilled);
-							player.Load ();
-							player.Play ();
-						});
-
-					} else if (settings.FallBack) {
-						this.PlayNotification ();
-					}
-
-
-
-					rw.NotificationLedger = tuple.LastLedger;
-					rw.SaveBotLedger (tuple.LastLedger, rw.NotificationLadgerPath);
-
 					continue;
 					//return;
 
@@ -251,8 +262,9 @@ namespace IhildaWallet
 #if DEBUG
 					Logging.ReportException (method_sig, ex);
 #endif
-
-					rw.Notification = "<span>Exception thrown in notification thread</span>";
+					foreach (RippleWallet rw in walletGroup) {
+						rw.Notification = "<span>Exception thrown in notification thread</span>";
+					}
 					continue;
 				} finally {
 
@@ -305,9 +317,11 @@ namespace IhildaWallet
 			int accnts = 0;
 			int count = 0;
 
-			foreach (RippleWallet rippleWallet in wallets) {
+			var accounts = wallets.Select((arg) => arg.GetStoredReceiveAddress()).Distinct();
 
-				RippleWallet rw = rippleWallet;
+			//foreach (RippleWallet rippleWallet in wallets) {
+	    		foreach (string account in accounts) {
+
 				//tasks.Add (Task.Run (
 
 				//		delegate {
@@ -317,84 +331,99 @@ namespace IhildaWallet
 
 				try {
 
-					RippleCurrency rippleCurrency = AccountInfo.GetNativeBalance (rw.GetStoredReceiveAddress (), ni, token);
+					var walletGroup = wallets.Where ((arg) => arg.GetStoredReceiveAddress () == account).ToList();
+
+					RippleCurrency rippleCurrency = AccountInfo.GetNativeBalance (account, ni, token);
 
 					DateTime dateTime = DateTime.Now;
 
-
-					if (rippleCurrency != null) {
-						rw.LastKnownNativeBalance = rippleCurrency;
-						rw.Notification = null;
-						rw.BalanceNote = "balance updated as of " + dateTime.ToShortTimeString ();
-					} else {
-
-						if (rw.CouldNotUpdateBalanceCount++ < 1) {
-							rw.Notification = "<span fgcolor=\"salmon\">Could not update balance</span>";
-						} else {
+					foreach (RippleWallet rw in walletGroup) {
+						if (rippleCurrency != null) {
+							rw.LastKnownNativeBalance = rippleCurrency;
 							rw.Notification = null;
-							rw.BalanceNote = "<span fgcolor=\"salmon\">Could not update balance</span>";
+							rw.BalanceNote = "balance updated as of " + dateTime.ToShortTimeString ();
+						} else {
+
+							if (rw.CouldNotUpdateBalanceCount++ < 1) {
+								rw.Notification = "<span fgcolor=\"salmon\">Could not update balance</span>";
+							} else {
+								rw.Notification = null;
+								rw.BalanceNote = "<span fgcolor=\"salmon\">Could not update balance</span>";
+							}
+
 						}
-						
+
+						WalletManager.currentInstance?.UpdateUI ();
+
+						if (rw?.NotificationLedger == null || rw.NotificationLedger == 0) {
+
+							rw.NotificationLedger = ledger;
+							rw.SaveBotLedger (ledger, rw.NotificationLadgerPath);
+							continue;
+							//return;
+						}
 					}
 
-					WalletManager.currentInstance?.UpdateUI ();
-
-					if (rw?.NotificationLedger == null || rw.NotificationLedger == 0) {
-
-						rw.NotificationLedger = ledger;
-						rw.SaveBotLedger (ledger, rw.NotificationLadgerPath);
-						continue;
-						//return;
-					}
-
-
-					DoLogicResponse tuple = DoOfferLogic (rw, ni);
+					DoLogicResponse tuple = DoOfferLogic (walletGroup.First (), ni);
 					if (tuple == null) {
 						continue;
 						//return;
 					}
-
-					if (tuple.HasError) {
-						if (tuple.ErrorCode == 55 ) {
-							rw.NotificationLedger = 0;
-							rw.SaveBotLedger (0, rw.NotificationLadgerPath);
-						}
-
-						
-						continue;
-					}
-
-		    			
-
 					IEnumerable<AutomatedOrder> totalFilled = tuple.FilledOrders;
+
 					if (totalFilled == null) {
-						rw.NotificationLedger = tuple.LastLedger;
-						rw.SaveBotLedger (tuple.LastLedger, rw.NotificationLadgerPath);
+						foreach (RippleWallet rw in walletGroup) {
+							rw.NotificationLedger = tuple.LastLedger;
+							rw.SaveBotLedger (tuple.LastLedger, rw.NotificationLadgerPath);
+						}
 						continue;
 					}
-
 
 					int c = totalFilled.Count ();
+					count += c;
 
-					if (c == 0) {
-						rw.NotificationLedger = tuple.LastLedger;
-						rw.SaveBotLedger (tuple.LastLedger, rw.NotificationLadgerPath);
-						continue;
+					if (c > 0) {
+						accnts += 1;
 					}
 
+					foreach (RippleWallet rw in walletGroup) {
+						if (tuple.HasError) {
+							if (tuple.ErrorCode == 55) {
+								rw.NotificationLedger = 0;
+								rw.SaveBotLedger (0, rw.NotificationLadgerPath);
+							}
 
-					string message2 =
-						c.ToString () +
-						" new orders";
 
-					rw.Notification = message2;
+							continue;
+						}
 
 
-					rw.NotificationLedger = tuple.LastLedger;
-					rw.SaveBotLedger (tuple.LastLedger, rw.NotificationLadgerPath);
 
-					count += c;
-					accnts += 1;
+						
+						
+
+						
+
+						if (c == 0) {
+							rw.NotificationLedger = tuple.LastLedger;
+							rw.SaveBotLedger (tuple.LastLedger, rw.NotificationLadgerPath);
+							continue;
+						}
+
+
+						string message2 =
+							c.ToString () +
+							" new orders";
+
+						rw.Notification = message2;
+
+
+						rw.NotificationLedger = tuple.LastLedger;
+						rw.SaveBotLedger (tuple.LastLedger, rw.NotificationLadgerPath);
+
+
+
+					}
 					continue;
 					//return;
 
@@ -666,7 +695,7 @@ namespace IhildaWallet
 #endif
 
 			DoLogicResponse logicResponse = new DoLogicResponse ();
-			 
+
 			string ledgerMax = (-1).ToString ();
 			string ledgerMin = wallet.NotificationLedger.ToString ();
 
@@ -736,10 +765,11 @@ namespace IhildaWallet
 				logicResponse.HasError = true;
 				logicResponse.ErrorMessage += fullTx.ErrorMessage;
 
-				logicResponse.ErrorCode = fullTx.TroubleResponse.error_code;
+				// find the null reference
+				logicResponse.ErrorCode = fullTx.TroubleResponse?.error_code;
 
 				return logicResponse;
-				
+
 			}
 
 			IEnumerable<Response<AccountTxResult>> res = fullTx.Responses;
@@ -809,8 +839,10 @@ namespace IhildaWallet
 				if (DebugIhildaWallet.Robotics) {
 					Logging.ReportException (method_sig, e);
 				}
-#endif
+
 				MessageDialog.ShowMessage ("Exception processing tx's\n" + e.ToString () + e.StackTrace);
+#endif
+
 
 				logicResponse.HasError = true;
 				logicResponse.ErrorMessage += "Excption thrown";
@@ -856,7 +888,7 @@ namespace IhildaWallet
 
 				rippleWallet.Notification = builder.ToString ();
 
-				ShowNotification (builder.ToString(), count++);
+				ShowNotification (builder.ToString (), count++);
 
 				if (settings.HasOnPaymentReceived && settings.OnPaymentReceived != null) {
 
@@ -911,7 +943,7 @@ namespace IhildaWallet
 										cu.Visible = false;
 									} else {
 
-										Program.splash?.Hide ();
+										UImain.splash?.Hide ();
 
 
 										cu.Visible = true;
@@ -931,20 +963,37 @@ namespace IhildaWallet
 						WaitHandle.WaitAny (new [] { mre, _token.WaitHandle });
 					}
 
-					if (!Program.network) {
-					// if networking explicitly prohibited don't do networking loop. 
+					if (!ProgramVariables.network) {
+						// if networking explicitly prohibited don't do networking loop. 
 						return;
 
 					}
+
+					Winter winter = new Winter ();
+					bool succeeded = winter.AuthenticateUser ();
+					if (succeeded) {
+						ProgramVariables.winter = winter;
+						SubscribeTransactions ();
+
+						 
+					}
+					
 					try {
 						//Thread.Sleep(1000);
-					Task.Delay (1000).Wait (1000, _token);
+						Task.Delay (1000).Wait (1000, _token);
 					}
 #pragma warning disable 0168
 					catch (Exception ex) {
 #pragma warning restore 0168
 						MessageDialog.ShowMessage ("hmmmm");
 					}
+
+					string authMessage = (succeeded ?
+					    "Connected to " :
+					    "Could not connect to ") + ProgramVariables.winterName;
+
+					ShowNotification (authMessage, 0);
+
 
 					//ThreadStart ts = doLoop;
 					//Thread thread = new Thread(ts);
@@ -954,6 +1003,112 @@ namespace IhildaWallet
 				}
 			);
 
+		private readonly string hubname = "TxRequestHub";
+
+
+		private signalR sigRConnect { get; set; }
+		public void SubscribeTransactions ()
+		{
+			var cookie = ProgramVariables.winter.authCookie;
+
+			sigRConnect = new signalR (hubname, cookie);
+
+			sigRConnect.hubProxy.On<string, string, string> (
+				"OnTx",
+				(string type, string json, string address) => {
+					OnTxHandler?.Invoke (type, json, address);
+				}
+			);
+
+			OnTxHandler += (string type, string json, string address) => {
+
+
+
+				ShowNotification (address, 0);
+
+				RippleTransaction rippleTransaction = null;
+				try {
+					switch (type) {
+					case "trustline":
+						RippleTrustSetTransaction trustline = DynamicJson.Parse (json);
+						rippleTransaction = trustline;
+						break;
+
+					case "offer":
+						RippleOfferTransaction rippleOffer = DynamicJson.Parse (json);
+						rippleTransaction = rippleOffer;
+						break;
+
+					case "payment":
+						RipplePaymentTransaction ripplePayment = DynamicJson.Parse (json);
+						rippleTransaction = ripplePayment;
+						break;
+
+					default:
+						// Todo error handling
+						return;
+					}
+				} catch (Exception e) {
+					Logging.WriteLog (e.Message);
+				}
+
+				if (rippleTransaction == null) {
+					return;
+				}
+				var walls = WalletManager.currentInstance?.wallets;
+				if (walls == null || walls.Count < 1) {
+					return;
+				}
+				IEnumerable<RippleWallet> wals = walls.Values.AsEnumerable ();
+
+				foreach (var wallet in wals) {
+					string add = wallet.Account;
+
+					rippleTransaction.Account = add;
+
+					if (add == address) {
+						Gtk.Application.Invoke (
+							delegate {
+
+								TransactionSubmitWindow submitWindow
+									= new TransactionSubmitWindow (wallet, LicenseType.NONE);
+								submitWindow.SetTransactions (rippleTransaction);
+							}
+						);
+					}
+
+				}
+
+
+				
+
+
+			};
+
+			try {
+				sigRConnect.Start ();
+			} catch (Exception e) {
+				// todo handle error
+			}
+
+			var wallets = WalletManager.currentInstance?.wallets;
+			if (wallets == null || wallets.Count < 1) {
+				return;
+			}
+
+			IEnumerable<RippleWallet> wal = wallets.Values.AsEnumerable ();
+
+			foreach (var wallet in wal) {
+				string rad = wallet.Account;
+				sigRConnect.hubProxy.Invoke ("subscribe", rad);
+			}
+
+
+			
+		}
+
+		public delegate void OnTx (string type, string json, string address);
+		public static OnTx OnTxHandler;
 		public void DoLoop ()
 		{
 
@@ -974,11 +1129,11 @@ namespace IhildaWallet
 			while (!_token.IsCancellationRequested) {
 				try {
 					T_Elapsed (null, null);
-					int x = WalletManager.currentInstance.wallets.Count;
+					//int x = WalletManager.currentInstance.wallets.Count;
 
 					//Task.Delay (15000);
 					//Thread.Sleep (15000);
-					
+
 				} catch (Exception e) {
 #if DEBUG
 					if (DebugIhildaWallet.NotificationThread) {
@@ -993,6 +1148,8 @@ namespace IhildaWallet
 
 		}
 
+
+		//private Cookie cookie = null;
 
 
 

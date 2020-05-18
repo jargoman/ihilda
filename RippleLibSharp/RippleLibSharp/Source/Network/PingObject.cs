@@ -17,7 +17,7 @@ namespace RippleLibSharp.Network
 		public string type { get; set; }
 
 		public string error { get; set; }
-		public int error_code { get; set; }
+		public int? error_code { get; set; }
 		public string error_message { get; set; }
 
 #pragma warning restore IDE1006 // Naming Styles

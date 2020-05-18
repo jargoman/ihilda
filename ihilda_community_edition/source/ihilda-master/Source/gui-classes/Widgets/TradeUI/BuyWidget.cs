@@ -1,6 +1,13 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Gtk;
+using IhildaWallet.Networking;
 using IhildaWallet.Util;
+using RippleLibSharp.Commands.Accounts;
+using RippleLibSharp.Commands.Stipulate;
+using RippleLibSharp.Network;
+using RippleLibSharp.Result;
 using RippleLibSharp.Transactions;
 using RippleLibSharp.Util;
 
@@ -31,7 +38,220 @@ namespace IhildaWallet
 
 			Label l = (Label)this.buybutton.Child;
 			l.UseMarkup = true;
+
+			button114.Clicked += PercentageClicked;
+			button115.Clicked += PercentageClicked;
+			button111.Clicked += PercentageClicked;
+			button112.Clicked += PercentageClicked;
+
+			button123.Clicked += PercentageClicked;
+			button113.Clicked += PercentageClicked;
+			button119.Clicked += PercentageClicked;
+
+			button116.Clicked += PercentageClicked;
+
+			button120.Clicked += PercentageClicked;
+
+			button117.Clicked += PercentageClicked;
+
+			button118.Clicked += PercentageClicked;
+
+			button121.Clicked += PercentageClicked;
+
+			button122.Clicked += PercentageClicked;
+
+			hscale2.ValueChanged += Hscale2_ValueChanged;
+
 		}
+
+		public void SetPrice (Decimal price)
+		{
+			pricecomboboxentry.Entry.Text = price.ToString ();
+		}
+
+		public void SetAmount (Decimal amount)
+		{
+			amountcomboboxentry.Entry.Text = amount.ToString ();
+		}
+
+		public void SetAmountMax ()
+		{
+			this.hscale2.Value = 100.0;
+		}
+
+		public void ScaleMethod (double value, string pri)
+		{
+#if DEBUG
+			string method_sig = clsstr + nameof (ScaleMethod) + DebugRippleLibSharp.colon;
+
+#endif
+
+			string acc = _rippleWallet.Account;
+
+
+
+			NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
+
+			CancellationTokenSource tokenSource = new CancellationTokenSource ();
+			CancellationToken token = tokenSource.Token;
+
+			Decimal? price = RippleCurrency.ParseDecimal (pri);
+
+			if (price == null) {
+
+				Task<Response<BookOfferResult>> sellTask =
+				BookOffers.GetResult (
+					_tradePair.Currency_Base,
+					_tradePair.Currency_Counter,
+					2,
+					ni,
+					tokenSource.Token
+				);
+
+				sellTask.Wait ();
+
+				var result = sellTask?.Result;
+
+				var res = result?.result;
+
+				var offs = res?.offers;
+
+				if (offs == null || offs.Length < 1) {
+
+					var mess = "Price is formatted incorrectly";
+
+					TextHighlighter.Highlightcolor = TextHighlighter.RED;
+					string sss = TextHighlighter.Highlight (mess);
+
+					Gtk.Application.Invoke (delegate {
+
+						infobar.Markup = sss;
+					}
+					);
+
+#if DEBUG
+					if (DebugIhildaWallet.BuyWidget) {
+						Logging.WriteLog (method_sig + "offs==null, returning\n");
+					}
+#endif
+
+					return;
+				}
+
+				var highestBid = offs [0];
+				price = highestBid.TakerPays.GetNativeAdjustedCostAt (highestBid.TakerGets);
+				if (price == null) {
+
+#if DEBUG
+					if (DebugIhildaWallet.BuyWidget) {
+						Logging.WriteLog (method_sig + "price==null, returning\n");
+					}
+#endif
+					return;
+				}
+
+				var bidLabelText = price.ToString ();
+
+				var message = "Price isn't specified using " + bidLabelText;
+
+				TextHighlighter.Highlightcolor = TextHighlighter.RED;
+				string ss = TextHighlighter.Highlight (message);
+
+				Gtk.Application.Invoke ( delegate {
+					pricecomboboxentry.Entry.Text = price.ToString ();
+					infobar.Markup = ss;
+				}
+				);
+
+			
+			}
+
+
+			if (!_tradePair.Currency_Counter.IsNative) {
+				var cur = AccountLines.GetBalanceForIssuer
+				(
+					_tradePair.Currency_Counter.currency,
+					_tradePair.Currency_Counter.issuer,
+					acc,
+					ni,
+					token
+				);
+
+				double bal = (double)cur.amount;
+
+				double res = bal * value / 100;
+
+				var amount = res / (double)price;
+
+
+				var ss = amount.ToString ();
+				Gtk.Application.Invoke (
+				delegate {
+
+					amountcomboboxentry.Entry.Text = ss;
+				});
+
+			} else {
+
+				Task<Response<AccountInfoResult>> task =
+					AccountInfo.GetResult (acc, ni, token);
+
+				task.Wait (token);
+
+				Response<AccountInfoResult> resp = task.Result;
+				AccountInfoResult res = resp.result;
+
+				RippleCurrency reserve = res.GetReserveRequirements (ni, token);
+
+				RippleCurrency rippleCurrency = new RippleCurrency (res.account_data.Balance);
+
+				double bal = (double)(rippleCurrency.amount - reserve.amount) / 1000000 * value / 100;
+
+				var amount = bal / (double)price;
+
+				string ss = amount.ToString ();
+				Gtk.Application.Invoke ( delegate {
+					amountcomboboxentry.Entry.Text = ss;
+				});
+			}
+
+		}
+
+		void Hscale2_ValueChanged (object sender, EventArgs e)
+		{
+#if DEBUG
+			string method_sig = clsstr + nameof (Hscale2_ValueChanged) + DebugRippleLibSharp.colon;
+#endif
+			double val = hscale2.Value;
+
+
+
+			String text2 = this.pricecomboboxentry.ActiveText;
+
+
+#if DEBUG
+			if (DebugIhildaWallet.BuyWidget) {
+				Logging.WriteLog (method_sig + "this.pricecomboboxentry.ActiveText = " + DebugIhildaWallet.ToAssertString (text2) + "\n");
+			}
+#endif
+
+			Task.Run ( delegate {
+				ScaleMethod (val, text2); 
+			});
+
+		}
+
+
+		void PercentageClicked (object sender, EventArgs e)
+		{
+			if (sender is Button b) {
+				string s = b?.Label.TrimEnd('%');
+				double d = Convert.ToDouble (s);
+
+				hscale2.Value = d;
+			}
+		}
+
 
 		private void CalculateMax () {
 			#if DEBUG
@@ -61,9 +281,12 @@ namespace IhildaWallet
 
 			Decimal? am =  RippleCurrency.ParseDecimal(text);
 			if (am==null) {
-				MessageDialog.ShowMessage ("Amount is formatted incorrectly \n");
+				var message = "Amount is formatted incorrectly \n";
+				TextHighlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = TextHighlighter.Highlight (message);
+				// Todo color amount entry red
 
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.BuyWidget) {
 					Logging.WriteLog(method_sig + "am==null, returning\n");
 				}
@@ -81,9 +304,11 @@ namespace IhildaWallet
 
 			if (pr == null) {
 
-				//MessageDialog.showMessage ("Price is formatted incorrectly");
+				var message = "Price is formatted incorrectly";
+				TextHighlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = TextHighlighter.Highlight (message);
 
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.BuyWidget) {
 					Logging.WriteLog(method_sig + "pr==null, returning\n");
 				}
@@ -318,13 +543,17 @@ namespace IhildaWallet
 
 			Decimal? payamount = RippleCurrency.ParseDecimal(amountcomboboxentry.ActiveText);
 			if (payamount == null) {
-				MessageDialog.ShowMessage (off.taker_pays.currency + " payamount is formatted incorrectly \n");
+				var message = off.taker_pays.currency + " payamount is formatted incorrectly \n";
+				TextHighlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = TextHighlighter.Highlight (message);
 				return;
 			}
 
 			Decimal? getamount = RippleCurrency.ParseDecimal( maxcomboboxentry.ActiveText );
 			if (getamount == null) {
-				MessageDialog.ShowMessage (off.taker_gets.currency + " getamount is formatted incorrectly \n");
+				var message = off.taker_gets.currency + " getamount is formatted incorrectly \n";
+				TextHighlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup= TextHighlighter.Highlight (message);
 				return;
 			}
 

@@ -29,6 +29,24 @@ namespace IhildaWallet
 
 			this.balanceLabel.Text = AddressDisplayWidget.UNSYNCED; // unsynced;
 
+			this.unitsSelectBox.Clear ();
+
+			unitsSelectBox.AppendText(RippleCurrency.NativeCurrency);
+			unitsSelectBox.AppendText (RippleCurrency.NativePip);
+
+
+			CellRendererText cell = new CellRendererText ();
+			unitsSelectBox.PackStart (cell, false);
+			unitsSelectBox.AddAttribute (cell, "text", 0);
+			ListStore store = new ListStore (typeof (string));
+			unitsSelectBox.Model = store;
+
+
+			store.AppendValues (RippleCurrency.NativeCurrency);
+			store.AppendValues (RippleCurrency.NativePip);
+
+			//unitsSelectBox.Model.
+
 			this.unitsSelectBox.Changed += OnUnitsSelectBoxChanged;
 
 			this.sendNativeButton.Clicked += OnSendNativeButtonClicked;
@@ -111,6 +129,28 @@ namespace IhildaWallet
 
 			var memo = Program.GetClientMemo ();
 			this.AddMemo (memo);
+
+			button114.Clicked += PercentageClicked;
+			button115.Clicked += PercentageClicked;
+			button111.Clicked += PercentageClicked;
+			button112.Clicked += PercentageClicked;
+
+			button123.Clicked += PercentageClicked;
+			button113.Clicked += PercentageClicked;
+			button119.Clicked += PercentageClicked;
+
+			button116.Clicked += PercentageClicked;
+
+			button120.Clicked += PercentageClicked;
+
+			button117.Clicked += PercentageClicked;
+
+			button118.Clicked += PercentageClicked;
+
+			button121.Clicked += PercentageClicked;
+
+			button122.Clicked += PercentageClicked;
+			hscale2.ValueChanged += Hscale2_ValueChanged;
 		}
 
 		Gtk.ListStore ListStore {
@@ -125,6 +165,126 @@ namespace IhildaWallet
 		}
 
 		private CancellationTokenSource TokenSource = new CancellationTokenSource();
+
+		private CancellationTokenSource scaleTokenSource = null;
+		private DateTime last_call_time = default (DateTime);
+
+
+		private RippleCurrency lastCurrencyAmount = default (RippleCurrency);
+		private RippleCurrency lastReserve = default (RippleCurrency);
+
+
+		//private CancellationTokenSource scaleToken = default (CancellationTokenSource);
+		public void ScaleMethod (Decimal value, string units)
+		{
+#if DEBUG
+			string method_sig = clsstr + nameof (ScaleMethod) + DebugRippleLibSharp.colon;
+
+#endif
+
+			string acc = _rippleWallet.Account;
+
+
+
+			if (last_call_time == default (DateTime) || (DateTime.Now - last_call_time).TotalMilliseconds < 2500) {
+
+				NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
+
+				scaleTokenSource?.Cancel ();
+				scaleTokenSource = new CancellationTokenSource ();
+				CancellationToken token = scaleTokenSource.Token;
+
+
+				Task<Response<AccountInfoResult>> task =
+						AccountInfo.GetResult (acc, ni, token);
+
+				task.Wait (token);
+
+				Response<AccountInfoResult> resp = task.Result;
+				AccountInfoResult res = resp.result;
+
+				lastReserve = res.GetReserveRequirements (ni, token);
+
+				lastCurrencyAmount = new RippleCurrency (res.account_data.Balance);
+
+				last_call_time = DateTime.Now;
+
+			} 
+
+
+
+
+
+			
+			Decimal? bal = null;
+			string ss = null;
+			if (RippleCurrency.NativeCurrency.Equals (units)) {
+				bal = (lastCurrencyAmount.amount - lastReserve.amount) / 1000000 * value / 100;
+
+				ss = bal.ToString ();
+
+			}
+
+			if (RippleCurrency.NativePip.Equals (units)) {
+				bal = (lastCurrencyAmount.amount - lastReserve.amount) * value / 100;
+				bal = Math.Round ((Decimal)bal, 0);
+				ss = bal.ToString ();
+			}
+			if (bal == null || ss == null) {
+				// TODO actual bug
+			}
+
+	    		
+
+			
+			Gtk.Application.Invoke (delegate {
+				amountcomboboxentry.Entry.Text = ss;
+			});
+
+
+
+		}
+
+
+
+		void Hscale2_ValueChanged (object sender, EventArgs e)
+		{
+#if DEBUG
+			string method_sig = clsstr + nameof (Hscale2_ValueChanged) + DebugRippleLibSharp.colon;
+#endif
+			Decimal val = (Decimal)hscale2.Value;
+
+
+
+
+			string units = unitsSelectBox?.ActiveText;
+
+#if DEBUG
+			if (DebugIhildaWallet.BuyWidget) {
+				Logging.WriteLog (method_sig + "this.hscale2.Value = " + DebugIhildaWallet.ToAssertString (val) + "\n");
+			}
+
+#endif
+			if (units == null) {
+				// TODO actual bug
+			}
+
+
+			Task.Run (delegate {
+				ScaleMethod (val, units);
+			});
+
+		}
+
+		void PercentageClicked (object sender, EventArgs e)
+		{
+			if (sender is Button b) {
+				string s = b?.Label.TrimEnd ('%');
+				double d = Convert.ToDouble (s);
+
+				hscale2.Value = d;
+			}
+		}
 
 		//String unsynced = "   --   unsynced   --   ";
 

@@ -25,7 +25,7 @@ namespace IhildaWallet
 
 		public void SetToolTips ()
 		{
-			if (!Program.showPopUps) {
+			if (!ProgramVariables.showPopUps) {
 				return;
 			}
 
@@ -194,7 +194,8 @@ namespace IhildaWallet
 				}
 
 
-				patterns = pattern.Split (' ');
+				
+				patterns = pattern.Split (' ', ',', ':');
 
 #if DEBUG
 				if (DebugIhildaWallet.FromScriptDialog) {

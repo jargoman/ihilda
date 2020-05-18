@@ -10,6 +10,7 @@ using RippleLibSharp.Util;
 using PdfSharp;
 using PdfSharp.Pdf;
 using PdfSharp.Drawing;
+
 using Gtk;
 
 namespace IhildaWallet
@@ -39,7 +40,7 @@ namespace IhildaWallet
 
 			PdfDocument document = new PdfDocument ();
 			document.Info.Title = "Printable Document";
-			document.Info.Author = Program.verboseName;
+			document.Info.Author = ProgramVariables.verboseName;
 
 			PdfPage pdfPage = document.AddPage ();
 
@@ -89,6 +90,8 @@ namespace IhildaWallet
 
 			rectF = new RectangleF (0,0,600, 600);
 			noteGraphics.DrawString (notes, font, solidBrushBig, rectF);
+
+			
 
 			XImage xImageAcc = XImage.FromGdiPlusImage (accBitmap);
 			XImage xImageSec = XImage.FromGdiPlusImage (secBitmap);
@@ -153,7 +156,7 @@ namespace IhildaWallet
 
 
 
-			TextHighlighter.Highlightcolor = Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
+			TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 			add = TextHighlighter.Highlight ("<big>" + add + "</big>");
 
 			TextHighlighter.Highlightcolor = TextHighlighter.RED;
@@ -213,7 +216,7 @@ namespace IhildaWallet
 
 
 
-			TextHighlighter.Highlightcolor = Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
+			TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 			add = TextHighlighter.Highlight ("<big>" + add + "</big>");
 
 			TextHighlighter.Highlightcolor = TextHighlighter.RED;

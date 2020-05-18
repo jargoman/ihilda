@@ -21,7 +21,7 @@ namespace IhildaWallet
 			this.target = license;
 			//this.balance = balance;
 
-			difference = (decimal)target - balance;
+			difference = target.Value - balance;
 
 			StringBuilder target_cur = new StringBuilder ();
 
@@ -34,7 +34,7 @@ namespace IhildaWallet
 
 
 			sb.Append ("This feature require an account balance of ");
-			sb.Append (((int)target).ToString ());
+			sb.Append (target.Value.ToString ());
 			sb.Append (" ");
 			sb.Append (target_cur.ToString());
 

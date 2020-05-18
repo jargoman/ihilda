@@ -568,7 +568,7 @@ namespace IhildaWallet
 						}
 						string DEFAULT_ERROR = "Error";
 						this.infoBarLabel.Text = 
-							Program.darkmode ? "< span fgcolor = \"#FFAABB\" > "  : " < span fgcolor=\"red\">" 
+							ProgramVariables.darkmode ? "< span fgcolor = \"#FFAABB\" > "  : " < span fgcolor=\"red\">" 
 							+ first?.error_message ?? DEFAULT_ERROR
 							+ "</span>";
 						this.infoBarLabel.Show();
@@ -587,7 +587,7 @@ namespace IhildaWallet
 
 				Gtk.Application.Invoke (
 					delegate {
-						string message = Program.darkmode ? "<span fgcolor=\"#FFAABB\">Server returned no orders for account " : "<span fgcolor=\"red\">Server returned no orders for account "
+						string message = ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">Server returned no orders for account " : "<span fgcolor=\"red\">Server returned no orders for account "
 							+ (ra?.ToString() ?? "")
 							+ "</span>" ;
 

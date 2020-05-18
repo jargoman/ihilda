@@ -173,7 +173,7 @@ namespace IhildaWallet
 							Gtk.Menu menu = new Menu ();
 
 							MenuItem mainBuyMenu = new MenuItem (
-								Program.darkmode ?
+								ProgramVariables.darkmode ?
 								"<span fgcolor=\"chartreuse\" font_size=\"xx-large\"><b>Buy</b></span>":
 								"<span fgcolor=\"green\" font_size=\"xx-large\"><b>Buy</b></span>"
 								);
@@ -186,7 +186,7 @@ namespace IhildaWallet
 							menu.Add (mainBuyMenu);
 
 
-							Gtk.MenuItem mainSellMenu = new MenuItem (Program.darkmode ? "<span fgcolor=\"#FFAABB\" font_size=\"xx - large\"><b>Sell</b></span>"  : "<span fgcolor=\"red\" font_size=\"xx-large\"><b>Sell</b></span>");
+							Gtk.MenuItem mainSellMenu = new MenuItem (ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\" font_size=\"xx-large\"><b>Sell</b></span>"  : "<span fgcolor=\"red\" font_size=\"xx-large\"><b>Sell</b></span>");
 							Label labe = (Label)mainSellMenu.Child;
 							labe.UseMarkup = true;
 
@@ -238,7 +238,7 @@ namespace IhildaWallet
 
 							#region buy
 							Gtk.MenuItem buy = new MenuItem (
-								Program.darkmode ?
+								ProgramVariables.darkmode ?
 								"<b>Prepare a <span fgcolor=\"chartreuse\">buy</span> order at this price</b>" :
 								"<b>Prepare a <span fgcolor=\"green\">buy</span> order at this price</b>"
 								);
@@ -275,7 +275,7 @@ namespace IhildaWallet
 							#region cassbuy
 
 							Gtk.MenuItem cassbuy = new MenuItem (
-								Program.darkmode ?
+								ProgramVariables.darkmode ?
 								"<b>Cascade <span fgcolor=\"chartreuse\">buy</span> orders beginning at this price</b>" :
 								"<b>Cascade <span fgcolor=\"green\">buy</span> orders beginning at this price</b>"
 								);
@@ -318,7 +318,7 @@ namespace IhildaWallet
 							#region autobuy
 
 							Gtk.MenuItem autobuy = new MenuItem (
-								Program.darkmode ?
+								ProgramVariables.darkmode ?
 								"<b>Prepare an automated <span fgcolor=\"chartreuse\">buy</span> order at this price</b>" :
 								"<b>Prepare an automated <span fgcolor=\"green\">buy</span> order at this price</b>"
 								);
@@ -356,7 +356,7 @@ namespace IhildaWallet
 
 
 							#region sell
-							Gtk.MenuItem sell = new MenuItem (Program.darkmode ? "<b>Prepare a <span fgcolor=\"#FFAABB\">sell</span> order at this price</b>" : "<b>Prepare a <span fgcolor=\"red\">sell</span> order at this price</b>");
+							Gtk.MenuItem sell = new MenuItem (ProgramVariables.darkmode ? "<b>Prepare a <span fgcolor=\"#FFAABB\">sell</span> order at this price</b>" : "<b>Prepare a <span fgcolor=\"red\">sell</span> order at this price</b>");
 							sell.Show ();
 							sellMenu.Add (sell);
 
@@ -387,7 +387,7 @@ namespace IhildaWallet
 
 							#region casssell
 
-							Gtk.MenuItem casssell = new MenuItem (Program.darkmode ? "<b>Cascade <span fgcolor=\"#FFAABB\">sell</span> orders begining at this price</b>" : "<b>Cascade <span fgcolor=\"red\">sell</span> orders begining at this price</b>");
+							Gtk.MenuItem casssell = new MenuItem (ProgramVariables.darkmode ? "<b>Cascade <span fgcolor=\"#FFAABB\">sell</span> orders begining at this price</b>" : "<b>Cascade <span fgcolor=\"red\">sell</span> orders begining at this price</b>");
 							casssell.Show ();
 							sellMenu.Add (casssell);
 
@@ -420,7 +420,7 @@ namespace IhildaWallet
 
 							#region autosell 
 
-							Gtk.MenuItem autosell = new MenuItem (Program.darkmode ? "<b>Prepare an automated <span fgcolor=\"#FFAABB\">sell</span> order at this price</b>" : "<b>Prepare an automated <span fgcolor=\"red\">sell</span> order at this price</b>");
+							Gtk.MenuItem autosell = new MenuItem (ProgramVariables.darkmode ? "<b>Prepare an automated <span fgcolor=\"#FFAABB\">sell</span> order at this price</b>" : "<b>Prepare an automated <span fgcolor=\"red\">sell</span> order at this price</b>");
 							autosell.Show ();
 							sellMenu.Add (autosell);
 							menulabel = (Label)autosell.Child;
@@ -631,7 +631,7 @@ namespace IhildaWallet
 			}
 
 
-			OrderSubmitWindow order_preview = new OrderSubmitWindow (_rippleWallet, licenseT);
+			OrderSubmitWindow order_preview = new OrderSubmitWindow (_rippleWallet,licenseT);
 			order_preview.SetOrders (opposing);
 			order_preview.Show ();
 

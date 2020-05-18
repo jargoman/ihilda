@@ -39,7 +39,89 @@ namespace IhildaWallet
 
 			Label l = (Label)this.sellbutton.Child;
 			l.UseMarkup = true;
+
+			button114.Clicked += PercentageClicked;
+			button115.Clicked += PercentageClicked;
+			button111.Clicked += PercentageClicked;
+			button112.Clicked += PercentageClicked;
+
+			button123.Clicked += PercentageClicked;
+			button113.Clicked += PercentageClicked;
+			button119.Clicked += PercentageClicked;
+
+			button116.Clicked += PercentageClicked;
+
+			button120.Clicked += PercentageClicked;
+
+			button117.Clicked += PercentageClicked;
+
+			button118.Clicked += PercentageClicked;
+
+			button121.Clicked += PercentageClicked;
+
+			button122.Clicked += PercentageClicked;
+
+			hscale2.ValueChanged += Hscale2_ValueChanged;
+
 		}
+
+		void Hscale2_ValueChanged (object sender, EventArgs e)
+		{
+			string acc = _rippleWallet.Account;
+
+			NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
+
+			CancellationTokenSource tokenSource = new CancellationTokenSource ();
+			CancellationToken token = tokenSource.Token;
+			double val = hscale2.Value;
+
+			if (!_TradePair.Currency_Base.IsNative) {
+				var cur = AccountLines.GetBalanceForIssuer
+				(
+					_TradePair.Currency_Base.currency,
+					_TradePair.Currency_Base.issuer,
+					acc,
+					ni,
+					token
+				);
+
+				double bal = (double)cur.amount;
+
+				double res = bal * val / 100;
+
+				amountcomboboxentry.Entry.Text = res.ToString ();
+			} else {
+
+				Task<Response<AccountInfoResult>> task = 
+					AccountInfo.GetResult (acc, ni, token);
+
+				task.Wait (token);
+
+				Response<AccountInfoResult> resp = task.Result;
+				AccountInfoResult res = resp.result;
+
+				var reserve = res.GetReserveRequirements (ni, token);
+
+				RippleCurrency rippleCurrency = new RippleCurrency (res.account_data.Balance);
+
+				double bal = (double)(rippleCurrency.amount - reserve.amount) / 1000000 * val / 100;
+
+				amountcomboboxentry.Entry.Text = bal.ToString ();
+
+			}
+		}
+
+
+		void PercentageClicked (object sender, EventArgs e)
+		{
+			if (sender is Button b) {
+				string s = b?.Label.TrimEnd ('%');
+				double d = Convert.ToDouble (s);
+
+				hscale2.Value = d;
+			}
+		}
+
 
 		public void CreateOffer ()
 		{
@@ -124,7 +206,12 @@ namespace IhildaWallet
 
 			Decimal? getamount = RippleCurrency.ParseDecimal(amountcomboboxentry.ActiveText );
 			if (getamount == null) {
-				MessageDialog.ShowMessage (off.taker_pays.currency + " getamount is formatted incorrectly\n" );
+
+				string message = off.taker_pays.currency + " getamount is formatted incorrectly\n";
+				TextHighlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = TextHighlighter.Highlight (message);
+
+				// TODO color amnt entry to red
 				#if DEBUG
 				if (DebugIhildaWallet.SellWidget) {
 					Logging.WriteLog (method_sig + "getamount == null\n");
@@ -136,14 +223,22 @@ namespace IhildaWallet
 			Decimal? payamount = RippleCurrency.ParseDecimal( maxcomboboxentry.ActiveText );
 			if (getamount == null) {
 
-				MessageDialog.ShowMessage (off.taker_gets.currency + " payamount is formatted incorrectly\n");
-				#if DEBUG
+				string message = off.taker_gets.currency + " payamount is formatted incorrectly\n";
+
+				TextHighlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = TextHighlighter.Highlight (message);
+
+#if DEBUG
 				if (DebugIhildaWallet.SellWidget) {
 					Logging.WriteLog (method_sig + "payamount == null\n");
 				}
 				#endif
 				return;
 			}
+
+			string mark = comboboxentry1.ActiveText;
+
+			off.BotMarking = mark;
 
 			off.taker_pays.amount = off.taker_pays.IsNative ? (Decimal)payamount * 1000000 : (Decimal)payamount;
 			off.taker_gets.amount = off.taker_gets.IsNative ? (Decimal)getamount * 1000000 : (Decimal)getamount;
@@ -223,9 +318,11 @@ namespace IhildaWallet
 				Decimal? am = RippleCurrency.ParseDecimal (text);
 				if (am == null) {
 
-					MessageDialog.ShowMessage ("Amount is formatted incorrectly");
+					var message = "Amount is formatted incorrectly";
+					TextHighlighter.Highlightcolor = TextHighlighter.RED;
+					infobar.Markup = TextHighlighter.Highlight (message);
 #if DEBUG
-					if (DebugIhildaWallet.SellWidget) {
+				if (DebugIhildaWallet.SellWidget) {
 						Logging.WriteLog (method_sig + "am==null, returning\n");
 					}
 #endif
@@ -369,6 +466,22 @@ namespace IhildaWallet
 
 			}
 		}
+
+		public void SetPrice (Decimal price)
+		{
+			pricecomboboxentry.Entry.Text = price.ToString ();
+		}
+
+		public void SetAmount (Decimal amount)
+		{
+			amountcomboboxentry.Entry.Text = amount.ToString ();
+		}
+
+		public void SetAmountMax ()
+		{
+			this.hscale2.Value = 100.0;
+		}
+
 
 		public void SetRippleWallet (RippleWallet rippleWallet)
 		{

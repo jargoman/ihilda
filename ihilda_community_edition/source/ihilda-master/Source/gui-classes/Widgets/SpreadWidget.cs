@@ -26,7 +26,61 @@ namespace IhildaWallet
 			}
 			);
 
+			eventbox1.ButtonReleaseEvent += (o, args) => {
+
+				string s = bidlabel.Text;
+
+				Decimal? d = RippleCurrency.ParseDecimal (s);
+
+				if (d == null) {
+					return;
+				}
+
+				OnBid?.Invoke (d);
+			};
+
+			eventbox2.ButtonPressEvent += (o, args) => {
+
+				string s = asklabel.Text;
+
+
+				Decimal? d = RippleCurrency.ParseDecimal (s);
+
+				if (d == null) {
+					return;
+				}
+
+				OnAsk?.Invoke (d);
+
+			};
+
+			eventbox3.ButtonReleaseEvent += (o, args) => {
+
+				string s1 = bidlabel.Text;
+				string s2 = asklabel.Text;
+
+				Decimal? d1 = RippleCurrency.ParseDecimal (s1);
+				Decimal? d2 = RippleCurrency.ParseDecimal (s2);
+
+				if (d1 == null || d2 == null) {
+					return;
+				}
+
+				Decimal average = (Decimal) ((d1 + d2) / 2.0m);
+
+				OnSpread?.Invoke (average);
+			};
+
+
+
 		}
+
+
+		public delegate void ClickDelegate ( Decimal? price);
+
+		public ClickDelegate OnBid;
+		public ClickDelegate OnAsk;
+		public ClickDelegate OnSpread;
 
 		~SpreadWidget()
 		{

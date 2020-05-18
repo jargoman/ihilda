@@ -24,14 +24,6 @@ namespace IhildaWallet
 
 		private global::Gtk.Notebook notebook1;
 
-		private global::IhildaWallet.WalletShowWidget walletshowwidget1;
-
-		private global::Gtk.Label label15;
-
-		private global::IhildaWallet.BalanceTab balancetab1;
-
-		private global::Gtk.Label label35;
-
 		private global::IhildaWallet.SendRipple sendripple1;
 
 		private global::Gtk.Label label40;
@@ -50,15 +42,15 @@ namespace IhildaWallet
 
 		private global::IhildaWallet.PathFindWidget pathfindwidget1;
 
-		private global::Gtk.Label label37;
+		private global::Gtk.Label label58;
 
 		private global::IhildaWallet.DividendWidget dividendwidget1;
 
-		private global::Gtk.Label label46;
+		private global::Gtk.Label label70;
 
 		private global::IhildaWallet.MassPaymentWidget masspaymentwidget1;
 
-		private global::Gtk.Label label55;
+		private global::Gtk.Label label80;
 
 		protected virtual void Build()
 		{
@@ -135,40 +127,10 @@ namespace IhildaWallet
 			this.notebook1.Scrollable = true;
 			this.notebook1.BorderWidth = ((uint)(16));
 			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.walletshowwidget1 = new global::IhildaWallet.WalletShowWidget();
-			this.walletshowwidget1.Events = ((global::Gdk.EventMask)(256));
-			this.walletshowwidget1.Name = "walletshowwidget1";
-			this.notebook1.Add(this.walletshowwidget1);
-			// Notebook tab
-			this.label15 = new global::Gtk.Label();
-			this.label15.Name = "label15";
-			this.label15.Xalign = 0F;
-			this.label15.LabelProp = global::Mono.Unix.Catalog.GetString("<big><b>Wallet</b></big>");
-			this.label15.UseMarkup = true;
-			this.notebook1.SetTabLabel(this.walletshowwidget1, this.label15);
-			this.label15.ShowAll();
-			// Container child notebook1.Gtk.Notebook+NotebookChild
-			this.balancetab1 = new global::IhildaWallet.BalanceTab();
-			this.balancetab1.Events = ((global::Gdk.EventMask)(256));
-			this.balancetab1.Name = "balancetab1";
-			this.notebook1.Add(this.balancetab1);
-			global::Gtk.Notebook.NotebookChild w8 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.balancetab1]));
-			w8.Position = 1;
-			// Notebook tab
-			this.label35 = new global::Gtk.Label();
-			this.label35.Name = "label35";
-			this.label35.Xalign = 0F;
-			this.label35.LabelProp = global::Mono.Unix.Catalog.GetString("<big><b>Balances</b></big>");
-			this.label35.UseMarkup = true;
-			this.notebook1.SetTabLabel(this.balancetab1, this.label35);
-			this.label35.ShowAll();
-			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.sendripple1 = new global::IhildaWallet.SendRipple();
 			this.sendripple1.Events = ((global::Gdk.EventMask)(256));
 			this.sendripple1.Name = "sendripple1";
 			this.notebook1.Add(this.sendripple1);
-			global::Gtk.Notebook.NotebookChild w9 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.sendripple1]));
-			w9.Position = 2;
 			// Notebook tab
 			this.label40 = new global::Gtk.Label();
 			this.label40.Name = "label40";
@@ -182,8 +144,8 @@ namespace IhildaWallet
 			this.sendiou1.Events = ((global::Gdk.EventMask)(256));
 			this.sendiou1.Name = "sendiou1";
 			this.notebook1.Add(this.sendiou1);
-			global::Gtk.Notebook.NotebookChild w10 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.sendiou1]));
-			w10.Position = 3;
+			global::Gtk.Notebook.NotebookChild w8 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.sendiou1]));
+			w8.Position = 1;
 			// Notebook tab
 			this.label48 = new global::Gtk.Label();
 			this.label48.Name = "label48";
@@ -197,8 +159,8 @@ namespace IhildaWallet
 			this.sendice1.Events = ((global::Gdk.EventMask)(256));
 			this.sendice1.Name = "sendice1";
 			this.notebook1.Add(this.sendice1);
-			global::Gtk.Notebook.NotebookChild w11 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.sendice1]));
-			w11.Position = 4;
+			global::Gtk.Notebook.NotebookChild w9 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.sendice1]));
+			w9.Position = 2;
 			// Notebook tab
 			this.label57 = new global::Gtk.Label();
 			this.label57.Name = "label57";
@@ -212,8 +174,8 @@ namespace IhildaWallet
 			this.sendandconvert1.Events = ((global::Gdk.EventMask)(256));
 			this.sendandconvert1.Name = "sendandconvert1";
 			this.notebook1.Add(this.sendandconvert1);
-			global::Gtk.Notebook.NotebookChild w12 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.sendandconvert1]));
-			w12.Position = 5;
+			global::Gtk.Notebook.NotebookChild w10 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.sendandconvert1]));
+			w10.Position = 3;
 			// Notebook tab
 			this.label65 = new global::Gtk.Label();
 			this.label65.Name = "label65";
@@ -227,56 +189,56 @@ namespace IhildaWallet
 			this.pathfindwidget1.Events = ((global::Gdk.EventMask)(256));
 			this.pathfindwidget1.Name = "pathfindwidget1";
 			this.notebook1.Add(this.pathfindwidget1);
-			global::Gtk.Notebook.NotebookChild w13 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.pathfindwidget1]));
-			w13.Position = 6;
+			global::Gtk.Notebook.NotebookChild w11 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.pathfindwidget1]));
+			w11.Position = 4;
 			// Notebook tab
-			this.label37 = new global::Gtk.Label();
-			this.label37.Name = "label37";
-			this.label37.Xalign = 0F;
-			this.label37.LabelProp = global::Mono.Unix.Catalog.GetString("<big><b>Path Find</b></big>");
-			this.label37.UseMarkup = true;
-			this.notebook1.SetTabLabel(this.pathfindwidget1, this.label37);
-			this.label37.ShowAll();
+			this.label58 = new global::Gtk.Label();
+			this.label58.Name = "label58";
+			this.label58.Xalign = 0F;
+			this.label58.LabelProp = global::Mono.Unix.Catalog.GetString("<big><b>Path Find</b></big>");
+			this.label58.UseMarkup = true;
+			this.notebook1.SetTabLabel(this.pathfindwidget1, this.label58);
+			this.label58.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.dividendwidget1 = new global::IhildaWallet.DividendWidget();
 			this.dividendwidget1.Events = ((global::Gdk.EventMask)(256));
 			this.dividendwidget1.Name = "dividendwidget1";
 			this.notebook1.Add(this.dividendwidget1);
-			global::Gtk.Notebook.NotebookChild w14 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.dividendwidget1]));
-			w14.Position = 7;
+			global::Gtk.Notebook.NotebookChild w12 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.dividendwidget1]));
+			w12.Position = 5;
 			// Notebook tab
-			this.label46 = new global::Gtk.Label();
-			this.label46.Name = "label46";
-			this.label46.Xalign = 0F;
-			this.label46.LabelProp = global::Mono.Unix.Catalog.GetString("<big><b>Dividend</b></big>");
-			this.label46.UseMarkup = true;
-			this.notebook1.SetTabLabel(this.dividendwidget1, this.label46);
-			this.label46.ShowAll();
+			this.label70 = new global::Gtk.Label();
+			this.label70.Name = "label70";
+			this.label70.Xalign = 0F;
+			this.label70.LabelProp = global::Mono.Unix.Catalog.GetString("<big><b>Dividend</b></big>");
+			this.label70.UseMarkup = true;
+			this.notebook1.SetTabLabel(this.dividendwidget1, this.label70);
+			this.label70.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.masspaymentwidget1 = new global::IhildaWallet.MassPaymentWidget();
 			this.masspaymentwidget1.Events = ((global::Gdk.EventMask)(256));
 			this.masspaymentwidget1.Name = "masspaymentwidget1";
 			this.notebook1.Add(this.masspaymentwidget1);
-			global::Gtk.Notebook.NotebookChild w15 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.masspaymentwidget1]));
-			w15.Position = 8;
+			global::Gtk.Notebook.NotebookChild w13 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.masspaymentwidget1]));
+			w13.Position = 6;
 			// Notebook tab
-			this.label55 = new global::Gtk.Label();
-			this.label55.Name = "label55";
-			this.label55.Xalign = 0F;
-			this.label55.LabelProp = global::Mono.Unix.Catalog.GetString("<big><b>Mass Payments</b></big>");
-			this.label55.UseMarkup = true;
-			this.notebook1.SetTabLabel(this.masspaymentwidget1, this.label55);
-			this.label55.ShowAll();
+			this.label80 = new global::Gtk.Label();
+			this.label80.Name = "label80";
+			this.label80.Xalign = 0F;
+			this.label80.LabelProp = global::Mono.Unix.Catalog.GetString("<big><b>Mass Payments</b></big>");
+			this.label80.UseMarkup = true;
+			this.notebook1.SetTabLabel(this.masspaymentwidget1, this.label80);
+			this.label80.ShowAll();
 			this.vbox1.Add(this.notebook1);
-			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.notebook1]));
-			w16.Position = 2;
+			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.notebook1]));
+			w14.Position = 2;
 			this.Add(this.vbox1);
 			if ((this.Child != null))
 			{
 				this.Child.ShowAll();
 			}
 			this.DefaultWidth = 940;
-			this.DefaultHeight = 497;
+			this.DefaultHeight = 599;
 			this.Hide();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler(this.OnDeleteEvent);
 		}

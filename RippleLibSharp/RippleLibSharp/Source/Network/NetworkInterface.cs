@@ -3,10 +3,11 @@
  */
 
 using System;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using RippleLibSharp.Commands.Subscriptions;
+//using Newtonsoft.Json.Serialization;
+
+
 //using SuperSocket.ClientEngine;
 //using WebSocket4Net;
 
@@ -247,6 +248,7 @@ namespace RippleLibSharp.Network
 		{
 
 			return Task.Run (
+#pragma warning disable RECS0002 // Convert anonymous method to method group
 				delegate {
 #if DEBUG
 					string method_sig = clsstr + "Task<bool> connectTask () : ";
@@ -260,6 +262,7 @@ namespace RippleLibSharp.Network
 
 					//return this.isConnected();
 				}
+#pragma warning restore RECS0002 // Convert anonymous method to method group
 
 			);
 		}
@@ -867,9 +870,9 @@ namespace RippleLibSharp.Network
 
 
 
-			//websocket.Error += ErrorFunction;
 
-
+			
+		
 
 			websocket.Error += (sender, ev) => {
 
@@ -915,16 +918,24 @@ namespace RippleLibSharp.Network
 				//stopConnect = true;
 				//throw ev.Exception;
 				//return;
+				
 
-				OnError?.Invoke ( ev);
+				var exc = ev.Exception;
+
+				IhildaWebSocketError error = new IhildaWebSocketError {
+					Exception = exc
+				};
+
+				OnError?.Invoke ( this, error);
 			};
-
+	    		
 
 			//};
 			NetworkRequestTask.InitNetworkTasking (this);
 
 
 		}
+
 
 
 
@@ -1027,6 +1038,9 @@ namespace RippleLibSharp.Network
 		}
 
 
+
+
+
 		#region handlers
 		public delegate void OnMessageEventHandler (object sender, WebSocket4Net.MessageReceivedEventArgs e);
 
@@ -1043,7 +1057,7 @@ namespace RippleLibSharp.Network
 
 		//public event EventHandler<SuperSocket.ClientEngine.ErrorEventArgs> OnError;
 		public event errorEventHandler OnError;
-		public delegate void errorEventHandler (SuperSocket.ClientEngine.ErrorEventArgs e);
+		public delegate void errorEventHandler (object o, IhildaWebSocketError e);
 
 
 
@@ -1058,7 +1072,11 @@ namespace RippleLibSharp.Network
 	}
 
 
-
+	public class IhildaWebSocketError
+	{
+		
+		public Exception Exception { get; set; }
+	}
 
 
 }

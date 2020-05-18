@@ -31,11 +31,13 @@ namespace IhildaWallet
 
 		}
 
-		public class SelectableMemoIndice : MemoIndice
-		{
-			public bool IsSelected = false;
+
+	}
+
+	public class SelectableMemoIndice : MemoIndice
+	{
+		public bool IsSelected = false;
 
 
-		}
 	}
 }

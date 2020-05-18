@@ -606,7 +606,7 @@ namespace IhildaWallet
 
 				StringBuilder sb = new StringBuilder ();
 
-				RippleWallet rippleWallet = WalletManager.GetRippleWallet ();
+				RippleWallet SelectedRippleWallet = WalletManager.GetRippleWallet ();
 
 				for (int i = 0; i < wallets.Count (); i++) {
 					//foreach (RippleWallet rw in wallets) {
@@ -615,8 +615,8 @@ namespace IhildaWallet
 
 					bool b = false;
 
-					if (rippleWallet?.WalletName != null) {
-						b |= rippleWallet.WalletName.Equals (rw?.WalletName);
+					if (SelectedRippleWallet?.WalletName != null) {
+						b |= SelectedRippleWallet.WalletName.Equals (rw?.WalletName);
 					}
 
 					sb.Clear ();
@@ -635,7 +635,7 @@ namespace IhildaWallet
 							}
 						} */
 
-						if (!Program.darkmode) {
+						if (!ProgramVariables.darkmode) {
 							sb.Append ("fgcolor=\"green\"><big>");
 						} else {
 							sb.Append ("fgcolor=\"chartreuse\"><big>");
@@ -654,7 +654,7 @@ namespace IhildaWallet
 
 						sb.Append ("</big></span>");
 
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							sb.Append ("<span fgcolor=\"deepskyblue\" size=\"x-large\">");
 						} else {
 							sb.Append ("<span fgcolor=\"darkblue\" size=\"x-large\">");
@@ -686,13 +686,13 @@ namespace IhildaWallet
 							*/		    
 						}
 
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							sb.Append ("fgcolor=\"chartreuse\">");
 						} else {
 							sb.Append ("fgcolor=\"green\">");
 						}
 
-						sb.Append (rw?.GetStoredReceiveAddress () ?? " ");
+						sb.Append (rw?.GetStoredReceiveAddress () ?? "Missing master account");
 						sb.Append ("</span>");
 
 
@@ -715,7 +715,7 @@ namespace IhildaWallet
 						sb.Append (rw?.Regular_Key_Account ?? " ");
 						sb.Append ("</span>");
 
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							sb.Append ("<span fgcolor=\"deepskyblue\" size=\"x-large\">");
 						} else {
 							sb.Append ("<span fgcolor=\"darkblue\" size=\"x-large\">");
@@ -741,7 +741,7 @@ namespace IhildaWallet
 
 					string name = rw?.WalletName ?? "";
 					if (b) {
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							name = "<span fgcolor=\"chartreuse\" ><b><u>" + name + "</u></b></span>";
 						} else {
 							name = "<span fgcolor=\"green\" ><b><u>" + name + "</u></b></span>";

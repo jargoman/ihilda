@@ -1,15 +1,10 @@
-﻿using System;
-
-using RippleLibSharp.Network;
-
-using System.Threading.Tasks;
+﻿
 using System.Threading;
-
-using RippleLibSharp.Result;
-using RippleLibSharp.Transactions;
-using RippleLibSharp.Transactions.TxTypes;
-
+using System.Threading.Tasks;
 using Codeplex.Data;
+using RippleLibSharp.Network;
+using RippleLibSharp.Result;
+using RippleLibSharp.Transactions.TxTypes;
 
 namespace RippleLibSharp.Commands.Tx
 {

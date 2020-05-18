@@ -78,6 +78,24 @@ namespace IhildaWallet
 				this.accountlabel.Text = _rippleWallet.GetStoredReceiveAddress();
 				this.secretlabel.Text = "Concealed";
 				//ToggleSecret();
+
+				if (_rippleWallet.AccountType == RippleWalletTypeEnum.Regular) {
+
+				}
+
+				switch (_rippleWallet.AccountType) {
+					case RippleWalletTypeEnum.Master:
+					typelabel.Text = "Master key";
+					break;
+
+					case RippleWalletTypeEnum.MasterPrivateKey:
+					typelabel.Text = "Private Key";
+					break;
+
+					case RippleWalletTypeEnum.Regular:
+					typelabel.Text = "Regular key";
+					break;
+				}
 				
 			});
 

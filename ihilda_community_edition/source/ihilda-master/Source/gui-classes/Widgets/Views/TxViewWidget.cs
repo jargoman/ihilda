@@ -242,7 +242,7 @@ namespace IhildaWallet
 					MessageDialog.ShowMessage (messg);
 #endif
 
-					infoBarLabel.Text = Program.darkmode ? "<span fgcolor=\"#FFAABB\">" : " < span fgcolor=\"red\">" + messg + "</span>";
+					infoBarLabel.Text = ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">" : " < span fgcolor=\"red\">" + messg + "</span>";
 					infoBarLabel.Visible = true;
 
 					SpinWaitObj.Hide ();
@@ -265,7 +265,7 @@ namespace IhildaWallet
 					MessageDialog.ShowMessage (messg);
 #endif
 
-					infoBarLabel.Markup = Program.darkmode ? "<span fgcolor=\"#FFAABB\">" : "<span fgcolor=\"red\">" + messg + "</span>";
+					infoBarLabel.Markup = ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">" : "<span fgcolor=\"red\">" + messg + "</span>";
 					infoBarLabel.Visible = true;
 
 					SpinWaitObj.Hide ();
@@ -423,8 +423,14 @@ namespace IhildaWallet
 					string question = "Without a ledger constraint your request will download full transaction history. This may take a very long time for accounts that have a long transaction history. Consider setting a limit.\n  example limit 100\n Are you sure you'd like to continue without a ledger constraint?";
 					bool cont = AreYouSure.AskQuestionNonGuiThread ("Download full history?", question);
 					if (!cont) {
-						expander1.Expanded = true;
-						ledgerconstraintswidget3.HighLightLimit ();
+						Gtk.Application.Invoke (
+							delegate {
+
+								expander1.Expanded = true;
+								ledgerconstraintswidget3.HighLightLimit ();
+
+							}
+						);
 
 						return;
 					}
@@ -463,6 +469,7 @@ namespace IhildaWallet
 						);
 					} else {
 
+						//Task<Response<AccountTxResult>> tas = AccountTx.GetResult (
 						Task<Response<AccountTxResult>> tas = AccountTx.GetResult (
 							para.address,
 							min?.ToString () ?? (-1).ToString (),
@@ -482,10 +489,40 @@ namespace IhildaWallet
 								}
 							);
 						}
-						var v = tas.Result.result.transactions;
+						if (tas.IsFaulted) {
+							Gtk.Application.Invoke (
+								delegate {
+									infoBarLabel.Text = "<span>Task faulted</span>";
+									infoBarLabel.Show ();
+								}
+							);
+							return;
+						}
+						var tasResponse = tas.Result;
 
-						if (v != null) {
-							SetTransactions (v, para.address);
+						if (tasResponse.HasError ()) {
+							Gtk.Application.Invoke (
+								delegate {
+									infoBarLabel.Text = "<span>" + tasResponse.error_message + "</span>";
+									infoBarLabel.Show ();
+								}
+							);
+							return;
+						}
+
+						var tasResult = tasResponse.result;
+
+						var tasTxs = tasResult.transactions;
+
+						if (tasTxs != null) {
+							SetTransactions (tasTxs, para.address);
+						} else {
+							Gtk.Application.Invoke (
+								delegate {
+									infoBarLabel.Text = "<span>null transaction list</span>";
+									infoBarLabel.Show ();
+								}
+							);
 						}
 						return;
 					}
@@ -720,7 +757,7 @@ namespace IhildaWallet
 
 				Gtk.Application.Invoke (
 					(object sender, EventArgs event_args) => {
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							this.infoBarLabel.Text = "<span fgcolor=\"#FFAABB\">Bug: AccountTx Task returned null value</span>";
 						} else {
 							this.infoBarLabel.Text = "<span fgcolor=\"red\">Bug: AccountTx Task returned null value</span>";
@@ -779,7 +816,7 @@ namespace IhildaWallet
 
 
 				StringBuilder message = new StringBuilder (110); // set to a few bytes larger than the string 104 chars
-				if (Program.darkmode) {
+				if (ProgramVariables.darkmode) {
 					message.Append ("<span fgcolor=\"#FFAABB\"> account ");
 				} else {
 					message.Append ("<span fgcolor=\"red\"> account ");

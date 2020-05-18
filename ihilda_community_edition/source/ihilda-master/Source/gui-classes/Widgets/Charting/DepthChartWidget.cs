@@ -27,7 +27,7 @@ namespace IhildaWallet
 
 			TokenSource = new CancellationTokenSource ();
 			var token = TokenSource.Token;
-			this.darkmodecheckbox.Active = Program.darkmode;
+			this.darkmodecheckbox.Active = ProgramVariables.darkmode;
 
 
 			if (this.drawingarea1 == null) {
@@ -265,7 +265,7 @@ this.CopyBuffer ();
 
 			#region buy_menus
 			MenuItem buy = new MenuItem (
-				Program.darkmode ? "Prepare a <span fgcolor=\"chartreuse\">buy</span>  order at" : "Prepare a <span fgcolor=\"green\">buy</span>  order at "
+				ProgramVariables.darkmode ? "Prepare a <span fgcolor=\"chartreuse\">buy</span>  order at" : "Prepare a <span fgcolor=\"green\">buy</span>  order at "
 				+ price.ToString ()
 				+ " "
 				+ tradePair.Currency_Counter.currency
@@ -309,7 +309,7 @@ this.CopyBuffer ();
 			};
 
 			Gtk.MenuItem cassbuy = new MenuItem (
-				Program.darkmode ? 
+				ProgramVariables.darkmode ? 
 					"Cascade <span fgcolor=\"chartreuse\">buy</span> orders from " : 
 				       	"Cascade <span fgcolor=\"green\">buy</span> orders from "
 					+ price.ToString ()
@@ -352,7 +352,7 @@ this.CopyBuffer ();
 			};
 
 			Gtk.MenuItem autobuy = new MenuItem (
-				Program.darkmode ?
+				ProgramVariables.darkmode ?
 				"Prepare an automated <span fgcolor=\"chartreuse\">buy</span> at " :
 				"Prepare an automated <span fgcolor=\"green\">buy</span> at "
 				+ price.ToString ()
@@ -383,7 +383,7 @@ this.CopyBuffer ();
 
 			#region sell_menus
 
-			Gtk.MenuItem sell = new MenuItem (Program.darkmode ? "Prepare a <span fgcolor=\"#FFAABB\">sell</span> order at this price" : "Prepare a <span fgcolor=\"red\">sell</span> order at this price");
+			Gtk.MenuItem sell = new MenuItem (ProgramVariables.darkmode ? "Prepare a <span fgcolor=\"#FFAABB\">sell</span> order at this price" : "Prepare a <span fgcolor=\"red\">sell</span> order at this price");
 			sell.Show ();
 			menu.Add (sell);
 
@@ -404,7 +404,7 @@ this.CopyBuffer ();
 			};
 
 			Gtk.MenuItem casssell = new MenuItem (
-				(string)(Program.darkmode ? "Cascade <span fgcolor=\"#FFAABB\">sell</span> orders begining at " : "Cascade <span fgcolor=\"red\">sell</span> orders begining at ")
+				(string)(ProgramVariables.darkmode ? "Cascade <span fgcolor=\"#FFAABB\">sell</span> orders begining at " : "Cascade <span fgcolor=\"red\">sell</span> orders begining at ")
 				+ price.ToString ()
 				+ " "
 				+ tradePair.Currency_Counter.currency
@@ -430,7 +430,7 @@ this.CopyBuffer ();
 
 			Gtk.MenuItem autosell = new MenuItem (
 
-				Program.darkmode ? "Prepare an automated <span fgcolor=\"#FFAABB\">sell</span> order at " : "Prepare an automated <span fgcolor=\"red\">sell</span> order at "
+				ProgramVariables.darkmode ? "Prepare an automated <span fgcolor=\"#FFAABB\">sell</span> order at " : "Prepare an automated <span fgcolor=\"red\">sell</span> order at "
 				+ price.ToString ()
 				+ " "
 				+ tradePair.Currency_Counter.currency
@@ -791,8 +791,8 @@ this.CopyBuffer ();
 
 		private void SetOrdersTuple (decimal price)
 		{
-			var cluster = this.orderclusterwidget1.cluster;
-			var orderTuple = cluster.GetOrders ((double)price, _tradePair);
+			OrderCluster cluster = this.orderclusterwidget1.cluster;
+			Tuple<IEnumerable<AutomatedOrder>, IEnumerable<AutomatedOrder>> orderTuple = cluster.GetOrders ((double)price, _tradePair);
 			ordersTuple = orderTuple;
 		}
 
@@ -951,7 +951,8 @@ this.CopyBuffer ();
 
 
 
-			NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
+			//NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
+			NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
 			if (ni == null) {
 
 				ResetProgressBar ();

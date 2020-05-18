@@ -19,7 +19,7 @@ namespace IhildaWallet.Networking
 	{
 		public static NetworkInterface CurrentInterface {
 			get {
-				if (!Program.network) {
+				if (!ProgramVariables.network) {
 					return null;
 				}
 				return _CurrentInterface; 
@@ -31,7 +31,7 @@ namespace IhildaWallet.Networking
 
 		public static NetworkInterface InitNetworking (ConnectionSettings coninf)
 		{
-			if (!Program.network) {
+			if (!ProgramVariables.network) {
 				return null;
 			}
 			#region debug
@@ -173,7 +173,7 @@ namespace IhildaWallet.Networking
 
 
 		public static NetworkInterface GetNetworkInterfaceGuiThread () {
-			if (!Program.network) { return null; }
+			if (!ProgramVariables.network) { return null; }
 			if (CurrentInterface != null) {
 				return CurrentInterface;
 			}
@@ -184,7 +184,7 @@ namespace IhildaWallet.Networking
 		}
 
 		public static NetworkInterface GetNetworkInterfaceNonGUIThread () {
-			if (!Program.network) { return null; }
+			if (!ProgramVariables.network) { return null; }
 			if (CurrentInterface != null) {
 				return CurrentInterface;
 			}
@@ -195,7 +195,7 @@ namespace IhildaWallet.Networking
 		}
 
 		public static bool DoNetworkingDialog () {
-			if (!Program.network) {
+			if (!ProgramVariables.network) {
 				return false;
 			}
 
@@ -213,7 +213,7 @@ namespace IhildaWallet.Networking
 		}
 
 		public static bool DoNetworkingDialogNonGUIThread () {
-			if (!Program.network) {
+			if (!ProgramVariables.network) {
 				return false;
 			}
 
@@ -271,7 +271,7 @@ namespace IhildaWallet.Networking
 
 			return Task.Run (
 				delegate {
-					if (!Program.network) {
+					if (!ProgramVariables.network) {
 						return false;
 					}
 					

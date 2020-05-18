@@ -71,6 +71,12 @@ namespace IhildaWallet
 
 		}
 
+		public void ClearRules ()
+		{
+			RulesList.Clear ();
+			this.SaveRules ();
+		}
+
 		public void LoadRules ()
 		{
 			LoadRules (settingsPath);
@@ -100,6 +106,8 @@ namespace IhildaWallet
 			}
 
 		}
+
+
 
 		public bool SaveRules ()
 		{

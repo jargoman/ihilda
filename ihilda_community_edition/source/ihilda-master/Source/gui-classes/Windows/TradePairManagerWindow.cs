@@ -59,6 +59,8 @@ namespace IhildaWallet
 
 			};
 
+			trollbutton.Clicked += Trollbutton_Clicked;
+
 
 			tpm = new TradePairManager ();
 
@@ -66,6 +68,21 @@ namespace IhildaWallet
 
 
 
+		}
+
+		void Trollbutton_Clicked (object sender, EventArgs e)
+		{
+			RippleWallet rippleWallet = WalletManager.GetRippleWallet ();
+
+			TradePair tp = TradePairManager.SelectedTradePair;
+
+			if (tp == null) {
+				// TODO update user ui
+				return;
+			}
+
+			TrollBoxWindow trollBoxWindow = new TrollBoxWindow (tp.Currency_Base.currency, tp.Currency_Counter.currency);
+			trollBoxWindow.Show ();
 		}
 
 
@@ -76,16 +93,19 @@ namespace IhildaWallet
 #endif
 
 			RippleWallet rippleWallet = WalletManager.GetRippleWallet ();
-			bool shouldContinue = LeIceSense.DoTrialDialog (rippleWallet, LicenseType.TRADING);
-			if (!shouldContinue) {
-				return;
-			}
+
+			// make trading free
 
 			TradePair tp = TradePairManager.SelectedTradePair;
 
 			if (tp == null) {
+				// TODO update user ui
 				return;
 			}
+
+			bool hasPro = LeIceSense.DoTrialDialog (rippleWallet, LicenseType.TRADING);
+
+
 
 			DepthChartWidget dcw = null;
 			DepthChartWindow dcwin = null;
@@ -172,6 +192,7 @@ namespace IhildaWallet
 
 		}
 
+
 		public void EditTradePair (object sender, EventArgs args)
 		{
 
@@ -179,34 +200,43 @@ namespace IhildaWallet
 			string method_sig = clsstr + nameof (EditTradePair) + DebugRippleLibSharp.both_parentheses;
 #endif
 
+			Gtk.Application.Invoke (
+				delegate {
 
-			TradePair oldtp = TradePairManager.SelectedTradePair;
+					TradePair oldtp = TradePairManager.SelectedTradePair;
 
-			if (oldtp == null) {
-				MessageDialog.ShowMessage ("You must first select a tradepair to edit.");
-				return;
-			}
+					if (oldtp == null) {
+						MessageDialog.ShowMessage ("You must first select a tradepair to edit.");
+						return;
+					}
+				
+					RippleWallet rippleWallet = WalletManager.GetRippleWallet ();
 
-			TradePair newtp = TradePairCreateDialog.DoDialog (oldtp);
+					TradePair newtp = TradePairCreateDialog.DoDialog (oldtp, rippleWallet);
 
-			if (newtp == null) {
-				//MessageDialog.ShowMessage ("");
-				return;
-			}
+					if (newtp == null) {
+						//MessageDialog.ShowMessage ("");
+						return;
+					}
 
-			if (newtp.Currency_Base == null) {
-				return;
-			}
+					if (newtp.Currency_Base == null) {
+						return;
+					}
 
-			if (newtp.Currency_Base == null) {
-				return;
-			}
+					if (newtp.Currency_Base == null) {
+						return;
+					}
 
-			tpm.RemoveTradePair (oldtp);
-			tpm.AddTradePair (newtp);
-			tpm.SaveTradePairs ();
+					tpm.RemoveTradePair (oldtp);
+					tpm.AddTradePair (newtp);
+					tpm.SaveTradePairs ();
 
-			UpdateUI ();
+
+
+					UpdateUI ();
+				}
+			);
+
 
 		}
 
@@ -225,7 +255,11 @@ namespace IhildaWallet
 			tpm.RemoveTradePair (tp);
 			tpm.SaveTradePairs ();
 
-			UpdateUI ();
+			Application.Invoke ( delegate {
+
+				UpdateUI ();
+			});
+
 		}
 
 		public void Networksetting ( object sender, EventArgs args ) {
@@ -235,6 +269,7 @@ namespace IhildaWallet
 
 
 		public void UpdateUI () {
+
 
 
 			if (tradepairtree1 == null) {

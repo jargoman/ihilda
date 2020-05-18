@@ -57,31 +57,7 @@ namespace IhildaWallet
 
 
 
-			if (this.walletshowwidget1 == null) {
-				walletshowwidget1 = new WalletShowWidget ();
-				walletshowwidget1.Show ();
-
-				if (label15 == null) {
-					label15 = new Label ("<b>Wallet</b>") {
-						UseMarkup = true
-					};
-				}
-
-				notebook1.AppendPage (walletshowwidget1, label15);
-			}
-
-			if (this.balancetab1 == null) {
-				this.balancetab1 = new BalanceTab ();
-				balancetab1.Show ();
-
-				if (label35 == null) {
-					label35 = new Label ("<b>Balance</b>") {
-						UseMarkup = true
-					};
-				}
-				notebook1.AppendPage (walletshowwidget1, label35);
-			}
-
+			
 			if (this.sendripple1 == null) {
 				sendripple1 = new SendRipple ();
 				sendripple1.Show ();
@@ -131,30 +107,30 @@ namespace IhildaWallet
 			if (pathfindwidget1 == null) {
 				pathfindwidget1 = new PathFindWidget ();
 				pathfindwidget1.Show ();
-				if (label37 == null) {
-					label37 = new Label ("<b>Path Find</b>") {
+				if (label58 == null) {
+					label58 = new Label ("<b>Path Find</b>") {
 						UseMarkup = true
 					};
 				}
-				notebook1.AppendPage (pathfindwidget1, label37);
+				notebook1.AppendPage (pathfindwidget1, label58);
 			}
 
 			if (dividendwidget1 == null) {
 				dividendwidget1 = new DividendWidget ();
 				dividendwidget1.Show ();
-				if (label46 == null) {
-					label46 = new Label ("<b>Dividend</b>");
+				if (label70 == null) {
+					label70 = new Label ("<b>Dividend</b>");
 				}
-				notebook1.AppendPage (dividendwidget1, label46);
+				notebook1.AppendPage (dividendwidget1, label70);
 			}
 
 			if (masspaymentwidget1 == null) {
 				masspaymentwidget1 = new MassPaymentWidget ();
 				masspaymentwidget1.Show ();
-				if (label55 == null) {
-					label55 = new Label ("<b>Mass Payment</b>");
+				if (label80 == null) {
+					label80 = new Label ("<b>Mass Payment</b>");
 				}
-				notebook1.AppendPage (masspaymentwidget1, label55);
+				notebook1.AppendPage (masspaymentwidget1, label80);
 			}
 
 
@@ -447,26 +423,6 @@ namespace IhildaWallet
 			}
 
 
-			if (this.walletshowwidget1 != null) {
-#if DEBUG
-				if (DebugIhildaWallet.PaymentWindow) {
-					Logging.WriteLog (method_sig + "wallet1 != null");
-				}
-#endif
-				this.walletshowwidget1.SetRippleWallet (rw);
-			}
-
-
-
-			if (this.balancetab1 != null) {
-#if DEBUG
-				if (DebugIhildaWallet.PaymentWindow) {
-					Logging.WriteLog (method_sig + "balancetab1 != null");
-				}
-#endif
-
-				this.balancetab1.SetAddress (rw.GetStoredReceiveAddress ());
-			}
 
 			if (this.sendripple1 != null) {
 				this.sendripple1.SetRippleWallet (rw);

@@ -407,6 +407,7 @@ namespace RippleLibSharp.Commands.Accounts
 			get { return _err_mess; }
 			set { _err_mess = value; }
 		}
+
 		private string _err_mess = null;
 
 		public bool HasError {

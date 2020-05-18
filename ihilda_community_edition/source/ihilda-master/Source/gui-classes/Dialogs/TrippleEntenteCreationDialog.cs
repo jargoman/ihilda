@@ -35,21 +35,21 @@ namespace IhildaWallet
 
 			if (string.IsNullOrEmpty (str)) {
 				// TODO alert user
-				label6.Markup = Program.darkmode ? "<span fgcolor=\"#FFAABB\">Password can not be blank</span>" : "<span fgcolor=\"red\">Password can not be blank</span>";
+				label6.Markup = ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">Password can not be blank</span>" : "<span fgcolor=\"red\">Password can not be blank</span>";
 				label6.Show ();
 				passentry.ModifyBase (StateType.Normal, orchid);
 				return null;
 			}
 
 			if (string.IsNullOrEmpty (confstr)) {
-				label6.Markup = Program.darkmode ? "<span fgcolor=\"#FFAABB\">Confirm your password</span>" : " < span fgcolor=\"red\">Confirm your password</span>";
+				label6.Markup = ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">Confirm your password</span>" : " < span fgcolor=\"red\">Confirm your password</span>";
 				label6.Show ();
 				this.confentry.ModifyBase (StateType.Normal, orchid);
 				return null;
 			}
 
 			if (!str.Equals(confstr)) {
-				label6.Markup = Program.darkmode ? "<span fgcolor=\"#FFAABB\">Passwords do not match</span>" : "<span fgcolor=\"red\">Passwords do not match</span>";
+				label6.Markup = ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">Passwords do not match</span>" : "<span fgcolor=\"red\">Passwords do not match</span>";
 				passentry.ModifyBase (StateType.Normal, orchid);
 				confentry.ModifyBase (StateType.Normal, orchid);
 				return null;
@@ -59,7 +59,7 @@ namespace IhildaWallet
 			var v = this.prismwidget2.CollectPrisms ();
 			if (v == null) {
 
-				label6.Markup = Program.darkmode ? "<span fgcolor=\"#FFAABB\">Invalid Prism Values</span>" : "<span fgcolor=\"red\">Invalid Prism Values</span>";
+				label6.Markup = ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">Invalid Prism Values</span>" : "<span fgcolor=\"red\">Invalid Prism Values</span>";
 				label6.Show ();
 				return null;
 			}

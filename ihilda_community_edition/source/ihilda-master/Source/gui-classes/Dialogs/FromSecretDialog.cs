@@ -124,7 +124,7 @@ namespace IhildaWallet
 					try {
 						RippleWallet rw = new RippleWallet (s, RippleWalletTypeEnum.Master);
 						string address = rw.GetStoredReceiveAddress ();
-						TextHighlighter.Highlightcolor = Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
+						TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 						this.label2.Markup = TextHighlighter.Highlight (address);
 
 					}
@@ -147,7 +147,7 @@ namespace IhildaWallet
 					try {
 						RipplePrivateKey privateKey = new RipplePrivateKey (s);
 						string address = privateKey.GetPublicKey ().GetAddress ();
-						TextHighlighter.Highlightcolor = Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
+						TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 						this.label2.Markup = TextHighlighter.Highlight (address);
 
 					} catch (Exception ex) {
@@ -220,7 +220,7 @@ namespace IhildaWallet
 
 				combobox1.ModifyBase (StateType.Normal, new Gdk.Color (218, 112, 214));
 
-				if (Program.darkmode) {
+				if (ProgramVariables.darkmode) {
 					label6.Markup = "<span fgcolor=\"#FFAABB\">Not a valid type</span>";
 				} else {
 					label6.Markup = "<span fgcolor=\"red\">Not a valid type</span>";
@@ -306,7 +306,7 @@ namespace IhildaWallet
 				return;
 			}
 
-			TextHighlighter.Highlightcolor = Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
+			TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 			label3.Markup = TextHighlighter.Highlight (address2);
 		}
 
@@ -541,7 +541,7 @@ namespace IhildaWallet
 
 					this.entry5.ModifyBase (StateType.Normal, orchid);
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						this.label6.Markup = "<span fgcolor=\"#FFAABB\">Wallet needs a name</span>";
 					} else {
 						this.label6.Markup = "<span fgcolor=\"red\">Wallet needs a name</span>";
@@ -558,7 +558,7 @@ namespace IhildaWallet
 						Logging.WriteLog (method_sig + "WallerManager.currentInstance == null, returning");
 					}
 #endif
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						this.label6.Markup = "<span fgcolor=\"#FFAABB\">Integral bug. No wallet manager found in application. Definitely a bug</span>";
 					} else {
 						this.label6.Markup = "<span fgcolor=\"red\">Integral bug. No wallet manager found in application. Definitely a bug</span>";
@@ -577,7 +577,7 @@ namespace IhildaWallet
 					}
 #endif
 
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						this.label6.Markup = "<span fgcolor=\"#FFAABB\">invalid name</span>";
 					} else {
 						this.label6.Markup = "<span fgcolor=\"red\">invalid name</span>";
@@ -619,7 +619,7 @@ namespace IhildaWallet
 						Logging.WriteLog (method_sig + "name contains " + ((invalid > 1) ? "invalid characters" : "an invalid character") + ", returning");
 					}
 #endif
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						label6.Markup = "<span fgcolor=\"#FFAABB\">name contains invalid characters</span>";
 					} else {
 						label6.Markup = "<span fgcolor=\"red\">name contains invalid characters</span>";
@@ -633,7 +633,7 @@ namespace IhildaWallet
 
 
 				if (string.IsNullOrWhiteSpace (secret)) {
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						this.label6.Markup = "<span fgcolor=\"#FFAABB\">You need to specify a secret</span>";
 					} else {
 						this.label6.Markup = "<span fgcolor=\"red\">You need to specify a secret</span>";
@@ -647,7 +647,7 @@ namespace IhildaWallet
 
 				if (!Base58.IsBase58 (secret)) {
 					// todo show invalid secret message
-					if (Program.darkmode) {
+					if (ProgramVariables.darkmode) {
 						this.label6.Markup = "<span fgcolor=\"#FFAABB\">Invalid Secret</span>";
 					} else {
 						this.label6.Markup = "<span fgcolor=\"red\">Invalid Secret</span>";
@@ -675,7 +675,7 @@ namespace IhildaWallet
 					}
 
 #endif
-					this.label6.Markup = (string)(Program.darkmode ? "<span fgcolor=\"#FFAABB\">Invalid Wallet type "  : "<span fgcolor=\"red\">Invalid Wallet type ") + (string)(walletType ?? null) + "</span>";
+					this.label6.Markup = (string)(ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">Invalid Wallet type "  : "<span fgcolor=\"red\">Invalid Wallet type ") + (string)(walletType ?? null) + "</span>";
 
 					combobox1.ModifyBase (StateType.Normal, orchid);
 					this.label6.Show ();
@@ -702,7 +702,7 @@ namespace IhildaWallet
 
 						}
 #endif
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							this.label6.Markup = "<span fgcolor=\"#FFAABB\">Failed to create the wallet. Valid secret??</span>";
 						} else {
 							this.label6.Markup = "<span fgcolor=\"red\">Failed to create the wallet. Valid secret??</span>";
@@ -725,7 +725,7 @@ namespace IhildaWallet
 
 						}
 #endif
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							this.label6.Markup = "<span fgcolor=\"#FFAABB\">Failed to create the wallet. Valid private key??</span>";
 						} else {
 							this.label6.Markup = "<span fgcolor=\"red\">Failed to create the wallet. Valid private key??</span>";
@@ -746,7 +746,7 @@ namespace IhildaWallet
 					if (string.IsNullOrWhiteSpace (mast)) {
 						// TODO are ya sure. limited account capabilities 
 						// I haven't tested regular accounts yet
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							this.label6.Markup = "<span fgcolor=\"#FFAABB\">Failed to create a regular key wallet; you must specify the master account it signs on behalf of</span>";
 						} else {
 							this.label6.Markup = "<span fgcolor=\"red\">Failed to create a regular key wallet; you must specify the master account it signs on behalf of</span>";
@@ -768,7 +768,7 @@ namespace IhildaWallet
 						}
 #endif
 
-						if (Program.darkmode) {
+						if (ProgramVariables.darkmode) {
 							this.label6.Markup = "<span fgcolor=\"#FFAABB\">Invalid Master account</span>";
 						} else {
 							this.label6.Markup = "<span fgcolor=\"red\">Invalid Master account</span>";

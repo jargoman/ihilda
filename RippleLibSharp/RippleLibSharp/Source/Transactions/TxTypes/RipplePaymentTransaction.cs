@@ -282,7 +282,18 @@ namespace RippleLibSharp.Transactions.TxTypes
 			}
 		}
 
+		public override string ToString ()
+		{
+			StringBuilder stringBuilder = new StringBuilder ();
+			stringBuilder.Append ("Send ");
+			stringBuilder.Append (this.Amount?.ToString());
+			stringBuilder.Append (" to ");
+			stringBuilder.Append (this.Destination);
 
+			return stringBuilder.ToString ();
+
+			
+		}
 
 
 	}

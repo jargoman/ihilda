@@ -44,7 +44,7 @@ namespace IhildaWallet
 	    		
 			
 
-			if (Program.darkmode) {
+			if (ProgramVariables.darkmode) {
 				label26.Markup = "<b><span fgcolor=\"chartreuse\" font_size=\"xx-large\">Buy Order Bids</span></b>";
 
 			}
@@ -87,7 +87,7 @@ namespace IhildaWallet
 
 		public void SetToolTips (TradePair tradePair)
 		{
-			if (!Program.showPopUps) {
+			if (!ProgramVariables.showPopUps) {
 				return;
 
 			}
@@ -96,7 +96,7 @@ namespace IhildaWallet
 				return;
 			}
 
-			if (!Program.showPopUps) {
+			if (!ProgramVariables.showPopUps) {
 				return;
 			}
 

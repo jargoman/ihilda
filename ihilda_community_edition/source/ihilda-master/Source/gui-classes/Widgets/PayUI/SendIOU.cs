@@ -58,7 +58,7 @@ namespace IhildaWallet
 			this.issuerentry.SelectionReceived += this.OnSelectionReceivedEvent;
 			this.issuerentry.Changed += this.OnCurrencycomboboxentryChanged;
 			//this.issuerentry.Changed
-			this.amountentry.Activated += this.OnAmountentryActivated;
+			this.amountentry.Entry.Activated += this.OnAmountentryActivated;
 
 			this.destinationentry.Activated += this.OnDestinationentryActivated;
 
@@ -144,8 +144,188 @@ namespace IhildaWallet
 			var memo = Program.GetClientMemo ();
 			this.AddMemo (memo);
 
+			button114.Clicked += PercentageClicked;
+			button115.Clicked += PercentageClicked;
+			button111.Clicked += PercentageClicked;
+			button112.Clicked += PercentageClicked;
+
+			button123.Clicked += PercentageClicked;
+			button113.Clicked += PercentageClicked;
+			button119.Clicked += PercentageClicked;
+
+			button116.Clicked += PercentageClicked;
+
+			button120.Clicked += PercentageClicked;
+
+			button117.Clicked += PercentageClicked;
+
+			button118.Clicked += PercentageClicked;
+
+			button121.Clicked += PercentageClicked;
+
+			button122.Clicked += PercentageClicked;
+			hscale2.ValueChanged += Hscale2_ValueChanged;
+		}
+
+		void Hscale2_ValueChanged (object sender, EventArgs e)
+		{
+#if DEBUG
+			string method_sig = clsstr + nameof (Hscale2_ValueChanged) + DebugRippleLibSharp.colon;
+#endif
+			Decimal val = (Decimal)hscale2.Value;
+
+			string cur = currencycomboboxentry?.Entry?.Text;
+
+			if (cur == null) {
+
+				string message = "Must set sending currency to use percentage shortcuts";
+				if (ProgramVariables.darkmode) {
+					currencycomboboxentry.ModifyBase (StateType.Normal, new Gdk.Color (0xff, 0xAA, 0xBB));
+
+					infobar.Text = "<span fgcolor=\"#FFAABB\">" + message + "</span>";
+
+				} else {
+					currencycomboboxentry.ModifyBase (StateType.Normal, new Gdk.Color (0xFF, 0x00, 0x00));
+					infobar.Text = "<span fgcolor=\"#Red\">" + message + "</span>";
+				}
+				return;
+			}
+
+
+
+			string issuer = issuerentry?.Entry?.Text;
+
+			if (!RippleCurrency.NativeCurrency.Equals (cur) && issuer == null) {
+
+				string message = "Must set issuer to use percentage shortcuts for non xrp currencies";
+				if (ProgramVariables.darkmode) {
+					issuerentry.ModifyBase (StateType.Normal, new Gdk.Color (0xff, 0xAA, 0xBB));
+
+					infobar.Text = "<span fgcolor=\"#FFAABB\">" + message + "</span>";
+
+				} else {
+					issuerentry.ModifyBase (StateType.Normal, new Gdk.Color (0xFF, 0x00, 0x00));
+					infobar.Text = "<span fgcolor=\"#Red\">" + message + "</span>";
+				}
+
+				return;
+			}
+
+
+			Task.Run (delegate {
+				ScaleMethod (val, cur, issuer);
+			});
 
 		}
+
+
+		private RippleCurrency lastCurrencyAmount = default (RippleCurrency);
+		private RippleCurrency lastReserve = default (RippleCurrency);
+
+
+
+		CancellationTokenSource scaleTokenSource = new CancellationTokenSource ();
+
+		public void ScaleMethod (Decimal value, string currency, string issuer)
+		{
+#if DEBUG
+			string method_sig = clsstr + nameof (ScaleMethod) + DebugRippleLibSharp.colon;
+
+#endif
+			string acc = _rippleWallet.Account;
+
+			if (
+				last_call_time == default (DateTime) || 
+				(DateTime.Now - last_call_time).TotalMilliseconds < 2500 ||
+				lastCurrencyAmount.currency != currency ||
+				lastCurrencyAmount.issuer != issuer
+			) {
+
+				scaleTokenSource?.Cancel ();
+				scaleTokenSource = new CancellationTokenSource ();
+				NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
+
+
+				CancellationToken token = scaleTokenSource.Token;
+
+
+				if (!RippleCurrency.NativeCurrency.Equals (currency)) {
+					lastCurrencyAmount = AccountLines.GetBalanceForIssuer
+					(
+						currency,
+						issuer,
+						acc,
+						ni,
+						token
+					);
+
+
+
+
+
+
+
+				} else {
+
+					Task<Response<AccountInfoResult>> task =
+						AccountInfo.GetResult (acc, ni, token);
+
+					task.Wait (token);
+
+					Response<AccountInfoResult> resp = task.Result;
+					AccountInfoResult res = resp.result;
+
+					lastReserve = res.GetReserveRequirements (ni, token);
+
+					lastCurrencyAmount = new RippleCurrency (res.account_data.Balance);
+
+
+				}
+
+				last_call_time = DateTime.Now;
+
+			}
+
+
+
+
+			if (!RippleCurrency.NativeCurrency.Equals (currency)) {
+
+
+				Decimal bal = lastCurrencyAmount.amount;
+
+				Decimal res = bal * value / 100;
+
+
+
+
+				var ss = res.ToString ();
+				Gtk.Application.Invoke (
+				delegate {
+
+					amountentry.Entry.Text = ss;
+				});
+
+			} else {
+
+
+
+
+
+				Decimal bal = (lastCurrencyAmount.amount - lastReserve.amount) / 1000000 * value / 100;
+
+
+
+				string ss = bal.ToString ();
+				Gtk.Application.Invoke (delegate {
+					amountentry.Entry.Text = ss;
+				});
+			}
+
+
+
+		}
+
 
 		private IEnumerable<SelectableMemoIndice> Memos {
 			get;
@@ -199,10 +379,20 @@ namespace IhildaWallet
 
 		private CancellationTokenSource TokenSource = new CancellationTokenSource();
 
+		void PercentageClicked (object sender, EventArgs e)
+		{
+			if (sender is Button b) {
+				string s = b?.Label.TrimEnd ('%');
+				double d = Convert.ToDouble (s);
 
-//#pragma warning disable RECS0122 // Initializing field with default value is redundant
+				hscale2.Value = d;
+			}
+		}
+
+
+		//#pragma warning disable RECS0122 // Initializing field with default value is redundant
 		//public static SendIOU currentInstance = null;
-//#pragma warning restore RECS0122 // Initializing field with default value is redundant
+		//#pragma warning restore RECS0122 // Initializing field with default value is redundant
 		//private double highestLedger = 0;
 
 
@@ -389,7 +579,7 @@ namespace IhildaWallet
 
 			String destination = this.destinationentry.Text;
 
-			String amount = this.amountentry.Text;
+			String amount = this.amountentry.Entry.Text;
 
 
 			String currency = currencycomboboxentry.ActiveText;
@@ -907,6 +1097,7 @@ namespace IhildaWallet
 		}
 
 		static bool part = true;
+		private DateTime last_call_time = default (DateTime); 
 
 		private void UpdateCurrencies ()
 		{

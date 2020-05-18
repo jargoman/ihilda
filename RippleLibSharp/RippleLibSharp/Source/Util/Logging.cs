@@ -31,7 +31,11 @@ namespace RippleLibSharp.Util
 			}
 
 			if (WRITE_TO_STDOUT) {
-				System.Console.WriteLine(message); // namespace is needed because I named a class Console like an idiot
+				try {
+					System.Console.WriteLine (message); // namespace is needed because I named a class Console like an idiot
+				} catch (Exception e) {
+
+				}
 			}
 
 			// TODO write to log

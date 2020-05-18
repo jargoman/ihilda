@@ -20,23 +20,27 @@ namespace IhildaWallet
 
 		private global::IhildaWallet.WalletSwitchWidget walletswitchwidget1;
 
-		private global::Gtk.Button SubmitButton;
-
-		private global::Gtk.Button stopbutton;
-
-		private global::Gtk.Button removebutton;
-
-		private global::Gtk.Button selectbutton;
-
-		private global::Gtk.Button button209;
-
-		private global::Gtk.Button button625;
+		private global::Gtk.Table table2;
 
 		private global::Gtk.Button analysisbutton;
 
 		private global::Gtk.Button applyRuleButton;
 
+		private global::Gtk.Button button209;
+
+		private global::Gtk.Button button625;
+
 		private global::Gtk.Button marketbutton;
+
+		private global::Gtk.Button removebutton;
+
+		private global::Gtk.Button ruleToSelectedbutton;
+
+		private global::Gtk.Button selectbutton;
+
+		private global::Gtk.Button stopbutton;
+
+		private global::Gtk.Button SubmitButton;
 
 		private global::Gtk.Button resetbutton;
 
@@ -102,104 +106,141 @@ namespace IhildaWallet
 			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.walletswitchwidget1]));
 			w6.Position = 0;
 			// Container child hbox1.Gtk.Box+BoxChild
-			this.SubmitButton = new global::Gtk.Button();
-			this.SubmitButton.CanFocus = true;
-			this.SubmitButton.Name = "SubmitButton";
-			this.SubmitButton.UseUnderline = true;
-			this.SubmitButton.Label = global::Mono.Unix.Catalog.GetString("Submit");
-			this.hbox1.Add(this.SubmitButton);
-			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.SubmitButton]));
-			w7.Position = 1;
-			w7.Expand = false;
-			w7.Fill = false;
-			// Container child hbox1.Gtk.Box+BoxChild
-			this.stopbutton = new global::Gtk.Button();
-			this.stopbutton.CanFocus = true;
-			this.stopbutton.Name = "stopbutton";
-			this.stopbutton.UseUnderline = true;
-			this.stopbutton.Label = global::Mono.Unix.Catalog.GetString("Stop");
-			this.hbox1.Add(this.stopbutton);
-			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.stopbutton]));
-			w8.Position = 2;
-			w8.Expand = false;
-			w8.Fill = false;
-			// Container child hbox1.Gtk.Box+BoxChild
-			this.removebutton = new global::Gtk.Button();
-			this.removebutton.CanFocus = true;
-			this.removebutton.Name = "removebutton";
-			this.removebutton.UseUnderline = true;
-			this.removebutton.Label = global::Mono.Unix.Catalog.GetString("Remove");
-			this.hbox1.Add(this.removebutton);
-			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.removebutton]));
-			w9.Position = 3;
-			w9.Expand = false;
-			w9.Fill = false;
-			// Container child hbox1.Gtk.Box+BoxChild
-			this.selectbutton = new global::Gtk.Button();
-			this.selectbutton.CanFocus = true;
-			this.selectbutton.Name = "selectbutton";
-			this.selectbutton.UseUnderline = true;
-			this.selectbutton.Label = global::Mono.Unix.Catalog.GetString("Select All or None");
-			this.hbox1.Add(this.selectbutton);
-			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.selectbutton]));
-			w10.Position = 4;
-			w10.Expand = false;
-			w10.Fill = false;
-			// Container child hbox1.Gtk.Box+BoxChild
-			this.button209 = new global::Gtk.Button();
-			this.button209.CanFocus = true;
-			this.button209.Name = "button209";
-			this.button209.UseUnderline = true;
-			this.button209.Label = global::Mono.Unix.Catalog.GetString("Deselect Validated");
-			this.hbox1.Add(this.button209);
-			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.button209]));
-			w11.Position = 5;
-			w11.Expand = false;
-			w11.Fill = false;
-			// Container child hbox1.Gtk.Box+BoxChild
-			this.button625 = new global::Gtk.Button();
-			this.button625.CanFocus = true;
-			this.button625.Name = "button625";
-			this.button625.UseUnderline = true;
-			this.button625.Label = global::Mono.Unix.Catalog.GetString("Combine");
-			this.hbox1.Add(this.button625);
-			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.button625]));
-			w12.Position = 6;
-			w12.Expand = false;
-			w12.Fill = false;
-			// Container child hbox1.Gtk.Box+BoxChild
+			this.table2 = new global::Gtk.Table(((uint)(2)), ((uint)(5)), false);
+			this.table2.Name = "table2";
+			this.table2.RowSpacing = ((uint)(6));
+			this.table2.ColumnSpacing = ((uint)(6));
+			// Container child table2.Gtk.Table+TableChild
 			this.analysisbutton = new global::Gtk.Button();
 			this.analysisbutton.CanFocus = true;
 			this.analysisbutton.Name = "analysisbutton";
 			this.analysisbutton.UseUnderline = true;
 			this.analysisbutton.Label = global::Mono.Unix.Catalog.GetString("Analysis");
-			this.hbox1.Add(this.analysisbutton);
-			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.analysisbutton]));
-			w13.Position = 7;
-			w13.Expand = false;
-			w13.Fill = false;
-			// Container child hbox1.Gtk.Box+BoxChild
+			this.table2.Add(this.analysisbutton);
+			global::Gtk.Table.TableChild w7 = ((global::Gtk.Table.TableChild)(this.table2[this.analysisbutton]));
+			w7.LeftAttach = ((uint)(3));
+			w7.RightAttach = ((uint)(4));
+			w7.XOptions = ((global::Gtk.AttachOptions)(4));
+			w7.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
 			this.applyRuleButton = new global::Gtk.Button();
 			this.applyRuleButton.CanFocus = true;
 			this.applyRuleButton.Name = "applyRuleButton";
 			this.applyRuleButton.UseUnderline = true;
 			this.applyRuleButton.Label = global::Mono.Unix.Catalog.GetString("Apply Rule To Red");
-			this.hbox1.Add(this.applyRuleButton);
-			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.applyRuleButton]));
-			w14.Position = 8;
-			w14.Expand = false;
-			w14.Fill = false;
-			// Container child hbox1.Gtk.Box+BoxChild
+			this.table2.Add(this.applyRuleButton);
+			global::Gtk.Table.TableChild w8 = ((global::Gtk.Table.TableChild)(this.table2[this.applyRuleButton]));
+			w8.LeftAttach = ((uint)(4));
+			w8.RightAttach = ((uint)(5));
+			w8.XOptions = ((global::Gtk.AttachOptions)(4));
+			w8.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.button209 = new global::Gtk.Button();
+			this.button209.CanFocus = true;
+			this.button209.Name = "button209";
+			this.button209.UseUnderline = true;
+			this.button209.Label = global::Mono.Unix.Catalog.GetString("Deselect Validated");
+			this.table2.Add(this.button209);
+			global::Gtk.Table.TableChild w9 = ((global::Gtk.Table.TableChild)(this.table2[this.button209]));
+			w9.LeftAttach = ((uint)(2));
+			w9.RightAttach = ((uint)(3));
+			w9.XOptions = ((global::Gtk.AttachOptions)(4));
+			w9.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.button625 = new global::Gtk.Button();
+			this.button625.CanFocus = true;
+			this.button625.Name = "button625";
+			this.button625.UseUnderline = true;
+			this.button625.Label = global::Mono.Unix.Catalog.GetString("Combine");
+			this.table2.Add(this.button625);
+			global::Gtk.Table.TableChild w10 = ((global::Gtk.Table.TableChild)(this.table2[this.button625]));
+			w10.TopAttach = ((uint)(1));
+			w10.BottomAttach = ((uint)(2));
+			w10.LeftAttach = ((uint)(2));
+			w10.RightAttach = ((uint)(3));
+			w10.XOptions = ((global::Gtk.AttachOptions)(4));
+			w10.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
 			this.marketbutton = new global::Gtk.Button();
 			this.marketbutton.CanFocus = true;
 			this.marketbutton.Name = "marketbutton";
 			this.marketbutton.UseUnderline = true;
 			this.marketbutton.Label = global::Mono.Unix.Catalog.GetString("Market Compare");
-			this.hbox1.Add(this.marketbutton);
-			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.marketbutton]));
-			w15.Position = 9;
-			w15.Expand = false;
-			w15.Fill = false;
+			this.table2.Add(this.marketbutton);
+			global::Gtk.Table.TableChild w11 = ((global::Gtk.Table.TableChild)(this.table2[this.marketbutton]));
+			w11.TopAttach = ((uint)(1));
+			w11.BottomAttach = ((uint)(2));
+			w11.LeftAttach = ((uint)(3));
+			w11.RightAttach = ((uint)(4));
+			w11.XOptions = ((global::Gtk.AttachOptions)(4));
+			w11.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.removebutton = new global::Gtk.Button();
+			this.removebutton.CanFocus = true;
+			this.removebutton.Name = "removebutton";
+			this.removebutton.UseUnderline = true;
+			this.removebutton.Label = global::Mono.Unix.Catalog.GetString("Remove");
+			this.table2.Add(this.removebutton);
+			global::Gtk.Table.TableChild w12 = ((global::Gtk.Table.TableChild)(this.table2[this.removebutton]));
+			w12.TopAttach = ((uint)(1));
+			w12.BottomAttach = ((uint)(2));
+			w12.LeftAttach = ((uint)(1));
+			w12.RightAttach = ((uint)(2));
+			w12.XOptions = ((global::Gtk.AttachOptions)(4));
+			w12.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.ruleToSelectedbutton = new global::Gtk.Button();
+			this.ruleToSelectedbutton.CanFocus = true;
+			this.ruleToSelectedbutton.Name = "ruleToSelectedbutton";
+			this.ruleToSelectedbutton.UseUnderline = true;
+			this.ruleToSelectedbutton.Label = global::Mono.Unix.Catalog.GetString("Apply Rule To Selected");
+			this.table2.Add(this.ruleToSelectedbutton);
+			global::Gtk.Table.TableChild w13 = ((global::Gtk.Table.TableChild)(this.table2[this.ruleToSelectedbutton]));
+			w13.TopAttach = ((uint)(1));
+			w13.BottomAttach = ((uint)(2));
+			w13.LeftAttach = ((uint)(4));
+			w13.RightAttach = ((uint)(5));
+			w13.XOptions = ((global::Gtk.AttachOptions)(4));
+			w13.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.selectbutton = new global::Gtk.Button();
+			this.selectbutton.CanFocus = true;
+			this.selectbutton.Name = "selectbutton";
+			this.selectbutton.UseUnderline = true;
+			this.selectbutton.Label = global::Mono.Unix.Catalog.GetString("Select All or None");
+			this.table2.Add(this.selectbutton);
+			global::Gtk.Table.TableChild w14 = ((global::Gtk.Table.TableChild)(this.table2[this.selectbutton]));
+			w14.LeftAttach = ((uint)(1));
+			w14.RightAttach = ((uint)(2));
+			w14.XOptions = ((global::Gtk.AttachOptions)(4));
+			w14.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.stopbutton = new global::Gtk.Button();
+			this.stopbutton.CanFocus = true;
+			this.stopbutton.Name = "stopbutton";
+			this.stopbutton.UseUnderline = true;
+			this.stopbutton.Label = global::Mono.Unix.Catalog.GetString("Stop");
+			this.table2.Add(this.stopbutton);
+			global::Gtk.Table.TableChild w15 = ((global::Gtk.Table.TableChild)(this.table2[this.stopbutton]));
+			w15.TopAttach = ((uint)(1));
+			w15.BottomAttach = ((uint)(2));
+			w15.XOptions = ((global::Gtk.AttachOptions)(4));
+			w15.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.SubmitButton = new global::Gtk.Button();
+			this.SubmitButton.CanFocus = true;
+			this.SubmitButton.Name = "SubmitButton";
+			this.SubmitButton.UseUnderline = true;
+			this.SubmitButton.Label = global::Mono.Unix.Catalog.GetString("Submit");
+			this.table2.Add(this.SubmitButton);
+			global::Gtk.Table.TableChild w16 = ((global::Gtk.Table.TableChild)(this.table2[this.SubmitButton]));
+			w16.XOptions = ((global::Gtk.AttachOptions)(4));
+			w16.YOptions = ((global::Gtk.AttachOptions)(4));
+			this.hbox1.Add(this.table2);
+			global::Gtk.Box.BoxChild w17 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.table2]));
+			w17.Position = 1;
+			w17.Expand = false;
+			w17.Fill = false;
 			// Container child hbox1.Gtk.Box+BoxChild
 			this.resetbutton = new global::Gtk.Button();
 			this.resetbutton.CanFocus = true;
@@ -207,15 +248,15 @@ namespace IhildaWallet
 			this.resetbutton.UseUnderline = true;
 			this.resetbutton.Label = global::Mono.Unix.Catalog.GetString("Reset to default");
 			this.hbox1.Add(this.resetbutton);
-			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.resetbutton]));
-			w16.Position = 10;
-			w16.Expand = false;
-			w16.Fill = false;
+			global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.resetbutton]));
+			w18.Position = 2;
+			w18.Expand = false;
+			w18.Fill = false;
 			this.vbox2.Add(this.hbox1);
-			global::Gtk.Box.BoxChild w17 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hbox1]));
-			w17.Position = 2;
-			w17.Expand = false;
-			w17.Fill = false;
+			global::Gtk.Box.BoxChild w19 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hbox1]));
+			w19.Position = 2;
+			w19.Expand = false;
+			w19.Fill = false;
 			this.Add(this.vbox2);
 			if ((this.Child != null))
 			{

@@ -6,40 +6,6 @@ namespace IhildaWallet
 	{
 		private global::Gtk.UIManager UIManager;
 
-		private global::Gtk.Action FileAction;
-
-		private global::Gtk.Action NewWalletAction;
-
-		private global::Gtk.Action EditAction;
-
-		private global::Gtk.Action DeleteWalletAction;
-
-		private global::Gtk.Action WalletAction;
-
-		private global::Gtk.Action NewAction;
-
-		private global::Gtk.Action UpgradeAction;
-
-		private global::Gtk.Action EncryptAction;
-
-		private global::Gtk.Action DecryptAction;
-
-		private global::Gtk.Action ImportAction;
-
-		private global::Gtk.Action ExportAction;
-
-		private global::Gtk.Action CommerceAction;
-
-		private global::Gtk.Action TradingMarketAction;
-
-		private global::Gtk.Action MakeAPaymentAction;
-
-		private global::Gtk.Action MarketBotAction;
-
-		private global::Gtk.Action ManageTrustAction;
-
-		private global::Gtk.Action EditWalletAction;
-
 		private global::Gtk.VBox vbox2;
 
 		private global::Gtk.HPaned hpaned1;
@@ -76,13 +42,13 @@ namespace IhildaWallet
 
 		private global::Gtk.Button editButton;
 
-		private global::Gtk.Button button67;
+		private global::Gtk.Button encryptbutton;
 
-		private global::Gtk.Button button66;
+		private global::Gtk.Button decryptbutton;
 
 		private global::Gtk.Button deleteButton;
 
-		private global::Gtk.Button button134;
+		private global::Gtk.Button rmbackupbutton;
 
 		private global::Gtk.Label label5;
 
@@ -108,13 +74,27 @@ namespace IhildaWallet
 
 		private global::Gtk.Button consolebutton1;
 
-		private global::Gtk.Button button91;
+		private global::Gtk.Button debugbutton;
 
 		private global::Gtk.Button quitButton;
 
 		private global::Gtk.Label label9;
 
-		private global::Gtk.EventBox eventbox1;
+		private global::Gtk.VBox vbox8;
+
+		private global::Gtk.Button youtubebutton;
+
+		private global::Gtk.Button blogsbutton;
+
+		private global::Gtk.Button thirdpartybutton;
+
+		private global::Gtk.Button toolsbutton;
+
+		private global::Gtk.Button chartsbutton;
+
+		private global::Gtk.Label label1;
+
+		private global::Gtk.EventBox eventboxWallet;
 
 		private global::Gtk.Image image1;
 
@@ -134,6 +114,14 @@ namespace IhildaWallet
 
 		private global::IhildaWallet.ConnectedDisplayWidget connecteddisplaywidget1;
 
+		private global::Gtk.EventBox eventboxfee;
+
+		private global::Gtk.Label label16;
+
+		private global::Gtk.EventBox eventboxfee2;
+
+		private global::Gtk.Label feelabel;
+
 		private global::Gtk.Label label10;
 
 		private global::Gtk.Label ledgerlabel;
@@ -143,6 +131,24 @@ namespace IhildaWallet
 		private global::Gtk.HBox hbox7;
 
 		private global::IhildaWallet.WalletTree wallettree1;
+
+		private global::Gtk.Table table4;
+
+		private global::Gtk.Label label11;
+
+		private global::Gtk.Label label12;
+
+		private global::Gtk.Label label13;
+
+		private global::Gtk.Label label14;
+
+		private global::Gtk.Label label15;
+
+		private global::Gtk.Label label3;
+
+		private global::Gtk.Label label7;
+
+		private global::Gtk.Label label8;
 
 		private global::Gtk.HBox hbox2;
 
@@ -155,57 +161,6 @@ namespace IhildaWallet
 			Stetic.BinContainer w1 = global::Stetic.BinContainer.Attach(this);
 			this.UIManager = new global::Gtk.UIManager();
 			global::Gtk.ActionGroup w2 = new global::Gtk.ActionGroup("Default");
-			this.FileAction = new global::Gtk.Action("FileAction", global::Mono.Unix.Catalog.GetString("File"), null, null);
-			this.FileAction.ShortLabel = global::Mono.Unix.Catalog.GetString("File");
-			w2.Add(this.FileAction, null);
-			this.NewWalletAction = new global::Gtk.Action("NewWalletAction", global::Mono.Unix.Catalog.GetString("New Wallet"), null, null);
-			this.NewWalletAction.ShortLabel = global::Mono.Unix.Catalog.GetString("New");
-			w2.Add(this.NewWalletAction, null);
-			this.EditAction = new global::Gtk.Action("EditAction", global::Mono.Unix.Catalog.GetString("Edit"), null, null);
-			this.EditAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Edit");
-			w2.Add(this.EditAction, null);
-			this.DeleteWalletAction = new global::Gtk.Action("DeleteWalletAction", global::Mono.Unix.Catalog.GetString("Delete Wallet"), null, null);
-			this.DeleteWalletAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Delete Wallet");
-			w2.Add(this.DeleteWalletAction, null);
-			this.WalletAction = new global::Gtk.Action("WalletAction", global::Mono.Unix.Catalog.GetString("Wallet..."), null, null);
-			this.WalletAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Wallet...");
-			w2.Add(this.WalletAction, null);
-			this.NewAction = new global::Gtk.Action("NewAction", global::Mono.Unix.Catalog.GetString("New"), null, null);
-			this.NewAction.ShortLabel = global::Mono.Unix.Catalog.GetString("New");
-			w2.Add(this.NewAction, null);
-			this.UpgradeAction = new global::Gtk.Action("UpgradeAction", global::Mono.Unix.Catalog.GetString("Upgrade"), null, null);
-			this.UpgradeAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Upgrade");
-			w2.Add(this.UpgradeAction, null);
-			this.EncryptAction = new global::Gtk.Action("EncryptAction", global::Mono.Unix.Catalog.GetString("Encrypt"), null, null);
-			this.EncryptAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Encrypt");
-			w2.Add(this.EncryptAction, null);
-			this.DecryptAction = new global::Gtk.Action("DecryptAction", global::Mono.Unix.Catalog.GetString("Decrypt"), null, null);
-			this.DecryptAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Decrypt");
-			w2.Add(this.DecryptAction, null);
-			this.ImportAction = new global::Gtk.Action("ImportAction", global::Mono.Unix.Catalog.GetString("Import"), null, null);
-			this.ImportAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Import");
-			w2.Add(this.ImportAction, null);
-			this.ExportAction = new global::Gtk.Action("ExportAction", global::Mono.Unix.Catalog.GetString("Export"), null, null);
-			this.ExportAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Export");
-			w2.Add(this.ExportAction, null);
-			this.CommerceAction = new global::Gtk.Action("CommerceAction", global::Mono.Unix.Catalog.GetString("Commerce"), null, null);
-			this.CommerceAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Commerce");
-			w2.Add(this.CommerceAction, null);
-			this.TradingMarketAction = new global::Gtk.Action("TradingMarketAction", global::Mono.Unix.Catalog.GetString("Trading Market"), null, null);
-			this.TradingMarketAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Trade");
-			w2.Add(this.TradingMarketAction, null);
-			this.MakeAPaymentAction = new global::Gtk.Action("MakeAPaymentAction", global::Mono.Unix.Catalog.GetString("Make a payment"), null, null);
-			this.MakeAPaymentAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Make a payment");
-			w2.Add(this.MakeAPaymentAction, null);
-			this.MarketBotAction = new global::Gtk.Action("MarketBotAction", global::Mono.Unix.Catalog.GetString("Market Bot"), null, null);
-			this.MarketBotAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Market Bot");
-			w2.Add(this.MarketBotAction, null);
-			this.ManageTrustAction = new global::Gtk.Action("ManageTrustAction", global::Mono.Unix.Catalog.GetString("Manage Trust"), null, null);
-			this.ManageTrustAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Manage Trust");
-			w2.Add(this.ManageTrustAction, null);
-			this.EditWalletAction = new global::Gtk.Action("EditWalletAction", global::Mono.Unix.Catalog.GetString("Edit Wallet"), null, null);
-			this.EditWalletAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Edit Wallet");
-			w2.Add(this.EditWalletAction, null);
 			this.UIManager.InsertActionGroup(w2, 0);
 			this.Name = "IhildaWallet.WalletManagerWidget";
 			// Container child IhildaWallet.WalletManagerWidget.Gtk.Container+ContainerChild
@@ -233,7 +188,7 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 0;
+			this.notebook1.CurrentPage = 4;
 			this.notebook1.TabPos = ((global::Gtk.PositionType)(0));
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.eventbox4 = new global::Gtk.EventBox();
@@ -347,26 +302,26 @@ namespace IhildaWallet
 			w11.Expand = false;
 			w11.Fill = false;
 			// Container child vbox5.Gtk.Box+BoxChild
-			this.button67 = new global::Gtk.Button();
-			this.button67.CanFocus = true;
-			this.button67.Name = "button67";
-			this.button67.UseUnderline = true;
-			this.button67.Xalign = 0F;
-			this.button67.Label = global::Mono.Unix.Catalog.GetString("Encr_ypt Wallet");
-			this.vbox5.Add(this.button67);
-			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox5[this.button67]));
+			this.encryptbutton = new global::Gtk.Button();
+			this.encryptbutton.CanFocus = true;
+			this.encryptbutton.Name = "encryptbutton";
+			this.encryptbutton.UseUnderline = true;
+			this.encryptbutton.Xalign = 0F;
+			this.encryptbutton.Label = global::Mono.Unix.Catalog.GetString("Encr_ypt Wallet");
+			this.vbox5.Add(this.encryptbutton);
+			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox5[this.encryptbutton]));
 			w12.Position = 2;
 			w12.Expand = false;
 			w12.Fill = false;
 			// Container child vbox5.Gtk.Box+BoxChild
-			this.button66 = new global::Gtk.Button();
-			this.button66.CanFocus = true;
-			this.button66.Name = "button66";
-			this.button66.UseUnderline = true;
-			this.button66.Xalign = 0F;
-			this.button66.Label = global::Mono.Unix.Catalog.GetString("Dec_rypt Wallet");
-			this.vbox5.Add(this.button66);
-			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.vbox5[this.button66]));
+			this.decryptbutton = new global::Gtk.Button();
+			this.decryptbutton.CanFocus = true;
+			this.decryptbutton.Name = "decryptbutton";
+			this.decryptbutton.UseUnderline = true;
+			this.decryptbutton.Xalign = 0F;
+			this.decryptbutton.Label = global::Mono.Unix.Catalog.GetString("Dec_rypt Wallet");
+			this.vbox5.Add(this.decryptbutton);
+			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.vbox5[this.decryptbutton]));
 			w13.Position = 3;
 			w13.Expand = false;
 			w13.Fill = false;
@@ -383,14 +338,14 @@ namespace IhildaWallet
 			w14.Expand = false;
 			w14.Fill = false;
 			// Container child vbox5.Gtk.Box+BoxChild
-			this.button134 = new global::Gtk.Button();
-			this.button134.CanFocus = true;
-			this.button134.Name = "button134";
-			this.button134.UseUnderline = true;
-			this.button134.Xalign = 0F;
-			this.button134.Label = global::Mono.Unix.Catalog.GetString("Remove .bkp wallet files");
-			this.vbox5.Add(this.button134);
-			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.vbox5[this.button134]));
+			this.rmbackupbutton = new global::Gtk.Button();
+			this.rmbackupbutton.CanFocus = true;
+			this.rmbackupbutton.Name = "rmbackupbutton";
+			this.rmbackupbutton.UseUnderline = true;
+			this.rmbackupbutton.Xalign = 0F;
+			this.rmbackupbutton.Label = global::Mono.Unix.Catalog.GetString("Remove .bkp wallet files");
+			this.vbox5.Add(this.rmbackupbutton);
+			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.vbox5[this.rmbackupbutton]));
 			w15.Position = 5;
 			w15.Expand = false;
 			w15.Fill = false;
@@ -524,14 +479,14 @@ namespace IhildaWallet
 			w26.Expand = false;
 			w26.Fill = false;
 			// Container child vbox7.Gtk.Box+BoxChild
-			this.button91 = new global::Gtk.Button();
-			this.button91.CanFocus = true;
-			this.button91.Name = "button91";
-			this.button91.UseUnderline = true;
-			this.button91.Xalign = 0F;
-			this.button91.Label = global::Mono.Unix.Catalog.GetString("Debugging");
-			this.vbox7.Add(this.button91);
-			global::Gtk.Box.BoxChild w27 = ((global::Gtk.Box.BoxChild)(this.vbox7[this.button91]));
+			this.debugbutton = new global::Gtk.Button();
+			this.debugbutton.CanFocus = true;
+			this.debugbutton.Name = "debugbutton";
+			this.debugbutton.UseUnderline = true;
+			this.debugbutton.Xalign = 0F;
+			this.debugbutton.Label = global::Mono.Unix.Catalog.GetString("Debugging");
+			this.vbox7.Add(this.debugbutton);
+			global::Gtk.Box.BoxChild w27 = ((global::Gtk.Box.BoxChild)(this.vbox7[this.debugbutton]));
 			w27.Position = 4;
 			w27.Expand = false;
 			w27.Fill = false;
@@ -554,40 +509,114 @@ namespace IhildaWallet
 			this.label9 = new global::Gtk.Label();
 			this.label9.Name = "label9";
 			this.label9.Xalign = 0F;
-			this.label9.LabelProp = global::Mono.Unix.Catalog.GetString("<span size=\"x-large\" ><b> Options      </b></span>");
+			this.label9.LabelProp = "<span size=\"x-large\" ><b> Options      </b></span>";
 			this.label9.UseMarkup = true;
 			this.notebook1.SetTabLabel(this.vbox7, this.label9);
 			this.label9.ShowAll();
-			this.eventbox3.Add(this.notebook1);
-			this.hbox5.Add(this.eventbox3);
-			global::Gtk.Box.BoxChild w31 = ((global::Gtk.Box.BoxChild)(this.hbox5[this.eventbox3]));
-			w31.Position = 0;
+			// Container child notebook1.Gtk.Notebook+NotebookChild
+			this.vbox8 = new global::Gtk.VBox();
+			this.vbox8.Name = "vbox8";
+			this.vbox8.Spacing = 6;
+			// Container child vbox8.Gtk.Box+BoxChild
+			this.youtubebutton = new global::Gtk.Button();
+			this.youtubebutton.CanFocus = true;
+			this.youtubebutton.Name = "youtubebutton";
+			this.youtubebutton.UseUnderline = true;
+			this.youtubebutton.Xalign = 0F;
+			this.youtubebutton.Label = global::Mono.Unix.Catalog.GetString("Youtubers");
+			this.vbox8.Add(this.youtubebutton);
+			global::Gtk.Box.BoxChild w30 = ((global::Gtk.Box.BoxChild)(this.vbox8[this.youtubebutton]));
+			w30.Position = 0;
+			w30.Expand = false;
+			w30.Fill = false;
+			// Container child vbox8.Gtk.Box+BoxChild
+			this.blogsbutton = new global::Gtk.Button();
+			this.blogsbutton.CanFocus = true;
+			this.blogsbutton.Name = "blogsbutton";
+			this.blogsbutton.UseUnderline = true;
+			this.blogsbutton.Xalign = 0F;
+			this.blogsbutton.Label = global::Mono.Unix.Catalog.GetString("Bloggers");
+			this.vbox8.Add(this.blogsbutton);
+			global::Gtk.Box.BoxChild w31 = ((global::Gtk.Box.BoxChild)(this.vbox8[this.blogsbutton]));
+			w31.Position = 1;
 			w31.Expand = false;
 			w31.Fill = false;
+			// Container child vbox8.Gtk.Box+BoxChild
+			this.thirdpartybutton = new global::Gtk.Button();
+			this.thirdpartybutton.CanFocus = true;
+			this.thirdpartybutton.Name = "thirdpartybutton";
+			this.thirdpartybutton.UseUnderline = true;
+			this.thirdpartybutton.Xalign = 0F;
+			this.thirdpartybutton.Label = global::Mono.Unix.Catalog.GetString("3rd Party Wallets");
+			this.vbox8.Add(this.thirdpartybutton);
+			global::Gtk.Box.BoxChild w32 = ((global::Gtk.Box.BoxChild)(this.vbox8[this.thirdpartybutton]));
+			w32.Position = 2;
+			w32.Expand = false;
+			w32.Fill = false;
+			// Container child vbox8.Gtk.Box+BoxChild
+			this.toolsbutton = new global::Gtk.Button();
+			this.toolsbutton.CanFocus = true;
+			this.toolsbutton.Name = "toolsbutton";
+			this.toolsbutton.UseUnderline = true;
+			this.toolsbutton.Xalign = 0F;
+			this.toolsbutton.Label = global::Mono.Unix.Catalog.GetString("Ledger Tools");
+			this.vbox8.Add(this.toolsbutton);
+			global::Gtk.Box.BoxChild w33 = ((global::Gtk.Box.BoxChild)(this.vbox8[this.toolsbutton]));
+			w33.Position = 3;
+			w33.Expand = false;
+			w33.Fill = false;
+			// Container child vbox8.Gtk.Box+BoxChild
+			this.chartsbutton = new global::Gtk.Button();
+			this.chartsbutton.CanFocus = true;
+			this.chartsbutton.Name = "chartsbutton";
+			this.chartsbutton.UseUnderline = true;
+			this.chartsbutton.Xalign = 0F;
+			this.chartsbutton.Label = global::Mono.Unix.Catalog.GetString("Charts");
+			this.vbox8.Add(this.chartsbutton);
+			global::Gtk.Box.BoxChild w34 = ((global::Gtk.Box.BoxChild)(this.vbox8[this.chartsbutton]));
+			w34.Position = 4;
+			w34.Expand = false;
+			w34.Fill = false;
+			this.notebook1.Add(this.vbox8);
+			global::Gtk.Notebook.NotebookChild w35 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.vbox8]));
+			w35.Position = 4;
+			// Notebook tab
+			this.label1 = new global::Gtk.Label();
+			this.label1.Name = "label1";
+			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString("<span size=\"x-large\" ><b> Community </b></span>");
+			this.label1.UseMarkup = true;
+			this.notebook1.SetTabLabel(this.vbox8, this.label1);
+			this.label1.ShowAll();
+			this.eventbox3.Add(this.notebook1);
+			this.hbox5.Add(this.eventbox3);
+			global::Gtk.Box.BoxChild w37 = ((global::Gtk.Box.BoxChild)(this.hbox5[this.eventbox3]));
+			w37.Position = 0;
+			w37.Expand = false;
+			w37.Fill = false;
 			// Container child hbox5.Gtk.Box+BoxChild
-			this.eventbox1 = new global::Gtk.EventBox();
-			this.eventbox1.HeightRequest = 132;
-			this.eventbox1.Name = "eventbox1";
-			// Container child eventbox1.Gtk.Container+ContainerChild
+			this.eventboxWallet = new global::Gtk.EventBox();
+			this.eventboxWallet.HeightRequest = 132;
+			this.eventboxWallet.Name = "eventboxWallet";
+			// Container child eventboxWallet.Gtk.Container+ContainerChild
 			this.image1 = new global::Gtk.Image();
 			this.image1.Name = "image1";
 			this.image1.Pixbuf = global::Gdk.Pixbuf.LoadFromResource("IhildaWallet.Images.ihildaplain-100-wide.png");
-			this.eventbox1.Add(this.image1);
-			this.hbox5.Add(this.eventbox1);
-			global::Gtk.Box.BoxChild w33 = ((global::Gtk.Box.BoxChild)(this.hbox5[this.eventbox1]));
-			w33.Position = 1;
+			this.eventboxWallet.Add(this.image1);
+			this.hbox5.Add(this.eventboxWallet);
+			global::Gtk.Box.BoxChild w39 = ((global::Gtk.Box.BoxChild)(this.hbox5[this.eventboxWallet]));
+			w39.Position = 1;
 			this.vbox1.Add(this.hbox5);
-			global::Gtk.Box.BoxChild w34 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hbox5]));
-			w34.Position = 0;
-			w34.Expand = false;
-			w34.Fill = false;
+			global::Gtk.Box.BoxChild w40 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hbox5]));
+			w40.Position = 0;
+			w40.Expand = false;
+			w40.Fill = false;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.balancetab1 = new global::IhildaWallet.BalanceTab();
 			this.balancetab1.Events = ((global::Gdk.EventMask)(256));
 			this.balancetab1.Name = "balancetab1";
 			this.vbox1.Add(this.balancetab1);
-			global::Gtk.Box.BoxChild w35 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.balancetab1]));
-			w35.Position = 1;
+			global::Gtk.Box.BoxChild w41 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.balancetab1]));
+			w41.Position = 1;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.scrolledwindow1 = new global::Gtk.ScrolledWindow();
 			this.scrolledwindow1.CanFocus = true;
@@ -596,8 +625,8 @@ namespace IhildaWallet
 			this.scrolledwindow1.HscrollbarPolicy = ((global::Gtk.PolicyType)(2));
 			this.scrolledwindow1.ShadowType = ((global::Gtk.ShadowType)(1));
 			// Container child scrolledwindow1.Gtk.Container+ContainerChild
-			global::Gtk.Viewport w36 = new global::Gtk.Viewport();
-			w36.ShadowType = ((global::Gtk.ShadowType)(0));
+			global::Gtk.Viewport w42 = new global::Gtk.Viewport();
+			w42.ShadowType = ((global::Gtk.ShadowType)(0));
 			// Container child GtkViewport.Gtk.Container+ContainerChild
 			this.eventbox6 = new global::Gtk.EventBox();
 			this.eventbox6.Name = "eventbox6";
@@ -607,21 +636,21 @@ namespace IhildaWallet
 			this.image5.Yalign = 1F;
 			this.image5.Pixbuf = global::Gdk.Pixbuf.LoadFromResource("IhildaWallet.Images.earthfrommoonsided.png");
 			this.eventbox6.Add(this.image5);
-			w36.Add(this.eventbox6);
-			this.scrolledwindow1.Add(w36);
+			w42.Add(this.eventbox6);
+			this.scrolledwindow1.Add(w42);
 			this.vbox1.Add(this.scrolledwindow1);
-			global::Gtk.Box.BoxChild w40 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.scrolledwindow1]));
-			w40.PackType = ((global::Gtk.PackType)(1));
-			w40.Position = 2;
+			global::Gtk.Box.BoxChild w46 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.scrolledwindow1]));
+			w46.PackType = ((global::Gtk.PackType)(1));
+			w46.Position = 2;
 			this.hpaned1.Add(this.vbox1);
-			global::Gtk.Paned.PanedChild w41 = ((global::Gtk.Paned.PanedChild)(this.hpaned1[this.vbox1]));
-			w41.Resize = false;
+			global::Gtk.Paned.PanedChild w47 = ((global::Gtk.Paned.PanedChild)(this.hpaned1[this.vbox1]));
+			w47.Resize = false;
 			// Container child hpaned1.Gtk.Paned+PanedChild
 			this.vbox4 = new global::Gtk.VBox();
 			this.vbox4.Name = "vbox4";
 			this.vbox4.Spacing = 6;
 			// Container child vbox4.Gtk.Box+BoxChild
-			this.table1 = new global::Gtk.Table(((uint)(1)), ((uint)(5)), false);
+			this.table1 = new global::Gtk.Table(((uint)(1)), ((uint)(7)), false);
 			this.table1.Name = "table1";
 			this.table1.RowSpacing = ((uint)(6));
 			this.table1.ColumnSpacing = ((uint)(6));
@@ -634,11 +663,44 @@ namespace IhildaWallet
 			this.connecteddisplaywidget1.Name = "connecteddisplaywidget1";
 			this.eventbox9.Add(this.connecteddisplaywidget1);
 			this.table1.Add(this.eventbox9);
-			global::Gtk.Table.TableChild w43 = ((global::Gtk.Table.TableChild)(this.table1[this.eventbox9]));
-			w43.LeftAttach = ((uint)(1));
-			w43.RightAttach = ((uint)(3));
-			w43.XOptions = ((global::Gtk.AttachOptions)(0));
-			w43.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w49 = ((global::Gtk.Table.TableChild)(this.table1[this.eventbox9]));
+			w49.LeftAttach = ((uint)(1));
+			w49.RightAttach = ((uint)(3));
+			w49.XOptions = ((global::Gtk.AttachOptions)(0));
+			w49.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table1.Gtk.Table+TableChild
+			this.eventboxfee = new global::Gtk.EventBox();
+			this.eventboxfee.Name = "eventboxfee";
+			// Container child eventboxfee.Gtk.Container+ContainerChild
+			this.label16 = new global::Gtk.Label();
+			this.label16.Name = "label16";
+			this.label16.Xalign = 0F;
+			this.label16.Yalign = 0.2F;
+			this.label16.LabelProp = global::Mono.Unix.Catalog.GetString("<b>Fee</b>");
+			this.label16.UseMarkup = true;
+			this.eventboxfee.Add(this.label16);
+			this.table1.Add(this.eventboxfee);
+			global::Gtk.Table.TableChild w51 = ((global::Gtk.Table.TableChild)(this.table1[this.eventboxfee]));
+			w51.LeftAttach = ((uint)(5));
+			w51.RightAttach = ((uint)(6));
+			w51.XOptions = ((global::Gtk.AttachOptions)(4));
+			w51.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table1.Gtk.Table+TableChild
+			this.eventboxfee2 = new global::Gtk.EventBox();
+			this.eventboxfee2.Name = "eventboxfee2";
+			// Container child eventboxfee2.Gtk.Container+ContainerChild
+			this.feelabel = new global::Gtk.Label();
+			this.feelabel.WidthRequest = 80;
+			this.feelabel.Name = "feelabel";
+			this.feelabel.Xalign = 0F;
+			this.feelabel.Yalign = 0.25F;
+			this.eventboxfee2.Add(this.feelabel);
+			this.table1.Add(this.eventboxfee2);
+			global::Gtk.Table.TableChild w53 = ((global::Gtk.Table.TableChild)(this.table1[this.eventboxfee2]));
+			w53.LeftAttach = ((uint)(6));
+			w53.RightAttach = ((uint)(7));
+			w53.XOptions = ((global::Gtk.AttachOptions)(4));
+			w53.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.label10 = new global::Gtk.Label();
 			this.label10.Name = "label10";
@@ -647,11 +709,11 @@ namespace IhildaWallet
 			this.label10.LabelProp = global::Mono.Unix.Catalog.GetString("<b>Ledger</b>");
 			this.label10.UseMarkup = true;
 			this.table1.Add(this.label10);
-			global::Gtk.Table.TableChild w44 = ((global::Gtk.Table.TableChild)(this.table1[this.label10]));
-			w44.LeftAttach = ((uint)(3));
-			w44.RightAttach = ((uint)(4));
-			w44.XOptions = ((global::Gtk.AttachOptions)(4));
-			w44.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w54 = ((global::Gtk.Table.TableChild)(this.table1[this.label10]));
+			w54.LeftAttach = ((uint)(3));
+			w54.RightAttach = ((uint)(4));
+			w54.XOptions = ((global::Gtk.AttachOptions)(4));
+			w54.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.ledgerlabel = new global::Gtk.Label();
 			this.ledgerlabel.WidthRequest = 80;
@@ -659,23 +721,25 @@ namespace IhildaWallet
 			this.ledgerlabel.Xalign = 0F;
 			this.ledgerlabel.Yalign = 0.25F;
 			this.table1.Add(this.ledgerlabel);
-			global::Gtk.Table.TableChild w45 = ((global::Gtk.Table.TableChild)(this.table1[this.ledgerlabel]));
-			w45.LeftAttach = ((uint)(4));
-			w45.RightAttach = ((uint)(5));
-			w45.XOptions = ((global::Gtk.AttachOptions)(4));
-			w45.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w55 = ((global::Gtk.Table.TableChild)(this.table1[this.ledgerlabel]));
+			w55.LeftAttach = ((uint)(4));
+			w55.RightAttach = ((uint)(5));
+			w55.XOptions = ((global::Gtk.AttachOptions)(4));
+			w55.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
-			this.UIManager.AddUiFromString(@"<ui><menubar name='menubar1'><menu name='FileAction' action='FileAction'><menu name='WalletAction' action='WalletAction'><menuitem name='NewAction' action='NewAction'/><menuitem name='EditWalletAction' action='EditWalletAction'/><menuitem name='UpgradeAction' action='UpgradeAction'/><menuitem name='EncryptAction' action='EncryptAction'/><menuitem name='DecryptAction' action='DecryptAction'/><menuitem name='ImportAction' action='ImportAction'/><menuitem name='ExportAction' action='ExportAction'/></menu></menu><menu name='EditAction' action='EditAction'/><menu name='CommerceAction' action='CommerceAction'><menuitem name='TradingMarketAction' action='TradingMarketAction'/><menuitem name='MakeAPaymentAction' action='MakeAPaymentAction'/><menuitem name='MarketBotAction' action='MarketBotAction'/><menuitem name='ManageTrustAction' action='ManageTrustAction'/></menu></menubar></ui>");
+			this.UIManager.AddUiFromString("<ui><menubar name=\'menubar1\'><menu><menu><menuitem/><menuitem/><menuitem/><menuit" +
+					"em/><menuitem/><menuitem/><menuitem/></menu></menu><menu/><menu><menuitem/><menu" +
+					"item/><menuitem/><menuitem/></menu></menubar></ui>");
 			this.menubar1 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget("/menubar1")));
 			this.menubar1.Name = "menubar1";
 			this.table1.Add(this.menubar1);
-			global::Gtk.Table.TableChild w46 = ((global::Gtk.Table.TableChild)(this.table1[this.menubar1]));
-			w46.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w56 = ((global::Gtk.Table.TableChild)(this.table1[this.menubar1]));
+			w56.YOptions = ((global::Gtk.AttachOptions)(4));
 			this.vbox4.Add(this.table1);
-			global::Gtk.Box.BoxChild w47 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.table1]));
-			w47.Position = 0;
-			w47.Expand = false;
-			w47.Fill = false;
+			global::Gtk.Box.BoxChild w57 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.table1]));
+			w57.Position = 0;
+			w57.Expand = false;
+			w57.Fill = false;
 			// Container child vbox4.Gtk.Box+BoxChild
 			this.hbox7 = new global::Gtk.HBox();
 			this.hbox7.Name = "hbox7";
@@ -685,11 +749,108 @@ namespace IhildaWallet
 			this.wallettree1.Events = ((global::Gdk.EventMask)(256));
 			this.wallettree1.Name = "wallettree1";
 			this.hbox7.Add(this.wallettree1);
-			global::Gtk.Box.BoxChild w48 = ((global::Gtk.Box.BoxChild)(this.hbox7[this.wallettree1]));
-			w48.Position = 0;
+			global::Gtk.Box.BoxChild w58 = ((global::Gtk.Box.BoxChild)(this.hbox7[this.wallettree1]));
+			w58.Position = 0;
 			this.vbox4.Add(this.hbox7);
-			global::Gtk.Box.BoxChild w49 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hbox7]));
-			w49.Position = 1;
+			global::Gtk.Box.BoxChild w59 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hbox7]));
+			w59.Position = 1;
+			// Container child vbox4.Gtk.Box+BoxChild
+			this.table4 = new global::Gtk.Table(((uint)(2)), ((uint)(4)), true);
+			this.table4.WidthRequest = 0;
+			this.table4.Name = "table4";
+			this.table4.RowSpacing = ((uint)(6));
+			this.table4.ColumnSpacing = ((uint)(6));
+			// Container child table4.Gtk.Table+TableChild
+			this.label11 = new global::Gtk.Label();
+			this.label11.Name = "label11";
+			this.label11.Xalign = 0F;
+			this.label11.LabelProp = global::Mono.Unix.Catalog.GetString("<b>Sequence</b>");
+			this.label11.UseMarkup = true;
+			this.table4.Add(this.label11);
+			global::Gtk.Table.TableChild w60 = ((global::Gtk.Table.TableChild)(this.table4[this.label11]));
+			w60.TopAttach = ((uint)(1));
+			w60.BottomAttach = ((uint)(2));
+			w60.LeftAttach = ((uint)(2));
+			w60.RightAttach = ((uint)(3));
+			w60.XOptions = ((global::Gtk.AttachOptions)(4));
+			w60.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table4.Gtk.Table+TableChild
+			this.label12 = new global::Gtk.Label();
+			this.label12.Name = "label12";
+			this.table4.Add(this.label12);
+			global::Gtk.Table.TableChild w61 = ((global::Gtk.Table.TableChild)(this.table4[this.label12]));
+			w61.LeftAttach = ((uint)(1));
+			w61.RightAttach = ((uint)(2));
+			w61.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table4.Gtk.Table+TableChild
+			this.label13 = new global::Gtk.Label();
+			this.label13.Name = "label13";
+			this.table4.Add(this.label13);
+			global::Gtk.Table.TableChild w62 = ((global::Gtk.Table.TableChild)(this.table4[this.label13]));
+			w62.TopAttach = ((uint)(1));
+			w62.BottomAttach = ((uint)(2));
+			w62.LeftAttach = ((uint)(1));
+			w62.RightAttach = ((uint)(2));
+			w62.XOptions = ((global::Gtk.AttachOptions)(4));
+			w62.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table4.Gtk.Table+TableChild
+			this.label14 = new global::Gtk.Label();
+			this.label14.Name = "label14";
+			this.table4.Add(this.label14);
+			global::Gtk.Table.TableChild w63 = ((global::Gtk.Table.TableChild)(this.table4[this.label14]));
+			w63.LeftAttach = ((uint)(3));
+			w63.RightAttach = ((uint)(4));
+			w63.XOptions = ((global::Gtk.AttachOptions)(4));
+			w63.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table4.Gtk.Table+TableChild
+			this.label15 = new global::Gtk.Label();
+			this.label15.Name = "label15";
+			this.table4.Add(this.label15);
+			global::Gtk.Table.TableChild w64 = ((global::Gtk.Table.TableChild)(this.table4[this.label15]));
+			w64.TopAttach = ((uint)(1));
+			w64.BottomAttach = ((uint)(2));
+			w64.LeftAttach = ((uint)(3));
+			w64.RightAttach = ((uint)(4));
+			w64.XOptions = ((global::Gtk.AttachOptions)(4));
+			w64.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table4.Gtk.Table+TableChild
+			this.label3 = new global::Gtk.Label();
+			this.label3.Name = "label3";
+			this.label3.Xalign = 0F;
+			this.label3.LabelProp = global::Mono.Unix.Catalog.GetString("<b>XRP Balance</b>");
+			this.label3.UseMarkup = true;
+			this.table4.Add(this.label3);
+			global::Gtk.Table.TableChild w65 = ((global::Gtk.Table.TableChild)(this.table4[this.label3]));
+			w65.XOptions = ((global::Gtk.AttachOptions)(4));
+			w65.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table4.Gtk.Table+TableChild
+			this.label7 = new global::Gtk.Label();
+			this.label7.Name = "label7";
+			this.label7.Xalign = 0F;
+			this.label7.LabelProp = global::Mono.Unix.Catalog.GetString("<b>Reserve</b>");
+			this.label7.UseMarkup = true;
+			this.table4.Add(this.label7);
+			global::Gtk.Table.TableChild w66 = ((global::Gtk.Table.TableChild)(this.table4[this.label7]));
+			w66.TopAttach = ((uint)(1));
+			w66.BottomAttach = ((uint)(2));
+			w66.XOptions = ((global::Gtk.AttachOptions)(4));
+			w66.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table4.Gtk.Table+TableChild
+			this.label8 = new global::Gtk.Label();
+			this.label8.Name = "label8";
+			this.label8.Xalign = 0F;
+			this.label8.LabelProp = global::Mono.Unix.Catalog.GetString("<b>Owner Count</b>");
+			this.label8.UseMarkup = true;
+			this.table4.Add(this.label8);
+			global::Gtk.Table.TableChild w67 = ((global::Gtk.Table.TableChild)(this.table4[this.label8]));
+			w67.LeftAttach = ((uint)(2));
+			w67.RightAttach = ((uint)(3));
+			w67.XOptions = ((global::Gtk.AttachOptions)(4));
+			w67.YOptions = ((global::Gtk.AttachOptions)(4));
+			this.vbox4.Add(this.table4);
+			global::Gtk.Box.BoxChild w68 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.table4]));
+			w68.Position = 2;
+			w68.Expand = false;
 			// Container child vbox4.Gtk.Box+BoxChild
 			this.hbox2 = new global::Gtk.HBox();
 			this.hbox2.Name = "hbox2";
@@ -698,27 +859,28 @@ namespace IhildaWallet
 			this.walletswitchwidget1.Events = ((global::Gdk.EventMask)(256));
 			this.walletswitchwidget1.Name = "walletswitchwidget1";
 			this.hbox2.Add(this.walletswitchwidget1);
-			global::Gtk.Box.BoxChild w50 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.walletswitchwidget1]));
-			w50.Position = 0;
+			global::Gtk.Box.BoxChild w69 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.walletswitchwidget1]));
+			w69.PackType = ((global::Gtk.PackType)(1));
+			w69.Position = 0;
 			this.vbox4.Add(this.hbox2);
-			global::Gtk.Box.BoxChild w51 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hbox2]));
-			w51.Position = 2;
-			w51.Expand = false;
-			w51.Fill = false;
+			global::Gtk.Box.BoxChild w70 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hbox2]));
+			w70.Position = 3;
+			w70.Expand = false;
+			w70.Fill = false;
 			this.hpaned1.Add(this.vbox4);
 			this.vbox2.Add(this.hpaned1);
-			global::Gtk.Box.BoxChild w53 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hpaned1]));
-			w53.Position = 0;
+			global::Gtk.Box.BoxChild w72 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hpaned1]));
+			w72.Position = 0;
 			this.Add(this.vbox2);
 			if ((this.Child != null))
 			{
 				this.Child.ShowAll();
 			}
 			w1.SetUiManager(UIManager);
-			this.button67.Hide();
-			this.button66.Hide();
+			this.encryptbutton.Hide();
+			this.decryptbutton.Hide();
 			this.balancetab1.Hide();
-			this.connecteddisplaywidget1.Hide();
+			this.table4.Hide();
 			this.Hide();
 		}
 	}

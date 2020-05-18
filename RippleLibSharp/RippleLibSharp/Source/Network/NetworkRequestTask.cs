@@ -217,6 +217,7 @@ namespace RippleLibSharp.Network
 			TicketStub ticketstub = null;
 			if (!(param is StrParam sp)) {
 #if DEBUG
+
 				if (DebugRippleLibSharp.NetworkRequestTask) {
 					Logging.WriteLog (method_sig + "sp == null ");
 				}
@@ -419,10 +420,12 @@ namespace RippleLibSharp.Network
 
 						ticketstub.Handle?.Set ();
 					} catch ( Exception e) {
+
+#if DEBUG
 						if (DebugRippleLibSharp.NetworkRequestTask) {
 							Logging.ReportException (method_sig, e);
 						}
-						
+#endif
 					}
 					ticketstub.FireConsumer (response);
 				}

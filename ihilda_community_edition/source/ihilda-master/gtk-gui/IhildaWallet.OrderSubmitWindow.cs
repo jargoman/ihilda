@@ -11,7 +11,7 @@ namespace IhildaWallet
 			global::Stetic.Gui.Initialize(this);
 			// Widget IhildaWallet.OrderSubmitWindow
 			this.Name = "IhildaWallet.OrderSubmitWindow";
-			this.Title = global::Mono.Unix.Catalog.GetString("OrderSubmitWindow");
+			this.Title = global::Mono.Unix.Catalog.GetString("Order Submit Window");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Container child IhildaWallet.OrderSubmitWindow.Gtk.Container+ContainerChild
 			this.orderpreviewsubmitwidget1 = new global::IhildaWallet.OrderPreviewSubmitWidget();

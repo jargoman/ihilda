@@ -20,13 +20,15 @@ namespace IhildaWallet
 			{
 				Process.Start(url);
 			}
-			catch
+			catch (Exception e)
 			{
 
+
+				Logging.WriteLog (e.Message);
 				// The commented code below doesn't compile due to missing dependencies. would have to upgrade nugget to 3.???? 
 				// missing RuntimeInformation.dll 
 
-				/*
+
 				// hack because of this: https://github.com/dotnet/corefx/issues/10361
 				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 				{
@@ -45,7 +47,7 @@ namespace IhildaWallet
 				{
 					throw;
 				}
-				*/
+				
 			}
 		}
 

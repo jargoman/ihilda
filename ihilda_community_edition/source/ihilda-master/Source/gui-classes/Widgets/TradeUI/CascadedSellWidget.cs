@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Linq;
-using RippleLibSharp.Transactions;
 using System.Text;
-
+using System.Threading;
+using System.Threading.Tasks;
 using Gtk;
-using RippleLibSharp.Util;
+using IhildaWallet.Networking;
 using IhildaWallet.Util;
+using RippleLibSharp.Commands.Accounts;
+using RippleLibSharp.Network;
+using RippleLibSharp.Result;
+using RippleLibSharp.Transactions;
+using RippleLibSharp.Util;
 
 namespace IhildaWallet
 {
@@ -26,7 +31,104 @@ namespace IhildaWallet
 
 			Label l = (Label)this.sellbutton.Child;
 			l.UseMarkup = true;
+
+			button114.Clicked += PercentageClicked;
+			button115.Clicked += PercentageClicked;
+			button111.Clicked += PercentageClicked;
+			button112.Clicked += PercentageClicked;
+
+			button123.Clicked += PercentageClicked;
+			button113.Clicked += PercentageClicked;
+			button119.Clicked += PercentageClicked;
+
+			button116.Clicked += PercentageClicked;
+
+			button120.Clicked += PercentageClicked;
+
+			button117.Clicked += PercentageClicked;
+
+			button118.Clicked += PercentageClicked;
+
+			button121.Clicked += PercentageClicked;
+
+			button122.Clicked += PercentageClicked;
+
+			hscale2.ValueChanged += Hscale2_ValueChanged;
+
 		}
+
+		public void SetAmount (Decimal amount)
+		{
+			amountentry.Entry.Text = amount.ToString ();
+		}
+
+
+		public void SetPrice (Decimal price)
+		{
+			priceentry.Entry.Text = price.ToString ();
+		}
+
+		public void SetAmountMax ()
+		{
+			this.hscale2.Value = 100.0;
+		}
+
+
+		void Hscale2_ValueChanged (object sender, EventArgs e)
+		{
+			string acc = _rippleWallet.Account;
+
+			NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
+
+			CancellationTokenSource tokenSource = new CancellationTokenSource ();
+			CancellationToken token = tokenSource.Token;
+
+			double val = hscale2.Value;
+			if (!_tradepair.Currency_Base.IsNative) {
+				var cur = AccountLines.GetBalanceForIssuer
+				(
+					_tradepair.Currency_Base.currency,
+					_tradepair.Currency_Base.issuer,
+					acc,
+					ni,
+					token
+				);
+
+				double bal = (double)cur.amount;
+
+				double res = bal * val / 100;
+
+				amountentry.Entry.Text = res.ToString ();
+			} else {
+
+				Task<Response<AccountInfoResult>> task =
+					AccountInfo.GetResult (acc, ni, token);
+
+				task.Wait (token);
+
+				Response<AccountInfoResult> resp = task.Result;
+				AccountInfoResult res = resp.result;
+
+				var reserve = res.GetReserveRequirements (ni, token);
+
+				RippleCurrency rippleCurrency = new RippleCurrency (res.account_data.Balance);
+
+				double bal = (double)(rippleCurrency.amount - reserve.amount) / 1000000 * val / 100;
+
+				amountentry.Entry.Text = bal.ToString ();
+			}
+		}
+
+		void PercentageClicked (object sender, EventArgs e)
+		{
+			if (sender is Button b) {
+				string s = b?.Label.TrimEnd ('%');
+				double d = Convert.ToDouble (s);
+
+				hscale2.Value = d;
+			}
+		}
+
 
 		public void SetOffer (Offer off) {
 			#if DEBUG
@@ -382,7 +484,10 @@ namespace IhildaWallet
 			uint? numberOfOrders = RippleCurrency.ParseUInt32 ( num );
 			if (numberOfOrders == null) {
 				if ( warnuser ) {
-					MessageDialog.ShowMessage ("Numbers of orders is formatted incorrectly \n");
+					var message = "Numbers of orders is formatted incorrectly \n";
+
+					TextHighlighter.Highlightcolor = TextHighlighter.RED;
+					label17.Markup = TextHighlighter.Highlight (message);
 				}
 				return null;
 			}
@@ -390,7 +495,10 @@ namespace IhildaWallet
 			Decimal? startingPrice = RippleCurrency.ParseDecimal (pstr);
 			if (startingPrice == null) {
 				if (warnuser) {
-					MessageDialog.ShowMessage ("Starting price is formatted incorrectly \n");
+					var message = "Starting price is formatted incorrectly \n";
+
+					TextHighlighter.Highlightcolor = TextHighlighter.RED;
+					label17.Markup = TextHighlighter.Highlight (message);
 				}
 				return null;
 			}
@@ -398,7 +506,11 @@ namespace IhildaWallet
 			Decimal? priceMod = RippleCurrency.ParseDecimal ( pms );
 			if (priceMod == null) {
 				if (warnuser) {
-					MessageDialog.ShowMessage ("Price mod is formatted incorrectly \n");
+					var message = "Price mod is formatted incorrectly \n";
+
+					TextHighlighter.Highlightcolor = TextHighlighter.RED;
+					label17.Markup = TextHighlighter.Highlight (message);
+
 				}
 				return null;
 			}
@@ -406,7 +518,10 @@ namespace IhildaWallet
 			Decimal? amount = RippleCurrency.ParseDecimal (amst);
 			if (amount == null) {
 				if (warnuser) {
-					MessageDialog.ShowMessage ("Amount is formatted incorrectly \n");
+					var message = "Amount is formatted incorrectly \n";
+					TextHighlighter.Highlightcolor = TextHighlighter.RED;
+					label17.Markup = TextHighlighter.Highlight (message);
+					// TODO color amount red
 				}
 				return null;
 			}
@@ -414,7 +529,10 @@ namespace IhildaWallet
 			Decimal? amountMod = RippleCurrency.ParseDecimal (ammt);
 			if (amountMod == null) {
 				if (warnuser) {
-					MessageDialog.ShowMessage ("Amount mod is formatted incorrectly");
+					var message = "Amount mod is formatted incorrectly";
+
+					TextHighlighter.Highlightcolor = TextHighlighter.RED;
+					label17.Markup = TextHighlighter.Highlight (message);
 				}
 				return null;
 			}

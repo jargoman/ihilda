@@ -269,7 +269,7 @@ namespace IhildaWallet.Util
 			}
 
 			Decimal amount = (Decimal)amountn;
-			Decimal targetAmount = (int)target_amount;
+			Decimal targetAmount = target_amount.Value;
 
 			if ( amount >= targetAmount) {
 				return true;
@@ -313,8 +313,8 @@ namespace IhildaWallet.Util
 			if (rw == null) {
 
 				StringBuilder stringBuilder = new StringBuilder ();
-				stringBuilder.Append ("To use this feature you must first select a wallet that is funded with ");
-				string str = ((int)target).ToString ();
+				stringBuilder.Append ("To use this feature you must first select a wallet");
+				string str = target.Value.ToString ();
 				stringBuilder.Append (str);
 				stringBuilder.Append (" ");
 				stringBuilder.Append (LeIceSense.LICENSE_CURRENCY);
@@ -324,7 +324,8 @@ namespace IhildaWallet.Util
 				MessageDialog.ShowMessage (stringBuilder.ToString ());
 				return false;
 			}
-			Decimal targetAmount = (int)target;
+
+			Decimal targetAmount = target.Value;
 			Decimal? amountn = GetCachedAmount (rw.GetStoredReceiveAddress ());
 			if (amountn != null) {
 				Decimal amount = (decimal)amountn;
@@ -461,7 +462,7 @@ namespace IhildaWallet.Util
 
 				StringBuilder stringBuilder = new StringBuilder ();
 				stringBuilder.Append ("To use this feature you must first select a wallet that is funded with ");
-				string str = ((int)licenseType).ToString ();
+				string str = licenseType.Value.ToString ();
 				stringBuilder.Append (str);
 				stringBuilder.Append (" ");
 				stringBuilder.Append (LeIceSense.LICENSE_CURRENCY);
@@ -484,7 +485,7 @@ namespace IhildaWallet.Util
 
 			LeIceSense leIceSense = new LeIceSense ();
 
-			Decimal targetAmount = (Decimal)(int)licenseType;
+			Decimal targetAmount = licenseType.Value;
 
 			Decimal? amountn = leIceSense.GetCachedAmount ( rw.GetStoredReceiveAddress () );
 
@@ -594,7 +595,7 @@ namespace IhildaWallet.Util
 			}
 
 
-			Decimal ICE_amount = (Decimal)(int)licenseType;
+			Decimal ICE_amount = licenseType.Value;
 
 			Decimal sum = 0.0m;
 			for (int i = 0; i < offers.Length; i++) {
@@ -630,7 +631,9 @@ namespace IhildaWallet.Util
 		{
 
 			string key = rippleAddress.ToString ();
-			return (key == RippleAddress.RIPPLE_ADDRESS_JARGOMAN || key == RippleAddress.RIPPLE_ADDRESS_DAHLIOO); // ? true : false;
+			return (
+				key == RippleAddress.RIPPLE_ADDRESS_JARGOMAN || 
+				key == RippleAddress.RIPPLE_ADDRESS_DAHLIOO); // 
 		}
 
 		private static LeIceSense license = null;
@@ -644,7 +647,9 @@ namespace IhildaWallet.Util
 
 
 #if DEBUG
-		public static string LICENSE_ISSUER_TESTNET = "rGtH6UM2k76QMXav6GGGxXczP9ghq5kwCW";
+		//public static string LICENSE_ISSUER_TESTNET = "rGtH6UM2k76QMXav6GGGxXczP9ghq5kwCW";
+
+		public static string LICENSE_ISSUER_TESTNET = "r4H3F9dDaYPFwbrUsusvNAHLz2sEZk4wE5";
 #endif
 
 		//public const decimal LICENSE_FEE = ;
@@ -661,28 +666,47 @@ namespace IhildaWallet.Util
 
 	}
 
-	public enum LicenseType
+	public class LicenseType
 	{
 
-		NONE = 0,
-		PAYMENT = 1, // ability to make payments
-		TRUST = 1,
-		MASSPAYMENT = 5,
-		TRADING = 10,
-		SEMIAUTOMATED = 25,
-		CASCADING = 50,
-		MARKETBOT = 100,
-		DIVIDEND = 250,
-		AUTOMATIC = 500,
+		public static readonly LicenseType 
 
-		KING = 5000
+		NONE = new LicenseType (decimal.Zero, nameof (NONE)),
+		PAYMENT = new LicenseType ( 0.1m, nameof(PAYMENT)), // ability to make payments
+		TRUST = new LicenseType (0.1m, nameof (TRUST)),
+		MASSPAYMENT = new LicenseType (0.5m, nameof(MASSPAYMENT)),
+		TRADING = new LicenseType (1m, nameof (TRADING)),
+		SEMIAUTOMATED = new LicenseType (2.5m, nameof(SEMIAUTOMATED)),
+		CASCADING = new LicenseType (5m, nameof (SEMIAUTOMATED)),
+		MARKETBOT = new LicenseType (10m, nameof(MARKETBOT)),
+		DIVIDEND = new LicenseType (25m, nameof(DIVIDEND)),
+		AUTOMATIC = new LicenseType (50m, nameof(AUTOMATIC)),
+
+		
 
 #if DEBUG
-		,
-		EXTREMEHIGHTEST = 100000099 // an amount of coins that will never exist. 
+		
+		EXTREMEHIGHTEST = new LicenseType (100000099m, nameof (EXTREMEHIGHTEST)),// an amount of coins that will never exist. 
 #endif
 
+		KING = new LicenseType (500m, nameof (KING));
 
+
+		public LicenseType ( Decimal value, String name)
+		{
+			this.Value = value;
+			Name = name;
+		}
+
+		public Decimal Value {
+			get;
+			set;
+		}
+
+		public String Name {
+			get;
+			set;
+		}
 	}
 }
 

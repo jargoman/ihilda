@@ -116,7 +116,6 @@ namespace RippleLibSharp.Commands.Stipulate
 		}
 
 
-	
 	}
 }
 

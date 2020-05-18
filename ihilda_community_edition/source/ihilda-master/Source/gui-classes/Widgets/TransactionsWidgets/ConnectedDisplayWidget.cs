@@ -13,8 +13,8 @@ namespace IhildaWallet
 
 			this.connectStatusLabel.UseMarkup = true;
 
-			if (!Program.network) {
-				if (Program.darkmode) {
+			if (!ProgramVariables.network) {
+				if (ProgramVariables.darkmode) {
 					this.connectStatusLabel.Markup = "<span foreground=\"#FFAABB\">Networking Disabled</span>";
 				} else {
 					this.connectStatusLabel.Markup = "<span foreground=\"red\">Networking Disabled</span>";
@@ -48,10 +48,10 @@ namespace IhildaWallet
 
 				StringBuilder stringBuilder = new StringBuilder ();
 				stringBuilder.Append ("<span foreground=\"");
-				stringBuilder.Append (Program.darkmode ? "chartreuse" : "green");
+				stringBuilder.Append (ProgramVariables.darkmode ? "chartreuse" : "green");
 				stringBuilder.Append ("\"><big><b>Connected</b></big></span>");
 				this.connectStatusLabel.Markup = stringBuilder.ToString();
-				if (Program.showPopUps) {
+				if (ProgramVariables.showPopUps) {
 					this.TooltipMarkup = serverUrl;
 				}
 			}
@@ -75,16 +75,16 @@ namespace IhildaWallet
 				}
 #endif
 
-				if (!Program.network) {
+				if (!ProgramVariables.network) {
 
-					this.connectStatusLabel.Markup = Program.darkmode
+					this.connectStatusLabel.Markup = ProgramVariables.darkmode
 						? "<span foreground=\"#FFAABB\">Networking Disabled</span>"
 						: "<span foreground=\"red\">Networking Disabled</span>";
 					return;
 				}
 
-				this.connectStatusLabel.Markup = 
-					Program.darkmode 
+				this.connectStatusLabel.Markup =
+					ProgramVariables.darkmode 
 					? "<span foreground=\"#FFAABB\">Disconnected</span>" 
 		    			: "<span foreground=\"red\">Disconnected</span>";
 

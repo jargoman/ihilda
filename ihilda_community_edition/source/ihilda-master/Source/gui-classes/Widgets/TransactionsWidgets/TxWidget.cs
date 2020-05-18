@@ -23,7 +23,7 @@ namespace IhildaWallet
 			this.Build ();
 
 
-			if (!Program.darkmode) {
+			if (!ProgramVariables.darkmode) {
 				Gdk.Color col = new Gdk.Color (255, 234, 254);
 				this.eventbox1.ModifyBg (StateType.Normal, col);
 			} else {

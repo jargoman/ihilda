@@ -19,7 +19,7 @@ namespace IhildaWallet
 
 
 		public static IEnumerable<AutomatedOrder> GetBuyBacks (IEnumerable<OrderChange> ords) {
-			if (!Program.preferLinq) {
+			if (!ProgramVariables.preferLinq) {
 
 				List<AutomatedOrder> lst = new List<AutomatedOrder> ();
 				foreach ( OrderChange o in ords) {
@@ -54,7 +54,7 @@ namespace IhildaWallet
 		}
 
 		public static IEnumerable<AutomatedOrder> GetBuyBacks ( IEnumerable<AutomatedOrder> ords) {
-			if (!Program.preferLinq) {
+			if (!ProgramVariables.preferLinq) {
 				List<AutomatedOrder> lst = new List<AutomatedOrder> ();
 				foreach (AutomatedOrder o in ords) {
 
@@ -122,7 +122,10 @@ namespace IhildaWallet
 					moreshare = (int)SentimentRatingEnum.Neutral;
 				}
 
-
+				if (lessShare + moreshare == 0) {
+					lessShare++;
+					moreshare++;
+				}
 
 				int totalShare = lessShare + moreshare;
 				Decimal profitPerShare = (strategy.Speculate - 1) / totalShare;

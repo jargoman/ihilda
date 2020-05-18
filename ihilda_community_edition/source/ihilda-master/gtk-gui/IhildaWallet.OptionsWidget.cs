@@ -100,6 +100,16 @@ namespace IhildaWallet
 
 		private global::Gtk.Label label10;
 
+		private global::Gtk.VBox vbox6;
+
+		private global::Gtk.HBox hbox2;
+
+		private global::Gtk.Button button13;
+
+		private global::Gtk.Label label19;
+
+		private global::Gtk.Label label14;
+
 		private global::Gtk.HSeparator hseparator2;
 
 		private global::Gtk.HSeparator hseparator5;
@@ -158,7 +168,7 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 0;
+			this.notebook1.CurrentPage = 1;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.splashoptionswidget1 = new global::IhildaWallet.SplashOptionsWidget();
 			this.splashoptionswidget1.Events = ((global::Gdk.EventMask)(256));
@@ -634,40 +644,80 @@ namespace IhildaWallet
 			this.label10.LabelProp = global::Mono.Unix.Catalog.GetString("Sounds");
 			this.notebook1.SetTabLabel(this.vbox5, this.label10);
 			this.label10.ShowAll();
-			this.vbox3.Add(this.notebook1);
-			global::Gtk.Box.BoxChild w41 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.notebook1]));
+			// Container child notebook1.Gtk.Notebook+NotebookChild
+			this.vbox6 = new global::Gtk.VBox();
+			this.vbox6.Name = "vbox6";
+			this.vbox6.Spacing = 6;
+			// Container child vbox6.Gtk.Box+BoxChild
+			this.hbox2 = new global::Gtk.HBox();
+			this.hbox2.Name = "hbox2";
+			this.hbox2.Spacing = 6;
+			// Container child hbox2.Gtk.Box+BoxChild
+			this.button13 = new global::Gtk.Button();
+			this.button13.CanFocus = true;
+			this.button13.Name = "button13";
+			this.button13.UseUnderline = true;
+			this.button13.Label = global::Mono.Unix.Catalog.GetString("Pair");
+			this.hbox2.Add(this.button13);
+			global::Gtk.Box.BoxChild w41 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.button13]));
 			w41.Position = 0;
 			w41.Expand = false;
 			w41.Fill = false;
+			// Container child hbox2.Gtk.Box+BoxChild
+			this.label19 = new global::Gtk.Label();
+			this.label19.Name = "label19";
+			this.label19.LabelProp = global::Mono.Unix.Catalog.GetString("this is the pairing label");
+			this.hbox2.Add(this.label19);
+			global::Gtk.Box.BoxChild w42 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.label19]));
+			w42.Position = 1;
+			this.vbox6.Add(this.hbox2);
+			global::Gtk.Box.BoxChild w43 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.hbox2]));
+			w43.Position = 0;
+			w43.Expand = false;
+			w43.Fill = false;
+			this.notebook1.Add(this.vbox6);
+			global::Gtk.Notebook.NotebookChild w44 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1[this.vbox6]));
+			w44.Position = 5;
+			// Notebook tab
+			this.label14 = new global::Gtk.Label();
+			this.label14.Name = "label14";
+			this.label14.LabelProp = global::Mono.Unix.Catalog.GetString("Pairing");
+			this.notebook1.SetTabLabel(this.vbox6, this.label14);
+			this.label14.ShowAll();
+			this.vbox3.Add(this.notebook1);
+			global::Gtk.Box.BoxChild w45 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.notebook1]));
+			w45.Position = 0;
+			w45.Expand = false;
+			w45.Fill = false;
 			// Container child vbox3.Gtk.Box+BoxChild
 			this.hseparator2 = new global::Gtk.HSeparator();
 			this.hseparator2.Name = "hseparator2";
 			this.vbox3.Add(this.hseparator2);
-			global::Gtk.Box.BoxChild w42 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hseparator2]));
-			w42.Position = 1;
-			w42.Expand = false;
-			w42.Fill = false;
+			global::Gtk.Box.BoxChild w46 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hseparator2]));
+			w46.Position = 1;
+			w46.Expand = false;
+			w46.Fill = false;
 			// Container child vbox3.Gtk.Box+BoxChild
 			this.hseparator5 = new global::Gtk.HSeparator();
 			this.hseparator5.Name = "hseparator5";
 			this.vbox3.Add(this.hseparator5);
-			global::Gtk.Box.BoxChild w43 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hseparator5]));
-			w43.Position = 2;
-			w43.Expand = false;
-			w43.Fill = false;
+			global::Gtk.Box.BoxChild w47 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hseparator5]));
+			w47.Position = 2;
+			w47.Expand = false;
+			w47.Fill = false;
 			// Container child vbox3.Gtk.Box+BoxChild
 			this.hseparator4 = new global::Gtk.HSeparator();
 			this.hseparator4.Name = "hseparator4";
 			this.vbox3.Add(this.hseparator4);
-			global::Gtk.Box.BoxChild w44 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hseparator4]));
-			w44.Position = 3;
-			w44.Expand = false;
-			w44.Fill = false;
+			global::Gtk.Box.BoxChild w48 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hseparator4]));
+			w48.Position = 3;
+			w48.Expand = false;
+			w48.Fill = false;
 			w3.Add(this.vbox3);
 			this.scrolledwindow1.Add(w3);
 			this.vbox1.Add(this.scrolledwindow1);
-			global::Gtk.Box.BoxChild w47 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.scrolledwindow1]));
-			w47.Position = 2;
+			global::Gtk.Box.BoxChild w51 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.scrolledwindow1]));
+			w51.Position = 2;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.hbox1 = new global::Gtk.HBox();
 			this.hbox1.Name = "hbox1";
@@ -680,8 +730,8 @@ namespace IhildaWallet
 			this.button293.UseUnderline = true;
 			this.button293.Label = global::Mono.Unix.Catalog.GetString("Cancel");
 			this.hbox1.Add(this.button293);
-			global::Gtk.Box.BoxChild w48 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.button293]));
-			w48.Position = 0;
+			global::Gtk.Box.BoxChild w52 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.button293]));
+			w52.Position = 0;
 			// Container child hbox1.Gtk.Box+BoxChild
 			this.savebutton = new global::Gtk.Button();
 			this.savebutton.CanFocus = true;
@@ -689,13 +739,13 @@ namespace IhildaWallet
 			this.savebutton.UseUnderline = true;
 			this.savebutton.Label = global::Mono.Unix.Catalog.GetString("Save Settings");
 			this.hbox1.Add(this.savebutton);
-			global::Gtk.Box.BoxChild w49 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.savebutton]));
-			w49.Position = 1;
+			global::Gtk.Box.BoxChild w53 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.savebutton]));
+			w53.Position = 1;
 			this.vbox1.Add(this.hbox1);
-			global::Gtk.Box.BoxChild w50 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hbox1]));
-			w50.Position = 3;
-			w50.Expand = false;
-			w50.Fill = false;
+			global::Gtk.Box.BoxChild w54 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hbox1]));
+			w54.Position = 3;
+			w54.Expand = false;
+			w54.Fill = false;
 			this.Add(this.vbox1);
 			if ((this.Child != null))
 			{

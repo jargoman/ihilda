@@ -20,8 +20,10 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 		//UInt32 qualityIn = null;
 		//UInt32 qualityOut = null;
+		public RippleTrustSetTransaction ()
+		{
 
-
+		}
 
 		public RippleTrustSetTransaction (RippleTransaction tx)
 		{
@@ -192,7 +194,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 			StringBuilder stringBuilder = new StringBuilder ();
 			stringBuilder.Append ("Trust ");
-			stringBuilder.Append (Account ?? "null");
+			stringBuilder.Append (LimitAmount.issuer ?? "null");
 			stringBuilder.Append (" for ");
 			stringBuilder.Append (LimitAmount.amount);
 			stringBuilder.Append (" ");

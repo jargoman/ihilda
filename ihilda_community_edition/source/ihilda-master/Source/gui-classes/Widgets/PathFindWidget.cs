@@ -78,12 +78,16 @@ namespace IhildaWallet
 			if (dee != null) {
 				amountd = (decimal)dee;
 			} else {
-				MessageDialog.ShowMessage ("Payment Amount is formatted incorretly");
+				var message = "Payment Amount is formatted incorretly";
+				TextHighlighter.Highlightcolor = TextHighlighter.RED;
+				label7.Text = TextHighlighter.Highlight (message);
 				return;
 			}
 
 			if (amountd < 0) {
-				MessageDialog.ShowMessage ("Sending negative amounts is not supported. Please enter a valid amount");
+				string message = "Sending negative amounts is not supported. Please enter a valid amount";
+				TextHighlighter.Highlightcolor = TextHighlighter.RED;
+				label7.Text = TextHighlighter.Highlight (message);
 				return;
 			}
 

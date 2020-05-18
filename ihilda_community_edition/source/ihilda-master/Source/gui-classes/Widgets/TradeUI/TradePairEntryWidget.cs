@@ -2,6 +2,12 @@
 using RippleLibSharp.Transactions;
 using RippleLibSharp.Keys;
 using RippleLibSharp.Util;
+using System.Threading;
+using System.Threading.Tasks;
+using IhildaWallet.Networking;
+using RippleLibSharp.Commands.Accounts;
+using System.Linq;
+using Gtk;
 
 namespace IhildaWallet
 {
@@ -62,6 +68,99 @@ namespace IhildaWallet
 
 		}
 
+		public void SetAddress (RippleAddress address) {
+
+			string acc = address?.ToString ();
+
+			if (acc == null) {
+				return;
+			}
+			TokenSource = new CancellationTokenSource ();
+			Task.Run ( delegate {
+
+
+				var net = NetworkController.GetNetworkInterfaceNonGUIThread ();
+				if (net == null) {
+					return;
+				}
+
+				Task.Run (() => {
+
+
+					var task = AccountCurrencies.GetResult (acc, net, TokenSource.Token);
+
+					task.Wait (TokenSource.Token);
+
+					var response = task?.Result?.result;
+
+					if (response == null) {
+						return;
+					}
+
+					var uniqueCurrencies = response
+						.send_currencies
+						.Concat (response.receive_currencies)
+						.Distinct()
+						.ToList();
+
+					uniqueCurrencies.Add ("XRP");
+
+					// TODO add currencies to text entries
+
+					Gtk.Application.Invoke (
+					delegate {
+						ListStore store1 = new ListStore (typeof (string));
+						ListStore store2 = new ListStore (typeof (string));
+						foreach (String s in uniqueCurrencies) {
+							store1.AppendValues (s);
+							store2.AppendValues (s);
+						}
+
+						this.basecurrencycombobox.Model = store1;
+						this.countercurrencycombobox.Model = store2;
+
+					}
+					);
+
+
+
+				}, TokenSource.Token);
+
+
+				Task.Run (() => {
+					var lines = AccountLines.GetTrustLines (address.ToString (), net, TokenSource.Token );
+
+					var issuers = lines.Select (x => x.account).Distinct ().ToList ();
+					Application.Invoke ( delegate {
+
+						ListStore store1 = new ListStore (typeof (string));
+						ListStore store2 = new ListStore (typeof (string));
+
+						foreach (var line in issuers) {
+							store1.AppendValues (line);
+							store2.AppendValues (line);
+						}
+
+						this.baseissuercombobox.Model = store1;
+						this.countercurrencycombobox1.Model = store2;
+
+					});
+
+
+				}, TokenSource.Token);
+
+			}, TokenSource.Token);
+
+
+
+
+
+
+		}
+
+
+
+		private CancellationTokenSource TokenSource = default (CancellationTokenSource);
 
 		public event EventHandler WidgetChanged;
 

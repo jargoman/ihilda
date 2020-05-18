@@ -40,7 +40,7 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 3;
+			this.notebook1.CurrentPage = 0;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.txviewwidget1 = new global::IhildaWallet.TxViewWidget();
 			this.txviewwidget1.Events = ((global::Gdk.EventMask)(256));
@@ -62,7 +62,7 @@ namespace IhildaWallet
 			// Notebook tab
 			this.label50 = new global::Gtk.Label();
 			this.label50.Name = "label50";
-			this.label50.LabelProp = global::Mono.Unix.Catalog.GetString("Order Pager");
+			this.label50.LabelProp = global::Mono.Unix.Catalog.GetString("Orders");
 			this.notebook1.SetTabLabel(this.orderswidget1, this.label50);
 			this.label50.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild
@@ -75,7 +75,7 @@ namespace IhildaWallet
 			// Notebook tab
 			this.label52 = new global::Gtk.Label();
 			this.label52.Name = "label52";
-			this.label52.LabelProp = global::Mono.Unix.Catalog.GetString("Order Tree");
+			this.label52.LabelProp = global::Mono.Unix.Catalog.GetString("Orders");
 			this.notebook1.SetTabLabel(this.orderstreewidget1, this.label52);
 			this.label52.ShowAll();
 			// Container child notebook1.Gtk.Notebook+NotebookChild

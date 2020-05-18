@@ -50,8 +50,23 @@ namespace IhildaWallet
 				}
 			}
 			);
+
+
+
+
+			eventbox4.ButtonReleaseEvent += delegate {
+				string s = label3.Text;
+				OnLabelClicked?.Invoke (s);			
+
+			};
+
 			
 		}
+
+		public delegate void LabelClickedEvent (string cur);
+
+		public LabelClickedEvent OnLabelClicked;
+		
 
 		~CurrencyWidget ()
 		{

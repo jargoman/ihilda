@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using IhildaWallet.Networking;
+using RippleLibSharp.Binary;
 using RippleLibSharp.Commands.Accounts;
 using RippleLibSharp.Commands.Server;
 using RippleLibSharp.Commands.Subscriptions;
@@ -681,6 +682,34 @@ namespace IhildaWallet
 				orderSubmittedEventArgs.ApiRequestErrors++;
 				goto retry;
 			}
+
+
+			#region clientmemo
+
+
+			MemoIndice memoIndice = Program.GetClientMemo ();
+			orderSubmittedEventArgs.RippleOfferTransaction.AddMemo (memoIndice);
+			//off.AddMemo (memoIndice);
+
+			#endregion
+
+
+
+			#region markmemo
+			if (order.BotMarking != null) {
+				MemoIndice markIndice = new MemoIndice {
+					Memo = new RippleMemo {
+						MemoType = Base58.StringToHex ("ihildamark"),
+						MemoFormat = Base58.StringToHex (""),
+						MemoData = Base58.StringToHex (order?.BotMarking ?? "")
+					}
+				};
+				orderSubmittedEventArgs.RippleOfferTransaction.AddMemo (markIndice);
+				//off.AddMemo (markIndice);
+			}
+
+			#endregion
+
 
 			switch (orderSubmittedEventArgs.signOptions.SigningLibrary) {
 			case "Rippled":

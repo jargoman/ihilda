@@ -32,17 +32,24 @@ namespace IhildaWallet
 			return this.tradepairentrywidget1.GetTradePair (true);
 		}
 
-
-		public static TradePair DoDialog ()
-		{
-			return DoDialog (null);
+		public void SetAddress (RippleWallet rippleWallet) {
+			this.tradepairentrywidget1.SetAddress (rippleWallet.Account);
 		}
 
-		public static TradePair DoDialog (TradePair preset)
+		public static TradePair DoDialog (RippleWallet rippleWallet = null)
+		{
+			return DoDialog (null, rippleWallet);
+		}
+
+		public static TradePair DoDialog (TradePair preset, RippleWallet rippleWallet = null)
 		{
 
 
 			using (TradePairCreateDialog tpcd = new TradePairCreateDialog (preset)) {
+				string address = rippleWallet?.Account;
+				if (address != null) {
+					tpcd.SetAddress (rippleWallet);
+				}
 				while (true) {
 
 					TradePair tp = null;

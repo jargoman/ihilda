@@ -12,7 +12,7 @@ namespace IhildaWallet
 		}
 
 
-		public static Gdk.PixbufAnimation pa = new Gdk.PixbufAnimation(System.Reflection.Assembly.Load(Program.appname), nameof (IhildaWallet) + ".Images.ajax-loader-200x200.gif");
+		public static Gdk.PixbufAnimation pa = new Gdk.PixbufAnimation(System.Reflection.Assembly.Load(ProgramVariables.appname), nameof (IhildaWallet) + ".Images.ajax-loader-200x200.gif");
 	}
 }
 

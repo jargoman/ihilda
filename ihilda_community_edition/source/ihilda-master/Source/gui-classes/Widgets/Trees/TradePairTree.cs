@@ -110,7 +110,11 @@ namespace IhildaWallet
 						}
 						DepthChartWindow dcw = new DepthChartWindow (WalletManager.GetRippleWallet(), tp);
 
-						dcw.GetWidget ().UpdateBooks (new CancellationToken());
+						Task.Run ( () => {
+							dcw.GetWidget ().UpdateBooks (new CancellationToken ());
+						});
+
+
 					};
 
 					menu.Add (depthMenu);

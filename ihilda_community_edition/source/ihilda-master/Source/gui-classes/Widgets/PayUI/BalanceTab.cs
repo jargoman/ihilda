@@ -66,6 +66,8 @@ namespace IhildaWallet
 
 			SetInteractivty ();
 
+
+
 		}
 
 		public void SetInteractivty ()
@@ -456,7 +458,7 @@ namespace IhildaWallet
 						values.Add (new Tuple<string, string, string> (cu, iss, "<b>" + ba + "</b>" + "\n" + lim ));
 					} else {
 
-						TextHighlighter.Highlightcolor = Program.darkmode ? "\"chartreuse\"" : "\"green\"";
+						TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? "\"chartreuse\"" : "\"green\"";
 						//cu = TextHighlighter.Highlight (cu);
 						//iss = TextHighlighter.Highlight (iss);
 						ba = TextHighlighter.Highlight (ba);

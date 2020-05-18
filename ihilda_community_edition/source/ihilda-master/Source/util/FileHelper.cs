@@ -91,6 +91,9 @@ namespace IhildaWallet
 			COMPLIANCE_FOLDER_PATH = Path.Combine (DATA_FOLDER_PATH, DATA_FOLDER, COMPLIANCE_FOLDER);
 			AssureDirectory (COMPLIANCE_FOLDER_PATH);
 
+			WINTER_FOLDER_PATH = Path.Combine (DATA_FOLDER_PATH, DATA_FOLDER, WINTER_FOLDER);
+			AssureDirectory (WINTER_FOLDER_PATH);
+
 		}
 
 		public static String GetSettingsPath (String filename)
@@ -375,7 +378,7 @@ namespace IhildaWallet
 		public static string userSetPath = null;
 
 
-		public static string DATA_FOLDER = Program.appname; // folder that contains all settings
+		public static string DATA_FOLDER = ProgramVariables.appname; // folder that contains all settings
 		public static string DATA_FOLDER_PATH = null;  //
 
 		public static string PLUGIN_FOLDER = "plugins";  // folder to place plugins
@@ -401,6 +404,10 @@ namespace IhildaWallet
 
 		public static string COMPLIANCE_FOLDER = "compliance";
 		public static string COMPLIANCE_FOLDER_PATH = null;
+
+
+		public static string WINTER_FOLDER = "winter";
+		public static string WINTER_FOLDER_PATH = null;
 
 		public static string examplename = "exampleplugin";
 

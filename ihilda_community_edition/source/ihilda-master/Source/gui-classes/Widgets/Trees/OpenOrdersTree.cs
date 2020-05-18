@@ -59,8 +59,13 @@ namespace IhildaWallet
 			this.treeview1.AppendColumn ("Result", txtr, "markup", 8);
 
 			this.treeview1.ButtonReleaseEvent += (object o, ButtonReleaseEventArgs args) => {
-				Logging.WriteLog ("ButtonReleaseEvent at x=" + args.Event.X.ToString () + " y=" + args.Event.Y.ToString ());
 
+#if DEBUG
+				if (DebugIhildaWallet.OpenOrdersTree) {
+					Logging.WriteLog ("ButtonReleaseEvent at x=" + args.Event.X.ToString () + " y=" + args.Event.Y.ToString ());
+				}
+				
+#endif
 
 				int x = Convert.ToInt32 (args.Event.X);
 				int y = Convert.ToInt32 (args.Event.Y);
@@ -81,7 +86,11 @@ namespace IhildaWallet
 				}
 
 				if (args.Event.Button == 3) {
+
+#if DEBUG
 					Logging.WriteLog ("Right click \n");
+#endif
+
 
 					OrderRightClicked (ao, index);
 
@@ -95,7 +104,7 @@ namespace IhildaWallet
 			if (message == null)
 				message = "";
 
-			TextHighlighter.Highlightcolor = Program.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
+			TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 			string s = TextHighlighter.Highlight (/*"Success : " + */message);
 
 			Application.Invoke ((object sender, EventArgs e) => {
@@ -514,13 +523,16 @@ namespace IhildaWallet
 					return false;
 					*/
 
-				case (Ter.terQUEUED):
-					Thread.Sleep (1000);
+				case Ter.terQUEUED:
+					Thread.Sleep (5);
 					this.SetIsSubmitted (index.ToString (), res.engine_result);
+					this._offers [index].Succeeded = true;
 					return true;
 
+				case Ter.tefALREADY:
 				case Ter.tesSUCCESS:
 					this.SetIsSubmitted (index.ToString (), res.engine_result);
+					this._offers [index].Succeeded = true;
 					return true;
 
 				case Ter.terPRE_SEQ:
@@ -550,7 +562,7 @@ namespace IhildaWallet
 					return false;
 
 				default:
-					this.SetIsSubmitted (index.ToString (), "Response not imlemented");
+					this.SetIsSubmitted (index.ToString (), "Response not imlemented " + res.engine_result);
 					return false;
 
 				}
@@ -588,7 +600,7 @@ namespace IhildaWallet
 
 		}
 
-		public void SetOffers (IEnumerable<Offer> offers)
+		public void SetOffers (IEnumerable<AutomatedOrder> offers)
 		{
 
 			int count = offers.Count ();
@@ -600,44 +612,47 @@ namespace IhildaWallet
 				//});
 
 				int index = 0;
-				foreach (Offer offer in offers) {
+				foreach (AutomatedOrder offer in offers) {
 
-					AutomatedOrder o = new AutomatedOrder (offer);
+					AutomatedOrder order = new AutomatedOrder (offer) {
+						Selected = offer.Selected,
+						Succeeded = offer.Succeeded
+					};
 
-					Decimal price = o.TakerGets.GetNativeAdjustedPriceAt (o.TakerPays);
-					Decimal cost = o.TakerPays.GetNativeAdjustedPriceAt (o.TakerGets);
+					Decimal price = order.TakerGets.GetNativeAdjustedPriceAt (order.TakerPays);
+					Decimal cost = order.TakerPays.GetNativeAdjustedPriceAt (order.TakerGets);
 					price = Math.Round (price, 15);
 					cost = Math.Round (cost, 15);
-					this._offers [index++] = o;
+					this._offers [index++] = order;
 
 					StringBuilder paysbuilder = new StringBuilder ();
 					StringBuilder getsbuilder = new StringBuilder ();
 
-					paysbuilder.Append (o?.TakerPays?.currency ?? "null currency");
+					paysbuilder.Append (order?.TakerPays?.currency ?? "null currency");
 					paysbuilder.Append (" ");
-					paysbuilder.AppendLine (o?.TakerPays?.amount.ToString() ?? "null amount");
+					paysbuilder.AppendLine (order?.TakerPays?.amount.ToString() ?? "null amount");
 
-					if (o?.taker_pays?.issuer != null) {
-						paysbuilder.Append (o?.taker_pays?.issuer);
+					if (order?.taker_pays?.issuer != null) {
+						paysbuilder.Append (order?.taker_pays?.issuer);
 					}
 
-					getsbuilder.Append (o?.TakerGets?.currency ?? "null currency");
+					getsbuilder.Append (order?.TakerGets?.currency ?? "null currency");
 					getsbuilder.Append (" ");
-					getsbuilder.AppendLine (o.taker_gets.amount.ToString() ?? "");
+					getsbuilder.AppendLine (order.taker_gets.amount.ToString() ?? "");
 
-					if (o?.TakerGets?.issuer != null) {
-						getsbuilder.Append (o?.taker_gets.issuer);
+					if (order?.TakerGets?.issuer != null) {
+						getsbuilder.Append (order?.taker_gets.issuer);
 					}
 
 					listStore.AppendValues (
 						(index).ToString (),
-						o.Selected,
+						order.Selected,
 						paysbuilder.ToString(),
 						getsbuilder.ToString(),
 						price.ToString (),
 						cost.ToString (),
-						o.BotMarking ?? "",
-						"",
+						order.BotMarking ?? "",
+						order.Succeeded ? "Submitted" : "",
 						""
 					);
 

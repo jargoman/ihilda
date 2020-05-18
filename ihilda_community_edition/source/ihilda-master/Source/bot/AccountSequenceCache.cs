@@ -453,7 +453,7 @@ namespace IhildaWallet
 
 			Dictionary<String, AutomatedOrder> orderDict = null;
 
-			if (Program.preferLinq) {
+			if (ProgramVariables.preferLinq) {
 				orderDict = ords.ToDictionary ((AutomatedOrder arg) => arg.Bot_ID, (AutomatedOrder arg) => arg);
 
 			} else {
