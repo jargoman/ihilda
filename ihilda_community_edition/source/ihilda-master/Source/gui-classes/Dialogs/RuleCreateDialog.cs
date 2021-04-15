@@ -59,6 +59,22 @@ namespace IhildaWallet
 				}
 			};
 
+			onebutton.Clicked += (sender, e) => {
+				SetPercentage (1.002);
+			};
+
+			onep5button.Clicked += (sender, e) => {
+				SetPercentage (1.007);
+			};
+
+			twobutton.Clicked += (sender, e) => {
+				SetPercentage (1.012);
+			};
+
+			twop5button.Clicked += (sender, e) => {
+				SetPercentage (1.017);
+			};
+
 			Modal = true;
 
 
@@ -70,6 +86,13 @@ namespace IhildaWallet
 			if (address != null) {
 				tradepairentrywidget1.SetAddress (address);
 			}
+		}
+
+
+		public void SetPercentage (double speculate) {
+			comboboxentry1.Entry.Text = 1.005.ToString();
+			comboboxentry2.Entry.Text = 1.005.ToString ();
+			comboboxentry3.Entry.Text = speculate.ToString ();
 		}
 
 

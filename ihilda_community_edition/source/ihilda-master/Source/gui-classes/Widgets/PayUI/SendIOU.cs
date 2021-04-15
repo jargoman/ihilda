@@ -65,38 +65,6 @@ namespace IhildaWallet
 			this.sendIOUButton.Clicked += this.OnSendIOUButtonClicked;
 			//this.ChooseButton.Clicked += new EventHandler(this.OnChooseButtonClicked);
 
-			this.addmemobutton.Clicked += (object sender, EventArgs e) => {
-
-				SelectableMemoIndice createdMemo = null;
-				using (MemoCreateDialog memoCreateDialog = new MemoCreateDialog ()) {
-					try {
-						ResponseType resp = (ResponseType)memoCreateDialog.Run ();
-
-
-						if (resp != ResponseType.Ok) {
-
-							return;
-						}
-						createdMemo = memoCreateDialog.GetMemoIndice ();
-						this.AddMemo (createdMemo);
-					} catch (Exception ee) {
-						throw ee;
-					} finally {
-						memoCreateDialog?.Destroy ();
-					}
-				}
-
-
-
-
-			};
-
-			clearmemobutton.Clicked += (object sender, EventArgs e) => {
-				ListStore.Clear ();
-
-				Memos = null;
-
-			};
 
 			Task.Factory.StartNew ( () => {
 				var token = TokenSource.Token;
@@ -122,27 +90,6 @@ namespace IhildaWallet
 			}
 			);
 
-			CellRendererToggle rendererToggle = new CellRendererToggle () {
-				Activatable = true
-			};
-
-			CellRendererText cellRendererText = new CellRendererText ();
-
-			treeview1.AppendColumn ("Enabled", rendererToggle, "active", 0);
-			treeview1.AppendColumn ("MemoType", cellRendererText, "text", 1);
-			treeview1.AppendColumn ("MemoFormat", cellRendererText, "text", 2);
-			treeview1.AppendColumn ("MemoData", cellRendererText, "text", 3);
-
-			ListStore = new ListStore (
-					typeof (bool),
-					typeof (string),
-		    			typeof (string),
-					typeof (string)
-				);
-
-
-			var memo = Program.GetClientMemo ();
-			this.AddMemo (memo);
 
 			button114.Clicked += PercentageClicked;
 			button115.Clicked += PercentageClicked;
@@ -325,50 +272,7 @@ namespace IhildaWallet
 
 
 		}
-
-
-		private IEnumerable<SelectableMemoIndice> Memos {
-			get;
-			set;
-		}
-
-		public void AddMemo (SelectableMemoIndice indice)
-		{
-			List<SelectableMemoIndice> memoIndices = Memos?.ToList () ?? new List<SelectableMemoIndice> ();
-			indice.IsSelected = true;
-			memoIndices.Add (indice);
-
-			SetMemos (memoIndices);
-
-		}
-
-		public void SetMemos (IEnumerable<SelectableMemoIndice> Memos)
-		{
-			Gtk.Application.Invoke (
-				delegate {
-					ListStore.Clear ();
-
-					foreach (SelectableMemoIndice memoIndice in Memos) {
-						ListStore.AppendValues (
-							memoIndice.IsSelected,
-							memoIndice?.GetMemoTypeAscii (),
-							memoIndice?.GetMemoFormatAscii (),
-							memoIndice?.GetMemoDataAscii ()
-						);
-					}
-
-					this.Memos = Memos;
-					this.treeview1.Model = ListStore;
-
-				}
-			);
-
-		}
-
-		Gtk.ListStore ListStore {
-			get;
-			set;
-		}
+	
 
 
 		~SendIOU ()
@@ -488,9 +392,14 @@ namespace IhildaWallet
 			}
 			tx.DestinationTag = DestTag;
 
+			/*
 			tx.Memos = Memos?.Where ((SelectableMemoIndice arg) =>
 				arg.IsSelected
-			).ToArray();
+			).ToArray(); */
+			if (memowidget1.HasSelectedMemos ()) {
+				tx.Memos = memowidget1.GetSelectedMemos ().ToArray ();
+			}
+
 			//RipplePaymentTransaction[] arr = new RipplePaymentTransaction[] { tx } ;
 
 			LicenseType licenseT = Util.LicenseType.PAYMENT;

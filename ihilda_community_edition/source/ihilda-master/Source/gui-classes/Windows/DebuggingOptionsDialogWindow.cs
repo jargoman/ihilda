@@ -33,6 +33,25 @@ namespace IhildaWallet
 
 				this.notebook1.AppendPage (debuglibrarywidget1, label2);
 			}
+
+
+			button245.Clicked += StartTestClicked;
+		}
+
+
+
+		void StartTestClicked (object sender, EventArgs e)
+		{
+
+		}
+
+
+		private void WriteToOutPut (string message)
+		{
+			Gtk.Application.Invoke ( delegate {
+				textview1.Buffer.Text += message;
+
+			});
 		}
 	}
 }

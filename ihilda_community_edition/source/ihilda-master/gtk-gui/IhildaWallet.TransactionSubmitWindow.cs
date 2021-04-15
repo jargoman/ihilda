@@ -31,7 +31,7 @@ namespace IhildaWallet
 			{
 				this.Child.ShowAll();
 			}
-			this.DefaultWidth = 595;
+			this.DefaultWidth = 634;
 			this.DefaultHeight = 300;
 			this.Show();
 		}

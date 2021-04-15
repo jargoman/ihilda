@@ -10,13 +10,29 @@ namespace IhildaWallet
 
 		private global::Gtk.Label label2;
 
-		private global::Gtk.RadioButton radiobutton1;
+		private global::Gtk.HSeparator hseparator1;
 
-		private global::Gtk.RadioButton radiobutton2;
+		private global::Gtk.HBox hbox1;
 
-		private global::Gtk.RadioButton radiobutton3;
+		private global::Gtk.VBox vbox2;
 
-		private global::Gtk.RadioButton radiobutton4;
+		private global::Gtk.Label label1;
+
+		private global::Gtk.RadioButton randomRadioButton;
+
+		private global::Gtk.RadioButton ScriptRadioButton;
+
+		private global::Gtk.VBox vbox4;
+
+		private global::Gtk.Label label3;
+
+		private global::Gtk.RadioButton secretRadioButton;
+
+		private global::Gtk.RadioButton privateRadioButton;
+
+		private global::Gtk.RadioButton wordListRadioButton;
+
+		private global::Gtk.RadioButton fileRadioButton;
 
 		private global::Gtk.Button buttonCancel;
 
@@ -48,7 +64,7 @@ namespace IhildaWallet
 			// Container child vbox3.Gtk.Box+BoxChild
 			this.label2 = new global::Gtk.Label();
 			this.label2.Name = "label2";
-			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString("<u>Create a new wallet</u>");
+			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString("<b><u>Create a new wallet</u></b>");
 			this.label2.UseMarkup = true;
 			this.vbox3.Add(this.label2);
 			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.label2]));
@@ -56,65 +72,143 @@ namespace IhildaWallet
 			w3.Expand = false;
 			w3.Fill = false;
 			// Container child vbox3.Gtk.Box+BoxChild
-			this.radiobutton1 = new global::Gtk.RadioButton(global::Mono.Unix.Catalog.GetString("from secret"));
-			this.radiobutton1.CanFocus = true;
-			this.radiobutton1.Name = "radiobutton1";
-			this.radiobutton1.Active = true;
-			this.radiobutton1.DrawIndicator = true;
-			this.radiobutton1.UseUnderline = true;
-			this.radiobutton1.Group = new global::GLib.SList(global::System.IntPtr.Zero);
-			this.vbox3.Add(this.radiobutton1);
-			global::Gtk.Box.BoxChild w4 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.radiobutton1]));
+			this.hseparator1 = new global::Gtk.HSeparator();
+			this.hseparator1.Name = "hseparator1";
+			this.vbox3.Add(this.hseparator1);
+			global::Gtk.Box.BoxChild w4 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hseparator1]));
 			w4.Position = 1;
 			w4.Expand = false;
 			w4.Fill = false;
 			// Container child vbox3.Gtk.Box+BoxChild
-			this.radiobutton2 = new global::Gtk.RadioButton(global::Mono.Unix.Catalog.GetString("from random"));
-			this.radiobutton2.CanFocus = true;
-			this.radiobutton2.Name = "radiobutton2";
-			this.radiobutton2.DrawIndicator = true;
-			this.radiobutton2.UseUnderline = true;
-			this.radiobutton2.Group = this.radiobutton1.Group;
-			this.vbox3.Add(this.radiobutton2);
-			global::Gtk.Box.BoxChild w5 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.radiobutton2]));
-			w5.Position = 2;
+			this.hbox1 = new global::Gtk.HBox();
+			this.hbox1.Name = "hbox1";
+			this.hbox1.Homogeneous = true;
+			this.hbox1.Spacing = 6;
+			// Container child hbox1.Gtk.Box+BoxChild
+			this.vbox2 = new global::Gtk.VBox();
+			this.vbox2.Name = "vbox2";
+			this.vbox2.Spacing = 6;
+			// Container child vbox2.Gtk.Box+BoxChild
+			this.label1 = new global::Gtk.Label();
+			this.label1.Name = "label1";
+			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString("<u>New </u>");
+			this.label1.UseMarkup = true;
+			this.vbox2.Add(this.label1);
+			global::Gtk.Box.BoxChild w5 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.label1]));
+			w5.Position = 0;
 			w5.Expand = false;
 			w5.Fill = false;
-			// Container child vbox3.Gtk.Box+BoxChild
-			this.radiobutton3 = new global::Gtk.RadioButton(global::Mono.Unix.Catalog.GetString("from script"));
-			this.radiobutton3.CanFocus = true;
-			this.radiobutton3.Name = "radiobutton3";
-			this.radiobutton3.DrawIndicator = true;
-			this.radiobutton3.UseUnderline = true;
-			this.radiobutton3.Group = this.radiobutton1.Group;
-			this.vbox3.Add(this.radiobutton3);
-			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.radiobutton3]));
-			w6.Position = 3;
+			// Container child vbox2.Gtk.Box+BoxChild
+			this.randomRadioButton = new global::Gtk.RadioButton(global::Mono.Unix.Catalog.GetString("new from random"));
+			this.randomRadioButton.CanFocus = true;
+			this.randomRadioButton.Name = "randomRadioButton";
+			this.randomRadioButton.Active = true;
+			this.randomRadioButton.DrawIndicator = true;
+			this.randomRadioButton.UseUnderline = true;
+			this.randomRadioButton.Group = new global::GLib.SList(global::System.IntPtr.Zero);
+			this.vbox2.Add(this.randomRadioButton);
+			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.randomRadioButton]));
+			w6.Position = 1;
 			w6.Expand = false;
 			w6.Fill = false;
-			// Container child vbox3.Gtk.Box+BoxChild
-			this.radiobutton4 = new global::Gtk.RadioButton(global::Mono.Unix.Catalog.GetString("from file"));
-			this.radiobutton4.CanFocus = true;
-			this.radiobutton4.Name = "radiobutton4";
-			this.radiobutton4.DrawIndicator = true;
-			this.radiobutton4.UseUnderline = true;
-			this.radiobutton4.Group = this.radiobutton1.Group;
-			this.vbox3.Add(this.radiobutton4);
-			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.radiobutton4]));
-			w7.Position = 4;
+			// Container child vbox2.Gtk.Box+BoxChild
+			this.ScriptRadioButton = new global::Gtk.RadioButton(global::Mono.Unix.Catalog.GetString("new from vanity script"));
+			this.ScriptRadioButton.CanFocus = true;
+			this.ScriptRadioButton.Name = "ScriptRadioButton";
+			this.ScriptRadioButton.DrawIndicator = true;
+			this.ScriptRadioButton.UseUnderline = true;
+			this.ScriptRadioButton.Group = this.randomRadioButton.Group;
+			this.vbox2.Add(this.ScriptRadioButton);
+			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.ScriptRadioButton]));
+			w7.Position = 2;
 			w7.Expand = false;
 			w7.Fill = false;
+			this.hbox1.Add(this.vbox2);
+			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.vbox2]));
+			w8.Position = 0;
+			w8.Expand = false;
+			w8.Fill = false;
+			// Container child hbox1.Gtk.Box+BoxChild
+			this.vbox4 = new global::Gtk.VBox();
+			this.vbox4.Name = "vbox4";
+			this.vbox4.Spacing = 6;
+			// Container child vbox4.Gtk.Box+BoxChild
+			this.label3 = new global::Gtk.Label();
+			this.label3.Name = "label3";
+			this.label3.LabelProp = global::Mono.Unix.Catalog.GetString("<u>Import</u>");
+			this.label3.UseMarkup = true;
+			this.vbox4.Add(this.label3);
+			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.label3]));
+			w9.Position = 0;
+			w9.Expand = false;
+			w9.Fill = false;
+			// Container child vbox4.Gtk.Box+BoxChild
+			this.secretRadioButton = new global::Gtk.RadioButton(global::Mono.Unix.Catalog.GetString("import from secret seed"));
+			this.secretRadioButton.CanFocus = true;
+			this.secretRadioButton.Name = "secretRadioButton";
+			this.secretRadioButton.DrawIndicator = true;
+			this.secretRadioButton.UseUnderline = true;
+			this.secretRadioButton.Group = this.randomRadioButton.Group;
+			this.vbox4.Add(this.secretRadioButton);
+			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.secretRadioButton]));
+			w10.Position = 1;
+			w10.Expand = false;
+			w10.Fill = false;
+			// Container child vbox4.Gtk.Box+BoxChild
+			this.privateRadioButton = new global::Gtk.RadioButton(global::Mono.Unix.Catalog.GetString("import from private key"));
+			this.privateRadioButton.CanFocus = true;
+			this.privateRadioButton.Name = "privateRadioButton";
+			this.privateRadioButton.DrawIndicator = true;
+			this.privateRadioButton.UseUnderline = true;
+			this.privateRadioButton.Group = this.randomRadioButton.Group;
+			this.vbox4.Add(this.privateRadioButton);
+			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.privateRadioButton]));
+			w11.Position = 2;
+			w11.Expand = false;
+			w11.Fill = false;
+			// Container child vbox4.Gtk.Box+BoxChild
+			this.wordListRadioButton = new global::Gtk.RadioButton(global::Mono.Unix.Catalog.GetString("import from word list"));
+			this.wordListRadioButton.CanFocus = true;
+			this.wordListRadioButton.Name = "wordListRadioButton";
+			this.wordListRadioButton.DrawIndicator = true;
+			this.wordListRadioButton.UseUnderline = true;
+			this.wordListRadioButton.Group = this.randomRadioButton.Group;
+			this.vbox4.Add(this.wordListRadioButton);
+			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.wordListRadioButton]));
+			w12.Position = 3;
+			w12.Expand = false;
+			w12.Fill = false;
+			// Container child vbox4.Gtk.Box+BoxChild
+			this.fileRadioButton = new global::Gtk.RadioButton(global::Mono.Unix.Catalog.GetString("import from file"));
+			this.fileRadioButton.CanFocus = true;
+			this.fileRadioButton.Name = "fileRadioButton";
+			this.fileRadioButton.DrawIndicator = true;
+			this.fileRadioButton.UseUnderline = true;
+			this.fileRadioButton.Group = this.randomRadioButton.Group;
+			this.vbox4.Add(this.fileRadioButton);
+			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.fileRadioButton]));
+			w13.Position = 4;
+			w13.Expand = false;
+			w13.Fill = false;
+			this.hbox1.Add(this.vbox4);
+			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.vbox4]));
+			w14.Position = 1;
+			w14.Expand = false;
+			w14.Fill = false;
+			this.vbox3.Add(this.hbox1);
+			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hbox1]));
+			w15.Position = 2;
 			w2.Add(this.vbox3);
 			this.scrolledwindow2.Add(w2);
 			w1.Add(this.scrolledwindow2);
-			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(w1[this.scrolledwindow2]));
-			w10.Position = 0;
+			global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(w1[this.scrolledwindow2]));
+			w18.Position = 0;
 			// Internal child IhildaWallet.NewButtonDialog.ActionArea
-			global::Gtk.HButtonBox w11 = this.ActionArea;
-			w11.Name = "dialog1_ActionArea";
-			w11.Spacing = 10;
-			w11.BorderWidth = ((uint)(5));
-			w11.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
+			global::Gtk.HButtonBox w19 = this.ActionArea;
+			w19.Name = "dialog1_ActionArea";
+			w19.Spacing = 10;
+			w19.BorderWidth = ((uint)(5));
+			w19.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonCancel = new global::Gtk.Button();
 			this.buttonCancel.CanDefault = true;
@@ -124,9 +218,9 @@ namespace IhildaWallet
 			this.buttonCancel.UseUnderline = true;
 			this.buttonCancel.Label = "gtk-cancel";
 			this.AddActionWidget(this.buttonCancel, -6);
-			global::Gtk.ButtonBox.ButtonBoxChild w12 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w11[this.buttonCancel]));
-			w12.Expand = false;
-			w12.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w20 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w19[this.buttonCancel]));
+			w20.Expand = false;
+			w20.Fill = false;
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonOk = new global::Gtk.Button();
 			this.buttonOk.CanDefault = true;
@@ -136,16 +230,16 @@ namespace IhildaWallet
 			this.buttonOk.UseUnderline = true;
 			this.buttonOk.Label = "gtk-ok";
 			this.AddActionWidget(this.buttonOk, -5);
-			global::Gtk.ButtonBox.ButtonBoxChild w13 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w11[this.buttonOk]));
-			w13.Position = 1;
-			w13.Expand = false;
-			w13.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w21 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w19[this.buttonOk]));
+			w21.Position = 1;
+			w21.Expand = false;
+			w21.Fill = false;
 			if ((this.Child != null))
 			{
 				this.Child.ShowAll();
 			}
-			this.DefaultWidth = 307;
-			this.DefaultHeight = 221;
+			this.DefaultWidth = 472;
+			this.DefaultHeight = 206;
 			this.Show();
 		}
 	}

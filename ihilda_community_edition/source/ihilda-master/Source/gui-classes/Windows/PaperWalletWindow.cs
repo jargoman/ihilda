@@ -38,22 +38,26 @@ namespace IhildaWallet
 		void Button138_Clicked (object sender, EventArgs e)
 		{
 
-			PdfDocument document = new PdfDocument ();
-			document.Info.Title = "Printable Document";
-			document.Info.Author = ProgramVariables.verboseName;
+			PdfDocument pdfDocument = new PdfDocument ();
 
-			PdfPage pdfPage = document.AddPage ();
+			pdfDocument.Info.Title = "Printable Document";
+			pdfDocument.Info.Author = ProgramVariables.verboseName;
+
+			PdfPage pdfPage = pdfDocument.AddPage ();
 
 			XGraphics gfx = XGraphics.FromPdfPage (pdfPage);
 
 			//const string facename = "Times New Roman";
 
 
+			// get the values from UI
 			string acc = addresslabel.Text;
 			string sec = secretlabel.Text;
 			string notes = textview3.Buffer.Text;
+
+
 			Bitmap accTextBitMap = new Bitmap (300, 20);
-			Bitmap secTextBitMap = new Bitmap (300, 20);
+			Bitmap secTextBitMap = new Bitmap (this.IsPrivateKey ? 500 : 300, 20);
 
 			Bitmap noteBitMap = new Bitmap (600, 600);
 
@@ -82,10 +86,21 @@ namespace IhildaWallet
 			SolidBrush solidBrushBig = new SolidBrush (System.Drawing.Color.Black);
 
 
+			/*
+			System.Drawing.Font fontPk = new System.Drawing.Font (
+			   fontFamilyBig,
+			   14,
+			   FontStyle.Bold,
+			   GraphicsUnit.Point); */
+
+			RectangleF rectFBigPk = new RectangleF (0, 0, 502, 20);
+			//SolidBrush solidBrushBigPk = new SolidBrush (System.Drawing.Color.Black);
+
+
 			accGraphic.DrawString (acc, font, solidBrush, rectF);
 
 
-			secGraphic.DrawString (sec, font, solidBrush, rectF);
+			secGraphic.DrawString (sec, font, solidBrush, this.IsPrivateKey ? rectFBigPk : rectF);
 
 
 			rectF = new RectangleF (0,0,600, 600);
@@ -103,12 +118,26 @@ namespace IhildaWallet
 			gfx.DrawImage (xImageAcc, 5, 100, 275, 275);
 
 			//gfx.DrawString (sec, xFont, XBrushes.Black, 0, 200);
-			gfx.DrawImage (secTextBitMap, 302, 65, 275, 20);
 
-			gfx.DrawImage (xImageSec, 280, 100, 275, 275);
+			if (IsPrivateKey) {
 
-			gfx.DrawImage (noteBitMap, 27, 380, 600, 600);
+				int y_increase = 425;
 
+				gfx.DrawImage (secTextBitMap, 27, 65 + y_increase, 375, 20);
+
+				gfx.DrawImage (xImageSec, 5, 100 + y_increase, 275, 275);
+
+				gfx.DrawImage (noteBitMap, 27, 380, 600 + y_increase, 600);
+
+			} else {
+
+				gfx.DrawImage (secTextBitMap, 302, 65, 275, 20);
+
+				gfx.DrawImage (xImageSec, 280, 100, 275, 275);
+
+				gfx.DrawImage (noteBitMap, 27, 380, 600, 600);
+
+			}
 
 			FileChooserDialog fileChooserDialog = new FileChooserDialog (
 				"Save PDF", 
@@ -119,7 +148,7 @@ namespace IhildaWallet
 				"Save", ResponseType.Accept);
 
 			if (fileChooserDialog.Run () == (int)ResponseType.Accept) {
-				document.Save (fileChooserDialog.Filename + ".pdf");
+				pdfDocument.Save (fileChooserDialog.Filename + ".pdf");
 			}
 
 			fileChooserDialog.Destroy ();
@@ -133,6 +162,10 @@ namespace IhildaWallet
 
 		public void SetSecret ( string secret )
 		{
+
+			IsPrivateKey = false;
+
+			TextHighlighter highlighter = new TextHighlighter ();
 
 			RippleSeedAddress seedAddress = null;
 
@@ -156,11 +189,11 @@ namespace IhildaWallet
 
 
 
-			TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
-			add = TextHighlighter.Highlight ("<big>" + add + "</big>");
+			highlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
+			add = highlighter.Highlight ("<big>" + add + "</big>");
 
-			TextHighlighter.Highlightcolor = TextHighlighter.RED;
-			sec = TextHighlighter.Highlight ("<big>" + sec + "</big>");
+			highlighter.Highlightcolor = TextHighlighter.RED;
+			sec = highlighter.Highlight ("<big>" + sec + "</big>");
 			this.addresslabel.Markup = add;
 			this.secretlabel.Markup = sec;
 
@@ -194,6 +227,11 @@ namespace IhildaWallet
 
 		public void SetPrivateKey (string secret)
 		{
+
+			IsPrivateKey = true;
+
+			TextHighlighter highlighter = new TextHighlighter ();
+
 			RipplePrivateKey privateKey = null;
 
 			privateKey = new RipplePrivateKey (secret);
@@ -216,11 +254,11 @@ namespace IhildaWallet
 
 
 
-			TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
-			add = TextHighlighter.Highlight ("<big>" + add + "</big>");
+			highlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
+			add = highlighter.Highlight ("<big>" + add + "</big>");
 
-			TextHighlighter.Highlightcolor = TextHighlighter.RED;
-			sec = TextHighlighter.Highlight ("<big>" + sec + "</big>");
+			highlighter.Highlightcolor = TextHighlighter.RED;
+			sec = highlighter.Highlight ("<big>" + sec + "</big>");
 			this.addresslabel.Markup = add;
 			this.secretlabel.Markup = sec;
 
@@ -251,6 +289,8 @@ namespace IhildaWallet
 
 
 		}
+
+		private bool IsPrivateKey { get; set; }
 
 		private Bitmap accBitmap = null;
 		private Bitmap secBitmap = null;

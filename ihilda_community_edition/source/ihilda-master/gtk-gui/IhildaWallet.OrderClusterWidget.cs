@@ -36,6 +36,8 @@ namespace IhildaWallet
 
 		private global::Gtk.Expander expander1;
 
+		private global::Gtk.Label detailslabel;
+
 		private global::Gtk.Label GtkLabel;
 
 		protected virtual void Build()
@@ -199,14 +201,21 @@ namespace IhildaWallet
 			this.expander1 = new global::Gtk.Expander(null);
 			this.expander1.CanFocus = true;
 			this.expander1.Name = "expander1";
+			this.expander1.Expanded = true;
+			// Container child expander1.Gtk.Container+ContainerChild
+			this.detailslabel = new global::Gtk.Label();
+			this.detailslabel.Name = "detailslabel";
+			this.expander1.Add(this.detailslabel);
 			this.GtkLabel = new global::Gtk.Label();
 			this.GtkLabel.Name = "GtkLabel";
 			this.GtkLabel.LabelProp = global::Mono.Unix.Catalog.GetString("Details");
 			this.GtkLabel.UseUnderline = true;
 			this.expander1.LabelWidget = this.GtkLabel;
 			this.vbox3.Add(this.expander1);
-			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.expander1]));
-			w15.Position = 2;
+			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.expander1]));
+			w16.Position = 2;
+			w16.Expand = false;
+			w16.Fill = false;
 			this.Add(this.vbox3);
 			if ((this.Child != null))
 			{

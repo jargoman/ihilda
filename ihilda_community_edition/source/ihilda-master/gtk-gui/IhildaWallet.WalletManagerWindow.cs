@@ -24,6 +24,7 @@ namespace IhildaWallet
 			this.Title = global::Mono.Unix.Catalog.GetString("Wallet Manager");
 			this.Icon = global::Gdk.Pixbuf.LoadFromResource("IhildaWallet.Images.xrp_25x22.png");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(1));
+			this.BorderWidth = ((uint)(12));
 			// Container child IhildaWallet.WalletManagerWindow.Gtk.Container+ContainerChild
 			this.vbox2 = new global::Gtk.VBox();
 			this.vbox2.Name = "vbox2";
@@ -48,8 +49,8 @@ namespace IhildaWallet
 			{
 				this.Child.ShowAll();
 			}
-			this.DefaultWidth = 1065;
-			this.DefaultHeight = 493;
+			this.DefaultWidth = 1074;
+			this.DefaultHeight = 499;
 			this.Show();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler(this.OnDeleteEvent);
 		}

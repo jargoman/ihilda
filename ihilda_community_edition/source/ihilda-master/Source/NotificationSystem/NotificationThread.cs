@@ -177,6 +177,8 @@ namespace IhildaWallet
 
 
 					}
+
+		    			
 					DoLogicResponse tuple = DoOfferLogic (walletGroup.First(), ni);
 
 					foreach (RippleWallet rw in walletGroup) {
@@ -909,9 +911,9 @@ namespace IhildaWallet
 
 		public Task InitNotificationSystem () => Task.Run (
 				delegate {
-					using (ManualResetEvent mre = new ManualResetEvent (false)) {
-						mre.Reset ();
-						Application.Invoke (delegate {
+
+						
+						TaskHelper.GuiInvokeSyncronous (delegate {
 
 
 
@@ -955,13 +957,13 @@ namespace IhildaWallet
 							};
 
 
-							mre.Set ();
+
 
 						});
 
 						//mre.WaitOne ();
-						WaitHandle.WaitAny (new [] { mre, _token.WaitHandle });
-					}
+						
+
 
 					if (!ProgramVariables.network) {
 						// if networking explicitly prohibited don't do networking loop. 

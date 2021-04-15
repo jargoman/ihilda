@@ -4,23 +4,13 @@
 
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 //using Mono;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Gtk;
 //using Gdk;
 
-using IhildaWallet.Networking;
 using RippleLibSharp.Binary;
-using RippleLibSharp.Commands.Accounts;
-using RippleLibSharp.Keys;
-using RippleLibSharp.Network;
 using RippleLibSharp.Transactions;
-using RippleLibSharp.Transactions.TxTypes;
 using RippleLibSharp.Util;
 //using static IhildaWallet.MemoCreateDialog;
 
@@ -238,8 +228,9 @@ namespace IhildaWallet
 				if (de != null) de.RetVal = true; // slick!
 
 				
-				Application.Quit ();
+				
 				DoExit ();
+				Application.Quit ();
 				System.Environment.Exit (0);
 
 				return;

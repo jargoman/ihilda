@@ -98,6 +98,10 @@ namespace IhildaWallet
 			string method_sig = clsstr + nameof (ScaleMethod) + DebugRippleLibSharp.colon;
 
 #endif
+
+
+			TextHighlighter highlighter = new TextHighlighter ();
+
 			string acc = _rippleWallet.Account;
 
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
@@ -130,8 +134,8 @@ namespace IhildaWallet
 
 					var mess = "Price is formatted incorrectly";
 
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					string sss = TextHighlighter.Highlight (mess);
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					string sss = highlighter.Highlight (mess);
 
 					Gtk.Application.Invoke (delegate {
 
@@ -164,11 +168,11 @@ namespace IhildaWallet
 
 				var message = "Price isn't specified using " + bidLabelText;
 
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
+				highlighter.Highlightcolor = TextHighlighter.RED;
 
 
 
-				string ss = TextHighlighter.Highlight (message);
+				string ss = highlighter.Highlight (message);
 
 				Gtk.Application.Invoke (delegate {
 					pricecomboboxentry.Entry.Text = price.ToString ();
@@ -358,6 +362,8 @@ namespace IhildaWallet
 
 
 
+			TextHighlighter highlighter = new TextHighlighter ();
+
 			String text = this.amountcomboboxentry.ActiveText;
 #if DEBUG
 			if (DebugIhildaWallet.AutomatedBuyWidget) {
@@ -371,8 +377,8 @@ namespace IhildaWallet
 				// TODO optionally color amount entry
 				 var message = "Amount is formatted incorrectly \n";
 
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				infobar.Markup = TextHighlighter.Highlight (message);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = highlighter.Highlight (message);
 
 #if DEBUG
 				if (DebugIhildaWallet.AutomatedBuyWidget) {
@@ -393,8 +399,8 @@ namespace IhildaWallet
 			if (pr == null) {
 
 				var message = "Price is formatted incorrectly";
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				infobar.Markup = TextHighlighter.Highlight (message);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = highlighter.Highlight (message);
 #if DEBUG
 				if (DebugIhildaWallet.AutomatedBuyWidget) {
 					Logging.WriteLog (method_sig + "pr==null, returning\n");
@@ -432,6 +438,8 @@ namespace IhildaWallet
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
 #endif
+
+			AutomationWarning = true;
 
 			if (off == null) {
 #if DEBUG
@@ -503,41 +511,48 @@ namespace IhildaWallet
 		void Buybutton_Clicked (object sender, EventArgs e)
 		{
 
+			TextHighlighter highlighter = new TextHighlighter ();
+
 			Decimal? amoun = RippleCurrency.ParseDecimal (amountcomboboxentry?.ActiveText);
 			if (amoun == null) {
 				var message = "Invalid buy amount\n";
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				infobar.Markup = TextHighlighter.Highlight (message);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = highlighter.Highlight (message);
 				return;
 			}
-			Decimal? maxPrice = RippleCurrency.ParseDecimal (amountcomboboxentry?.ActiveText);
+			Decimal? maxPrice = RippleCurrency.ParseDecimal (pricecomboboxentry?.ActiveText);
 			if (maxPrice == null) {
-				var message = "Invalid Price Amount\n";
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				infobar.Markup = TextHighlighter.Highlight (message);
+				var message = "Invalid Price Price\n";
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = highlighter.Highlight (message);
+				return;
+			}
+
+			bool sane = _parent.SafetyCheck ((Decimal)maxPrice, "buy");
+			if (!sane) {
 				return;
 			}
 
 			Decimal? maxValue = RippleCurrency.ParseDecimal (maxcomboboxentry?.ActiveText);
 			if (maxValue == null) {
 				var message = "Invalid max value\n";
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				infobar.Markup = TextHighlighter.Highlight (message);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = highlighter.Highlight (message);
 				return;
 			}
 			Int32? minTx = RippleCurrency.ParseInt32 (comboboxentry1?.ActiveText);
 			if (minTx == null) {
 				var message = "Invalid minTx\n";
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				infobar.Markup = TextHighlighter.Highlight (message);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = highlighter.Highlight (message);
 				return;
 
 			}
 			Int32? maxTx = RippleCurrency.ParseInt32 (comboboxentry2?.ActiveText);
 			if (maxTx == null) {
 				var message = "Invalid maxTx";
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				infobar.Markup = TextHighlighter.Highlight (message);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = highlighter.Highlight (message);
 				return;
 
 			}
@@ -560,7 +575,12 @@ namespace IhildaWallet
 
 					Application.Invoke (
 						delegate {
-						
+
+							if (AutomationWarning) {
+
+								bool ignored = AreYouSure.AutomatedTradingWarning ();
+								if (!ignored) return;
+							}
 							AutomatedPurchaseWindow automatedPurchaseWindow = new AutomatedPurchaseWindow (_rippleWallet, automatedOrder, (Int32)minTx, (Int32)maxTx);
 
 							automatedPurchaseWindow.Show ();
@@ -615,7 +635,7 @@ namespace IhildaWallet
 						Logging.WriteLog (event_sig + nameof (a) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString (a) + DebugRippleLibSharp.comma + nameof (b) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString (b));
 					}
 #endif
-					label10.Markup = "<b><u>Buy " + a + "</u></b>";
+					label10.Markup = "<span foreground=\"green\"><b><u>Buy " + a + "</u></b></span>";
 					label12.Text = a;
 					label15.Text = b;
 					label16.Text = b;
@@ -633,6 +653,9 @@ namespace IhildaWallet
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
 #endif
+
+
+			TextHighlighter highlighter = new TextHighlighter ();
 
 			if (amountcomboboxentry == null || pricecomboboxentry == null || maxcomboboxentry == null) {
 				// todo gui in state of disarray, debug
@@ -662,21 +685,33 @@ namespace IhildaWallet
 				return null;
 			}
 
-			RippleIdentifier seed = rw.GetDecryptedSeed ();
+			PasswordAttempt passwordAttempt = new PasswordAttempt ();
 
-			while (seed.GetHumanReadableIdentifier() == null) {
-
-				rw.Forget ();
-				bool should = AreYouSure.AskQuestion (
-				"Invalid password", 
+			passwordAttempt.InvalidPassEvent += (object sender, EventArgs e) =>
+			{
+				bool shou = AreYouSure.AskQuestionNonGuiThread (
+				"Invalid password",
 				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
 				);
+			};
 
-				if (!should) {
-					return null;
-				}
+			passwordAttempt.MaxPassEvent += (object sender, EventArgs e) =>
+			{
+				string mess = "Max password attempts";
 
-				seed = rw.GetDecryptedSeed ();
+				MessageDialog.ShowMessage (mess);
+				//WriteToOurputScreen ("\n" + mess + "\n");
+			};
+
+
+			DecryptResponse response = passwordAttempt.DoRequest (rw, new CancellationTokenSource().Token);
+
+
+			RippleIdentifier seed = response.Seed;
+
+			if (seed.GetHumanReadableIdentifier() == null) {
+
+				return null;
 			}
 
 #if DEBUG
@@ -721,18 +756,28 @@ namespace IhildaWallet
 			Decimal? payamount = RippleCurrency.ParseDecimal (amountcomboboxentry.ActiveText);
 			if (payamount == null) {
 				var message= off.taker_pays.currency + " payamount is formatted incorrectly \n";
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				infobar.Markup = TextHighlighter.Highlight (message);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = highlighter.Highlight (message);
 				return null;
 			}
 
 			Decimal? getamount = RippleCurrency.ParseDecimal (maxcomboboxentry.ActiveText);
 			if (getamount == null) {
 				var message = off.taker_gets.currency + " getamount is formatted incorrectly \n";
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				infobar.Markup = TextHighlighter.Highlight (message);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = highlighter.Highlight (message);
 				return null;
 			}
+
+			Decimal? price = RippleCurrency.ParseDecimal (this.pricecomboboxentry.ActiveText);
+			if (price == null) {
+				string message = "price is formatted incorrectly\n";
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = highlighter.Highlight (message);
+				return null;
+			}
+
+			
 
 
 			off.taker_pays.amount = off.taker_pays.IsNative ? (Decimal)payamount * 1000000 : (Decimal)payamount;
@@ -745,6 +790,17 @@ namespace IhildaWallet
 
 
 		}
+
+
+		public void SetParent (TradeWindow parent)
+		{
+			this._parent = parent;
+		}
+
+
+		public bool AutomationWarning { get; set; }
+
+		private TradeWindow _parent = null;
 
 #pragma warning disable RECS0122 // Initializing field with default value is redundant
 		private TradePair _tradePair = null;

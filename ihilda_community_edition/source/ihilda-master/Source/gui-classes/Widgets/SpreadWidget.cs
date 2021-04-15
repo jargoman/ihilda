@@ -181,7 +181,8 @@ namespace IhildaWallet
 				askLabelText = askPrice.ToString ();
 			}
 
-
+			bid = bidPrice;
+			ask = askPrice;
 
 			if (canSpread) {
 
@@ -214,6 +215,10 @@ namespace IhildaWallet
 			);
 
 		}
+
+
+		public Decimal bid = default (decimal);
+		public Decimal ask = default (decimal);
 	}
 }
 

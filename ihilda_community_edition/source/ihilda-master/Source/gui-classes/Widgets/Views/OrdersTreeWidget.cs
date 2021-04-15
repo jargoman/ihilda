@@ -29,8 +29,10 @@ namespace IhildaWallet
 				vbox1.Add (openorderstree1);
 			}
 
+			this.openorderstree1.SetParent (this);
+
 			this.infoBarLabel.UseMarkup = true;
-			this.infoBarLabel.Hide ();
+			//this.infoBarLabel.Hide ();
 
 			this.stopButton.Clicked += (object sender, EventArgs e) => {
 				tokenSource.Cancel ();
@@ -81,7 +83,7 @@ namespace IhildaWallet
 				infoBarLabel.Markup = "Retrieving orders for " + addr;
 				infoBarLabel.Visible = true;
 				selectButon.Visible = false;
-				//cancelbutton.Visible = false;
+				cancelbutton.Visible = false;
 				stopButton.Visible = true;
 
 				OAParam oap = new OAParam(addr);
@@ -155,9 +157,15 @@ namespace IhildaWallet
 
 		public void SetRippleWallet (RippleWallet rippleWallet) {
 
+			string address = rippleWallet.GetStoredReceiveAddress ()?.ToString () ?? "";
+
 			this._rippleWallet = rippleWallet;
 
-			this.comboboxentry1.Entry.Text = rippleWallet.GetStoredReceiveAddress ()?.ToString() ?? "";
+			this.openorderstree1.SetRippleWallet (rippleWallet);
+
+			this.comboboxentry1.Entry.Text = address;
+
+			activeWalletLabel.Text = "Active Wallet : " + address;
 			stopButton.Visible = false;
 			selectButon.Visible = false;
 			deselect.Visible = false;
@@ -205,19 +213,35 @@ namespace IhildaWallet
 
 			uint se = Convert.ToUInt32( AccountInfo.GetSequence ( rw.GetStoredReceiveAddress(), ni, token ));
 
-			RippleIdentifier rsa = rw.GetDecryptedSeed();
 
-			while (rsa.GetHumanReadableIdentifier () == null) {
-				bool should = AreYouSure.AskQuestion (
+
+			PasswordAttempt passwordAttempt = new PasswordAttempt ();
+
+			passwordAttempt.InvalidPassEvent += (object sender, EventArgs e) =>
+			{
+				bool shou = AreYouSure.AskQuestionNonGuiThread (
 				"Invalid password",
 				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
 				);
+			};
 
-				if (!should) {
-					return;
-				}
+			passwordAttempt.MaxPassEvent += (object sender, EventArgs e) =>
+			{
+				string mess = "Max password attempts";
 
-				rsa = rw.GetDecryptedSeed ();
+				MessageDialog.ShowMessage (mess);
+				//WriteToOurputScreen ("\n" + mess + "\n");
+			};
+
+
+			DecryptResponse response = passwordAttempt.DoRequest (rw, token);
+
+
+
+			RippleIdentifier rsa = response.Seed;
+
+			if (rsa.GetHumanReadableIdentifier () == null) {
+				return;
 			}
 
 
@@ -251,7 +275,7 @@ namespace IhildaWallet
 						infoBarLabel.Markup = "";
 						infoBarLabel.Visible = false;
 
-						//cancelbutton.Visible = true;
+						cancelbutton.Visible = true;
 						selectButon.Visible = true;
 						stopButton.Visible = false;
 					}
@@ -282,7 +306,7 @@ namespace IhildaWallet
 				delegate {
 					if (mess == null) {
 						infoBarLabel.Markup = ProgramVariables.darkmode ? "<span fgcolor=\"#FFAABB\">" : "<span fgcolor=\"red\">" + mess + "</span>";
-						infoBarLabel.Visible = true;
+
 					} else {
 						infoBarLabel.Visible = false;
 					}
@@ -298,7 +322,12 @@ namespace IhildaWallet
 		}
 
 
-
+		public CancellationTokenSource InitTokenSource ()
+		{
+			tokenSource?.Cancel ();
+			tokenSource = new CancellationTokenSource ();
+			return tokenSource;
+		}
 		private CancellationTokenSource tokenSource = null;
 		public void SyncClicked ( object address ) {
 
@@ -317,6 +346,12 @@ namespace IhildaWallet
 
 #endif
 
+	    		/* 
+	    		 * This casts the parameter to an orders address parameter
+	    		 * It's equivalent to OAParam oap = (OAParam)address;
+	    		 * then checks for null	 
+	    		 * it's syntactical sugar	 
+			*/
 
 			if (!(address is OAParam oap)) {
 #if DEBUG
@@ -344,7 +379,7 @@ namespace IhildaWallet
 				ra = new RippleAddress(addr);
 			}
 
-			#pragma warning disable 0168
+#pragma warning disable 0168
 			catch (FormatException fe) {
 #pragma warning restore 0168
 
@@ -359,11 +394,11 @@ namespace IhildaWallet
 				if (DebugIhildaWallet.OrdersTreeWidget) {
 					Logging.WriteLog(fe.Message);
 				}
-				#endif
+#endif
 				return;
 			}
 
-			#pragma warning disable 0168
+#pragma warning disable 0168
 			catch (Exception ex) {
 #pragma warning restore 0168
 
@@ -376,20 +411,20 @@ namespace IhildaWallet
 				if (DebugIhildaWallet.OrdersTreeWidget) {
 					Logging.WriteLog(ex.Message);
 				}
-				#endif
+#endif
 				return;
 			}
 
 			finally {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.OrdersTreeWidget) {
 					Logging.WriteLog (method_sig + nameof (ra) + DebugRippleLibSharp.equals + DebugIhildaWallet.ToAssertString(ra));
 				}
-				#endif
+#endif
 			}
 
 			if (ra == null) {
-				#if DEBUG
+#if DEBUG
 				if (DebugIhildaWallet.OrdersTreeWidget) {
 					Logging.WriteLog (method_sig + nameof (ra) + DebugRippleLibSharp.equals + DebugRippleLibSharp.null_str + DebugRippleLibSharp.comma + DebugRippleLibSharp.returning);
 				}
@@ -410,28 +445,23 @@ namespace IhildaWallet
 
 			Task <IEnumerable< Response <AccountOffersResult> > > task = AccountOffers.GetFullOfferList (addr, ni, token);
 			while (!task.IsCompleted && !token.IsCancellationRequested) {
-				Gtk.Application.Invoke (
-					delegate {
-
-						progressbar1.Pulse ();
-					}
-				);
+				Pulse ();
+					
 
 				try {
 					task.Wait (500, token);
+
+					/* catch two exceptions at once */
 				} catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException) {
+
+					// TODO what to do when canceled
 
 				}
 			}
+			
 
-			Gtk.Application.Invoke (
-				delegate {
-					infoBarLabel.Markup = "Recieved result, processing\n";
-					infoBarLabel.Visible = true;
-					progressbar1.Pulse ();
-
-				}
-			);
+			SetInfoBar ("Recieved result, processing\n");
+			Pulse ();
 
 			if (task == null) {
 				ResetSync ("task == null, network issues");
@@ -452,12 +482,9 @@ namespace IhildaWallet
 				return;
 			}
 
-			Gtk.Application.Invoke (
-					delegate {
-
-						progressbar1.Pulse ();
-					}
-				);
+			Pulse ();
+					
+				
 
 			IEnumerable <AutomatedOrder> firstOffs = from Offer off in first?.result?.offers select new AutomatedOrder(off);
 			if (firstOffs == null || !firstOffs.Any()) {
@@ -472,14 +499,8 @@ namespace IhildaWallet
 				return;
 			}
 
-			
-			Gtk.Application.Invoke (
-					delegate {
 
-						progressbar1.Pulse ();
-					}
-				);
-
+			Pulse ();
 			//List<Offer> offers = new List<Offer> ();
 
 
@@ -544,13 +565,30 @@ namespace IhildaWallet
 
 						progressbar1.Fraction = 1;
 						infoBarLabel.Markup = "";
-						infoBarLabel.Visible = false;
+						//infoBarLabel.Visible = false;
 
-						//cancelbutton.Visible = true;
+						cancelbutton.Visible = true;
 						selectButon.Visible = true;
 						stopButton.Visible = false;
 					}
 				);
+
+		}
+
+
+		public void Pulse ()
+		{
+			Gtk.Application.Invoke ( delegate {
+				progressbar1.Pulse (); 
+			});
+
+		}
+
+		public void SetInfoBar (string text)
+		{
+			Gtk.Application.Invoke ( delegate {
+				infoBarLabel.Markup = text;
+			});
 
 		}
 

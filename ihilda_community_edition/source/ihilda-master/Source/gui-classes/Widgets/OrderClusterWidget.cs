@@ -27,12 +27,14 @@ namespace IhildaWallet
 
 		public void ParseUI (object sender, EventArgs e) {
 
+			TextHighlighter highlighter = new TextHighlighter ();
+
 			Gdk.Color orchid = new Gdk.Color (218, 112, 214);
 
-			TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? "\"#FFAABB\"" : "\"red\"";
+			highlighter.Highlightcolor = ProgramVariables.darkmode ? "\"#FFAABB\"" : "\"red\"";
 			string orders = ordersentry.ActiveText;
 			if (string.IsNullOrWhiteSpace(orders)) {
-				label8.Markup = TextHighlighter.Highlight ("Please specify a number orders per side");
+				label8.Markup = highlighter.Highlight ("Please specify a number orders per side");
 
 				ordersentry.Entry.ModifyBase (Gtk.StateType.Normal, orchid);
 				cluster = null;
@@ -42,7 +44,7 @@ namespace IhildaWallet
 
 			bool b = int.TryParse (orders, out int ordernum);
 			if (!b) {
-				label8.Markup = TextHighlighter.Highlight ("Number of orders must be a valid integer.");
+				label8.Markup = highlighter.Highlight ("Number of orders must be a valid integer.");
 				ordersentry.Entry.ModifyBase (Gtk.StateType.Normal, orchid);
 				cluster = null;
 				return;
@@ -52,7 +54,7 @@ namespace IhildaWallet
 
 			string spread = spreadentry.ActiveText;
 			if (string.IsNullOrWhiteSpace (spread)) {
-				label8.Markup = TextHighlighter.Highlight ("Please specify a spread. use 1.01 for one percent (1%)");
+				label8.Markup = highlighter.Highlight ("Please specify a spread. use 1.01 for one percent (1%)");
 
 				spreadentry.Entry.ModifyBase (Gtk.StateType.Normal, orchid);
 				cluster = null;
@@ -64,7 +66,7 @@ namespace IhildaWallet
 			b = double.TryParse (spread, out double spreadnum);
 
 			if (!b) {
-				label8.Markup = TextHighlighter.Highlight ("Spread is not a valid number");
+				label8.Markup = highlighter.Highlight ("Spread is not a valid number");
 				spreadentry.Entry.ModifyBase (Gtk.StateType.Normal, orchid);
 				cluster = null;
 				return;
@@ -74,7 +76,7 @@ namespace IhildaWallet
 
 			string priceMod = pricemodentry.ActiveText;
 			if (string.IsNullOrWhiteSpace (priceMod)) {
-				label8.Markup = TextHighlighter.Highlight ("Please specify a price mod.");
+				label8.Markup = highlighter.Highlight ("Please specify a price mod.");
 
 				pricemodentry.Entry.ModifyBase (Gtk.StateType.Normal, orchid);
 				cluster = null;
@@ -83,7 +85,7 @@ namespace IhildaWallet
 
 			b = double.TryParse (priceMod, out double priceModNum);
 			if (!b) {
-				label8.Markup = TextHighlighter.Highlight ("Price mod is not a valid number");
+				label8.Markup = highlighter.Highlight ("Price mod is not a valid number");
 
 				pricemodentry.Entry.ModifyBase (Gtk.StateType.Normal, orchid);
 				cluster = null;
@@ -94,7 +96,7 @@ namespace IhildaWallet
 
 			string amount = amountentry.ActiveText;
 			if (string.IsNullOrWhiteSpace (amount)) {
-				label8.Markup = TextHighlighter.Highlight ("Please specify an amount.");
+				label8.Markup = highlighter.Highlight ("Please specify an amount.");
 
 				amountentry.Entry.ModifyBase (Gtk.StateType.Normal, orchid);
 				cluster = null;
@@ -103,7 +105,7 @@ namespace IhildaWallet
 
 			b = double.TryParse (amount, out double amountNum);
 			if (!b) {
-				label8.Markup = TextHighlighter.Highlight ("Amount is not a valid number.");
+				label8.Markup = highlighter.Highlight ("Amount is not a valid number.");
 				amountentry.Entry.ModifyBase (Gtk.StateType.Normal, orchid);
 				cluster = null;
 				return;
@@ -113,7 +115,7 @@ namespace IhildaWallet
 			string amountMod = amountmodentry.ActiveText;
 			if (string.IsNullOrWhiteSpace (amountMod)) {
 
-				label8.Markup = TextHighlighter.Highlight ("Please specify an amount mod.");
+				label8.Markup = highlighter.Highlight ("Please specify an amount mod.");
 
 				amountmodentry.Entry.ModifyBase (Gtk.StateType.Normal, orchid);
 				cluster = null;
@@ -122,7 +124,7 @@ namespace IhildaWallet
 
 			b = double.TryParse (amountMod, out double amountModNum);
 			if (!b) {
-				label8.Markup = TextHighlighter.Highlight ("Amount mod is not a valid number.");
+				label8.Markup = highlighter.Highlight ("Amount mod is not a valid number.");
 				amountmodentry.Entry.ModifyBase (Gtk.StateType.Normal, orchid);
 				cluster = null;
 				return;
@@ -133,7 +135,7 @@ namespace IhildaWallet
 			string mark = markentry.ActiveText;
 			if (string.IsNullOrWhiteSpace (mark)) {
 				
-				label8.Markup = TextHighlighter.Highlight ("please specify a mark.");
+				label8.Markup = highlighter.Highlight ("please specify a mark.");
 
 				markentry.Entry.ModifyBase (Gtk.StateType.Normal, orchid);
 				cluster = null;
@@ -160,7 +162,7 @@ namespace IhildaWallet
 
 		public void SetDetails (OrderCluster cluster)
 		{
-			//cluster.GetOrders (
+			//var ords = cluster.GetOrders ();
 		}
 
 		public OrderCluster cluster = null;

@@ -372,9 +372,10 @@ namespace IhildaWallet
 
 								TradeWindow tradeWindow = ShowTradeWindow (/*off,*/ rw);
 								if (offerType == OrderEnum.BID) {
-									AutomatedOrder automatedOrder = new AutomatedOrder (off);
-									automatedOrder.taker_gets = off.taker_pays.DeepCopy ();
-									automatedOrder.taker_pays = off.taker_gets.DeepCopy ();
+									AutomatedOrder automatedOrder = new AutomatedOrder (off) {
+										taker_gets = off.taker_pays.DeepCopy (),
+										taker_pays = off.taker_gets.DeepCopy ()
+									};
 									tradeWindow.SetSellOffer (automatedOrder);
 								} else {
 									tradeWindow.SetSellOffer (off);
@@ -616,7 +617,8 @@ namespace IhildaWallet
 			Boolean accepted = AreYouSure.AskQuestion(title, stringBuilder.ToString());
 
 
-			#if DEBUG
+#if DEBUG
+
 			if (DebugIhildaWallet.OrderBookTableWidget) {
 				Logging.WriteLog (method_sig + nameof (accepted) + DebugRippleLibSharp.equals + accepted.ToString());
 			}
@@ -624,14 +626,23 @@ namespace IhildaWallet
 			if (!accepted) {
 				return;
 			}
+
 #endif
-			LicenseType licenseT = Util.LicenseType.TRADING;
-			if (LeIceSense.IsLicenseExempt(first.taker_gets) || LeIceSense.IsLicenseExempt (first.taker_pays)) {
-				licenseT = LicenseType.NONE;
-			}
+
+			/*
+
+				    LicenseType licenseT = Util.LicenseType.TRADING;
+				    if (LeIceSense.IsLicenseExempt(first.taker_gets) || LeIceSense.IsLicenseExempt (first.taker_pays)) {
+					    licenseT = LicenseType.NONE;
+				    }
+
+				    OrderSubmitWindow order_preview = new OrderSubmitWindow (_rippleWallet,licenseT);
+			*/
 
 
-			OrderSubmitWindow order_preview = new OrderSubmitWindow (_rippleWallet,licenseT);
+
+			OrderSubmitWindow order_preview = new OrderSubmitWindow (_rippleWallet);
+
 			order_preview.SetOrders (opposing);
 			order_preview.Show ();
 
@@ -680,7 +691,7 @@ namespace IhildaWallet
 			);
 		}
 
-		public void SetAsk (AutomatedOrder [] asks)
+		public void SetAsks (AutomatedOrder [] asks)
 		{
 			int count = asks.Length;
 
@@ -702,6 +713,16 @@ namespace IhildaWallet
 			}
 
 #endif
+
+			SetInfoBar (
+				"<span foreground=\"green\">Setting "
+#if DEBUG
+				+ asks.Length.ToString () + " "
+#endif
+				+ "asks</span>"
+
+			);
+
 
 			lock (orderLock) {
 				this.offerType = OrderEnum.ASK;
@@ -764,30 +785,37 @@ namespace IhildaWallet
 
 		public void SetAsk (AutomatedOrder ask, int index, decimal sum)
 		{
+
 #if DEBUG
 			StringBuilder stringBuilder = new StringBuilder ();
-			stringBuilder.Append (clsstr);
-			stringBuilder.Append (nameof (SetAsk));
-			stringBuilder.Append (DebugRippleLibSharp.left_parentheses);
-			stringBuilder.Append (nameof (AutomatedOrder));
-			stringBuilder.Append (DebugRippleLibSharp.space_char);
-			stringBuilder.Append (nameof (ask));
-			stringBuilder.Append (DebugRippleLibSharp.equals);
-			stringBuilder.Append (DebugIhildaWallet.ToAssertString (ask));
-			stringBuilder.Append (DebugRippleLibSharp.comma);
-			stringBuilder.Append (nameof (Int32));
-			stringBuilder.Append (DebugRippleLibSharp.space_char);
-			stringBuilder.Append (nameof (index));
-			stringBuilder.Append (DebugRippleLibSharp.equals);
-			stringBuilder.Append (index.ToString());
-			stringBuilder.Append (DebugRippleLibSharp.comma);
-			stringBuilder.Append (nameof (Decimal));
-			stringBuilder.Append (DebugRippleLibSharp.space_char);
-			stringBuilder.Append (nameof (sum));
-			stringBuilder.Append (DebugRippleLibSharp.equals);
-			stringBuilder.Append (sum.ToString ());
-			stringBuilder.Append (DebugRippleLibSharp.right_parentheses);
-			String method_sig = stringBuilder.ToString();
+
+			{
+
+				stringBuilder.Append (clsstr);
+				stringBuilder.Append (nameof (SetAsk));
+				stringBuilder.Append (DebugRippleLibSharp.left_parentheses);
+				stringBuilder.Append (nameof (AutomatedOrder));
+				stringBuilder.Append (DebugRippleLibSharp.space_char);
+				stringBuilder.Append (nameof (ask));
+				stringBuilder.Append (DebugRippleLibSharp.equals);
+				stringBuilder.Append (DebugIhildaWallet.ToAssertString (ask));
+				stringBuilder.Append (DebugRippleLibSharp.comma);
+				stringBuilder.Append (nameof (Int32));
+				stringBuilder.Append (DebugRippleLibSharp.space_char);
+				stringBuilder.Append (nameof (index));
+				stringBuilder.Append (DebugRippleLibSharp.equals);
+				stringBuilder.Append (index.ToString ());
+				stringBuilder.Append (DebugRippleLibSharp.comma);
+				stringBuilder.Append (nameof (Decimal));
+				stringBuilder.Append (DebugRippleLibSharp.space_char);
+				stringBuilder.Append (nameof (sum));
+				stringBuilder.Append (DebugRippleLibSharp.equals);
+				stringBuilder.Append (sum.ToString ());
+				stringBuilder.Append (DebugRippleLibSharp.right_parentheses);
+
+			}
+
+			String method_sig = stringBuilder.ToString ();
 #endif
 			if (ask == null) {
 #if DEBUG
@@ -943,10 +971,18 @@ namespace IhildaWallet
 #endif
 
 			if (bid == null) {
+#if DEBUG
+
+				SetErrorBar ("<span foreground=\"red\">bid is null</span>");
+#endif
 				return;
 			}
 
 			if (index < 1 || index > MAX_ORDERS) {
+#if DEBUG
+
+				SetErrorBar ("<span foreground=\"red\">Bid index less than 1</span>");
+#endif
 				return;
 			}
 
@@ -956,6 +992,7 @@ namespace IhildaWallet
 			}
 
 #endif
+
 
 
 			//Decimal price = bid.TakerGets.amount;	//
@@ -1042,6 +1079,17 @@ namespace IhildaWallet
 				Logging.WriteLog(method_sig + DebugRippleLibSharp.beginn);
 			}
 #endif
+
+			
+			SetInfoBar (
+				"<span foreground=\"green\">Setting "
+
+#if DEBUG                       
+				+ bids.Length.ToString () + " "
+#endif
+				+ "bids</span>"
+			);
+
 			lock (orderLock) {
 				this.offers = bids;
 				this.offerType = OrderEnum.BID;
@@ -1115,6 +1163,22 @@ namespace IhildaWallet
 		public void SetRippleWallet (RippleWallet rippleWallet)
 		{
 			this._rippleWallet = rippleWallet;
+		}
+
+		public void SetInfoBar (string text)
+		{
+			Application.Invoke (delegate {
+				infolabel.Markup = text;
+
+			});
+		}
+
+		public void SetErrorBar (string text)
+		{
+			Application.Invoke ( delegate {
+
+				errorlabel.Markup = text;
+			});
 		}
 
 		public TradePair _TradePair {

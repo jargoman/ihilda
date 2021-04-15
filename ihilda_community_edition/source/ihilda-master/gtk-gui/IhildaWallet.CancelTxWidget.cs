@@ -14,7 +14,11 @@ namespace IhildaWallet
 
 		private global::Gtk.ComboBoxEntry comboboxentry1;
 
-		private global::Gtk.Button button55;
+		private global::Gtk.HBox hbox1;
+
+		private global::Gtk.Button cancelOrderButton;
+
+		private global::Gtk.Button AbortCancellationButton;
 
 		private global::Gtk.Label label3;
 
@@ -64,16 +68,32 @@ namespace IhildaWallet
 			w4.Expand = false;
 			w4.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.button55 = new global::Gtk.Button();
-			this.button55.CanFocus = true;
-			this.button55.Name = "button55";
-			this.button55.UseUnderline = true;
-			this.button55.Label = global::Mono.Unix.Catalog.GetString("Cancel Transaction");
-			this.vbox2.Add(this.button55);
-			global::Gtk.Box.BoxChild w5 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.button55]));
-			w5.Position = 4;
-			w5.Expand = false;
-			w5.Fill = false;
+			this.hbox1 = new global::Gtk.HBox();
+			this.hbox1.Name = "hbox1";
+			this.hbox1.Spacing = 6;
+			// Container child hbox1.Gtk.Box+BoxChild
+			this.cancelOrderButton = new global::Gtk.Button();
+			this.cancelOrderButton.CanFocus = true;
+			this.cancelOrderButton.Name = "cancelOrderButton";
+			this.cancelOrderButton.UseUnderline = true;
+			this.cancelOrderButton.Label = global::Mono.Unix.Catalog.GetString("Cancel Order");
+			this.hbox1.Add(this.cancelOrderButton);
+			global::Gtk.Box.BoxChild w5 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.cancelOrderButton]));
+			w5.Position = 0;
+			// Container child hbox1.Gtk.Box+BoxChild
+			this.AbortCancellationButton = new global::Gtk.Button();
+			this.AbortCancellationButton.CanFocus = true;
+			this.AbortCancellationButton.Name = "AbortCancellationButton";
+			this.AbortCancellationButton.UseUnderline = true;
+			this.AbortCancellationButton.Label = global::Mono.Unix.Catalog.GetString("Abort Cancellation");
+			this.hbox1.Add(this.AbortCancellationButton);
+			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.AbortCancellationButton]));
+			w6.Position = 1;
+			this.vbox2.Add(this.hbox1);
+			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hbox1]));
+			w7.Position = 4;
+			w7.Expand = false;
+			w7.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.label3 = new global::Gtk.Label();
 			this.label3.Name = "label3";
@@ -83,8 +103,8 @@ namespace IhildaWallet
 					" cancelled with the orders widget");
 			this.label3.UseMarkup = true;
 			this.vbox2.Add(this.label3);
-			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.label3]));
-			w6.Position = 5;
+			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.label3]));
+			w8.Position = 5;
 			this.Add(this.vbox2);
 			if ((this.Child != null))
 			{

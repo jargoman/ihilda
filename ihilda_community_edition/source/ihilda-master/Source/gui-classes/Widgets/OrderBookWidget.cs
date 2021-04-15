@@ -10,6 +10,7 @@ using RippleLibSharp.Network;
 using RippleLibSharp.Result;
 using RippleLibSharp.Transactions;
 using RippleLibSharp.Util;
+using Gtk;
 
 namespace IhildaWallet
 {
@@ -57,7 +58,58 @@ namespace IhildaWallet
 			string method_sig = clsstr + nameof (InitRefreshTask) + DebugRippleLibSharp.both_parentheses;
 #endif
 
-			Task.Factory.StartNew (async () => {
+			Task.Factory.StartNew ( () => {
+
+				TradePair tp = _tradePair;
+
+				if (tp == null) {
+#if DEBUG
+					if (DebugIhildaWallet.OrderBookWidget) {
+						Logging.WriteLog (method_sig + "tp == null");
+					}
+#endif
+					// todo the lines below
+					//if (this.buyorderbooktablewidget != null) {
+					//	this.buyorderbooktablewidget.clearTable();
+					//}
+
+					//if (this.sellorderbooktablewidget != null) {
+					//	this.sellorderbooktablewidget.clearTable();
+					//}
+
+
+
+					SetInfoBar ("<span foreground=\"red\">Can't sync. Null tradepair</span>");
+					return;
+				}
+
+				RippleCurrency cur_base = tp.Currency_Base;
+				if (cur_base == null) {
+#if DEBUG
+					if (DebugIhildaWallet.OrderBookWidget) {
+						Logging.WriteLog (method_sig + "cur_base == null, returning");
+					}
+#endif
+
+
+					SetInfoBar ("<span foreground=\"red\">Can't sync. Null base currency</span>");
+					return;
+				}
+
+				RippleCurrency counter_currency = tp.Currency_Counter;
+				if (counter_currency == null) {
+#if DEBUG
+					if (DebugIhildaWallet.OrderBookWidget) {
+						Logging.WriteLog (method_sig + "counter_currency == null, returning");
+					}
+#endif
+
+
+					SetInfoBar ("<span foreground=\"red\">Can't sync. Null currency</span>");
+					return;
+				}
+
+
 
 				var token = tokenSource.Token;
 
@@ -175,51 +227,14 @@ namespace IhildaWallet
 
 		private TradePair _tradePair = null;
 
-		public void ResyncNetwork ( CancellationToken token )
+		public void ResyncNetwork (CancellationToken token)
 		{
 #if DEBUG
 			String method_sig = clsstr + nameof (ResyncNetwork) + DebugRippleLibSharp.both_parentheses;
 #endif
 
-			TradePair tp = _tradePair;
 
-			if (tp == null) {
-#if DEBUG
-				if (DebugIhildaWallet.OrderBookWidget) {
-					Logging.WriteLog(method_sig + "tp == null");
-				}
-#endif
-				// todo the lines below
-				//if (this.buyorderbooktablewidget != null) {
-				//	this.buyorderbooktablewidget.clearTable();
-				//}
 
-				//if (this.sellorderbooktablewidget != null) {
-				//	this.sellorderbooktablewidget.clearTable();
-				//}
-				return;
-			}
-
-			RippleCurrency cur_base = tp.Currency_Base;
-			if (cur_base == null) {
-#if DEBUG
-				if (DebugIhildaWallet.OrderBookWidget) {
-					Logging.WriteLog(method_sig + "cur_base == null, returning");
-				}
-#endif
-				return;
-			}
-
-			RippleCurrency counter_currency = tp.Currency_Counter;
-			if (counter_currency == null) {
-#if DEBUG
-				if (DebugIhildaWallet.OrderBookWidget) {
-					Logging.WriteLog(method_sig + "counter_currency == null, returning");
-				}
-#endif
-				return;
-			}
-				
 			/*
 			Object gets = cur_base.getAnonObjectWithoutAmount();//counter_currency.getAnonObjectWithoutAmount();
 			Object pays = counter_currency.getAnonObjectWithoutAmount();
@@ -236,6 +251,33 @@ namespace IhildaWallet
 			*/
 
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
+			if (ni == null) {
+
+
+				SetInfoBar ("<span foreground=\"red\">Network error</span>");
+				return;
+			}
+
+			if (!ni.IsConnected ()) {
+
+				SetInfoBar ("<span foreground=\"red\">Not connected to network</span>");
+				return;
+			}
+
+			if (limit == null) {
+
+
+				SetInfoBar ("<span foreground=\"orange\">For better performance set the limit for the number of orders using options</span>");
+
+			} else if (limit > 50) {
+
+				SetInfoBar ("<span foreground=\"orange\">For better performance reduce the number of displayed orders using options</span>");
+			}
+
+
+			TradePair tp = _tradePair;
+			RippleCurrency cur_base = tp.Currency_Base;
+			RippleCurrency counter_currency = tp.Currency_Counter;
 
 			Task<Response<BookOfferResult>> buyTask =
 			limit == null ?
@@ -243,12 +285,15 @@ namespace IhildaWallet
 	   			: RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (counter_currency, cur_base, limit + 1, ni, token);
 			;
 
-			var btask = buyTask.ContinueWith((arg) => {
+			var btask = buyTask.ContinueWith ((arg) => {
 
 				Offer [] buys = null;
 				Offer [] res = arg?.Result?.result?.offers;
 				if (res == null) {
 					// TODO
+
+					orderbooktablewidget2.SetErrorBar ("<span foreground=\"red\">Network returned no bids</span>");
+
 					return;
 				}
 
@@ -265,21 +310,23 @@ namespace IhildaWallet
 
 				IEnumerable<AutomatedOrder> buyoffers = AutomatedOrder.ConvertFromIEnumerableOrder (buys);
 				this.orderbooktablewidget1.SetBids (buyoffers.ToArray ());  // .ToArray()
-				//buyoffers.
+											    //buyoffers.
 			});
 
 
-			Task< Response<BookOfferResult>> sellTask = 
+			Task<Response<BookOfferResult>> sellTask =
 			limit == null ?
 				RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (cur_base, counter_currency, ni, token)
-	   	 		: RippleLibSharp.Commands.Stipulate.BookOffers.GetResult(cur_base, counter_currency, limit + 1, ni, token);
+	   	 		: RippleLibSharp.Commands.Stipulate.BookOffers.GetResult (cur_base, counter_currency, limit + 1, ni, token);
 
 			var stask = sellTask.ContinueWith ((arg) => {
 
 				Offer [] sells = null;
 				var res = arg?.Result?.result?.offers;
 				if (res == null) {
-					// TODO
+
+
+					orderbooktablewidget1.SetErrorBar ("<span foreground=\"red\">Network returned no asks</span>");
 					return;
 				}
 
@@ -296,16 +343,92 @@ namespace IhildaWallet
 				}
 
 				IEnumerable<AutomatedOrder> selloffers = AutomatedOrder.ConvertFromIEnumerableOrder (sells);
-				this.orderbooktablewidget2.SetAsk (selloffers.ToArray ());  // .ToArray()
+				this.orderbooktablewidget2.SetAsks (selloffers.ToArray ());  // .ToArray()
 			});
 
 
 
-			if (autoRefresh) {
-				return;
-			}
 
-			Task.WaitAll ( new Task[] { btask, stask }, token );
+
+
+			const string refreshBids = "Syncing bids";
+			const string refreshAsks = "Syncing asks";
+			const int countMax = 10;
+
+			string refBids = default(string);
+			string refAsks = default(string);
+
+			int count = 0;
+			do {
+
+
+				if (btask.IsCompleted) {
+
+				} else if (btask.IsFaulted) {
+					orderbooktablewidget1.SetErrorBar ("<span foreground=\"green\">syncing bids faulted</span>");
+				} else if (btask.IsCanceled) {
+					orderbooktablewidget1.SetErrorBar ("<span foreground=\"green\">syncing bids canceled</span>");
+				} else {
+
+					if (count % 5 == 0) {
+						refBids = refreshBids;
+					} else {
+						refBids += ".";
+					}
+
+					orderbooktablewidget1.SetInfoBar ("<span foreground=\"green\">" + refBids + "</span>");
+
+					if (count > countMax) {
+						orderbooktablewidget1.SetErrorBar ("<span foreground=\"red\">Syncing bids is taking longer than usual</span>");
+					}
+				}
+
+
+
+				if (stask.IsCompleted) {
+
+				} else if (stask.IsFaulted) {
+					orderbooktablewidget2.SetErrorBar ("<span foreground=\"red\">Syncing asks faulted</span>");
+				} else if (stask.IsCanceled) {
+					orderbooktablewidget2.SetErrorBar ("<span foreground=\"red\">Syncing asks canceled</span>");
+				} else {
+					if (count % 5 == 0) {
+						refAsks = refreshAsks;
+					} else {
+						refAsks += ".";
+					}
+
+					orderbooktablewidget2.SetInfoBar ("<span foreground=\"green\">" + refAsks + "</span>");
+
+					if (count > countMax) {
+						orderbooktablewidget2.SetErrorBar ("<span foreground=\"red\">Syncing asks is taking longer than usual</span>");
+					}
+				}
+
+				Task.WaitAll (new Task [] { btask, stask }, 1000, token);
+
+				count++;
+
+				if (count > countMax * 10) {
+					count = 0;
+
+					// TODO what to do about this
+					if (autoRefresh) {
+						return;
+					}
+
+				}
+
+			}
+			while (
+			    (!btask.IsCompleted && !btask.IsFaulted && !btask.IsCanceled)
+			    || (!stask.IsCompleted && !stask.IsFaulted && !stask.IsCanceled)
+		    	); 
+				
+
+
+
+
 
 #if DEBUG
 
@@ -320,19 +443,20 @@ namespace IhildaWallet
 
 			
 
-#if DEBUG
-			if (DebugIhildaWallet.OrderBookWidget) {
-				Logging.WriteLog(method_sig + "end for");
-
-			}
-#endif
-
 
 
 	    		
 			
 			
 
+		}
+
+		private void SetInfoBar (string text)
+		{
+			Application.Invoke ( delegate {
+
+				infoLabel.Markup = text;
+			});
 		}
 
 		public uint? limit = null;

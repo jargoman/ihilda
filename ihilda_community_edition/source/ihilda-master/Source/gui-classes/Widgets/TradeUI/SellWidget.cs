@@ -8,7 +8,6 @@ using RippleLibSharp.Keys;
 using RippleLibSharp.Network;
 using RippleLibSharp.Result;
 using IhildaWallet.Networking;
-
 using Gtk;
 
 using RippleLibSharp.Commands.Accounts;
@@ -130,7 +129,12 @@ namespace IhildaWallet
 			if (DebugIhildaWallet.SellWidget) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
-			#endif
+#endif
+
+
+			TextHighlighter highlighter = new TextHighlighter ();
+
+
 			if ( 
 				this.amountcomboboxentry == null 
 				|| this.pricecomboboxentry == null 
@@ -154,6 +158,8 @@ namespace IhildaWallet
 				#endif
 				return;
 			}
+
+			
 
 			//RippleWallet rw = MainWindow.currentInstance.getRippleWallet();
 
@@ -208,8 +214,8 @@ namespace IhildaWallet
 			if (getamount == null) {
 
 				string message = off.taker_pays.currency + " getamount is formatted incorrectly\n";
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				infobar.Markup = TextHighlighter.Highlight (message);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = highlighter.Highlight (message);
 
 				// TODO color amnt entry to red
 				#if DEBUG
@@ -225,8 +231,8 @@ namespace IhildaWallet
 
 				string message = off.taker_gets.currency + " payamount is formatted incorrectly\n";
 
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				infobar.Markup = TextHighlighter.Highlight (message);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = highlighter.Highlight (message);
 
 #if DEBUG
 				if (DebugIhildaWallet.SellWidget) {
@@ -236,6 +242,18 @@ namespace IhildaWallet
 				return;
 			}
 
+			Decimal? price = RippleCurrency.ParseDecimal (this.pricecomboboxentry.ActiveText);
+			if (price == null) {
+				string message = "price is formatted incorrectly\n";
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				infobar.Markup = highlighter.Highlight (message);
+				return;
+			}
+
+			bool sane = _parent.SafetyCheck ((Decimal)price, "sell");
+			if (!sane) {
+				return;
+			}
 			string mark = comboboxentry1.ActiveText;
 
 			off.BotMarking = mark;
@@ -248,7 +266,13 @@ namespace IhildaWallet
 				licenseT = LicenseType.NONE;
 			}
 
-			OrderSubmitWindow win = new OrderSubmitWindow (_rippleWallet, licenseT);
+			if (AutomationWarning) {
+
+				bool ignored = AreYouSure.AutomatedTradingWarning ();
+				if (!ignored) return;
+			}
+
+			OrderSubmitWindow win = new OrderSubmitWindow (_rippleWallet);
 
 			win.SetOrders ( new AutomatedOrder[] { off });
 
@@ -297,6 +321,9 @@ namespace IhildaWallet
 				}
 #endif
 
+
+				TextHighlighter highlighter = new TextHighlighter ();
+
 				/*
 				ComboBoxEntry combo = sender as ComboBoxEntry;
 				if (combo == null) {
@@ -319,8 +346,8 @@ namespace IhildaWallet
 				if (am == null) {
 
 					var message = "Amount is formatted incorrectly";
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					infobar.Markup = TextHighlighter.Highlight (message);
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					infobar.Markup = highlighter.Highlight (message);
 #if DEBUG
 				if (DebugIhildaWallet.SellWidget) {
 						Logging.WriteLog (method_sig + "am==null, returning\n");
@@ -389,7 +416,7 @@ namespace IhildaWallet
 				Gtk.Application.Invoke (
 				delegate {
 
-						label10.Markup = "<b><u>Sell " + b + "</u></b>";
+						label10.Markup = "<span foreground=\"red\"><b><u>Sell " + b + "</u></b></span>";
 					label12.Text = b;
 					label15.Text = c;
 					label16.Text = c;
@@ -405,6 +432,8 @@ namespace IhildaWallet
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
 			}
 			#endif
+
+			AutomationWarning = true;
 
 			if (off == null) {
 				#if DEBUG
@@ -488,10 +517,19 @@ namespace IhildaWallet
 			this._rippleWallet = rippleWallet;
 		}
 
+		public void SetParent (TradeWindow parent)
+		{
+			this._parent = parent;
+		}
+
+		private TradeWindow _parent = null;
+
 		private RippleWallet _rippleWallet {
 			get;
 			set;
 		}
+
+		public bool AutomationWarning { get; set; }
 
 
 #pragma warning disable RECS0122 // Initializing field with default value is redundant

@@ -13,6 +13,7 @@ using RippleLibSharp.Commands.Subscriptions;
 using RippleLibSharp.Keys;
 using RippleLibSharp.Network;
 using RippleLibSharp.Result;
+using RippleLibSharp.Source.Mnemonics;
 using RippleLibSharp.Transactions;
 using RippleLibSharp.Util;
 
@@ -313,11 +314,31 @@ namespace IhildaWallet
 			#region community
 
 			youtubebutton.Clicked += (sender, e) => {
-				List<WebLinkItem> list = new List<WebLinkItem> ();
+				List<WebLinkItem> list = new List<WebLinkItem> {
+					new WebLinkItem ("Ckj Crypto News", "https://www.youtube.com/channel/UCmexsZ6pFvmXa9hOnnyRz5A"),
 
-				list.Add (
-					new WebLinkItem ("Ckj Crypto News", "https://www.youtube.com/channel/UCmexsZ6pFvmXa9hOnnyRz5A")
-				);
+					new WebLinkItem ("Do It Yourself Investing", "https://www.youtube.com/channel/UCvts9csZ03FZXsuMnOIQ4VQ"),
+
+					new WebLinkItem ("Thinking Crypto", "https://www.youtube.com/channel/UCjpkwsuHgYx9fBE0ojsJ_-w"),
+
+					new WebLinkItem ("Digital Asset Investor", "https://www.youtube.com/channel/UCtQycmSrKdJ0zE0bWumO4vA"),
+
+					new WebLinkItem ("Love For Crypto", "https://www.youtube.com/channel/UCNx_o-lrpiA2lA1OnMKqb_A"),
+
+					new WebLinkItem ("Digital Perspectives", "https://www.youtube.com/channel/UCQKnyICqWksz8ygILHS01gQ"),
+
+					new WebLinkItem ("Moon Lambo", "https://www.youtube.com/channel/UCf3Vlkhhxrwr3A8IYN8KVkw"),
+
+					new WebLinkItem ("", ""),
+
+					new WebLinkItem ("", ""),
+
+					new WebLinkItem ("", ""),
+
+					new WebLinkItem ("", ""),
+
+					new WebLinkItem ("", "")
+				};
 
 				WebLinksWindow linksWindow = new WebLinksWindow (list);
 				linksWindow.Show ();
@@ -545,29 +566,47 @@ namespace IhildaWallet
 					MessageDialog.ShowMessage ("No wallet selected", "You must select a wallet first");
 					return;
 				}
-				RippleIdentifier secretIdentifier = rippleWallet.GetDecryptedSeed ();
-				if (secretIdentifier == null) {
+
+
+				PasswordAttempt passwordAttempt = new PasswordAttempt ();
+
+				passwordAttempt.InvalidPassEvent += (object s, EventArgs ev) => {
+					bool shou = AreYouSure.AskQuestionNonGuiThread (
+					"Invalid password",
+					"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
+					);
+				};
+
+				passwordAttempt.MaxPassEvent += (object sende, EventArgs ev) => {
+					string mess = "Max password attempts";
+
+					MessageDialog.ShowMessage (mess);
+					//WriteToOurputScreen ("\n" + mess + "\n");
+				};
+
+
+				// TODO cancel token implementation - use system wide?
+				DecryptResponse response = passwordAttempt.DoRequest (rippleWallet, new CancellationTokenSource().Token);
+
+
+
+
+				RippleIdentifier secretIdentifier = response.Seed;
+
+
+
+				if ( secretIdentifier?.GetHumanReadableIdentifier () == null ) {
+
 					// TODO 
 					//MessageDialog.ShowMessage ("invalid seed");
 					return;
+
+
 				}
 
 
-				while ( secretIdentifier.GetHumanReadableIdentifier () == null ) {
-					bool should = AreYouSure.AskQuestionNonGuiThread (
-						"Invalid password",
-						"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
-					);
-
-					if (!should) {
-						return;
-					}
-
-					secretIdentifier = rippleWallet.GetDecryptedSeed ();
-				}
-
-
-				string secret = secretIdentifier.ToString ();
+				// TODO quit passing the secret around like a yo mamma joke
+				string secret = secretIdentifier.ToString (); 
 
 
 				Gtk.Application.Invoke ( delegate {
@@ -578,12 +617,19 @@ namespace IhildaWallet
 
 					paperWalletWindow.Show ();
 
-					if (rippleWallet.AccountType == RippleWalletTypeEnum.Master || rippleWallet.AccountType == RippleWalletTypeEnum.Regular) {
-						paperWalletWindow.SetSecret (secret);
-					}
 
-					if (rippleWallet.AccountType == RippleWalletTypeEnum.MasterPrivateKey) {
+					switch (rippleWallet.AccountType) {
+
+					case RippleWalletTypeEnum.Master:
+					case RippleWalletTypeEnum.Regular:
+
+						paperWalletWindow.SetSecret (secret);
+						break;
+
+					case RippleWalletTypeEnum.MasterPrivateKey:
+
 						paperWalletWindow.SetPrivateKey (secret);
+						break;
 					}
 
 				});
@@ -987,10 +1033,13 @@ namespace IhildaWallet
 				return;
 			}
 
+
+	    		/*
 			bool shouldContinue = LeIceSense.DoTrialDialog (rw, LicenseType.TRUST);
 			if (!shouldContinue) {
 				return;
 			}
+			*/    
 
 			Task t1 = Task.Run (delegate {
 				using (EventWaitHandle wh = new ManualResetEvent (true)) {
@@ -1095,34 +1144,40 @@ namespace IhildaWallet
 		}
 
 
-
+		CancellationTokenSource qrTokenSource = null;
 		public void SetQRandWalletAddress (RippleWallet rippleWallet /*, Gdk.Pixbuf pixbuf */)
 		{
 
 			//this.label7.Markup = "<span fgcolor=\"darkgreen\"><big><b>" + address + "</b></big></span>";
-
-			Gtk.Application.Invoke (delegate {
-				this.walletswitchwidget1.SetRippleWallet (rippleWallet);
-
-				string qrtooltip = "Click to create QR code for address\n" + rippleWallet.GetStoredReceiveAddress () + "\nand save to image file";
-				image1.TooltipMarkup = qrtooltip;
-
-				//table4.Visible = false;
-				this.label12.Text = "";
-				this.label14.Text = "";
-				this.label13.Text = "";
-				this.label15.Text = "";
+			this.walletswitchwidget1.SetRippleWallet (rippleWallet);
 
 
-
-			});
 
 			string acc = rippleWallet.GetStoredReceiveAddress ();
 			Task.Run (delegate {
-				NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
 
-				CancellationTokenSource tokenSource = new CancellationTokenSource ();
-				CancellationToken token = tokenSource.Token;
+				string qrtooltip = "Click to create QR code for address\n" + acc + "\nand save to image file";
+
+				Gtk.Application.Invoke (delegate {
+
+
+
+					image1.TooltipMarkup = qrtooltip;
+
+					//table4.Visible = false;
+					this.label12.Text = "";
+					this.label14.Text = "";
+					this.label13.Text = "";
+					this.label15.Text = "";
+
+
+
+				});
+				NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
+
+				qrTokenSource?.Cancel ();
+				qrTokenSource = new CancellationTokenSource ();
+				CancellationToken token = qrTokenSource.Token;
 
 				Task<Response<AccountInfoResult>> task =
 					AccountInfo.GetResult (acc, ni, token);
@@ -1349,6 +1404,7 @@ namespace IhildaWallet
 
 			}
 
+	    /*
 			//lock (WalletManager.walletLock) {
 			if (walletManager?.wallets?.Values == null) {
 #if DEBUG
@@ -1363,7 +1419,7 @@ namespace IhildaWallet
 
 				return;
 			}
-
+	    */
 			if (walletManager.wallets.Values.Count > 0) {
 
 #if DEBUG
@@ -1377,7 +1433,7 @@ namespace IhildaWallet
 
 				wallettree1?.SetValues (walletManager.wallets.Values);
 
-
+			
 
 			} else {
 #if DEBUG
@@ -1393,6 +1449,85 @@ namespace IhildaWallet
 			}
 			//}
 
+
+		}
+
+
+		public RippleWallet FromPrivate (RipplePrivateKey privateKey = null) {
+
+
+#if DEBUG
+			String method_sig = clsstr + nameof (FromPrivate) + DebugRippleLibSharp.both_parentheses;
+			if (DebugIhildaWallet.WalletManagerWidget) {
+				Logging.WriteLog (method_sig + DebugRippleLibSharp.begin);
+			}
+#endif
+			using (FromSecretDialog fsd = new FromSecretDialog (NewButtonDialog.NewOption.PRIVATE)) {
+
+				fsd.SetPrivateKey (privateKey);
+
+				fsd.Modal = true;
+
+
+				while (true) {
+#if DEBUG
+					if (DebugIhildaWallet.WalletManagerWidget) {
+						Logging.WriteLog (method_sig + "while (true) begining from secret dialog");
+					}
+#endif
+					ResponseType ret = (ResponseType)fsd.Run ();
+					fsd.Hide ();
+
+					if (ret != ResponseType.Ok) {
+#if DEBUG
+						if (DebugIhildaWallet.WalletManagerWidget) {
+							Logging.WriteLog (method_sig + "User did not click ok");
+						}
+#endif
+						fsd.Destroy ();
+
+						return null;
+					}
+
+#if DEBUG
+					// todo 
+					if (DebugIhildaWallet.WalletManagerWidget) {
+						Logging.WriteLog (method_sig + "User selected OK");
+					}
+#endif
+
+					RippleWallet rw = fsd.GetWallet ();
+
+					if (rw == null) {
+#if DEBUG
+						if (DebugIhildaWallet.WalletManagerWidget) {
+							Logging.WriteLog (method_sig + "rw == null");
+						}
+#endif
+						continue;
+					}
+
+#if DEBUG
+					if (DebugIhildaWallet.WalletManagerWidget) {
+						Logging.WriteLog (method_sig + "rw != null");
+					}
+#endif
+
+					//walletManager.addWallet (rw);
+					//initiateWalletAddThread(rw);
+
+					fsd.Destroy ();
+					return rw;
+
+
+
+				}
+
+
+				//fsd.Destroy ();
+			}
+
+			//return null;
 
 		}
 
@@ -1541,7 +1676,7 @@ namespace IhildaWallet
 						case NewButtonDialog.NewOption.FILE:
 #if DEBUG
 							if (DebugIhildaWallet.WalletManagerWidget) {
-								Logging.WriteLog (method_sig + usel + "user selected ");
+								Logging.WriteLog (method_sig + usel + "user selected FROMFILE");
 							}
 #endif
 
@@ -1549,8 +1684,34 @@ namespace IhildaWallet
 
 							this.UpdateUI ();
 							return;
-						default:
+
+
+						case NewButtonDialog.NewOption.PRIVATE:
+
+#if DEBUG
+							if (DebugIhildaWallet.WalletManagerWidget) {
+								Logging.WriteLog (method_sig + usel + "user selected PRIVATEKEY");
+							}
+#endif
+
+
+							rw = FromPrivate ();
 							break;
+
+
+						case NewButtonDialog.NewOption.WORDS:
+
+#if DEBUG
+							if (DebugIhildaWallet.WalletManagerWidget) {
+								Logging.WriteLog (method_sig + usel + "user selected Word List");
+							}
+#endif
+
+							rw = FromWordList ();
+							break;
+							/*
+							default:
+								break; */
 						}  // ends switch
 
 						InitiateWalletAddThread (rw);
@@ -1677,6 +1838,35 @@ namespace IhildaWallet
 			return true;
 		}
 		*/
+
+
+		public RippleWallet FromWordList ()
+		{
+
+			MnemonicWordList list = WordListInnitiateDialog.DoDialog ();
+
+			if (list == null) {
+				return null;
+			}
+
+			bool created = list.LoadKeysFromMnemonic ();
+			if (!created) {
+				// TODO error reporting to user
+				return null;
+			}
+
+
+			RipplePrivateKey pk = PrivateKeySelectDialog.DoDialog (list);
+
+			if (pk == null) {
+				return null;
+			}
+
+	    		
+
+			return FromPrivate(pk);
+
+		}
 
 		public RippleWallet FromRandom ()
 		{
@@ -1966,10 +2156,16 @@ namespace IhildaWallet
 				Application.Invoke ((sender, e) => NoWalletSelected ());
 			}
 
+
+	    		/*
 			bool shouldContinue = LeIceSense.DoTrialDialog (rw, LicenseType.MARKETBOT);
 			if (!shouldContinue) {
 				return;
 			}
+			
+			*/
+
+
 			Application.Invoke (
 				(sender, e) => {
 					FilledRuleManagementWindow rulewin = new FilledRuleManagementWindow (rw);
@@ -2002,6 +2198,7 @@ namespace IhildaWallet
 				this.connecteddisplaywidget1.SetDisConnected ();
 
 			}
+	    		
 	    		
 	    		Gtk.Application.Invoke ((sender, e) => {
 				    this.connecteddisplaywidget1.Show ();

@@ -4,6 +4,7 @@ using Gtk;
 using RippleLibSharp.Keys;
 using RippleLibSharp.Transactions.TxTypes;
 using RippleLibSharp.Util;
+using RippleLibSharp.Binary;
 
 namespace IhildaWallet
 {
@@ -137,7 +138,11 @@ namespace IhildaWallet
 				}
 
 				if (messagekeycheckbutton.Active) {
-					accountSetTransaction.MessageKey = messagekeyentry.Text;
+					// TODO possibly give user option to convert number to hex
+					//var message = Base58.StringToHex (messagekeyentry.Text);
+					var message = messagekeyentry.Text;
+
+					accountSetTransaction.MessageKey = message;
 				}
 				if (ticksizecheckbutton.Active) {
 					bool b = byte.TryParse (ticksizeentry.Text, out byte tick);

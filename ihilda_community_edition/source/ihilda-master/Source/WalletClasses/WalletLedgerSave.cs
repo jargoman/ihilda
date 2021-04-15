@@ -8,6 +8,9 @@ namespace IhildaWallet
 {
 
 
+	/* 
+	 * The wallets last ledger is saved to its own file to avoid file corruption affecting other data
+    	*/ 
 	public class WalletLedgerSave
 	{
 		public UInt32? Ledger {
@@ -16,7 +19,7 @@ namespace IhildaWallet
 		}
 
 
-		public static WalletLedgerSave LoadLedger (String path)
+		public static WalletLedgerSave LoadLedger (string path)
 		{
 #if DEBUG
 			string method_sig = nameof (WalletLedgerSave) + DebugRippleLibSharp.colon + nameof (LoadLedger);
@@ -34,7 +37,7 @@ namespace IhildaWallet
 				if (File.Exists (path)) { // 
 					Logging.WriteLog ("Wallet " + path + " Exists!\n");
 
-					String wah = File.ReadAllText (path, Encoding.UTF8);
+					string wah = File.ReadAllText (path, Encoding.UTF8);
 
 					WalletLedgerSave ledge = DynamicJson.Parse (wah);
 					return ledge;

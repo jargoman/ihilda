@@ -101,7 +101,7 @@ namespace IhildaWallet
 			// Container child vbox5.Gtk.Box+BoxChild
 			this.label10 = new global::Gtk.Label();
 			this.label10.Name = "label10";
-			this.label10.LabelProp = global::Mono.Unix.Catalog.GetString("<b><u>Sell ICE</u></b>");
+			this.label10.LabelProp = global::Mono.Unix.Catalog.GetString("<span foreground=\"red\"><b><u>Sell ICE</u></b></span>");
 			this.label10.UseMarkup = true;
 			this.vbox5.Add(this.label10);
 			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.vbox5[this.label10]));

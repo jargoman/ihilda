@@ -136,7 +136,9 @@ namespace IhildaWallet
 			if (DebugIhildaWallet.CascadedSellWidget) {
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
-			#endif
+#endif
+
+			AutomationWarning = true;
 
 			if (off == null) {
 				#if DEBUG
@@ -288,7 +290,13 @@ namespace IhildaWallet
 			if (col == null) {
 				return;
 			}
-			AutomatedOrder[] offers = DetermineOrders ( col, TradePairInstance);
+
+			bool sane = _parent.SafetyCheck ((Decimal)col.startingPrice, "sell");
+			if (!sane) {
+				return;
+			}
+
+			AutomatedOrder [] offers = DetermineOrders ( col, TradePairInstance);
 
 			//RebuyDialog.doDialog(v);
 			if (offers == null) {
@@ -299,12 +307,25 @@ namespace IhildaWallet
 			if (offers.Length == 0) {
 				return;
 			}
+
+			if (AutomationWarning) {
+
+				bool ignored = AreYouSure.AutomatedTradingWarning ();
+				if (!ignored) return;
+			}
+
+	    /*
 			LicenseType licenseT = Util.LicenseType.CASCADING;
 			if (LeIceSense.IsLicenseExempt (offers [0].taker_gets) || LeIceSense.IsLicenseExempt (offers [0].taker_pays)) {
 				licenseT = LicenseType.NONE;
 			}
 
+			
+
 			OrderSubmitWindow win = new OrderSubmitWindow (_rippleWallet, licenseT);
+	    */
+
+			OrderSubmitWindow win = new OrderSubmitWindow (_rippleWallet);
 			win.SetOrders (offers);
 
 		}
@@ -469,6 +490,7 @@ namespace IhildaWallet
 
 		private CascadedOrderLogic GetCascadedOrderLogic ( bool warnuser ) {
 
+			TextHighlighter highlighter = new TextHighlighter ();
 
 			CascadedOrderLogic cbo = new CascadedOrderLogic ();
 
@@ -486,8 +508,8 @@ namespace IhildaWallet
 				if ( warnuser ) {
 					var message = "Numbers of orders is formatted incorrectly \n";
 
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					label17.Markup = TextHighlighter.Highlight (message);
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					label17.Markup = highlighter.Highlight (message);
 				}
 				return null;
 			}
@@ -497,19 +519,20 @@ namespace IhildaWallet
 				if (warnuser) {
 					var message = "Starting price is formatted incorrectly \n";
 
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					label17.Markup = TextHighlighter.Highlight (message);
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					label17.Markup = highlighter.Highlight (message);
 				}
 				return null;
 			}
 
+			
 			Decimal? priceMod = RippleCurrency.ParseDecimal ( pms );
 			if (priceMod == null) {
 				if (warnuser) {
 					var message = "Price mod is formatted incorrectly \n";
 
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					label17.Markup = TextHighlighter.Highlight (message);
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					label17.Markup = highlighter.Highlight (message);
 
 				}
 				return null;
@@ -519,8 +542,8 @@ namespace IhildaWallet
 			if (amount == null) {
 				if (warnuser) {
 					var message = "Amount is formatted incorrectly \n";
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					label17.Markup = TextHighlighter.Highlight (message);
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					label17.Markup = highlighter.Highlight (message);
 					// TODO color amount red
 				}
 				return null;
@@ -531,8 +554,8 @@ namespace IhildaWallet
 				if (warnuser) {
 					var message = "Amount mod is formatted incorrectly";
 
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					label17.Markup = TextHighlighter.Highlight (message);
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					label17.Markup = highlighter.Highlight (message);
 				}
 				return null;
 			}
@@ -564,11 +587,19 @@ namespace IhildaWallet
 				string b = _tradepair.Currency_Base.currency;
 				Gtk.Application.Invoke (
 					delegate {
-						label10.Markup = "<b><u>Sell " + b + "</u></b>";
+						label10.Markup = "<span foreground=\"red\"><b><u>Sell " + b + "</u></b></span>";
 					}
 				);
 			}
 		}
+
+		public bool AutomationWarning { get; set; }
+		public void SetParent (TradeWindow parent)
+		{
+			this._parent = parent;
+		}
+
+		private TradeWindow _parent = null;
 
 		public void SetRippleWallet (RippleWallet rippleWallet)
 		{

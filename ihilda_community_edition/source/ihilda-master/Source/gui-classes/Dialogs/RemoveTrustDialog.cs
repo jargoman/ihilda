@@ -77,18 +77,32 @@ namespace IhildaWallet
 #endif
 			}
 
-			RippleIdentifier rsa = rw.GetDecryptedSeed ();
-			while (rsa.GetHumanReadableIdentifier () == null) {
-				bool should = AreYouSure.AskQuestion (
+			PasswordAttempt passwordAttempt = new PasswordAttempt ();
+
+			passwordAttempt.InvalidPassEvent += (object sender, EventArgs e) =>
+			{
+				bool shou = AreYouSure.AskQuestionNonGuiThread (
 				"Invalid password",
 				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
 				);
+			};
 
-				if (!should) {
-					return;
-				}
+			passwordAttempt.MaxPassEvent += (object sender, EventArgs e) =>
+			{
+				string mess = "Max password attempts";
 
-				rsa = rw.GetDecryptedSeed ();
+				MessageDialog.ShowMessage (mess);
+				//WriteToOurputScreen ("\n" + mess + "\n");
+			};
+
+
+			DecryptResponse response = passwordAttempt.DoRequest (rw, token);
+
+
+
+			RippleIdentifier rsa = response.Seed;
+			if (rsa?.GetHumanReadableIdentifier () == null) {
+				return;
 			}
 
 
@@ -157,7 +171,7 @@ namespace IhildaWallet
 				rts.SignLocalRippled (rsa);
 				break;
 			case "RippleLibSharp":
-				rts.Sign (rsa);
+				rts.SignRippleLibSharp (rsa);
 				break;
 			case "RippleDotNet":
 				rts.SignRippleDotNet (rsa);

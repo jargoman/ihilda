@@ -299,10 +299,15 @@ namespace IhildaWallet
 
 
 			if (fs == null) {
-				if (nullFeeCount++ > 5) {
+
+				// if we keep getting a null response then return null if MAX_NULL_FEE reached
+				if (nullFeeCount++ > MAX_NULL_FEE) {
 					return null;
 				}
 				goto START;
+			} else {
+				// reset the null counter to 0 if response isn't null
+				nullFeeCount = 0;
 			}
 
 			if (fs.HasError) {
@@ -353,10 +358,11 @@ namespace IhildaWallet
 
 					UInt32 newSuggestedAmount = (UInt32)fs.Fee * (UInt32)this.RetryFactor;
 
-					bool newSuggestionIshigher = lastAmountFactored > newSuggestedAmount ;
+					bool newSuggestionIshigher = lastAmountFactored > newSuggestedAmount;
 
 					UInt32 highestSuggestion = newSuggestionIshigher ? lastAmountFactored : newSuggestedAmount;
 					UInt32 lowestSuggestion = newSuggestionIshigher ? newSuggestedAmount : lastAmountFactored;
+
 					// if waiting for lower fee is specified
 					if ( this.Wait != null ) {
 
@@ -475,7 +481,9 @@ namespace IhildaWallet
 		static string settingsPath = null;
 #pragma warning restore RECS0122 // Initializing field with default value is redundant
 
-		private const int MAX_FEE_RETRY_ATTEMPTS = 20 * 5;  // 20 = 1 minute of trying 
+		private const int MAX_FEE_RETRY_ATTEMPTS = 20 * 10;  // 20 = 1 minute of trying 
+
+		private const int MAX_NULL_FEE = 10;
 
 			#if DEBUG
 		private const string clsstr = nameof (FeeSettings) + DebugRippleLibSharp.colon;
@@ -494,6 +502,10 @@ namespace IhildaWallet
 			set;
 		}
 
+		public int PumpNumber {
+			get;
+			set;
+		}
 
 	}
 

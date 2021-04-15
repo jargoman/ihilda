@@ -32,7 +32,7 @@ namespace IhildaWallet
 			}
 
 
-			byte[] bytes = Base58.StringToByteArray (hexstr);
+			byte[] bytes = Base58.HexStringToByteArray (hexstr);
 
 			//string base58encoded = "test";
 			string base58encoded = Base58.Encode (bytes);

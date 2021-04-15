@@ -22,6 +22,8 @@ namespace IhildaWallet
 
 		private global::IhildaWallet.OrderBookTableWidget orderbooktablewidget2;
 
+		private global::Gtk.Label infoLabel;
+
 		protected virtual void Build()
 		{
 			global::Stetic.Gui.Initialize(this);
@@ -96,6 +98,16 @@ namespace IhildaWallet
 			this.vbox2.Add(this.hpaned1);
 			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hpaned1]));
 			w8.Position = 1;
+			// Container child vbox2.Gtk.Box+BoxChild
+			this.infoLabel = new global::Gtk.Label();
+			this.infoLabel.Name = "infoLabel";
+			this.infoLabel.LabelProp = global::Mono.Unix.Catalog.GetString("<span foreground=\"red\">This is an info bar</span>");
+			this.infoLabel.UseMarkup = true;
+			this.vbox2.Add(this.infoLabel);
+			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.infoLabel]));
+			w9.Position = 2;
+			w9.Expand = false;
+			w9.Fill = false;
 			this.Add(this.vbox2);
 			if ((this.Child != null))
 			{

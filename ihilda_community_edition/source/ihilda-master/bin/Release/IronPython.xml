@@ -3719,6 +3719,11 @@
             because byte code is not supported.
             </summary>
         </member>
+        <member name="P:IronPython.Runtime.FunctionCode.Target">
+            <summary>
+            The current target for the function.  This can change based upon adaptive compilation, recursion enforcement, and tracing.
+            </summary>
+        </member>
         <member name="M:IronPython.Runtime.FunctionCode.FromSourceUnit(Microsoft.Scripting.SourceUnit,IronPython.Compiler.PythonCompilerOptions,System.Boolean)">
             <summary>
             Creates a FunctionCode object for exec/eval/execfile'd/compile'd code.
@@ -6018,17 +6023,6 @@
             
             Data is a public field so that this works properly with DynamicSite's as the reference
             type (and EnsureInitialize)
-            </summary>
-        </member>
-        <member name="M:IronPython.Runtime.Slice.DeprecatedFixed(System.Object,System.Int32@,System.Int32@)">
-            <summary>
-            Gets the indices for the deprecated __getslice__, __setslice__, __delslice__ functions
-            
-            This form is deprecated in favor of using __getitem__ w/ a slice object as an index.  This
-            form also has subtly different mechanisms for fixing the slice index before calling the function.
-            
-            If an index is negative and __len__ is not defined on the object than an AttributeError
-            is raised.
             </summary>
         </member>
         <member name="T:IronPython.Runtime.StringFormatSpec">

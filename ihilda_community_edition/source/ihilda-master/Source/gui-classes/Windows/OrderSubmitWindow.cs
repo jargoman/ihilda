@@ -9,6 +9,24 @@ namespace IhildaWallet
 {
 	public partial class OrderSubmitWindow : Gtk.Window
 	{
+
+		public OrderSubmitWindow (RippleWallet rippleWallet) : base (WindowType.Toplevel)
+		{
+			this.Build ();
+
+			if (orderpreviewsubmitwidget1 == null) {
+				orderpreviewsubmitwidget1 = new OrderPreviewSubmitWidget ();
+				orderpreviewsubmitwidget1.Show ();
+				Add (orderpreviewsubmitwidget1);
+			}
+
+			orderpreviewsubmitwidget1.SetRippleWallet (rippleWallet);
+			//orderpreviewsubmitwidget1.SetLicenseType (licenseType);
+			//_rippleWallet = rippleWallet;
+		}
+
+
+		/*
 		public OrderSubmitWindow (RippleWallet rippleWallet, LicenseType licenseType) :
 			base (WindowType.Toplevel)
 		{
@@ -24,6 +42,7 @@ namespace IhildaWallet
 			orderpreviewsubmitwidget1.SetLicenseType (licenseType);
 			//_rippleWallet = rippleWallet;
 		}
+		*/
 
 		public void SetOrders ( IEnumerable <AutomatedOrder> offers ) {
 
@@ -32,10 +51,43 @@ namespace IhildaWallet
 			this.orderpreviewsubmitwidget1.SetDefaultOrders (offers);
 
 
-			this.orderpreviewsubmitwidget1.SetOffers (orderpreviewsubmitwidget1._default_offers);
+			//this.orderpreviewsubmitwidget1.SetOffers (orderpreviewsubmitwidget1._default_offers);
+			this.orderpreviewsubmitwidget1.SetOffers (offers);
 
 		}
 
+
+		public static bool ShortHandSubmit (RippleWallet rippleWallet, IEnumerable<AutomatedOrder> offers)
+		{
+
+			bool ret = false;
+			using (ManualResetEvent manualReset = new ManualResetEvent (false)) {
+				manualReset.Reset ();
+
+				Application.Invoke (
+				    delegate {
+					    OrderSubmitWindow orderSubmitWindow = new OrderSubmitWindow (rippleWallet);
+
+					    orderSubmitWindow.SetOrders (offers);
+
+					    orderSubmitWindow.DeleteEvent += (object o, DeleteEventArgs args) => {
+						    ret = orderSubmitWindow.GetReturnValue ();
+						    manualReset.Set ();
+					    };
+
+				    }
+				);
+
+				manualReset.WaitOne ();
+
+				manualReset.Dispose ();
+			}
+
+			return ret;
+
+		}
+
+		/*
 		public static bool ShortHandSubmit ( RippleWallet rippleWallet, IEnumerable<AutomatedOrder> offers, LicenseType licenseType)
 		{
 
@@ -64,7 +116,7 @@ namespace IhildaWallet
 
 			return ret;
 
-		}
+		} */
 
 		private bool GetReturnValue ()
 		{

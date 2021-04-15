@@ -10,6 +10,8 @@ namespace IhildaWallet
 
 		private global::Gtk.HSeparator hseparator10;
 
+		private global::Gtk.HBox hbox2;
+
 		private global::Gtk.Table table1;
 
 		private global::Gtk.CheckButton checkbutton5;
@@ -37,6 +39,30 @@ namespace IhildaWallet
 		private global::Gtk.Label label6;
 
 		private global::Gtk.Label label7;
+
+		private global::Gtk.VSeparator vseparator1;
+
+		private global::Gtk.VBox vbox2;
+
+		private global::Gtk.Label label8;
+
+		private global::Gtk.Table table3;
+
+		private global::Gtk.Button bitstampBTCbutton;
+
+		private global::Gtk.Button bitstampUSDbutton;
+
+		private global::Gtk.Button gatehubBTCbutton;
+
+		private global::Gtk.Button gatehubDASHbutton;
+
+		private global::Gtk.Button gatehubETHbutton;
+
+		private global::Gtk.Button gatehubEURbutton;
+
+		private global::Gtk.Button gatehubREPbutton;
+
+		private global::Gtk.Button gatehubUSDbutton;
 
 		private global::Gtk.HBox hbox1;
 
@@ -77,6 +103,10 @@ namespace IhildaWallet
 			w2.Expand = false;
 			w2.Fill = false;
 			// Container child vbox6.Gtk.Box+BoxChild
+			this.hbox2 = new global::Gtk.HBox();
+			this.hbox2.Name = "hbox2";
+			this.hbox2.Spacing = 6;
+			// Container child hbox2.Gtk.Box+BoxChild
 			this.table1 = new global::Gtk.Table(((uint)(6)), ((uint)(3)), false);
 			this.table1.Name = "table1";
 			this.table1.RowSpacing = ((uint)(6));
@@ -226,9 +256,151 @@ namespace IhildaWallet
 			w15.RightAttach = ((uint)(3));
 			w15.XOptions = ((global::Gtk.AttachOptions)(4));
 			w15.YOptions = ((global::Gtk.AttachOptions)(4));
-			this.vbox6.Add(this.table1);
-			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.table1]));
-			w16.Position = 2;
+			this.hbox2.Add(this.table1);
+			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.table1]));
+			w16.Position = 0;
+			// Container child hbox2.Gtk.Box+BoxChild
+			this.vseparator1 = new global::Gtk.VSeparator();
+			this.vseparator1.Name = "vseparator1";
+			this.hbox2.Add(this.vseparator1);
+			global::Gtk.Box.BoxChild w17 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.vseparator1]));
+			w17.Position = 1;
+			w17.Expand = false;
+			w17.Fill = false;
+			// Container child hbox2.Gtk.Box+BoxChild
+			this.vbox2 = new global::Gtk.VBox();
+			this.vbox2.Name = "vbox2";
+			this.vbox2.Spacing = 6;
+			// Container child vbox2.Gtk.Box+BoxChild
+			this.label8 = new global::Gtk.Label();
+			this.label8.Name = "label8";
+			this.label8.LabelProp = global::Mono.Unix.Catalog.GetString("<b>Helpers</b>");
+			this.label8.UseMarkup = true;
+			this.vbox2.Add(this.label8);
+			global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.label8]));
+			w18.Position = 0;
+			w18.Expand = false;
+			w18.Fill = false;
+			// Container child vbox2.Gtk.Box+BoxChild
+			this.table3 = new global::Gtk.Table(((uint)(4)), ((uint)(2)), false);
+			this.table3.Name = "table3";
+			this.table3.RowSpacing = ((uint)(6));
+			this.table3.ColumnSpacing = ((uint)(6));
+			// Container child table3.Gtk.Table+TableChild
+			this.bitstampBTCbutton = new global::Gtk.Button();
+			this.bitstampBTCbutton.CanFocus = true;
+			this.bitstampBTCbutton.Name = "bitstampBTCbutton";
+			this.bitstampBTCbutton.UseUnderline = true;
+			this.bitstampBTCbutton.Label = global::Mono.Unix.Catalog.GetString("BitstampBTC");
+			this.table3.Add(this.bitstampBTCbutton);
+			global::Gtk.Table.TableChild w19 = ((global::Gtk.Table.TableChild)(this.table3[this.bitstampBTCbutton]));
+			w19.LeftAttach = ((uint)(1));
+			w19.RightAttach = ((uint)(2));
+			w19.XOptions = ((global::Gtk.AttachOptions)(4));
+			w19.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.bitstampUSDbutton = new global::Gtk.Button();
+			this.bitstampUSDbutton.CanFocus = true;
+			this.bitstampUSDbutton.Name = "bitstampUSDbutton";
+			this.bitstampUSDbutton.UseUnderline = true;
+			this.bitstampUSDbutton.Label = global::Mono.Unix.Catalog.GetString("Bitstamp USD");
+			this.table3.Add(this.bitstampUSDbutton);
+			global::Gtk.Table.TableChild w20 = ((global::Gtk.Table.TableChild)(this.table3[this.bitstampUSDbutton]));
+			w20.XOptions = ((global::Gtk.AttachOptions)(4));
+			w20.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.gatehubBTCbutton = new global::Gtk.Button();
+			this.gatehubBTCbutton.CanFocus = true;
+			this.gatehubBTCbutton.Name = "gatehubBTCbutton";
+			this.gatehubBTCbutton.UseUnderline = true;
+			this.gatehubBTCbutton.Label = global::Mono.Unix.Catalog.GetString("Gatehub BTC");
+			this.table3.Add(this.gatehubBTCbutton);
+			global::Gtk.Table.TableChild w21 = ((global::Gtk.Table.TableChild)(this.table3[this.gatehubBTCbutton]));
+			w21.TopAttach = ((uint)(1));
+			w21.BottomAttach = ((uint)(2));
+			w21.LeftAttach = ((uint)(1));
+			w21.RightAttach = ((uint)(2));
+			w21.XOptions = ((global::Gtk.AttachOptions)(4));
+			w21.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.gatehubDASHbutton = new global::Gtk.Button();
+			this.gatehubDASHbutton.CanFocus = true;
+			this.gatehubDASHbutton.Name = "gatehubDASHbutton";
+			this.gatehubDASHbutton.UseUnderline = true;
+			this.gatehubDASHbutton.Label = global::Mono.Unix.Catalog.GetString("Gatehub DASH");
+			this.table3.Add(this.gatehubDASHbutton);
+			global::Gtk.Table.TableChild w22 = ((global::Gtk.Table.TableChild)(this.table3[this.gatehubDASHbutton]));
+			w22.TopAttach = ((uint)(3));
+			w22.BottomAttach = ((uint)(4));
+			w22.XOptions = ((global::Gtk.AttachOptions)(4));
+			w22.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.gatehubETHbutton = new global::Gtk.Button();
+			this.gatehubETHbutton.CanFocus = true;
+			this.gatehubETHbutton.Name = "gatehubETHbutton";
+			this.gatehubETHbutton.UseUnderline = true;
+			this.gatehubETHbutton.Label = global::Mono.Unix.Catalog.GetString("Gatehub ETH");
+			this.table3.Add(this.gatehubETHbutton);
+			global::Gtk.Table.TableChild w23 = ((global::Gtk.Table.TableChild)(this.table3[this.gatehubETHbutton]));
+			w23.TopAttach = ((uint)(2));
+			w23.BottomAttach = ((uint)(3));
+			w23.LeftAttach = ((uint)(1));
+			w23.RightAttach = ((uint)(2));
+			w23.XOptions = ((global::Gtk.AttachOptions)(4));
+			w23.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.gatehubEURbutton = new global::Gtk.Button();
+			this.gatehubEURbutton.CanFocus = true;
+			this.gatehubEURbutton.Name = "gatehubEURbutton";
+			this.gatehubEURbutton.UseUnderline = true;
+			this.gatehubEURbutton.Label = global::Mono.Unix.Catalog.GetString("Gatehub EUR");
+			this.table3.Add(this.gatehubEURbutton);
+			global::Gtk.Table.TableChild w24 = ((global::Gtk.Table.TableChild)(this.table3[this.gatehubEURbutton]));
+			w24.TopAttach = ((uint)(2));
+			w24.BottomAttach = ((uint)(3));
+			w24.XOptions = ((global::Gtk.AttachOptions)(4));
+			w24.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.gatehubREPbutton = new global::Gtk.Button();
+			this.gatehubREPbutton.CanFocus = true;
+			this.gatehubREPbutton.Name = "gatehubREPbutton";
+			this.gatehubREPbutton.UseUnderline = true;
+			this.gatehubREPbutton.Label = global::Mono.Unix.Catalog.GetString("Gatehub REP");
+			this.table3.Add(this.gatehubREPbutton);
+			global::Gtk.Table.TableChild w25 = ((global::Gtk.Table.TableChild)(this.table3[this.gatehubREPbutton]));
+			w25.TopAttach = ((uint)(3));
+			w25.BottomAttach = ((uint)(4));
+			w25.LeftAttach = ((uint)(1));
+			w25.RightAttach = ((uint)(2));
+			w25.XOptions = ((global::Gtk.AttachOptions)(4));
+			w25.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.gatehubUSDbutton = new global::Gtk.Button();
+			this.gatehubUSDbutton.CanFocus = true;
+			this.gatehubUSDbutton.Name = "gatehubUSDbutton";
+			this.gatehubUSDbutton.UseUnderline = true;
+			this.gatehubUSDbutton.Label = global::Mono.Unix.Catalog.GetString("Gatehub USD");
+			this.table3.Add(this.gatehubUSDbutton);
+			global::Gtk.Table.TableChild w26 = ((global::Gtk.Table.TableChild)(this.table3[this.gatehubUSDbutton]));
+			w26.TopAttach = ((uint)(1));
+			w26.BottomAttach = ((uint)(2));
+			w26.XOptions = ((global::Gtk.AttachOptions)(4));
+			w26.YOptions = ((global::Gtk.AttachOptions)(4));
+			this.vbox2.Add(this.table3);
+			global::Gtk.Box.BoxChild w27 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.table3]));
+			w27.Position = 1;
+			w27.Expand = false;
+			w27.Fill = false;
+			this.hbox2.Add(this.vbox2);
+			global::Gtk.Box.BoxChild w28 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.vbox2]));
+			w28.Position = 2;
+			w28.Expand = false;
+			w28.Fill = false;
+			this.vbox6.Add(this.hbox2);
+			global::Gtk.Box.BoxChild w29 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.hbox2]));
+			w29.Position = 2;
+			w29.Expand = false;
+			w29.Fill = false;
 			// Container child vbox6.Gtk.Box+BoxChild
 			this.hbox1 = new global::Gtk.HBox();
 			this.hbox1.Name = "hbox1";
@@ -241,9 +413,9 @@ namespace IhildaWallet
 			this.button2.UseUnderline = true;
 			this.button2.Label = global::Mono.Unix.Catalog.GetString("Sign and submit");
 			this.hbox1.Add(this.button2);
-			global::Gtk.Box.BoxChild w17 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.button2]));
-			w17.Position = 0;
-			w17.Expand = false;
+			global::Gtk.Box.BoxChild w30 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.button2]));
+			w30.Position = 0;
+			w30.Expand = false;
 			// Container child hbox1.Gtk.Box+BoxChild
 			this.button93 = new global::Gtk.Button();
 			this.button93.CanFocus = true;
@@ -251,23 +423,23 @@ namespace IhildaWallet
 			this.button93.UseUnderline = true;
 			this.button93.Label = global::Mono.Unix.Catalog.GetString("Sign offline");
 			this.hbox1.Add(this.button93);
-			global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.button93]));
-			w18.Position = 1;
-			w18.Expand = false;
+			global::Gtk.Box.BoxChild w31 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.button93]));
+			w31.Position = 1;
+			w31.Expand = false;
 			this.vbox6.Add(this.hbox1);
-			global::Gtk.Box.BoxChild w19 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.hbox1]));
-			w19.PackType = ((global::Gtk.PackType)(1));
-			w19.Position = 3;
-			w19.Expand = false;
+			global::Gtk.Box.BoxChild w32 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.hbox1]));
+			w32.PackType = ((global::Gtk.PackType)(1));
+			w32.Position = 3;
+			w32.Expand = false;
 			// Container child vbox6.Gtk.Box+BoxChild
 			this.hseparator2 = new global::Gtk.HSeparator();
 			this.hseparator2.Name = "hseparator2";
 			this.vbox6.Add(this.hseparator2);
-			global::Gtk.Box.BoxChild w20 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.hseparator2]));
-			w20.PackType = ((global::Gtk.PackType)(1));
-			w20.Position = 4;
-			w20.Expand = false;
-			w20.Fill = false;
+			global::Gtk.Box.BoxChild w33 = ((global::Gtk.Box.BoxChild)(this.vbox6[this.hseparator2]));
+			w33.PackType = ((global::Gtk.PackType)(1));
+			w33.Position = 4;
+			w33.Expand = false;
+			w33.Fill = false;
 			this.Add(this.vbox6);
 			if ((this.Child != null))
 			{

@@ -184,12 +184,15 @@ namespace IhildaWallet
 
 				repurchase.Activated += (object sender, EventArgs e) => {
 
+					/*
 					LicenseType licenseT = Util.LicenseType.SEMIAUTOMATED;
 					if (LeIceSense.IsLicenseExempt (first.taker_gets) || LeIceSense.IsLicenseExempt (first.taker_pays)) {
 						licenseT = LicenseType.NONE;
 					}
 					OrderSubmitWindow win = new OrderSubmitWindow (_rippleWallet, licenseT);
+		    			*/
 
+					OrderSubmitWindow win = new OrderSubmitWindow (_rippleWallet);
 					win.SetOrders (offs);
 
 				};

@@ -159,9 +159,9 @@ namespace IhildaWallet
 					};
 
 
-					return OrderSubmitWindow.ShortHandSubmit ( rippleWallet, new AutomatedOrder [] { automatedOrder }, Util.LicenseType.NONE);
+					//return OrderSubmitWindow.ShortHandSubmit ( rippleWallet, new AutomatedOrder [] { automatedOrder }, Util.LicenseType.NONE);
 
-
+					return OrderSubmitWindow.ShortHandSubmit (rippleWallet, new AutomatedOrder [] { automatedOrder });
 				}
 			}
 

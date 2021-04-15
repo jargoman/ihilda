@@ -68,31 +68,34 @@ namespace IhildaWallet
 
 		public static bool AskQuestionNonGuiThread (String title, String message)
 		{
-			int rt;
-			using (ManualResetEvent ev = new ManualResetEvent (false)) {
-				rt = (int)ResponseType.None;
-				Gtk.Application.Invoke ((object sender, EventArgs e) => {
+			int rt = (int)ResponseType.None;
 
-					using (AreYouSure aus = new AreYouSure (title, message)) {
-						rt = aus.Run ();
+			TaskHelper.GuiInvokeSyncronous ( delegate {
 
-						aus.Destroy ();
+				using (AreYouSure aus = new AreYouSure (title, message)) {
+					rt = aus.Run ();
 
-						//
-					}
+					aus.Destroy ();
+				}
+			});
 
-					ev.Set ();
-				});
 
-				ev.WaitOne ();
-			}
+
+
 
 			return rt == (int)ResponseType.Ok;
 
 		}
 
 
+		public static bool AutomatedTradingWarning ()
+		{
+			string title = "Check your inputs";
+			string message = "<span foreground=\"red\">This order was initiated by an automated script\nMake sure the order is correct\n\n<big>CHECK YOUR INPUTS</big></span>";
 
+			return AskQuestion (title, message);
+
+		}
 	}
 }
 

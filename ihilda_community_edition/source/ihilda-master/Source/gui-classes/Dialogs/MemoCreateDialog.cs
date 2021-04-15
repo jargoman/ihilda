@@ -21,9 +21,9 @@ namespace IhildaWallet
 
 			SelectableMemoIndice indice = new SelectableMemoIndice {
 				Memo = new RippleMemo () {
-					MemoType = entry1.Text,
-		    			MemoFormat = entry2.Text,
-					MemoData = textview2.Buffer.Text
+					MemoType = type, //entry1.Text,
+		    			MemoFormat = format, //entry2.Text,
+					MemoData = data, //textview2.Buffer.Text
 				}
 			};
 

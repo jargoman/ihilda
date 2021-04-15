@@ -31,7 +31,7 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 1;
+			this.notebook1.CurrentPage = 0;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.walletshowwidget1 = new global::IhildaWallet.WalletShowWidget();
 			this.walletshowwidget1.Events = ((global::Gdk.EventMask)(256));

@@ -21,6 +21,7 @@ namespace IhildaWallet
 			global::Stetic.Gui.Initialize(this);
 			// Widget IhildaWallet.FreeTrialAlertDialog
 			this.Name = "IhildaWallet.FreeTrialAlertDialog";
+			this.Title = global::Mono.Unix.Catalog.GetString("window1");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			this.Modal = true;
 			// Internal child IhildaWallet.FreeTrialAlertDialog.VBox

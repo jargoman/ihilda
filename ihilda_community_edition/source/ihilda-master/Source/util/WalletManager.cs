@@ -5,6 +5,7 @@ using Gtk;
 using Codeplex.Data;
 using System.Collections.Generic;
 using RippleLibSharp.Util;
+using System.Threading.Tasks;
 
 namespace IhildaWallet
 {
@@ -183,6 +184,13 @@ namespace IhildaWallet
 							//}
 							rw.WalletPath = path;
 
+
+							// TODO turn on and off using command line settings
+							Task task = new TaskFactory ().StartNew (delegate {
+
+								rw.GetQrCode ();
+							});
+
 						}
 
 #if DEBUG
@@ -210,6 +218,8 @@ namespace IhildaWallet
 
 
 			}
+
+			
 		}
 
 

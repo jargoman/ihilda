@@ -30,6 +30,32 @@ namespace IhildaWallet
 
 		private global::Gtk.Label typelabel;
 
+		private global::Gtk.Expander expander1;
+
+		private global::Gtk.Table table2;
+
+		private global::Gtk.Label label11;
+
+		private global::Gtk.Label label3;
+
+		private global::Gtk.Label label4;
+
+		private global::Gtk.Label label5;
+
+		private global::Gtk.Label label9;
+
+		private global::Gtk.Label privateHex;
+
+		private global::Gtk.Label privateLabel;
+
+		private global::Gtk.Label publicHex;
+
+		private global::Gtk.Label publicLabel;
+
+		private global::Gtk.Label secretHex;
+
+		private global::Gtk.Label GtkLabel4;
+
 		private global::Gtk.HSeparator hseparator2;
 
 		protected virtual void Build()
@@ -175,14 +201,156 @@ namespace IhildaWallet
 			this.vbox2.Add(this.table1);
 			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.table1]));
 			w12.Position = 2;
+			w12.Expand = false;
+			w12.Fill = false;
+			// Container child vbox2.Gtk.Box+BoxChild
+			this.expander1 = new global::Gtk.Expander(null);
+			this.expander1.CanFocus = true;
+			this.expander1.Name = "expander1";
+			this.expander1.Expanded = true;
+			// Container child expander1.Gtk.Container+ContainerChild
+			this.table2 = new global::Gtk.Table(((uint)(5)), ((uint)(2)), false);
+			this.table2.Name = "table2";
+			this.table2.RowSpacing = ((uint)(6));
+			this.table2.ColumnSpacing = ((uint)(6));
+			// Container child table2.Gtk.Table+TableChild
+			this.label11 = new global::Gtk.Label();
+			this.label11.Name = "label11";
+			this.label11.Xalign = 0F;
+			this.label11.LabelProp = global::Mono.Unix.Catalog.GetString("Private Key As Hex");
+			this.label11.Selectable = true;
+			this.table2.Add(this.label11);
+			global::Gtk.Table.TableChild w13 = ((global::Gtk.Table.TableChild)(this.table2[this.label11]));
+			w13.TopAttach = ((uint)(2));
+			w13.BottomAttach = ((uint)(3));
+			w13.XOptions = ((global::Gtk.AttachOptions)(4));
+			w13.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.label3 = new global::Gtk.Label();
+			this.label3.Name = "label3";
+			this.label3.Xalign = 0F;
+			this.label3.LabelProp = global::Mono.Unix.Catalog.GetString("Private Key");
+			this.label3.Selectable = true;
+			this.table2.Add(this.label3);
+			global::Gtk.Table.TableChild w14 = ((global::Gtk.Table.TableChild)(this.table2[this.label3]));
+			w14.TopAttach = ((uint)(1));
+			w14.BottomAttach = ((uint)(2));
+			w14.XOptions = ((global::Gtk.AttachOptions)(4));
+			w14.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.label4 = new global::Gtk.Label();
+			this.label4.Name = "label4";
+			this.label4.Xalign = 0F;
+			this.label4.LabelProp = global::Mono.Unix.Catalog.GetString("Secret as hex");
+			this.label4.Selectable = true;
+			this.table2.Add(this.label4);
+			global::Gtk.Table.TableChild w15 = ((global::Gtk.Table.TableChild)(this.table2[this.label4]));
+			w15.XOptions = ((global::Gtk.AttachOptions)(4));
+			w15.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.label5 = new global::Gtk.Label();
+			this.label5.Name = "label5";
+			this.label5.Xalign = 0F;
+			this.label5.LabelProp = global::Mono.Unix.Catalog.GetString("Public Key");
+			this.table2.Add(this.label5);
+			global::Gtk.Table.TableChild w16 = ((global::Gtk.Table.TableChild)(this.table2[this.label5]));
+			w16.TopAttach = ((uint)(3));
+			w16.BottomAttach = ((uint)(4));
+			w16.XOptions = ((global::Gtk.AttachOptions)(4));
+			w16.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.label9 = new global::Gtk.Label();
+			this.label9.Name = "label9";
+			this.label9.Xalign = 0F;
+			this.label9.LabelProp = global::Mono.Unix.Catalog.GetString("Public Key As Hex");
+			this.label9.Selectable = true;
+			this.table2.Add(this.label9);
+			global::Gtk.Table.TableChild w17 = ((global::Gtk.Table.TableChild)(this.table2[this.label9]));
+			w17.TopAttach = ((uint)(4));
+			w17.BottomAttach = ((uint)(5));
+			w17.XOptions = ((global::Gtk.AttachOptions)(4));
+			w17.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.privateHex = new global::Gtk.Label();
+			this.privateHex.Name = "privateHex";
+			this.privateHex.LabelProp = global::Mono.Unix.Catalog.GetString("*");
+			this.privateHex.Selectable = true;
+			this.table2.Add(this.privateHex);
+			global::Gtk.Table.TableChild w18 = ((global::Gtk.Table.TableChild)(this.table2[this.privateHex]));
+			w18.TopAttach = ((uint)(2));
+			w18.BottomAttach = ((uint)(3));
+			w18.LeftAttach = ((uint)(1));
+			w18.RightAttach = ((uint)(2));
+			w18.XOptions = ((global::Gtk.AttachOptions)(4));
+			w18.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.privateLabel = new global::Gtk.Label();
+			this.privateLabel.Name = "privateLabel";
+			this.privateLabel.LabelProp = global::Mono.Unix.Catalog.GetString("*");
+			this.privateLabel.Selectable = true;
+			this.table2.Add(this.privateLabel);
+			global::Gtk.Table.TableChild w19 = ((global::Gtk.Table.TableChild)(this.table2[this.privateLabel]));
+			w19.TopAttach = ((uint)(1));
+			w19.BottomAttach = ((uint)(2));
+			w19.LeftAttach = ((uint)(1));
+			w19.RightAttach = ((uint)(2));
+			w19.XOptions = ((global::Gtk.AttachOptions)(4));
+			w19.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.publicHex = new global::Gtk.Label();
+			this.publicHex.Name = "publicHex";
+			this.publicHex.LabelProp = global::Mono.Unix.Catalog.GetString("*");
+			this.publicHex.Selectable = true;
+			this.table2.Add(this.publicHex);
+			global::Gtk.Table.TableChild w20 = ((global::Gtk.Table.TableChild)(this.table2[this.publicHex]));
+			w20.TopAttach = ((uint)(4));
+			w20.BottomAttach = ((uint)(5));
+			w20.LeftAttach = ((uint)(1));
+			w20.RightAttach = ((uint)(2));
+			w20.XOptions = ((global::Gtk.AttachOptions)(4));
+			w20.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.publicLabel = new global::Gtk.Label();
+			this.publicLabel.Name = "publicLabel";
+			this.publicLabel.LabelProp = global::Mono.Unix.Catalog.GetString("*");
+			this.publicLabel.Selectable = true;
+			this.table2.Add(this.publicLabel);
+			global::Gtk.Table.TableChild w21 = ((global::Gtk.Table.TableChild)(this.table2[this.publicLabel]));
+			w21.TopAttach = ((uint)(3));
+			w21.BottomAttach = ((uint)(4));
+			w21.LeftAttach = ((uint)(1));
+			w21.RightAttach = ((uint)(2));
+			w21.XOptions = ((global::Gtk.AttachOptions)(4));
+			w21.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table2.Gtk.Table+TableChild
+			this.secretHex = new global::Gtk.Label();
+			this.secretHex.Name = "secretHex";
+			this.secretHex.LabelProp = global::Mono.Unix.Catalog.GetString("*");
+			this.secretHex.Selectable = true;
+			this.table2.Add(this.secretHex);
+			global::Gtk.Table.TableChild w22 = ((global::Gtk.Table.TableChild)(this.table2[this.secretHex]));
+			w22.LeftAttach = ((uint)(1));
+			w22.RightAttach = ((uint)(2));
+			w22.YOptions = ((global::Gtk.AttachOptions)(4));
+			this.expander1.Add(this.table2);
+			this.GtkLabel4 = new global::Gtk.Label();
+			this.GtkLabel4.Name = "GtkLabel4";
+			this.GtkLabel4.LabelProp = global::Mono.Unix.Catalog.GetString("More Info");
+			this.GtkLabel4.UseUnderline = true;
+			this.expander1.LabelWidget = this.GtkLabel4;
+			this.vbox2.Add(this.expander1);
+			global::Gtk.Box.BoxChild w24 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.expander1]));
+			w24.Position = 3;
+			w24.Expand = false;
+			w24.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.hseparator2 = new global::Gtk.HSeparator();
 			this.hseparator2.Name = "hseparator2";
 			this.vbox2.Add(this.hseparator2);
-			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hseparator2]));
-			w13.Position = 3;
-			w13.Expand = false;
-			w13.Fill = false;
+			global::Gtk.Box.BoxChild w25 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hseparator2]));
+			w25.Position = 4;
+			w25.Expand = false;
+			w25.Fill = false;
 			this.Add(this.vbox2);
 			if ((this.Child != null))
 			{

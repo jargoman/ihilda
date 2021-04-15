@@ -1,3 +1,5 @@
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/Debug/ihilda.exe.config
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/Debug/IhildaWallet.csproj.CoreCompileInputs.cache
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/Images/icebutton.png
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/Images/ih_alpha.png
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/Images/ice_splash.png
@@ -42,8 +44,8 @@
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/WebSocket4Net.dll
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/log4net.dll
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/websocket-sharp.dll
-/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/riplibsharp.pdb
-/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/riplibsharp.exe.config
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/NBitcoin.dll
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/Microsoft.Extensions.Logging.Abstractions.dll
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/PdfSharp-gdi.xml
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/PdfSharp.Charting-gdi.xml
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/Newtonsoft.Json.xml
@@ -56,13 +58,15 @@
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/IronPython.Modules.xml
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/IronPython.SQLite.xml
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/IronPython.Wpf.xml
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/riplibsharp.pdb
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/riplibsharp.exe.config
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/log4net.xml
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/websocket-sharp.xml
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/NBitcoin.xml
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/Microsoft.Extensions.Logging.Abstractions.xml
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/de/PdfSharp-gdi.resources.dll
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Debug/de/PdfSharp.Charting-gdi.resources.dll
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/Debug/IhildaWallet.csprojAssemblyReference.cache
-/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/Debug/ihilda.exe.config
-/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/Debug/IhildaWallet.csproj.CoreCompileInputs.cache
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/Debug/IhildaWallet.csproj.CopyComplete
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/Debug/ihilda.exe
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/Debug/ihilda.pdb

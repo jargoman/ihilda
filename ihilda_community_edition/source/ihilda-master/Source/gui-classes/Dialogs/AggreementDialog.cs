@@ -21,21 +21,19 @@ namespace IhildaWallet
 		{
 
 			ResponseType resp = ResponseType.None;
-			using (ManualResetEvent manualResetEvent = new ManualResetEvent (false)) {
-				manualResetEvent.Reset ();
 
-				Gtk.Application.Invoke (delegate {
+
+			TaskHelper.GuiInvokeSyncronous (
+				delegate {
 					using (
 					    AggreementDialog aggreementDialog = new AggreementDialog ()
 					) {
 						resp = (ResponseType)aggreementDialog.Run ();
 						aggreementDialog.Destroy ();
-						manualResetEvent.Set ();
-					}
-				});
 
-				manualResetEvent.WaitOne ();
-			}
+					}
+
+				});
 
 			return (resp == ResponseType.Ok) ? true : false;
 		}

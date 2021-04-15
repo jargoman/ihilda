@@ -28,7 +28,7 @@ namespace IhildaWallet
 			}
 
 
-			this.button5.Clicked += Button5_Clicked;
+			this.refreshButton.Clicked += Refresh_Button_Clicked;
 
 			this.comboboxentry3.Changed += (object sender, EventArgs e) => {
 				string cur = this.comboboxentry3.ActiveText;
@@ -43,12 +43,23 @@ namespace IhildaWallet
 				comboboxentry4.Visible = true;
 			};
 
+
+			this.destinationTagcomboboxentry.Entry.Changed += (sender, e) => {
+				string tag = this.destinationTagcomboboxentry.Entry.Text;
+
+				pathstree1.DestinationTag = tag;
+			};
+
+
+			pathstree1.MemoWidget = memowidget1;
 		}
 
 
 		private CancellationTokenSource tokenSource = null;
-		void Button5_Clicked (object sender, EventArgs e)
+		void Refresh_Button_Clicked (object sender, EventArgs e)
 		{
+
+			TextHighlighter highlighter = new TextHighlighter ();
 
 			tokenSource?.Cancel ();
 			tokenSource = new CancellationTokenSource ();
@@ -68,6 +79,8 @@ namespace IhildaWallet
 
 			string destination_account = comboboxentry1.Entry.Text;
 
+			string destination_tag = destinationTagcomboboxentry.Entry.Text;
+
 			string amount = comboboxentry2.Entry.Text;
 			string currency = comboboxentry3.Entry.Text;
 			string issuer = comboboxentry4.Entry.Text;
@@ -79,27 +92,36 @@ namespace IhildaWallet
 				amountd = (decimal)dee;
 			} else {
 				var message = "Payment Amount is formatted incorretly";
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				label7.Text = TextHighlighter.Highlight (message);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				label7.Text = highlighter.Highlight (message);
 				return;
 			}
 
 			if (amountd < 0) {
 				string message = "Sending negative amounts is not supported. Please enter a valid amount";
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				label7.Text = TextHighlighter.Highlight (message);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				label7.Text = highlighter.Highlight (message);
 				return;
 			}
 
-			RippleCurrency rc = new RippleCurrency (amountd, issuer, currency);
+			RippleCurrency rc = null; 
+
+			if (currency == RippleCurrency.NativeCurrency) {
+				rc = new RippleCurrency (amountd * 1000000);
+			} else {
+				rc = new RippleCurrency (amountd, issuer, currency);
+			}
 
 			//Thread thread = new Thread (
 			Task.Run (
 				delegate {
+
+
 					NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
 					if (ni == null) {
 						return;
 					}
+
 					Task<Response<PathFindResult>> task = PathFind.GetResult (
 						rw.GetStoredReceiveAddress (),
 						destination_account,
@@ -128,14 +150,14 @@ namespace IhildaWallet
 						StringBuilder stringBuilder = new StringBuilder ();
 						stringBuilder.Append (nameof (response.error_code));
 						stringBuilder.Append (" : ");
-						stringBuilder.Append (response.error_code.ToString () ?? "null");
+						stringBuilder.Append (response.error_code?.ToString () ?? "null");
 						stringBuilder.Append (" ");
 						stringBuilder.Append (nameof (response.error_message));
 						stringBuilder.Append (" : ");
 						stringBuilder.Append (response.error_message);
 
 						SetInfoBar (stringBuilder.ToString ());
-
+						return;
 					}
 
 

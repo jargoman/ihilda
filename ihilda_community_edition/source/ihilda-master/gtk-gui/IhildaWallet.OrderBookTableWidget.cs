@@ -4,7 +4,13 @@ namespace IhildaWallet
 {
 	public partial class OrderBookTableWidget
 	{
+		private global::Gtk.VBox vbox1;
+
+		private global::Gtk.Label infolabel;
+
 		private global::Gtk.ScrolledWindow scrolledwindow1;
+
+		private global::Gtk.Label errorlabel;
 
 		protected virtual void Build()
 		{
@@ -13,11 +19,40 @@ namespace IhildaWallet
 			global::Stetic.BinContainer.Attach(this);
 			this.Name = "IhildaWallet.OrderBookTableWidget";
 			// Container child IhildaWallet.OrderBookTableWidget.Gtk.Container+ContainerChild
+			this.vbox1 = new global::Gtk.VBox();
+			this.vbox1.Name = "vbox1";
+			this.vbox1.Spacing = 6;
+			// Container child vbox1.Gtk.Box+BoxChild
+			this.infolabel = new global::Gtk.Label();
+			this.infolabel.Name = "infolabel";
+			this.infolabel.Xalign = 0F;
+			this.infolabel.LabelProp = global::Mono.Unix.Catalog.GetString("<span foreground=\"red\">This is an info bar</span>");
+			this.infolabel.UseMarkup = true;
+			this.vbox1.Add(this.infolabel);
+			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.infolabel]));
+			w1.Position = 0;
+			w1.Expand = false;
+			w1.Fill = false;
+			// Container child vbox1.Gtk.Box+BoxChild
 			this.scrolledwindow1 = new global::Gtk.ScrolledWindow();
 			this.scrolledwindow1.CanFocus = true;
 			this.scrolledwindow1.Name = "scrolledwindow1";
 			this.scrolledwindow1.ShadowType = ((global::Gtk.ShadowType)(1));
-			this.Add(this.scrolledwindow1);
+			this.vbox1.Add(this.scrolledwindow1);
+			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.scrolledwindow1]));
+			w2.Position = 1;
+			// Container child vbox1.Gtk.Box+BoxChild
+			this.errorlabel = new global::Gtk.Label();
+			this.errorlabel.Name = "errorlabel";
+			this.errorlabel.Xalign = 0F;
+			this.errorlabel.LabelProp = global::Mono.Unix.Catalog.GetString("<span foreground=\"red\">This is an error bar</span>");
+			this.errorlabel.UseMarkup = true;
+			this.vbox1.Add(this.errorlabel);
+			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.errorlabel]));
+			w3.Position = 2;
+			w3.Expand = false;
+			w3.Fill = false;
+			this.Add(this.vbox1);
 			if ((this.Child != null))
 			{
 				this.Child.ShowAll();

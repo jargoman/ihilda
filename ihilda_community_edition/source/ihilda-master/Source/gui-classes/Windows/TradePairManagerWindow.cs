@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Gtk;
-
 using IhildaWallet.Splashes;
-
 using IhildaWallet.Util;
+using RippleLibSharp.Commands.Accounts;
+using RippleLibSharp.Transactions;
+using RippleLibSharp.Trust;
 using RippleLibSharp.Util;
 
 namespace IhildaWallet
@@ -62,6 +66,102 @@ namespace IhildaWallet
 			trollbutton.Clicked += Trollbutton_Clicked;
 
 
+			this.generatebutton.Clicked += (sender, e) => {
+
+				Task.Run(delegate {
+					RippleWallet rippleWallet = WalletManager.GetRippleWallet ();
+
+					if (rippleWallet == null) {
+						MessageDialog.ShowMessage ("Select a wallet", "You must select a wallet first before generating pairs");
+						return;
+
+					}
+
+
+					var ni = Networking.NetworkController.GetNetworkInterfaceNonGUIThread ();
+
+					var sure = AreYouSure.AskQuestionNonGuiThread (
+						"Generate Pairs",
+						"This wizard will create tradepairs based on the trustlines for account "
+						+ rippleWallet.GetStoredReceiveAddress ());
+
+
+					if (!sure) {
+						return;
+					}
+
+					// todo integrate cancel token
+					RippleLibSharp.Trust.TrustLine [] lines =
+						AccountLines.GetTrustLines (
+							rippleWallet.GetStoredReceiveAddress (),
+							ni,
+							    new CancellationTokenSource ().Token
+			    		);
+
+
+					if (lines == null) {
+
+						// TODO alert user
+						return;
+					}
+
+
+					if (!lines.Any()) {
+
+						// TODO alert user
+						return;
+					}
+
+		    			lines = lines.Where((arg) => int.Parse(arg.limit) > 0).Select((arg) =>  arg ).ToArray(); 
+					List<TradePair> pears = new List<TradePair> ();
+
+
+					for (int b = 0; b < lines.Length; b++) {
+						for (int c = 0; c < lines.Length; c++) {
+							if (b != c) {
+
+
+								pears.Add (new TradePair () { 
+									Currency_Base = new RippleCurrency(0, lines[b].account, lines[b].currency),
+				    					Currency_Counter = new RippleCurrency(0, lines[c].account, lines[c].currency)
+								});
+							}
+						}
+
+						pears.Add (new TradePair () {
+							Currency_Base = new RippleCurrency (0), // xrp
+							Currency_Counter = new RippleCurrency (0, lines [b].account, lines [b].currency)
+
+						});
+
+						pears.Add (new TradePair () {
+							Currency_Base = new RippleCurrency (0, lines [b].account, lines [b].currency),
+							Currency_Counter = new RippleCurrency (0) // XRP
+						});
+					}
+
+
+
+
+					foreach(TradePair obj in pears) {
+						tpm.AddTradePair (obj);
+					};
+
+
+
+					tpm.SaveTradePairs ();
+
+					Application.Invoke ((s, ev) => {
+						UpdateUI ();
+					});
+
+				});
+
+
+
+				
+			};
+
 			tpm = new TradePairManager ();
 
 			UpdateUI ();
@@ -103,8 +203,10 @@ namespace IhildaWallet
 				return;
 			}
 
-			bool hasPro = LeIceSense.DoTrialDialog (rippleWallet, LicenseType.TRADING);
 
+	    		/*
+			bool hasPro = LeIceSense.DoTrialDialog (rippleWallet, LicenseType.TRADING);
+	    		*/
 
 
 			DepthChartWidget dcw = null;
@@ -130,7 +232,10 @@ namespace IhildaWallet
 			if (dcw == null) {
 				return;
 			}
-			dcw.UpdateBooks (new CancellationToken ());
+
+			//dcw.UpdateBooksOnce ();
+
+			dcw.InitBooksUpdate ();
 
 			Gtk.Application.Invoke ( delegate {
 				dcwin.Show ();
@@ -148,10 +253,13 @@ namespace IhildaWallet
 				return;
 			}
 
+
+	    		/*
 			bool shouldContinue = LeIceSense.DoTrialDialog (rippleWallet, LicenseType.TRADING);
 			if (!shouldContinue) {
 				return;
 			}
+			*/    
 
 			TradePair tp = TradePairManager.SelectedTradePair;
 			if (tp == null) {
@@ -243,11 +351,32 @@ namespace IhildaWallet
 		public void Removetp ( object sender, EventArgs args ) {
 			TradePair tp = TradePairManager.SelectedTradePair;
 
-			if (tp == null) {
-				return;
+			if (tp == null) return;
+
+			StringBuilder stringBuilder = new StringBuilder ();
+			stringBuilder.AppendLine ("Are you sure you would like to remove this tradepair?");
+
+
+			if (tp.Currency_Base != null) {
+				stringBuilder.Append ("\nBase : ");
+				stringBuilder.Append (tp.Currency_Base.currency);
+				if (!tp.Currency_Base.IsNative) {
+					stringBuilder.Append (":");
+					stringBuilder.Append (tp.Currency_Base.issuer);
+				}
+
 			}
-				
-			bool sure = AreYouSure.AskQuestion ("Remove TradePair", "Are you sure you would like to remove this tradepair?");
+
+			if (tp.Currency_Counter != null) {
+				stringBuilder.Append ("\nCounter : ");
+				stringBuilder.Append (tp.Currency_Counter.currency);
+				if (tp.Currency_Counter.IsNative) {
+					stringBuilder.Append (":");
+					stringBuilder.Append (tp.Currency_Counter.issuer);
+				}
+
+			}
+			bool sure = AreYouSure.AskQuestion ("Remove TradePair", stringBuilder.ToString());
 			if (!sure) { // lol
 				return;
 			}
@@ -322,10 +451,12 @@ namespace IhildaWallet
 #endif
 
 
+	    		/*
 			bool shouldContinue = LeIceSense.DoTrialDialog (rw, LicenseType.TRADING);
 			if (!shouldContinue) {
 				return;
 			}
+			*/    
 
 			TradePair tp = TradePairManager.SelectedTradePair;
 			if (tp == null) {

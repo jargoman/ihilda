@@ -10,6 +10,8 @@ namespace IhildaWallet
 			this.Build ();
 
 			this.DeleteEvent += (object sender, Gtk.DeleteEventArgs args) => {
+
+				this.depthchartwidget1?.TokenSource?.Cancel ();
 				this.depthchartwidget1.Dispose ();
 				this.Dispose ();
 				this.Destroy ();

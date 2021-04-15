@@ -153,19 +153,33 @@ namespace IhildaWallet
 
 
 
-			RippleIdentifier rsa = rw.GetDecryptedSeed ();
+			PasswordAttempt passwordAttempt = new PasswordAttempt ();
 
-			while (rsa.GetHumanReadableIdentifier () == null) {
-				bool should = AreYouSure.AskQuestion (
+			passwordAttempt.InvalidPassEvent += (object sender, EventArgs e) =>
+			{
+				bool shou = AreYouSure.AskQuestionNonGuiThread (
 				"Invalid password",
 				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
 				);
+			};
 
-				if (!should) {
-					return;
-				}
+			passwordAttempt.MaxPassEvent += (object sender, EventArgs e) =>
+			{
+				string mess = "Max password attempts";
 
-				rsa = rw.GetDecryptedSeed ();
+				MessageDialog.ShowMessage (mess);
+				//WriteToOurputScreen ("\n" + mess + "\n");
+			};
+
+
+			DecryptResponse response = passwordAttempt.DoRequest (rw, token);
+
+
+
+			RippleIdentifier rsa = response.Seed;
+
+			if (rsa.GetHumanReadableIdentifier () == null) {
+				return;
 			}
 
 
@@ -332,11 +346,11 @@ namespace IhildaWallet
 					this.SetStatus (_index.ToString (), "Signing using RippleLibSharp", ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN);
 					try {
 						if (rsa is RippleSeedAddress) {
-							tx.Sign ((RippleSeedAddress)rsa);
+							tx.SignRippleLibSharp ((RippleSeedAddress)rsa);
 						}
 
 						if (rsa is RipplePrivateKey) {
-							tx.Sign ((RipplePrivateKey)rsa);
+							tx.SignRippleLibSharp ((RipplePrivateKey)rsa);
 						}
 
 					} catch (Exception e) {
@@ -634,8 +648,14 @@ namespace IhildaWallet
 			if (message == null)
 				message = "";
 
-			TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
-			string s = TextHighlighter.Highlight (/*"Success : " + */message);
+			TextHighlighter highlighter = new TextHighlighter {
+				Highlightcolor = 
+					ProgramVariables.darkmode ? 
+				TextHighlighter.CHARTREUSE : 
+				TextHighlighter.GREEN
+			};
+
+			string s = highlighter.Highlight (/*"Success : " + */message);
 
 			Gtk.Application.Invoke ((object sender, EventArgs e) => {
 				if (listStore.GetIterFromString (out TreeIter iterater, _path)) {
@@ -760,8 +780,11 @@ namespace IhildaWallet
 			if (message == null)
 				message = "";
 
-			TextHighlighter.Highlightcolor = colorName;
-			string s = TextHighlighter.Highlight (/*"Success : " + */message);
+			TextHighlighter highlighter = new TextHighlighter {
+				Highlightcolor = colorName
+			};
+
+			string s = highlighter.Highlight (/*"Success : " + */message);
 
 			Gtk.Application.Invoke ((object sender, EventArgs e) => {
 				if (listStore.GetIterFromString (out TreeIter iter, path)) {
@@ -776,9 +799,11 @@ namespace IhildaWallet
 
 		public void SetResult (string path, string message, string colorName)
 		{
+			TextHighlighter highlighter = new TextHighlighter {
+				Highlightcolor = colorName
+			};
 
-			TextHighlighter.Highlightcolor = colorName;
-			string s = TextHighlighter.Highlight (message ?? "");
+			string s = highlighter.Highlight (message ?? "");
 
 
 			Gtk.Application.Invoke ((object sender, EventArgs e) => {

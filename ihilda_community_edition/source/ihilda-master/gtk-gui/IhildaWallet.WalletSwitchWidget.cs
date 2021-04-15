@@ -67,12 +67,12 @@ namespace IhildaWallet
 			// Container child table1.Gtk.Table+TableChild
 			this.namelabel = new global::Gtk.Label();
 			this.namelabel.Name = "namelabel";
+			this.namelabel.Xalign = 0F;
 			this.namelabel.UseMarkup = true;
 			this.table1.Add(this.namelabel);
 			global::Gtk.Table.TableChild w4 = ((global::Gtk.Table.TableChild)(this.table1[this.namelabel]));
 			w4.LeftAttach = ((uint)(1));
 			w4.RightAttach = ((uint)(2));
-			w4.XOptions = ((global::Gtk.AttachOptions)(4));
 			w4.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.viewbutton = new global::Gtk.Button();
@@ -87,8 +87,6 @@ namespace IhildaWallet
 			this.hbox1.Add(this.table1);
 			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.hbox1[this.table1]));
 			w6.Position = 0;
-			w6.Expand = false;
-			w6.Fill = false;
 			this.Add(this.hbox1);
 			if ((this.Child != null))
 			{

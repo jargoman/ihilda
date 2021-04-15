@@ -316,30 +316,37 @@ namespace IhildaWallet
 
 			if (this.buywidget1 != null) {
 				this.buywidget1.SetRippleWallet (rw);
+				this.buywidget1.SetParent (this);
 			}
 
 			if (this.cascadedbuywidget1 != null) {
 				this.cascadedbuywidget1.SetRippleWallet (rw);
+				this.cascadedbuywidget1.SetParent (this);
 			}
 
 			if (this.automatedbuywidget1 != null) {
 				this.automatedbuywidget1.SetRippleWallet (rw);
+				this.automatedbuywidget1.SetParent (this);
 			}
 
 			if (this.sellwidget1 != null) {
 				this.sellwidget1.SetRippleWallet (rw);
+				this.sellwidget1.SetParent (this);
 			}
 
 			if (this.cascadedsellwidget1 != null) {
 				this.cascadedsellwidget1.SetRippleWallet (rw);
+				this.cascadedsellwidget1.SetParent (this);
 			}
 
 			if (this.automatedsellwidget1 != null) {
 				this.automatedsellwidget1.SetRippleWallet (rw);
+				this.automatedsellwidget1.SetParent (this);
 			}
 
 			if (this.currencywidget1 != null) {
 				this.currencywidget1.SetRippleWallet (rw.GetStoredReceiveAddress ());
+				
 			}
 
 			if (this.currencywidget2 != null) {
@@ -603,6 +610,54 @@ namespace IhildaWallet
 
 		}
 
+
+		public bool SafetyCheck (Decimal price, string direction)
+		{
+
+		
+			switch (direction) {
+			case "buy": {
+
+					Decimal ask = this.spreadwidget1.ask;
+					Decimal max_sane_price = ask * 1.01m;
+					if (price > max_sane_price) {
+						string message =
+						"<span foreground=\"red\">" +
+							"You're trying to buy 1% higher than the lowest ask!\n" +
+							"You probably made a mistake. Please check your inputs.\n" +
+							"Are you sure you want to continue?" +
+						    "</span>";
+
+						return AreYouSure.AskQuestion ("Buying high", message);
+					}
+				}
+
+				break;
+
+			case "sell": {
+
+					Decimal bid = this.spreadwidget1.bid;
+					Decimal min_sane_price = bid / 1.01m;
+					if (price < min_sane_price) {
+						string message =
+						"<span foreground=\"red\">" +
+							"You're trying to sell 1% cheaper than the highest bid" +
+							    "You probably made a mistake. Please check your inputs.\n" +
+							    "Are you sure you want to continue?" +
+						    "</span>";
+
+						return AreYouSure.AskQuestion ("Selling low", message);
+
+					}
+				}
+				break;
+
+
+			}
+
+			return true;
+		}
+
 		//public static TradeWindow currentInstance;
 
 		#if DEBUG
@@ -610,15 +665,18 @@ namespace IhildaWallet
 		#endif
 
 		//public const int buy
-		private enum NoteBookPages {
-			buy = 0,
-			cascadedBuy = 1,
-			automatedBuy = 2,
-			sell = 0,
-			cascadedSell = 1,
-			automatedSell = 2
+		
+	}
 
-		}
+	public enum NoteBookPages
+	{
+		buy = 0,
+		cascadedBuy = 1,
+		automatedBuy = 2,
+		sell = 0,
+		cascadedSell = 1,
+		automatedSell = 2
+
 	}
 
 

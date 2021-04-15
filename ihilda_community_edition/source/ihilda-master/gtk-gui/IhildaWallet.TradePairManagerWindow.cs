@@ -24,6 +24,8 @@ namespace IhildaWallet
 
 		private global::Gtk.Button removetpbutton;
 
+		private global::Gtk.Button generatebutton;
+
 		private global::Gtk.Button trollbutton;
 
 		private global::Gtk.Button nsbutton;
@@ -137,6 +139,18 @@ namespace IhildaWallet
 			w7.Expand = false;
 			w7.Fill = false;
 			// Container child vbox3.Gtk.Box+BoxChild
+			this.generatebutton = new global::Gtk.Button();
+			this.generatebutton.CanFocus = true;
+			this.generatebutton.Name = "generatebutton";
+			this.generatebutton.UseUnderline = true;
+			this.generatebutton.Xalign = 0F;
+			this.generatebutton.Label = global::Mono.Unix.Catalog.GetString("Generate Pairs");
+			this.vbox3.Add(this.generatebutton);
+			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.generatebutton]));
+			w8.Position = 7;
+			w8.Expand = false;
+			w8.Fill = false;
+			// Container child vbox3.Gtk.Box+BoxChild
 			this.trollbutton = new global::Gtk.Button();
 			this.trollbutton.CanFocus = true;
 			this.trollbutton.Name = "trollbutton";
@@ -144,10 +158,10 @@ namespace IhildaWallet
 			this.trollbutton.Xalign = 0F;
 			this.trollbutton.Label = global::Mono.Unix.Catalog.GetString("View TrollBox");
 			this.vbox3.Add(this.trollbutton);
-			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.trollbutton]));
-			w8.Position = 7;
-			w8.Expand = false;
-			w8.Fill = false;
+			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.trollbutton]));
+			w9.Position = 8;
+			w9.Expand = false;
+			w9.Fill = false;
 			// Container child vbox3.Gtk.Box+BoxChild
 			this.nsbutton = new global::Gtk.Button();
 			this.nsbutton.CanFocus = true;
@@ -156,13 +170,13 @@ namespace IhildaWallet
 			this.nsbutton.Xalign = 0F;
 			this.nsbutton.Label = global::Mono.Unix.Catalog.GetString("Network Settings");
 			this.vbox3.Add(this.nsbutton);
-			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.nsbutton]));
-			w9.Position = 8;
-			w9.Expand = false;
-			w9.Fill = false;
+			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.nsbutton]));
+			w10.Position = 9;
+			w10.Expand = false;
+			w10.Fill = false;
 			this.hpaned1.Add(this.vbox3);
-			global::Gtk.Paned.PanedChild w10 = ((global::Gtk.Paned.PanedChild)(this.hpaned1[this.vbox3]));
-			w10.Resize = false;
+			global::Gtk.Paned.PanedChild w11 = ((global::Gtk.Paned.PanedChild)(this.hpaned1[this.vbox3]));
+			w11.Resize = false;
 			// Container child hpaned1.Gtk.Paned+PanedChild
 			this.vbox4 = new global::Gtk.VBox();
 			this.vbox4.Name = "vbox4";
@@ -173,21 +187,21 @@ namespace IhildaWallet
 			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString("<b><u>Trade Pairs</u></b>");
 			this.label1.UseMarkup = true;
 			this.vbox4.Add(this.label1);
-			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.label1]));
-			w11.Position = 0;
-			w11.Expand = false;
-			w11.Fill = false;
+			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.label1]));
+			w12.Position = 0;
+			w12.Expand = false;
+			w12.Fill = false;
 			// Container child vbox4.Gtk.Box+BoxChild
 			this.tradepairtree1 = new global::IhildaWallet.TradePairTree();
 			this.tradepairtree1.Events = ((global::Gdk.EventMask)(256));
 			this.tradepairtree1.Name = "tradepairtree1";
 			this.vbox4.Add(this.tradepairtree1);
-			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.tradepairtree1]));
-			w12.Position = 1;
+			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.tradepairtree1]));
+			w13.Position = 1;
 			this.hpaned1.Add(this.vbox4);
 			this.vbox2.Add(this.hpaned1);
-			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hpaned1]));
-			w14.Position = 0;
+			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.hpaned1]));
+			w15.Position = 0;
 			this.Add(this.vbox2);
 			if ((this.Child != null))
 			{

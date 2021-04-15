@@ -1,27 +1,16 @@
 ﻿<Properties StartupConfiguration="{CA53CCC7-77CC-4338-A888-7F0ED71810AB}|Default">
   <MonoDevelop.Ide.ItemProperties.RippleLibSharp PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Source/WalletClasses/WalletLedgerSave.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Source/NameMaker.cs">
     <Files>
-      <File FileName="Source/gui-classes/Windows/WebLinksWindow.cs" Line="68" Column="1" />
-      <File FileName="Source/gui-classes/Widgets/Trees/OpenOrdersTree.cs" Line="293" Column="1" />
-      <File FileName="Source/util/URLexplorer.cs" Line="49" Column="6" />
-      <File FileName="Source/gui-classes/Widgets/Trees/WalletTree.cs" Line="1" Column="1" />
-      <File FileName="Source/Program.cs" Line="176" Column="16" />
-      <File FileName="Source/UImain.cs" Line="181" Column="13" />
-      <File FileName="Source/util/LeIceSense.cs" Line="635" Column="5" />
-      <File FileName="Source/gui-classes/Widgets/PayUI/SendIce.cs" Line="391" Column="56" />
-      <File FileName="Source/gui-classes/Windows/TradePairManagerWindow.cs" Line="116" Column="31" />
-      <File FileName="Source/gui-classes/Widgets/RuleWidgets/FilledRuleManagementWindow.cs" Line="937" Column="1" />
-      <File FileName="Source/gui-classes/Windows/DepthChartWindow.cs" Line="5" Column="23" />
-      <File FileName="Source/gui-classes/Widgets/TransactionsWidgets/TxWidget.cs" Line="1" Column="1" />
-      <File FileName="Source/gui-classes/Widgets/Views/TxViewWidget.cs" Line="483" Column="1" />
-      <File FileName="Source/gui-classes/Widgets/Views/AccountsViewSelector.cs" Line="1" Column="1" />
-      <File FileName="Source/gui-classes/Windows/TxWindow.cs" Line="1" Column="1" />
-      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Commands/Accounts/AccountTx.cs" Line="30" Column="1" />
-      <File FileName="Source/gui-classes/Widgets/WalletUI/WalletManagerWidget.cs" Line="1099" Column="3" />
-      <File FileName="Source/gui-classes/Widgets/PayUI/BalanceTab.cs" Line="69" Column="1" />
-      <File FileName="Source/bot/Robotics.cs" Line="60" Column="1" />
-      <File FileName="Source/WalletClasses/WalletLedgerSave.cs" Line="32" Column="1" />
+      <File FileName="Source/gui-classes/Widgets/OrderPreviewSubmitWidget.cs" Line="1305" Column="45" />
+      <File FileName="Source/gui-classes/Windows/OrderSubmitWindow.cs" Line="29" Column="4" />
+      <File FileName="Source/gui-classes/Widgets/Console.cs" Line="120" Column="12" />
+      <File FileName="../../../RippleLibSharp/RippleLibSharp/Source/Third-Party/ripple-dot-net-master/Ripple.Core/Types/EngineResult.cs" Line="33" Column="89" />
+      <File FileName="Source/gui-classes/Widgets/Trees/OpenOrdersTree.cs" Line="426" Column="42" />
+      <File FileName="Source/gui-classes/Widgets/OptionSettingsWidget/FeeOptionsWidget.cs" Line="290" Column="1" />
+      <File FileName="Source/Program.cs" Line="1" Column="1" />
+      <File FileName="Source/ProgramVariables.cs" Line="7" Column="49" />
+      <File FileName="Source/NameMaker.cs" Line="2" Column="7" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -29,38 +18,26 @@
           <Node name="Ihilda" expanded="True">
             <Node name="IhildaWallet" expanded="True">
               <Node name="Source" expanded="True">
-                <Node name="bot" expanded="True" />
-                <Node name="gui-classes" expanded="True">
-                  <Node name="Widgets" expanded="True">
-                    <Node name="PayUI" expanded="True" />
-                    <Node name="RuleWidgets" expanded="True" />
-                    <Node name="TransactionsWidgets" expanded="True" />
-                    <Node name="Trees" expanded="True" />
-                    <Node name="Views" expanded="True" />
-                    <Node name="WalletUI" expanded="True" />
-                  </Node>
-                  <Node name="Windows" expanded="True" />
-                </Node>
-                <Node name="util" expanded="True" />
-                <Node name="WalletClasses" expanded="True">
-                  <Node name="WalletLedgerSave.cs" selected="True" />
-                </Node>
+                <Node name="gui-classes" expanded="True" />
+                <Node name="NameMaker.cs" selected="True" />
               </Node>
             </Node>
             <Node name="RippleLibSharp" expanded="True">
               <Node name="Source" expanded="True">
-                <Node name="Commands" expanded="True">
-                  <Node name="Accounts" expanded="True" />
-                  <Node name="Server" expanded="True" />
-                  <Node name="Subscriptions" expanded="True" />
+                <Node name="Third-Party" expanded="True">
+                  <Node name="ripple-dot-net-master" expanded="True">
+                    <Node name="Ripple.Core" expanded="True">
+                      <Node name="Types" expanded="True" />
+                    </Node>
+                  </Node>
                 </Node>
-                <Node name="Network" expanded="True" />
-                <Node name="Third-Party" expanded="True" />
-                <Node name="Transactions" expanded="True" />
               </Node>
             </Node>
           </Node>
         </State>
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
@@ -68,11 +45,8 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Catchpoint exceptionName="Gtk.Builder+HandlerNotFoundException" includeSubclasses="True" />
-      <Breakpoint file="/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/Source/gui-classes/Widgets/Views/TxViewWidget.cs" relfile="Source/gui-classes/Widgets/Views/TxViewWidget.cs" line="521" column="1" />
-      <Breakpoint file="/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/Source/bot/Robotics.cs" relfile="Source/bot/Robotics.cs" line="46" column="1" />
-      <Breakpoint file="/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/Source/bot/Robotics.cs" relfile="Source/bot/Robotics.cs" line="60" column="1" />
-      <Breakpoint file="/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/Source/bot/Robotics.cs" relfile="Source/bot/Robotics.cs" line="74" column="1" />
+      <Breakpoint file="/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/Source/gui-classes/Windows/TradePairManagerWindow.cs" relfile="Source/gui-classes/Windows/TradePairManagerWindow.cs" line="72" column="1" />
+      <Breakpoint file="/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/Source/Binary/BinaryType.cs" line="238" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MultiItemStartupConfigurations />

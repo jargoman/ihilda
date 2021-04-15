@@ -71,6 +71,9 @@ namespace IhildaWallet
 			string method_sig = clsstr + nameof (ScaleMethod) + DebugRippleLibSharp.colon;
 
 #endif
+
+			TextHighlighter highlighter = new TextHighlighter ();
+
 			string acc = _rippleWallet.Account;
 
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
@@ -103,8 +106,8 @@ namespace IhildaWallet
 
 					var mess = "Price is formatted incorrectly";
 
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					string sss = TextHighlighter.Highlight (mess);
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					string sss = highlighter.Highlight (mess);
 
 					Gtk.Application.Invoke (delegate {
 
@@ -137,11 +140,11 @@ namespace IhildaWallet
 
 				var message = "Price isn't specified using " + bidLabelText;
 
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
+				highlighter.Highlightcolor = TextHighlighter.RED;
 
 
 
-				string ss = TextHighlighter.Highlight (message);
+				string ss = highlighter.Highlight (message);
 
 				Gtk.Application.Invoke (delegate {
 					priceentry.Entry.Text = price.ToString ();
@@ -253,9 +256,13 @@ namespace IhildaWallet
 				return;
 			}
 
+
+
 			if (this.TradePairInstance == null) {
 				return;
 			}
+
+			
 
 			// Determine the orders so we can tally up the totals
 			AutomatedOrder [] orders = DetermineOrders (cbo, this.TradePairInstance);
@@ -502,6 +509,8 @@ namespace IhildaWallet
 			}
 #endif
 
+			AutomationWarning = true;
+
 			if (off == null) {
 #if DEBUG
 				if (DebugIhildaWallet.CascadedBuyWidget) {
@@ -564,9 +573,16 @@ namespace IhildaWallet
 				return;
 			}
 
+			
 			if (cbo.priceMod == 0) {
 
 			}
+
+			bool sane = _parent.SafetyCheck ((Decimal)cbo.startingPrice, "buy");
+			if (!sane) {
+				return;
+			}
+
 
 			if (cbo.priceMod > 1) {
 
@@ -591,20 +607,35 @@ namespace IhildaWallet
 			if (offs.Length == 0) {
 				return;
 			}
-			//RebuyDialog.doDialog(offs);
+
+			if (AutomationWarning) {
+
+				bool ignored = AreYouSure.AutomatedTradingWarning ();
+				if (!ignored) return;
+			}
+
+	    		/*
+
 			LicenseType licenseT = Util.LicenseType.CASCADING;
 
 			if (LeIceSense.IsLicenseExempt (offs [0].taker_gets) || LeIceSense.IsLicenseExempt (offs [0].taker_pays)) {
 				licenseT = LicenseType.NONE;
 			}
+
+			
+
 			OrderSubmitWindow win = new OrderSubmitWindow (_rippleWallet, licenseT);
 
+			*/
+
+			OrderSubmitWindow win = new OrderSubmitWindow (_rippleWallet);
 			win.SetOrders (offs);
 		}
 
 		private CascadedOrderLogic GetCascadedOrderLogic (bool warnuser)
 		{
 
+			TextHighlighter highlighter = new TextHighlighter ();
 
 			CascadedOrderLogic cbo = new CascadedOrderLogic ();
 
@@ -622,8 +653,8 @@ namespace IhildaWallet
 				if (warnuser) {
 					string message = "Number of orders is formatted incorrectly \n";
 
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					infobar.Markup = TextHighlighter.Highlight (message);
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					infobar.Markup = highlighter.Highlight (message);
 
 				}
 				return null;
@@ -636,18 +667,22 @@ namespace IhildaWallet
 				if (warnuser) {
 					string message = "Starting price is formatted incorrectly \n";
 
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					infobar.Markup = TextHighlighter.Highlight (message);
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					infobar.Markup = highlighter.Highlight (message);
 				}
 				return null;
 			}
+
+			
+			
+
 			Decimal? priceMod = RippleCurrency.ParseDecimal (pms);
 			if (priceMod == null) {
 				if (warnuser) {
 					var message = "Pricemod is formatted incorrectly \n";
 
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					infobar.Markup = TextHighlighter.Highlight (message);
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					infobar.Markup = highlighter.Highlight (message);
 				}
 				return null;
 			}
@@ -656,8 +691,8 @@ namespace IhildaWallet
 				if (warnuser) {
 					var message = "Starting amount is formatted incorrectly \n";
 
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					infobar.Markup = TextHighlighter.Highlight (message);
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					infobar.Markup = highlighter.Highlight (message);
 				}
 				return null;
 			}
@@ -666,8 +701,8 @@ namespace IhildaWallet
 				if (warnuser) {
 					var message = "Amountmod is formatted incorrectly \n";
 
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					infobar.Markup = TextHighlighter.Highlight (message);
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					infobar.Markup = highlighter.Highlight (message);
 				}
 				return null;
 			}
@@ -701,7 +736,7 @@ namespace IhildaWallet
 				Gtk.Application.Invoke (
 					delegate {
 
-						label10.Markup = "<b><u>Buy " + b + "</u></b>";
+						label10.Markup = "<span foreground=\"green\"><b><u>Buy " + b + "</u></b></span>";
 
 					}
 				);
@@ -753,6 +788,16 @@ namespace IhildaWallet
 		{
 			priceentry.Entry.Text = price.ToString ();
 		}
+
+
+		public void SetParent (TradeWindow parent)
+		{
+			this._parent = parent;
+		}
+
+		public bool AutomationWarning { get; set; } 
+
+		private TradeWindow _parent = null;
 
 		private RippleWallet _rippleWallet = null;
 

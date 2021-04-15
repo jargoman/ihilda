@@ -1,5 +1,7 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+using RippleLibSharp.Binary;
 using RippleLibSharp.Keys;
 using RippleLibSharp.Util;
 
@@ -122,24 +124,78 @@ namespace IhildaWallet
 					if (sure) {
 
 						Task.Run (delegate {
-							RippleIdentifier rsa = rw.GetDecryptedSeed ();
-							while (rsa.GetHumanReadableIdentifier () == null) {
-								bool should = AreYouSure.AskQuestion (
+
+
+
+							PasswordAttempt passwordAttempt = new PasswordAttempt ();
+
+							passwordAttempt.InvalidPassEvent += (object sender, EventArgs e) =>
+							{
+								bool shou = AreYouSure.AskQuestionNonGuiThread (
 								"Invalid password",
 								"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
 								);
-									
-								if (!should) {
-									return;
+							};
+
+							passwordAttempt.MaxPassEvent += (object sender, EventArgs e) =>
+							{
+								string mess = "Max password attempts";
+
+								MessageDialog.ShowMessage (mess);
+								//WriteToOurputScreen ("\n" + mess + "\n");
+							};
+
+
+							DecryptResponse response = passwordAttempt.DoRequest (rw, new CancellationTokenSource().Token);
+
+
+
+
+							RippleIdentifier rsa = response.Seed;
+							if (rsa?.GetHumanReadableIdentifier () != null) {
+
+								if (rsa is RippleSeedAddress seedAddress) {
+									Gtk.Application.Invoke ( delegate {
+
+										string sec = seedAddress.AsHex ();
+										var privKey = seedAddress.GetPrivateKey (0);
+
+										var pubKey = privKey.GetPublicKey ();
+
+										this.secretHex.Markup = sec;
+										this.privateLabel.Markup = privKey.GetHumanReadableIdentifier();
+										this.privateHex.Markup = privKey.AsHex();
+										this.publicLabel.Markup = pubKey.GetHumanReadableIdentifier();
+										this.publicHex.Markup = pubKey.AsHex();
+									});
 								}
 
-								rsa = rw.GetDecryptedSeed ();
-							}
+								if (rsa is RipplePrivateKey privateKey) {
+									Gtk.Application.Invoke ( delegate {
 
+										var pub = privateKey.GetPublicKey ();
 
-							if (rsa != null) {
+										this.secretHex.Markup = "N/A";
+										
+
+										this.privateLabel.Markup = privateKey.GetHumanReadableIdentifier ();
+										this.privateHex.Markup = privateKey.AsHex ();
+										this.publicLabel.Markup = pub.GetHumanReadableIdentifier ();
+										this.publicHex.Markup = pub.AsHex ();
+									});
+								}
+
+								
 
 								Gtk.Application.Invoke ( delegate {
+
+									this.secretHex.SetAlignment (0, 0.5f);
+
+									this.privateLabel.SetAlignment (0, 0.5f);
+									this.privateHex.SetAlignment (0, 0.5f);
+									this.publicLabel.SetAlignment (0, 0.5f);
+									this.publicHex.SetAlignment (0, 0.5f);
+
 									this.secretlabel.Text = rsa.ToString ();
 
 								});

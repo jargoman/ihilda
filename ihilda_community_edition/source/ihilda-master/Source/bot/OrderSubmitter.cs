@@ -784,7 +784,7 @@ namespace IhildaWallet
 #endif
 
 				try {
-					string signature = orderSubmittedEventArgs.RippleOfferTransaction.Sign (rippleSeedAddress);
+					string signature = orderSubmittedEventArgs.RippleOfferTransaction.SignRippleLibSharp (rippleSeedAddress);
 					if (signature == null) {
 						orderSubmittedEventArgs.Unrecoverable = true;
 						orderSubmittedEventArgs.Success = false;

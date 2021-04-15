@@ -1,22 +1,20 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Gtk;
-using Codeplex.Data;
 using IhildaWallet.Networking;
-using RippleLibSharp.Network;
-using RippleLibSharp.Transactions.TxTypes;
-using RippleLibSharp.Keys;
-using RippleLibSharp.Transactions;
-using RippleLibSharp.Binary;
-using RippleLibSharp.Result;
 using IhildaWallet.Util;
-using RippleLibSharp.Util;
+using RippleLibSharp.Binary;
 using RippleLibSharp.Commands.Accounts;
-using System.Collections.Generic;
-using static IhildaWallet.MemoCreateDialog;
 using RippleLibSharp.Commands.Subscriptions;
+using RippleLibSharp.Keys;
+using RippleLibSharp.Network;
+using RippleLibSharp.Result;
+using RippleLibSharp.Transactions;
+using RippleLibSharp.Transactions.TxTypes;
+using RippleLibSharp.Util;
 
 namespace IhildaWallet
 {
@@ -35,15 +33,15 @@ namespace IhildaWallet
 			unitsSelectBox.AppendText (RippleCurrency.NativePip);
 
 
-			CellRendererText cell = new CellRendererText ();
-			unitsSelectBox.PackStart (cell, false);
-			unitsSelectBox.AddAttribute (cell, "text", 0);
-			ListStore store = new ListStore (typeof (string));
-			unitsSelectBox.Model = store;
+			CellRendererText unitSelectCell = new CellRendererText ();
+			unitsSelectBox.PackStart (unitSelectCell, false);
+			unitsSelectBox.AddAttribute (unitSelectCell, "text", 0);
+			ListStore unitSelectStore = new ListStore (typeof (string));
+			unitsSelectBox.Model = unitSelectStore;
 
 
-			store.AppendValues (RippleCurrency.NativeCurrency);
-			store.AppendValues (RippleCurrency.NativePip);
+			unitSelectStore.AppendValues (RippleCurrency.NativeCurrency);
+			unitSelectStore.AppendValues (RippleCurrency.NativePip);
 
 			//unitsSelectBox.Model.
 
@@ -51,39 +49,10 @@ namespace IhildaWallet
 
 			this.sendNativeButton.Clicked += OnSendNativeButtonClicked;
 
-			this.addmemobutton.Clicked += (object sender, EventArgs e) => {
-
-				SelectableMemoIndice createdMemo = null;
-				using (MemoCreateDialog memoCreateDialog = new MemoCreateDialog ()) {
-					try {
-						ResponseType resp = (ResponseType)memoCreateDialog.Run ();
 
 
-						if (resp != ResponseType.Ok) {
-
-							return;
-						}
-						createdMemo = memoCreateDialog.GetMemoIndice ();
-						this.AddMemo (createdMemo);
-					} catch (Exception ee) {
-						throw ee;
-					} finally {
-						memoCreateDialog?.Destroy ();
-					}
-				}
-
-				
-				
-				
-			};
 
 
-			clearmemobutton.Clicked += (object sender, EventArgs e) => {
-				ListStore.Clear ();
-
-				Memos = null;
-
-			};
 
 			Task.Factory.StartNew ( () => {
 				var token = TokenSource.Token;
@@ -108,27 +77,10 @@ namespace IhildaWallet
 			}
 			);
 
-			CellRendererToggle rendererToggle = new CellRendererToggle () { 
-				Activatable = true
-			};
-
-			CellRendererText cellRendererText = new CellRendererText ();
-
-			treeview1.AppendColumn ("Enabled", rendererToggle, "active", 0);
-			treeview1.AppendColumn ("MemoType", cellRendererText, "text", 1);
-			treeview1.AppendColumn ("MemoFormat", cellRendererText, "text", 2);
-			treeview1.AppendColumn ("MemoData", cellRendererText, "text", 3);
-
-			ListStore = new ListStore (
-					typeof (bool),
-					typeof (string),
-		    			typeof (string),
-					typeof (string)
-				);
 
 
-			var memo = Program.GetClientMemo ();
-			this.AddMemo (memo);
+
+
 
 			button114.Clicked += PercentageClicked;
 			button115.Clicked += PercentageClicked;
@@ -153,10 +105,9 @@ namespace IhildaWallet
 			hscale2.ValueChanged += Hscale2_ValueChanged;
 		}
 
-		Gtk.ListStore ListStore {
-			get;
-			set;
-		}
+
+
+
 
 		~SendRipple ()
 		{
@@ -337,10 +288,32 @@ namespace IhildaWallet
 		}
 
 
-		private static void SendPipsUsingPaymentManager (RippleWallet rw, string destination, UInt32? DestTag, Decimal dropsamount, IEnumerable<MemoIndice> memoIndices)
+		private void SendPipsUsingPaymentManager (
+			RippleWallet rw, 
+			string destination, 
+	    		UInt32? DestTag, 
+	    		Decimal dropsamount, 
+			IEnumerable<MemoIndice> memoIndices
+		)
 		{
+			TextHighlighter highlighter = new TextHighlighter ();
+			RippleAddress payee = null;
 
-			RippleAddress payee = new RippleAddress (destination);
+
+			try {
+				payee = new RippleAddress (destination);
+
+			} catch (Exception e) {
+
+				// errors to user
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				var message = highlighter.Highlight ("Address formated incorectly");
+
+				SetInfoBar (message);
+				return;
+			}
+
+
 			RippleCurrency amnt = new RippleCurrency (dropsamount);
 
 
@@ -351,9 +324,13 @@ namespace IhildaWallet
 					amnt,
 					null
 				) {
-					DestinationTag = DestTag,
-		    			Memos = memoIndices?.ToArray()
+					DestinationTag = DestTag
 				};
+
+
+			if (memoIndices != null) {
+				tx.Memos = memoIndices.ToArray ();
+			}
 
 			RipplePaymentTransaction [] arr = { tx };
 
@@ -371,7 +348,10 @@ namespace IhildaWallet
 		{
 #if DEBUG
 			if (DebugIhildaWallet.SendRipple) {
-				Logging.WriteLog ("send drops payment of " + dropsamount.ToString () + " drops");
+				Logging.WriteLog (
+					"send drops payment of " 
+					+ dropsamount.ToString () 
+		    			+ " drops");
 			}
 #endif
 
@@ -382,8 +362,19 @@ namespace IhildaWallet
 			}
 
 
-	    		IEnumerable <MemoIndice> memoIndices = Memos?.Where((SelectableMemoIndice arg) => arg.IsSelected);
-			SendPipsUsingPaymentManager (rw, destination, DestTag, dropsamount, memoIndices);
+			IEnumerable<MemoIndice> memoIndices = null;
+
+
+			if (memowidget1.HasSelectedMemos ()) {
+				memoIndices = memowidget1.GetSelectedMemos ().ToArray();
+			}
+
+			SendPipsUsingPaymentManager (
+				rw, 
+				destination, 
+				DestTag, 
+				dropsamount, 
+				memoIndices);
 
 			/*
 			if (rw.seed == null) {
@@ -554,43 +545,9 @@ namespace IhildaWallet
 			public uint? DestTag;
 		}
 
-		public void SetMemos (IEnumerable<SelectableMemoIndice> Memos)
-		{
-			Gtk.Application.Invoke (
-				delegate {
-					ListStore.Clear ();
 
-					foreach (SelectableMemoIndice memoIndice in Memos) {
-						ListStore.AppendValues (
-							memoIndice.IsSelected,
-							memoIndice?.GetMemoTypeAscii(),
-							memoIndice?.GetMemoFormatAscii(),
-							memoIndice?.GetMemoDataAscii()
-						);
-					}
 
-					this.Memos = Memos;
-					this.treeview1.Model = ListStore;
 
-				}
-			);
-
-		}
-
-		private IEnumerable<SelectableMemoIndice> Memos {
-			get;
-			set;
-		}
-
-		public void AddMemo (SelectableMemoIndice indice)
-		{
-			List<SelectableMemoIndice> memoIndices = Memos?.ToList() ?? new List<SelectableMemoIndice>();
-			indice.IsSelected = true;
-			memoIndices.Add (indice);
-
-			SetMemos (memoIndices);
-
-		}
 
 		private void SendThread (object param)
 		{
@@ -763,6 +720,15 @@ namespace IhildaWallet
 			});
 
 
+		}
+
+		public void SetInfoBar (string txt)
+		{
+			Application.Invoke (delegate {
+
+				infobar.Markup = txt;
+
+			});
 		}
 
 		public void Sync ()

@@ -181,6 +181,8 @@ namespace IhildaWallet
 
 		public bool IsValidated = false;
 
+
+
 		public static AutomatedOrder ReconstructFromNode (RippleNode node)
 		{
 

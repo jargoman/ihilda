@@ -29,11 +29,14 @@ namespace IhildaWallet
 			set;
 		}
 
+
+		// Add rule to the list
 		public void AddRule (OrderFilledRule val)
 		{
 			RulesList.Add (val);
 		}
 
+		// Remove rule to the list
 		public bool RemoveRule (OrderFilledRule val)
 		{
 			return RulesList.Remove (val);

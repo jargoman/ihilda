@@ -28,6 +28,10 @@ namespace IhildaWallet
 
 		private global::Gtk.Button syncbutton;
 
+		private global::Gtk.HBox hbox2;
+
+		private global::Gtk.Label activeWalletLabel;
+
 		private global::Gtk.Label infoBarLabel;
 
 		private global::IhildaWallet.OpenOrdersTree openorderstree1;
@@ -152,22 +156,39 @@ namespace IhildaWallet
 			w11.Expand = false;
 			w11.Fill = false;
 			// Container child vbox1.Gtk.Box+BoxChild
+			this.hbox2 = new global::Gtk.HBox();
+			this.hbox2.Name = "hbox2";
+			this.hbox2.Homogeneous = true;
+			this.hbox2.Spacing = 6;
+			// Container child hbox2.Gtk.Box+BoxChild
+			this.activeWalletLabel = new global::Gtk.Label();
+			this.activeWalletLabel.Name = "activeWalletLabel";
+			this.activeWalletLabel.Xalign = 0F;
+			this.activeWalletLabel.LabelProp = global::Mono.Unix.Catalog.GetString("Active Wallet : ");
+			this.hbox2.Add(this.activeWalletLabel);
+			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.activeWalletLabel]));
+			w12.Position = 0;
+			// Container child hbox2.Gtk.Box+BoxChild
 			this.infoBarLabel = new global::Gtk.Label();
 			this.infoBarLabel.Name = "infoBarLabel";
+			this.infoBarLabel.Xalign = 0F;
 			this.infoBarLabel.LabelProp = global::Mono.Unix.Catalog.GetString("<span fgcolor=\"red\">This is an infobar</span>");
 			this.infoBarLabel.UseMarkup = true;
-			this.vbox1.Add(this.infoBarLabel);
-			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.infoBarLabel]));
-			w12.Position = 3;
-			w12.Expand = false;
-			w12.Fill = false;
+			this.hbox2.Add(this.infoBarLabel);
+			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.infoBarLabel]));
+			w13.Position = 1;
+			this.vbox1.Add(this.hbox2);
+			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hbox2]));
+			w14.Position = 3;
+			w14.Expand = false;
+			w14.Fill = false;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.openorderstree1 = new global::IhildaWallet.OpenOrdersTree();
 			this.openorderstree1.Events = ((global::Gdk.EventMask)(256));
 			this.openorderstree1.Name = "openorderstree1";
 			this.vbox1.Add(this.openorderstree1);
-			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.openorderstree1]));
-			w13.Position = 4;
+			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.openorderstree1]));
+			w15.Position = 4;
 			this.Add(this.vbox1);
 			if ((this.Child != null))
 			{

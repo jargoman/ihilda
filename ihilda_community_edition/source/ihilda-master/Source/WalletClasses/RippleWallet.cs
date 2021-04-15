@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -10,7 +9,6 @@ using Gtk;
 using QRCoder;
 using RippleLibSharp.Binary;
 using RippleLibSharp.Keys;
-using RippleLibSharp.Transactions;
 using RippleLibSharp.Util;
 
 namespace IhildaWallet
@@ -175,7 +173,15 @@ namespace IhildaWallet
 		}
 		public string GetStoredReceiveAddress ()
 		{
-			if (this.AccountType == RippleWalletTypeEnum.MasterPrivateKey) {
+
+			switch (this.AccountType) {
+
+			case RippleWalletTypeEnum.MasterPrivateKey:
+
+				if (Account != null) {
+					return Account;
+				}
+
 				if (this.PrivateKey != null) {
 
 					RipplePublicKey publicKey = this.PrivateKey.GetPublicKey ();
@@ -184,12 +190,10 @@ namespace IhildaWallet
 					}
 				}
 
-				if (Account != null) {
-					return Account;
-				}
-			}
+				break;
 
-			if (this.AccountType == RippleWalletTypeEnum.Master) {
+			case RippleWalletTypeEnum.Master:
+
 				if (Seed != null) {
 					return Seed.GetPublicRippleAddress ().ToString ();
 				}
@@ -197,9 +201,11 @@ namespace IhildaWallet
 				if (Account != null) {
 					return Account;
 				}
-			}
 
-			if (this.AccountType == RippleWalletTypeEnum.Regular) {
+				break;
+
+			case RippleWalletTypeEnum.Regular:
+
 				if (Account != null) {
 					return Account;
 				}
@@ -215,6 +221,9 @@ namespace IhildaWallet
 				this._hasError = true;
 				this.WalletError = "missing receive address\n";
 				//throw new Exception ();
+
+				break;
+
 			}
 
 			return null;
@@ -393,9 +402,9 @@ namespace IhildaWallet
 
 		public void DecryptWithSideEffects ()
 		{
-			
 
-			RippleIdentifier decr = DecryptNoSides ();
+			DecryptResponse decryptResponse = DecryptNoSides ();
+			RippleIdentifier decr = decryptResponse.Seed;
 
 			if (decr == null) {
 				return;
@@ -434,12 +443,15 @@ namespace IhildaWallet
 			Salt = null;
 		}
 
-		private RippleIdentifier DecryptNoSides ()
+		private DecryptResponse DecryptNoSides ()
 		{
 #if DEBUG
 			string method_sig = clsstr + nameof(DecryptNoSides) + DebugRippleLibSharp.both_parentheses;
 
 #endif
+
+			DecryptResponse response = new DecryptResponse ();
+
 			string enc_typ_str = null;
 			string enc_wal_str = null;
 
@@ -465,18 +477,24 @@ namespace IhildaWallet
 				//String password, ,
 
 				IEncrypt ie = null;
+
+				// parse encryption type
 				bool worked = Enum.TryParse<EncryptionType> (enc_typ_str, out EncryptionType enc);
 				if (!worked) {
-					// TODO alert user of failure, 
-					MessageDialog.ShowMessage ("Wallet does not support encryption type" + enc_typ_str );
-					return null;
+
+
+
+					response.HasError = true;
+					response.ErrorMessage = "Wallet does not support encryption type" + enc_typ_str;
+
+					return response;
 				}
 
 				switch (enc) {
 				case EncryptionType.Rijndaelio:
 
-					Rijndaelio rijndaelio = RememberRijndaelio ?? Rijndaelio.GetPasswordInput();
-					if ( rijndaelio != null && rijndaelio.RememberPassword) {
+					Rijndaelio rijndaelio = RememberRijndaelio ?? Rijndaelio.GetPasswordInput ();
+					if (rijndaelio != null && rijndaelio.RememberPassword) {
 						RememberRijndaelio = rijndaelio;
 					}
 					ie = rijndaelio;
@@ -497,6 +515,8 @@ namespace IhildaWallet
 
 				if (ie == null) {
 					// TODO 
+					response.HasError = true;
+					response.ErrorMessage = "Encryptor returned null";
 					return null;
 				}
 
@@ -505,21 +525,27 @@ namespace IhildaWallet
 
 
 				byte [] decrypted = ie.Decrypt (
-					decoded, 
-					salty, 
+					decoded,
+					salty,
 					Account
 				);
 
 
-				
+
 
 
 				RippleSeedAddress decryptedSeed = null;
 				RipplePrivateKey decryptedPrivateKey = null;
 
-				if (AccountType == RippleWalletTypeEnum.Master || AccountType == RippleWalletTypeEnum.Regular) {
+
+				switch (AccountType) {
+
+				case RippleWalletTypeEnum.Master:
+				case RippleWalletTypeEnum.Regular:
 					try {
 						decryptedSeed = new RippleSeedAddress (decrypted);
+
+						// TODO this is a side effect :(
 						if (decryptedSeed != null && AccountType == RippleWalletTypeEnum.Regular && Regular_Key_Account == null) {
 							Regular_Key_Account = decryptedSeed?.GetPublicRippleAddress ();
 						}
@@ -527,18 +553,29 @@ namespace IhildaWallet
 					} catch (Exception e) {
 						RememberRijndaelio = null;
 						RememberedEntente = null;
-						MessageDialog.ShowMessage ("Invalid password. Unable to decrypt seed.");
+
 #if DEBUG
 						if (DebugIhildaWallet.RippleWallet) {
 							Logging.ReportException (method_sig, e);
 						}
 #endif
-						return null;
+						response.HasException = true;
+						response.Ex = e;
+						response.ErrorMessage = "Invalid password. Unable to decrypt seed.";
+						return response;
 
 					}
 
-					return decryptedSeed;
-				} else {
+					if (decryptedSeed == null) {
+						response.HasException = true;
+						response.Ex = new NullReferenceException ();
+						return response;
+					}
+
+					response.Seed = decryptedSeed;
+					return response;
+
+				case RippleWalletTypeEnum.MasterPrivateKey:
 					try {
 
 						decryptedPrivateKey = new RipplePrivateKey (decrypted);
@@ -549,20 +586,27 @@ namespace IhildaWallet
 
 						MessageDialog.ShowMessage ("Invalid password. Unable to decrypt private key.");
 
-						#if DEBUG
+#if DEBUG
 						if (DebugIhildaWallet.RippleWallet) {
 							Logging.ReportException (method_sig, e);
 						}
 #endif
-						return null;
+
+						response.HasException = true;
+						response.Ex = e;
+						return response;
 
 					}
 
-					return decryptedPrivateKey;
+					response.Seed = decryptedPrivateKey;
+					return response;
+
+				
+
 				}
 
 
-
+			
 
 			}
 
@@ -581,6 +625,8 @@ namespace IhildaWallet
 #endif
 				throw e;
 			}
+
+			return response;
 		}
 
 
@@ -592,14 +638,16 @@ namespace IhildaWallet
 		private Rijndaelio RememberRijndaelio = null;
 		private TrippleEntente RememberedEntente = null; 
 
-		public RippleIdentifier GetDecryptedSeed ()
+		public DecryptResponse GetDecryptedSeed ()
 		{
 
-
+			
+			// switch finds cached seed if one exists. Throws an exception if neither seed or encrypted blob exists. 
+	    		// Looks in the appropriate place depending on wallet type
 			switch (AccountType) {
 			case RippleWalletTypeEnum.Master:
 				if (Seed != null) {
-					return Seed;
+					return new DecryptResponse () { Seed = this.Seed };
 				}
 
 				if (Encrypted_Wallet == null) {
@@ -608,7 +656,7 @@ namespace IhildaWallet
 				break;
 			case RippleWalletTypeEnum.Regular:
 				if (Regular_Seed != null) {
-					return Regular_Seed;
+					return new DecryptResponse () { Seed = Regular_Seed };
 				}
 
 				if (Encrypted_Regular_Wallet == null) {
@@ -618,7 +666,7 @@ namespace IhildaWallet
 
 			case RippleWalletTypeEnum.MasterPrivateKey:
 				if (PrivateKey != null) {
-					return PrivateKey;
+					return new DecryptResponse () { Seed = PrivateKey };
 				}
 
 				if (Encrypted_PrivateKey == null) {
@@ -626,6 +674,8 @@ namespace IhildaWallet
 				}
 				break;
 			}
+
+			// Falls through to decryption 
 
 
 
@@ -649,11 +699,11 @@ namespace IhildaWallet
 			//IEncrypt ie = new Rijndaelio ();
 
 			//byte[] salty = Base58.decode (salt);
-			RippleIdentifier see = DecryptNoSides ();
+			DecryptResponse resp = DecryptNoSides ();
 
 
 
-			return see;
+			return resp;
 
 
 		}
@@ -1019,7 +1069,8 @@ namespace IhildaWallet
 		{
 
 			//string path = BotLedgerPath;
-
+	    		
+			// reusing string builder avoids calling new which saves time, debugging can be slow due to printing
 			StringBuilder sb = new StringBuilder ();
 #if DEBUG
 
@@ -1120,32 +1171,58 @@ namespace IhildaWallet
 		public Gdk.Pixbuf GetQrCode ()
 		{
 
+			// only compute pixbuff if cache doesn't exist
 			if (_Pixbuf == null) {
+
+				// retreive qr generator from static getter
 				QRCodeGenerator qRCodeGenerator = QRCodeGenerator;
 
-
+				// create the qrcode data
 				QRCodeData addressqrCodeData = qRCodeGenerator.CreateQrCode (this.GetStoredReceiveAddress (), QRCodeGenerator.ECCLevel.Q);
 				QRCode qrCodeAdd = new QRCode (addressqrCodeData);
 
-				Gdk.Pixbuf puf = global::Gdk.Pixbuf.LoadFromResource ("IhildaWallet.Images.xrp-symbol-black-25x25.png");
+				//Gdk.Pixbuf puf = global::Gdk.Pixbuf.LoadFromResource ("IhildaWallet.Images.xrp-symbol-black-25x25.png");
 
 
-				TypeConverter tc = TypeDescriptor.GetConverter(typeof(Bitmap));
-
-       
-				Bitmap xmap = (Bitmap)tc.ConvertFrom(puf.SaveToBuffer("png")); 
-
-				Bitmap bitmap = qrCodeAdd.GetGraphic (6, System.Drawing.Color.DarkBlue, System.Drawing.Color.LavenderBlush, xmap, 16, 4, false);
-				Bitmap qrCodeImageAdd = bitmap; //qrCodeAdd.GetGraphic (5, System.Drawing.Color.Black, System.Drawing.Color.White, true);
+				//TypeConverter tc = TypeDescriptor.GetConverter(typeof(Bitmap));
 
 
+				//Bitmap xmap = (Bitmap)tc.ConvertFrom(puf.SaveToBuffer("png")); 
+
+				//Bitmap bitmap = qrCodeAdd.GetGraphic (6, System.Drawing.Color.Black, System.Drawing.Color.White, xmap, 14, 4, false);
+
+				Bitmap bitmap = qrCodeAdd.GetGraphic (6, System.Drawing.Color.Black, System.Drawing.Color.White, null, 0, 6, false);
+
+				//qrCodeAdd.GetGraphic (5, System.Drawing.Color.Black, System.Drawing.Color.White, true); // simple method call
+
+				Bitmap qrCodeImageAdd = bitmap; 
+
+				// mem stream for pixbuff image  
 				MemoryStream ms = new MemoryStream ();
+
+				// copy bitmap to mem stream as png image
 				qrCodeImageAdd.Save (ms, ImageFormat.Png);
+
+				// reset the mem stream counter position to zero
 				ms.Position = 0;
+
+				// create pixbuff from the memory stream of the bitmap
 				_Pixbuf = new Gdk.Pixbuf (ms);
 			}
 			return _Pixbuf;
 
+		}
+
+
+		// used for the wallet tree. Avoids setting new markup every call. 
+		private WalletTreeModel _walletTreeItem = null;
+		public WalletTreeModel GetTreeModelItem ()
+		{
+			if (_walletTreeItem == null) {
+				_walletTreeItem = new WalletTreeModel (this);
+			}
+
+			return _walletTreeItem;
 		}
 
 		private static QRCodeGenerator QRCodeGenerator {
@@ -1166,7 +1243,29 @@ namespace IhildaWallet
 	}
 
 
+	// response for getDecrypted seed
+	public class DecryptResponse {
+
+		public bool HasError {
+			get { return _has_err || HasException; }
+			set { _has_err = value; } 
+			}
+
+		private bool _has_err = false;
 
 
+		public string ErrorMessage { get; set; }
+
+		public bool HasException {
+			get { return (_has_exception || Ex != null); } 
+			set { _has_exception = value; } 
+		}
+
+		private bool _has_exception = false;
+
+		public Exception Ex { get; set; }
+
+		public RippleIdentifier Seed { get; set; }
+	}
 }
 

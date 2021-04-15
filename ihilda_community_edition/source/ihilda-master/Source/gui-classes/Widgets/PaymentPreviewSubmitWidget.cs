@@ -10,6 +10,7 @@ using IhildaWallet.Util;
 using System.Linq;
 using System.Threading;
 using System.Media;
+using RippleLibSharp.Commands.Accounts;
 
 namespace IhildaWallet
 {
@@ -33,6 +34,8 @@ namespace IhildaWallet
 
 				hbox1.Add (walletswitchwidget1);
 			}
+
+			paymentstree1.SetParent (this);
 
 			infoBarlabel.Text = "";
 
@@ -91,7 +94,10 @@ namespace IhildaWallet
 		private CancellationTokenSource tokenSource = null;
 		public void SubmitAll ()
 		{
-			
+
+
+
+
 #if DEBUG
 			string method_sig = clsstr + nameof (SubmitAll) + DebugRippleLibSharp.both_parentheses;
 			if (DebugIhildaWallet.PaymentPreviewSubmitWidget) {
@@ -99,10 +105,41 @@ namespace IhildaWallet
 			}
 #endif
 
+
+
+	    		// Cancel any existing threads
 			tokenSource?.Cancel ();
+
+			// Create the tokens to cancel this thread
 			tokenSource = new CancellationTokenSource ();
 			var token = tokenSource.Token;
 
+
+
+
+			TextHighlighter greenHighlighter = new TextHighlighter {
+				Highlightcolor = ProgramVariables.darkmode ?
+					TextHighlighter.CHARTREUSE :
+					TextHighlighter.GREEN
+			};
+
+			TextHighlighter redHighlighter = new TextHighlighter {
+				Highlightcolor = ProgramVariables.darkmode ?
+					TextHighlighter.LIGHT_RED :
+		    			TextHighlighter.RED
+			};
+
+
+			// U.I
+			SetInfoBox (greenHighlighter.Highlight ("Submiting all payments"));
+
+
+
+
+
+
+
+			#region wallet
 			RippleWallet rw = walletswitchwidget1.GetRippleWallet();
 			if (rw == null) {
 #if DEBUG
@@ -111,40 +148,110 @@ namespace IhildaWallet
 				}
 #endif
 
-				this.SetInfoBox ("No wallet selected\n");
-				// 
+				this.SetInfoBox (redHighlighter.Highlight("No wallet selected"));
+
+
 				return;
 			}
+			#endregion
 
+
+
+
+
+
+
+			#region network
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
 			if (ni == null) {
 				// TODO network interface
-				this.SetInfoBox ("No network");
+
+				this.SetInfoBox (redHighlighter.Highlight("No network"));
+
 				return;
 			}
+
+			#endregion
+
+
+
+
+
+
+
+			#region license
+			SetInfoBox (greenHighlighter.Highlight("Verifying License"));
 
 			bool ShouldContinue = LeIceSense.LastDitchAttempt (rw, _licenseType);
 			if (!ShouldContinue) {
 				return;
 			}
+			#endregion
 
-			uint se = Convert.ToUInt32 (RippleLibSharp.Commands.Accounts.AccountInfo.GetSequence ( rw.GetStoredReceiveAddress (), ni, token) );
 
 
-			RippleIdentifier rsa = rw.GetDecryptedSeed ();
 
-			while (rsa.GetHumanReadableIdentifier () == null) {
-				bool should = AreYouSure.AskQuestion (
+
+
+			#region sequence
+			uint? s = AccountInfo.GetSequence (
+	    			rw.GetStoredReceiveAddress (), 
+				ni, 
+		    		token);
+
+
+			if (s==null) {
+				SetInfoBox (redHighlighter.Highlight("Unable to retrieve sequence from network"));
+				return;
+			}
+
+
+			uint se = Convert.ToUInt32 (s);
+			#endregion
+
+
+
+
+
+			#region password
+
+
+			SetInfoBox (greenHighlighter.Highlight("Requesting password"));
+
+			PasswordAttempt passwordAttempt = new PasswordAttempt ();
+
+			passwordAttempt.InvalidPassEvent += (object sender, EventArgs e) =>
+			{
+				bool shou = AreYouSure.AskQuestionNonGuiThread (
 				"Invalid password",
 				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
 				);
+			};
 
-				if (!should) {
-					return;
-				}
+			passwordAttempt.MaxPassEvent += (object sender, EventArgs e) =>
+			{
+				string mess = "Max password attempts";
 
-				rsa = rw.GetDecryptedSeed ();
+				MessageDialog.ShowMessage (mess);
+
+				SetInfoBox (redHighlighter.Highlight(mess));
+				//WriteToOurputScreen ("\n" + mess + "\n");
+			};
+
+
+			DecryptResponse response = passwordAttempt.DoRequest (rw, token);
+
+
+
+			RippleIdentifier rsa = response?.Seed;
+
+			if (rsa?.GetHumanReadableIdentifier () == null) {
+
+				return;
 			}
+
+			#endregion
+
 			SoundSettings settings = SoundSettings.LoadSoundSettings ();
 
 			for (int index = 0; index < this.paymentstree1._payments_tuple.Item1.Length; index++) {
@@ -155,15 +262,27 @@ namespace IhildaWallet
 					return;
 				}
 
+				// determine if selected
+				bool selected = this.paymentstree1._payments_tuple.Item2 [index];
 
-				bool b = this.paymentstree1._payments_tuple.Item2 [index];
-				if (!b) {
+				// skip if selected
+				if (!selected) {
 					continue;
 				}
 
 
-				bool suceeded = this.paymentstree1.SubmitPaymentAtIndex (index, se++, ni, token, rsa);
-				if (!suceeded) {
+				bool succeeded = this.paymentstree1.SubmitPaymentAtIndex (
+					index, 
+					se++, 
+		    			ni, 
+		    			token, 
+					rsa);
+
+
+
+
+
+				if (!succeeded) {
 
 					if (settings != null && settings.HasOnTxFail && settings.OnTxFail != null) {
 
@@ -177,18 +296,21 @@ namespace IhildaWallet
 					}
 
 					return;
-				} else {
-
-					if ( settings != null && settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
-
-						Task.Run (delegate {
-							SoundPlayer player = new SoundPlayer (settings.OnTxSubmit);
-							player.Load ();
-							player.Play ();
-						});
-
-					}
 				}
+
+
+
+				if (settings != null && settings.HasOnTxSubmit && settings.OnTxSubmit != null) {
+
+					Task.Run (delegate {
+						SoundPlayer player = new SoundPlayer (settings.OnTxSubmit);
+						player.Load ();
+						player.Play ();
+					});
+
+				}
+
+
 			}
 
 
@@ -214,7 +336,8 @@ namespace IhildaWallet
 		}
 		public void SetPayments (IEnumerable <RipplePaymentTransaction> payments, bool isSelectDefault)
 		{
-			this.paymentstree1.SetPayments (payments, isSelectDefault);
+			this.paymentstree1.SetPayments (payments.ToArray(), isSelectDefault);
+
 			this.SetDefaultPayments (payments.ToArray());
 		}
 

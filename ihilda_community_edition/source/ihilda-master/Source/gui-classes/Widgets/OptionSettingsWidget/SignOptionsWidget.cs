@@ -120,6 +120,20 @@ namespace IhildaWallet
 			set;
 		}
 
+		public string ErrorMessage {
+			get;
+			set;
+		}
+
+		public bool HasError {
+			get {
+				return !string.IsNullOrEmpty (ErrorMessage);
+			}
+			
+		}
+
+
+
 		public static void SaveSignOptions ( SignOptions settings ) {
 			
 
@@ -129,18 +143,29 @@ namespace IhildaWallet
 		}
 
 		public static SignOptions LoadSignOptions () {
-			string str = FileHelper.GetJsonConf (settingsPath);
-			if (str == null) {
-				return null;
-			}
+
 			SignOptions so = null;
+
+
 			try {
-				so=DynamicJson.Parse(str);
+				string str = FileHelper.GetJsonConf (settingsPath);
+				if (str == null) {
+					so = new SignOptions () {
+						ErrorMessage = "Error retreiving sing options file"
+					};
+					return so;
+				}
+
+				so = DynamicJson.Parse(str);
 			}
 
 			catch (Exception e) {
 				Logging.WriteLog (e.Message + e.StackTrace);
-				return null;
+
+				so = new SignOptions () {
+					ErrorMessage = e.Message
+				};
+				return so;
 			}
 
 			return so;

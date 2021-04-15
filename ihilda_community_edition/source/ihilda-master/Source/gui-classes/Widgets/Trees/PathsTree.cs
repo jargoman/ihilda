@@ -18,11 +18,11 @@ namespace IhildaWallet
 			this.Build ();
 
 
-			liststore = new ListStore ( typeof (string), typeof (string), typeof(string) );
+			liststore = new ListStore (typeof (string), typeof (string), typeof (string));
 
-			this.treeview2.AppendColumn("Amount", new CellRendererText(), "text", 0 );
-			this.treeview2.AppendColumn("Currency", new CellRendererText(), "text", 1 );
-			this.treeview2.AppendColumn("Issuer", new CellRendererText(), "text", 2 );
+			this.treeview2.AppendColumn ("Amount", new CellRendererText (), "text", 0);
+			this.treeview2.AppendColumn ("Currency", new CellRendererText (), "text", 1);
+			this.treeview2.AppendColumn ("Issuer", new CellRendererText (), "text", 2);
 
 			this.treeview2.Model = liststore;
 
@@ -30,6 +30,10 @@ namespace IhildaWallet
 			this.treeview2.ButtonReleaseEvent += Treeview2_ButtonReleaseEvent;
 
 		}
+
+		public MemoWidget MemoWidget { get; set; }
+		public string DestinationTag { get; set; }
+		
 
 		void Treeview2_ButtonReleaseEvent (object o, ButtonReleaseEventArgs args)
 		{
@@ -77,6 +81,10 @@ namespace IhildaWallet
 				Paths = alt.paths_computed,
 				SendMax = alt.source_amount
 			};
+
+			if (MemoWidget != null && MemoWidget.HasSelectedMemos()) {
+				ripplePaymentTransaction.Memos = MemoWidget.GetSelectedMemos ().ToArray();
+			}
 
 			LicenseType licenseT = Util.LicenseType.PAYMENT;
 			if (LeIceSense.IsLicenseExempt (ripplePaymentTransaction.Amount) || LeIceSense.IsLicenseExempt (ripplePaymentTransaction.SendMax)) {

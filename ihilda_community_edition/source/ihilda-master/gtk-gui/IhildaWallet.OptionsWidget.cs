@@ -168,7 +168,7 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 1;
+			this.notebook1.CurrentPage = 5;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.splashoptionswidget1 = new global::IhildaWallet.SplashOptionsWidget();
 			this.splashoptionswidget1.Events = ((global::Gdk.EventMask)(256));

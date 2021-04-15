@@ -171,7 +171,7 @@ namespace IhildaWallet
 			this.hpaned1 = new global::Gtk.HPaned();
 			this.hpaned1.CanFocus = true;
 			this.hpaned1.Name = "hpaned1";
-			this.hpaned1.Position = 451;
+			this.hpaned1.Position = 468;
 			// Container child hpaned1.Gtk.Paned+PanedChild
 			this.vbox1 = new global::Gtk.VBox();
 			this.vbox1.Name = "vbox1";
@@ -188,7 +188,7 @@ namespace IhildaWallet
 			this.notebook1 = new global::Gtk.Notebook();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 4;
+			this.notebook1.CurrentPage = 0;
 			this.notebook1.TabPos = ((global::Gtk.PositionType)(0));
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.eventbox4 = new global::Gtk.EventBox();
@@ -600,6 +600,8 @@ namespace IhildaWallet
 			// Container child eventboxWallet.Gtk.Container+ContainerChild
 			this.image1 = new global::Gtk.Image();
 			this.image1.Name = "image1";
+			this.image1.Xpad = 5;
+			this.image1.Ypad = 5;
 			this.image1.Pixbuf = global::Gdk.Pixbuf.LoadFromResource("IhildaWallet.Images.ihildaplain-100-wide.png");
 			this.eventboxWallet.Add(this.image1);
 			this.hbox5.Add(this.eventboxWallet);
@@ -645,6 +647,7 @@ namespace IhildaWallet
 			this.hpaned1.Add(this.vbox1);
 			global::Gtk.Paned.PanedChild w47 = ((global::Gtk.Paned.PanedChild)(this.hpaned1[this.vbox1]));
 			w47.Resize = false;
+			w47.Shrink = false;
 			// Container child hpaned1.Gtk.Paned+PanedChild
 			this.vbox4 = new global::Gtk.VBox();
 			this.vbox4.Name = "vbox4";
@@ -760,6 +763,7 @@ namespace IhildaWallet
 			this.table4.Name = "table4";
 			this.table4.RowSpacing = ((uint)(6));
 			this.table4.ColumnSpacing = ((uint)(6));
+			this.table4.BorderWidth = ((uint)(3));
 			// Container child table4.Gtk.Table+TableChild
 			this.label11 = new global::Gtk.Label();
 			this.label11.Name = "label11";

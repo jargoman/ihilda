@@ -4,7 +4,7 @@ namespace IhildaWallet
 	public static class ProgramVariables
 	{
 		public static readonly string appname = "ihilda";
-		public static readonly string version = "1.0.3";
+		public static readonly string version = "1.0.4";
 		public static readonly string verboseName = appname + "_community_edition_" + version;
 
 		public static readonly string webUrl = "http://192.168.1.195:45455";

@@ -616,7 +616,8 @@ namespace IhildaWallet.Util
 					};
 
 
-					OrderSubmitWindow.ShortHandSubmit (rw, new AutomatedOrder [] { automatedOrder }, Util.LicenseType.NONE);
+					//OrderSubmitWindow.ShortHandSubmit (rw, new AutomatedOrder [] { automatedOrder }, Util.LicenseType.NONE);
+					OrderSubmitWindow.ShortHandSubmit (rw, new AutomatedOrder [] { automatedOrder });
 					return false;
 
 				}
@@ -632,7 +633,9 @@ namespace IhildaWallet.Util
 
 			string key = rippleAddress.ToString ();
 			return (
-				key == RippleAddress.RIPPLE_ADDRESS_JARGOMAN || 
+				key == RippleAddress.RIPPLE_ADDRESS_JARGOMAN ||
+				key == RippleAddress.RIPPLE_ADDRESS_GRAVBALLE ||
+				key == RippleAddress.RIPPLE_ADDRESS_DISRUPTOR ||
 				key == RippleAddress.RIPPLE_ADDRESS_DAHLIOO); // 
 		}
 

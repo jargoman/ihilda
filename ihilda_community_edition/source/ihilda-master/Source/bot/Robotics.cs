@@ -43,8 +43,12 @@ namespace IhildaWallet
 			string method_sig = clsstr + nameof (DoLogic) + DebugRippleLibSharp.both_parentheses;
 #endif
 
+
 			DoLogicResponse logicResponse = new DoLogicResponse ();
 
+
+
+			// start loading order management bot
 			OrderManagementBot omb = null;
 			var ombTask = Task.Run (delegate {
 				omb = new OrderManagementBot (wallet, ni, cancelationToken);
@@ -54,9 +58,15 @@ namespace IhildaWallet
 				};
 			}, cancelationToken);
 
+
+
+
+
+			// sound settings from disk
 			SoundSettings settings = SoundSettings.LoadSoundSettings ();
 
 
+			// last saved ledger
 			WalletLedgerSave ledgerSave = WalletLedgerSave.LoadLedger (wallet.BotLedgerPath);
 
 			if (cancelationToken.IsCancellationRequested) {
@@ -78,7 +88,9 @@ namespace IhildaWallet
 					//logicResponse.HasError = true;
 					//logicResponse.ErrorMessage = "";
 				}
-				uint? lastRuleLedger = ledgerSave.Ledger;
+
+				// This should be the only place last ledger is incremented to the next available ledger
+				uint? lastRuleLedger = ledgerSave.Ledger + 1;
 				ledgerMin = lastRuleLedger?.ToString ();
 
 			}
@@ -127,7 +139,15 @@ namespace IhildaWallet
 				int minutes = 5;
 				int maxSeconds = 60 * minutes; // 
 				int seconds;
-				for (seconds = 0; task != null && !task.IsCompleted && !task.IsFaulted && !task.IsCanceled && !cancelationToken.IsCancellationRequested && (seconds < maxSeconds) && !StopWhenConvenient;) {
+				for (seconds = 0; 
+					task != null && 	
+		    			!task.IsCompleted && 
+		    			!task.IsFaulted && 
+					!task.IsCanceled && 
+					!cancelationToken.IsCancellationRequested && 
+		    			(seconds < maxSeconds) && 
+		    			!StopWhenConvenient;
+				){
 					try {
 						OnMessage?.Invoke (this, new MessageEventArgs { Message = "Waiting on network" });
 						for (int i = 0; i < 10 && !task.IsCompleted && !cancelationToken.IsCancellationRequested; i++, seconds++) {  // seconds are incremented where a second actually occurs and not in it's own loop. It's going to be ok. 

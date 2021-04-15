@@ -72,7 +72,8 @@ Global
 		$0.DotNetNamingPolicy = $11
 		$11.DirectoryNamespaceAssociation = Hierarchical
 		$0.StandardHeader = $12
-		version = 0.9
+		version = 1.0.4
 		StartupItem = Ripple-Client-Gtk.csproj
+		description = Ihilda XRP ledger desktop wallet
 	EndGlobalSection
 EndGlobal

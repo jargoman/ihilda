@@ -11,8 +11,9 @@ namespace IhildaWallet
 			global::Stetic.Gui.Initialize(this);
 			// Widget IhildaWallet.PaymentSubmitWindow
 			this.Name = "IhildaWallet.PaymentSubmitWindow";
-			this.Title = global::Mono.Unix.Catalog.GetString("PaymentSubmitWindow");
+			this.Title = global::Mono.Unix.Catalog.GetString("Payment Submit Window");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
+			this.BorderWidth = ((uint)(12));
 			// Container child IhildaWallet.PaymentSubmitWindow.Gtk.Container+ContainerChild
 			this.paymentpreviewsubmitwidget1 = new global::IhildaWallet.PaymentPreviewSubmitWidget();
 			this.paymentpreviewsubmitwidget1.Events = ((global::Gdk.EventMask)(256));
@@ -22,8 +23,8 @@ namespace IhildaWallet
 			{
 				this.Child.ShowAll();
 			}
-			this.DefaultWidth = 774;
-			this.DefaultHeight = 392;
+			this.DefaultWidth = 844;
+			this.DefaultHeight = 405;
 			this.Show();
 		}
 	}

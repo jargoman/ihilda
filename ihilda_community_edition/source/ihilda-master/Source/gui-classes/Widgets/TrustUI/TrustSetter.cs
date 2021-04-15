@@ -56,6 +56,88 @@ namespace IhildaWallet
 				label6.Visible = checkbutton5.Active;
 			};
 
+
+			this.bitstampUSDbutton.Clicked += (sender, e) => {
+
+				this.SetTrustLine (
+					new TrustLine () { 
+						currency = "USD",
+						account = "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+						
+					}
+				);
+			};
+
+			this.bitstampBTCbutton.Clicked += (sender, e) => {
+				this.SetTrustLine (
+					new TrustLine () {
+						currency = "BTC",
+						account = "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+
+					}
+				);
+			};
+
+			this.gatehubUSDbutton.Clicked += (sender, e) => {
+				this.SetTrustLine (
+					new TrustLine () {
+						currency = "USD",
+						account = "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq",
+
+					}
+				);
+			};
+
+			this.gatehubBTCbutton.Clicked += (sender, e) => {
+				this.SetTrustLine (
+					new TrustLine () {
+						currency = "BTC",
+						account = "rchGBxcD1A1C2tdxF6papQYZ8kjRKMYcL",
+
+					}
+				);
+			};
+
+			this.gatehubEURbutton.Clicked += (sender, e) => {
+				this.SetTrustLine (
+					new TrustLine () {
+						currency = "EUR",
+						account = "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq",
+
+					}
+				);
+			};
+
+			this.gatehubETHbutton.Clicked += (sender, e) => {
+				this.SetTrustLine (
+					new TrustLine () {
+						currency = "ETH",
+						account = "rcA8X3TVMST1n3CJeAdGk1RdRCHii7N2h",
+
+					}
+				);
+			};
+
+			this.gatehubDASHbutton.Clicked += (sender, e) => {
+				this.SetTrustLine (
+					new TrustLine () {
+						currency = "DASH",
+						account = "rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX",
+
+					}
+				);
+			};
+
+			this.gatehubREPbutton.Clicked += (sender, e) => {
+				this.SetTrustLine (
+					new TrustLine () {
+						currency = "REP",
+						account = "rckzVpTnKpP4TJ1puQe827bV3X4oYtdTP",
+
+					}
+				);
+			};
+
 		}
 		#if DEBUG
 		private static readonly String clsstr = nameof (TrustSetter) + DebugRippleLibSharp.colon;

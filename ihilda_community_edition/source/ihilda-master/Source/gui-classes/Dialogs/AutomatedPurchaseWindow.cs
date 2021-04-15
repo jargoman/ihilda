@@ -47,18 +47,31 @@ namespace IhildaWallet
 					return;
 				}
 
-				RippleIdentifier rippleSeedAddress = rw.GetDecryptedSeed ();
-				while (rippleSeedAddress.GetHumanReadableIdentifier () == null) {
-					bool should = AreYouSure.AskQuestion (
+				PasswordAttempt passwordAttempt = new PasswordAttempt ();
+
+				passwordAttempt.InvalidPassEvent += (object s, EventArgs ev) => {
+					bool shou = AreYouSure.AskQuestionNonGuiThread (
 					"Invalid password",
 					"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
 					);
+				};
 
-					if (!should) {
-						return;
-					}
+				passwordAttempt.MaxPassEvent += (object s, EventArgs ev) => {
+					string mess = "Max password attempts";
 
-					rippleSeedAddress = rw.GetDecryptedSeed ();
+					MessageDialog.ShowMessage (mess);
+					//WriteToOurputScreen ("\n" + mess + "\n");
+				};
+
+
+				DecryptResponse dresponse = passwordAttempt.DoRequest (rw, token);
+
+
+
+				RippleIdentifier rippleSeedAddress = dresponse.Seed;
+
+				if (rippleSeedAddress.GetHumanReadableIdentifier () == null) {
+					return;
 				}
 
 

@@ -150,6 +150,7 @@ namespace IhildaWallet
 			this.buywidget1 = new global::IhildaWallet.BuyWidget();
 			this.buywidget1.Events = ((global::Gdk.EventMask)(256));
 			this.buywidget1.Name = "buywidget1";
+			this.buywidget1.AutomationWarning = false;
 			this.buynotebook.Add(this.buywidget1);
 			// Notebook tab
 			this.label29 = new global::Gtk.Label();
@@ -162,6 +163,7 @@ namespace IhildaWallet
 			this.cascadedbuywidget1 = new global::IhildaWallet.CascadedBuyWidget();
 			this.cascadedbuywidget1.Events = ((global::Gdk.EventMask)(256));
 			this.cascadedbuywidget1.Name = "cascadedbuywidget1";
+			this.cascadedbuywidget1.AutomationWarning = false;
 			this.buynotebook.Add(this.cascadedbuywidget1);
 			global::Gtk.Notebook.NotebookChild w9 = ((global::Gtk.Notebook.NotebookChild)(this.buynotebook[this.cascadedbuywidget1]));
 			w9.Position = 1;
@@ -176,6 +178,7 @@ namespace IhildaWallet
 			this.automatedbuywidget1 = new global::IhildaWallet.AutomatedBuyWidget();
 			this.automatedbuywidget1.Events = ((global::Gdk.EventMask)(256));
 			this.automatedbuywidget1.Name = "automatedbuywidget1";
+			this.automatedbuywidget1.AutomationWarning = false;
 			this.buynotebook.Add(this.automatedbuywidget1);
 			global::Gtk.Notebook.NotebookChild w10 = ((global::Gtk.Notebook.NotebookChild)(this.buynotebook[this.automatedbuywidget1]));
 			w10.Position = 2;
@@ -202,6 +205,7 @@ namespace IhildaWallet
 			this.sellwidget1 = new global::IhildaWallet.SellWidget();
 			this.sellwidget1.Events = ((global::Gdk.EventMask)(256));
 			this.sellwidget1.Name = "sellwidget1";
+			this.sellwidget1.AutomationWarning = false;
 			this.sellnotebook.Add(this.sellwidget1);
 			// Notebook tab
 			this.label75 = new global::Gtk.Label();
@@ -213,6 +217,7 @@ namespace IhildaWallet
 			this.cascadedsellwidget1 = new global::IhildaWallet.CascadedSellWidget();
 			this.cascadedsellwidget1.Events = ((global::Gdk.EventMask)(256));
 			this.cascadedsellwidget1.Name = "cascadedsellwidget1";
+			this.cascadedsellwidget1.AutomationWarning = false;
 			this.sellnotebook.Add(this.cascadedsellwidget1);
 			global::Gtk.Notebook.NotebookChild w13 = ((global::Gtk.Notebook.NotebookChild)(this.sellnotebook[this.cascadedsellwidget1]));
 			w13.Position = 1;
@@ -227,6 +232,7 @@ namespace IhildaWallet
 			this.automatedsellwidget1 = new global::IhildaWallet.AutomatedSellWidget();
 			this.automatedsellwidget1.Events = ((global::Gdk.EventMask)(256));
 			this.automatedsellwidget1.Name = "automatedsellwidget1";
+			this.automatedsellwidget1.AutomationWarning = false;
 			this.sellnotebook.Add(this.automatedsellwidget1);
 			global::Gtk.Notebook.NotebookChild w14 = ((global::Gtk.Notebook.NotebookChild)(this.sellnotebook[this.automatedsellwidget1]));
 			w14.Position = 2;
@@ -255,8 +261,8 @@ namespace IhildaWallet
 			{
 				this.Child.ShowAll();
 			}
-			this.DefaultWidth = 795;
-			this.DefaultHeight = 679;
+			this.DefaultWidth = 846;
+			this.DefaultHeight = 687;
 			this.Show();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler(this.OnDeleteEvent);
 		}

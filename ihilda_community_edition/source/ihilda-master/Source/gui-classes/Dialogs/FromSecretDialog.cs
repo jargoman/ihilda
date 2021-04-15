@@ -13,6 +13,8 @@ using RippleLibSharp.Commands.Accounts;
 using System.Threading.Tasks;
 using Ripple.Signing;
 
+using System.Threading;
+
 namespace IhildaWallet
 {
 
@@ -26,6 +28,8 @@ namespace IhildaWallet
 				Logging.WriteLog (clsstr + "new");
 			}
 #endif
+
+			this.NewOption = NewButtonDialog.NewOption.SECRET;
 
 			this.Build ();
 			this.Modal = true;
@@ -44,9 +48,47 @@ namespace IhildaWallet
 			}
 #endif
 
+			this.NewOption = NewButtonDialog.NewOption.SECRET;
+
 			this.Build ();
 
 			this.SetTitle (title);
+
+			Initialize ();
+		}
+
+		public FromSecretDialog (NewButtonDialog.NewOption newOption)
+		{
+
+#if DEBUG
+			if (DebugIhildaWallet.FromSecretDialog) {
+				Logging.WriteLog (clsstr + "new ( newOption = " + DebugIhildaWallet.ToAssertString (newOption) + " )");
+			}
+#endif
+
+			this.NewOption = newOption;
+
+			this.Build ();
+
+			Initialize ();
+
+
+	    		
+
+		}
+
+		public FromSecretDialog (string title, NewButtonDialog.NewOption newOption)
+		{
+#if DEBUG
+			if (DebugIhildaWallet.FromSecretDialog) {
+				Logging.WriteLog (clsstr + "new ( title=" + DebugIhildaWallet.ToAssertString (title) + ", newOption = " + DebugIhildaWallet.ToAssertString(newOption) + " )");
+			}
+#endif
+
+
+			this.NewOption = newOption;
+
+			this.Build ();
 
 			Initialize ();
 		}
@@ -65,9 +107,17 @@ namespace IhildaWallet
 		}
 
 
+		
+
 		public void Initialize ()
 		{
 
+			// this dialog can be repurposed to be a private key dialog. 
+			if (NewOption == NewButtonDialog.NewOption.PRIVATE) {
+
+				secretlabel.Text = "Private Key";
+
+			}
 
 
 			SetComboBox ();
@@ -77,6 +127,7 @@ namespace IhildaWallet
 				string rippleSigningKey = SeedFromHexDialog.DoDialog ();
 
 				if (rippleSigningKey == null) {
+					// TODO opportunity to communicate error to user
 					return;
 				}
 
@@ -85,6 +136,7 @@ namespace IhildaWallet
 			};
 
 
+			//
 			entry5.Changed += (object sender, EventArgs e) => {
 				entry5.ModifyBase (StateType.Normal);
 			};
@@ -100,6 +152,8 @@ namespace IhildaWallet
 				}
 #endif
 
+				TextHighlighter highlighter = new TextHighlighter ();
+
 				secretentry.ModifyBase (StateType.Normal);
 
 				string s = secretentry.Text;
@@ -109,14 +163,14 @@ namespace IhildaWallet
 
 
 				if (!s.StartsWith ("s") && !s.StartsWith ("p")) {
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					this.label2.Markup = TextHighlighter.Highlight ("Secrets start with 's'");
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					this.label2.Markup = highlighter.Highlight ("Secrets start with 's'");
 					return;
 				}
 
 				if (!Base58.IsBase58 (s)) {
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
-					this.label2.Markup = TextHighlighter.Highlight ("invalid Base58 address");
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					this.label2.Markup = highlighter.Highlight ("invalid Base58 address");
 					return;
 				}
 
@@ -124,13 +178,13 @@ namespace IhildaWallet
 					try {
 						RippleWallet rw = new RippleWallet (s, RippleWalletTypeEnum.Master);
 						string address = rw.GetStoredReceiveAddress ();
-						TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
-						this.label2.Markup = TextHighlighter.Highlight (address);
+						highlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
+						this.label2.Markup = highlighter.Highlight (address);
 
 					}
 
 #pragma warning disable 0168
-				catch (Exception ex) {
+					catch (Exception ex) {
 #pragma warning restore 0168
 
 #if DEBUG
@@ -139,16 +193,17 @@ namespace IhildaWallet
 						}
 #endif
 
-						TextHighlighter.Highlightcolor = TextHighlighter.RED;
-						this.label2.Markup = TextHighlighter.Highlight ("invalid ripple address");
+						highlighter.Highlightcolor = TextHighlighter.RED;
+						this.label2.Markup = highlighter.Highlight ("invalid ripple address");
 						return;
 					}
+
 				} else {
 					try {
 						RipplePrivateKey privateKey = new RipplePrivateKey (s);
 						string address = privateKey.GetPublicKey ().GetAddress ();
-						TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
-						this.label2.Markup = TextHighlighter.Highlight (address);
+						highlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
+						this.label2.Markup = highlighter.Highlight (address);
 
 					} catch (Exception ex) {
 
@@ -158,8 +213,8 @@ namespace IhildaWallet
 						}
 #endif
 
-						TextHighlighter.Highlightcolor = TextHighlighter.RED;
-						this.label2.Markup = TextHighlighter.Highlight ("invalid private key");
+						highlighter.Highlightcolor = TextHighlighter.RED;
+						this.label2.Markup = highlighter.Highlight ("invalid private key");
 						return;
 
 					}
@@ -261,6 +316,8 @@ namespace IhildaWallet
 			string address = null;
 			string address2 = null;
 
+			TextHighlighter highlighter = new TextHighlighter ();
+
 			try {
 				RippleSeedAddress seed = new RippleSeedAddress (secret);
 				RippleAddress add = seed.GetPublicRippleAddress ();
@@ -274,8 +331,8 @@ namespace IhildaWallet
 #endif
 
 				// It makes sense to print the libraries name to the user
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				label3.Markup = TextHighlighter.Highlight (nameof (RippleLibSharp) + " : Invalid seed");
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				label3.Markup = highlighter.Highlight (nameof (RippleLibSharp) + " : Invalid seed");
 				return;
 			}
 
@@ -293,21 +350,21 @@ namespace IhildaWallet
 				}
 #endif
 
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				label3.Markup = TextHighlighter.Highlight ("No response from rippled");
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				label3.Markup = highlighter.Highlight ("No response from rippled");
 				return;
 			}
 
 
 
 			if (!address.Equals (address2)) {
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				label3.Markup = TextHighlighter.Highlight ("Error. addresses do not match !!!");
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				label3.Markup = highlighter.Highlight ("Error. addresses do not match !!!");
 				return;
 			}
 
-			TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
-			label3.Markup = TextHighlighter.Highlight (address2);
+			highlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
+			label3.Markup = highlighter.Highlight (address2);
 		}
 
 
@@ -388,6 +445,15 @@ namespace IhildaWallet
 		}
 
 
+		public void SetPrivateKey (RipplePrivateKey privateKey)
+		{
+			if (privateKey == null) {
+				return;
+			}
+
+			secretentry.Text = privateKey.GetHumanReadableIdentifier ();
+		}
+
 		public void SetWallet (RippleWallet rippleWallet)
 		{
 #if DEBUG
@@ -433,21 +499,41 @@ namespace IhildaWallet
 			}
 			*/
 
-			RippleIdentifier seed = rippleWallet.GetDecryptedSeed ();
-			while (seed.GetHumanReadableIdentifier () == null) {
+			PasswordAttempt passwordAttempt = new PasswordAttempt ();
+
+			passwordAttempt.InvalidPassEvent += (object sender, EventArgs e) => {
+
 				bool should = AreYouSure.AskQuestion (
 				"Invalid password",
 				"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
 				);
+			};
 
-				if (!should) {
-					return;
-				}
+			passwordAttempt.MaxPassEvent += (object sender, EventArgs e) => {
 
-				seed = rippleWallet.GetDecryptedSeed ();
+				string mess = "Max password attempts";
+
+				MessageDialog.ShowMessage (mess);
+				//WriteToOurputScreen ("\n" + mess + "\n");
+			};
+
+			// todo, cancel on window close
+			DecryptResponse decryptResponse = 
+				passwordAttempt.DoRequest (
+					rippleWallet, 
+					new System.Threading.CancellationTokenSource().Token);
+
+
+			RippleIdentifier seed = decryptResponse?.Seed;
+			if (seed?.GetHumanReadableIdentifier () == null) {
+
+
+
+				return;
 			}
 
 
+			
 
 			this.secretentry.Text = seed.ToString ();
 
@@ -948,6 +1034,8 @@ namespace IhildaWallet
 			this.label8.UseMarkup = true;
 		}
 
+
+		private NewButtonDialog.NewOption NewOption { get; set; }
 
 #if DEBUG
 		private static readonly String clsstr = nameof (FromSecretDialog) + DebugRippleLibSharp.colon;

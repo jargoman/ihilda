@@ -126,6 +126,9 @@ namespace IhildaWallet
 
 			orderSubmitter.OnVerifyingTxReturn += (object sender, VerifyEventArgs e) => {
 				StringBuilder stringBuilder = new StringBuilder ();
+				TextHighlighter highlighter = new TextHighlighter ();
+
+
 				string messg = null;
 				if (e.Success) {
 					stringBuilder.Append ("Transaction ");
@@ -133,7 +136,7 @@ namespace IhildaWallet
 					stringBuilder.Append (" Verified");
 
 
-					TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
+					highlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
 
 
 
@@ -142,13 +145,13 @@ namespace IhildaWallet
 					stringBuilder.Append ("Failed to validate transaction ");
 					stringBuilder.Append ((string)(e?.RippleOfferTransaction?.hash ?? ""));
 
-					TextHighlighter.Highlightcolor = TextHighlighter.RED;
+					highlighter.Highlightcolor = TextHighlighter.RED;
 
 				}
 
 				stringBuilder.AppendLine ();
 
-				messg = TextHighlighter.Highlight (stringBuilder);
+				messg = highlighter.Highlight (stringBuilder);
 
 				Logging.WriteLog (messg);
 			};
@@ -174,22 +177,35 @@ namespace IhildaWallet
 				Environment.Exit (-1);
 			}
 
-			RippleIdentifier rippleSeedAddress = rippleWallet.GetDecryptedSeed ();
+			PasswordAttempt passwordAttempt = new PasswordAttempt ();
 
-			while (rippleSeedAddress.GetHumanReadableIdentifier () == null) {
+			passwordAttempt.InvalidPassEvent += (object sender, EventArgs e) => {
 
 				Logging.WriteLog ("Unable to decrypt seed. Invalid password.\nWould you like to try again?");
+			};
+
+			passwordAttempt.MaxPassEvent += (object sender, EventArgs e) => {
+
+				Logging.WriteLog ("Max password attempts reached\n");
+			};
+
+			DecryptResponse decryptResponse = passwordAttempt.DoRequest (rippleWallet, token);
 
 
-				// TODO get user input
 
-				rippleSeedAddress = rippleWallet.GetDecryptedSeed ();
-			}
+			RippleIdentifier rippleSeedAddress = decryptResponse.Seed;
 
 
-			if (rippleSeedAddress == null) {
+
+			if (rippleSeedAddress?.GetHumanReadableIdentifier () == null) {
+
 				Environment.Exit (-1);
+				//return;
 			}
+	    		
+	    		
+
+			
 			bool success = false;
 
 			// Keeps track of where the next start ledger will be
@@ -221,7 +237,7 @@ namespace IhildaWallet
 
 
 				Logging.WriteLog (
-					"Polling data for "
+					"\nPolling data for "
 					+ (string)(rippleWallet?.GetStoredReceiveAddress () ?? "null")
 					+ "\n");
 

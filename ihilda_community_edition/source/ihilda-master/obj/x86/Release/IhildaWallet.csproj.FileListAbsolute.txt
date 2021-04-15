@@ -61,3 +61,9 @@
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/x86/Release/IhildaWallet.csproj.CoreCompileInputs.cache
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/x86/Release/IhildaWallet.csproj.CopyComplete
 /home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/obj/x86/Release/ihilda.exe
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Release/System.Runtime.InteropServices.RuntimeInformation.dll
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Release/NBitcoin.dll
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Release/Microsoft.Extensions.Logging.Abstractions.dll
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Release/riplibsharp.pdb
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Release/NBitcoin.xml
+/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/bin/Release/Microsoft.Extensions.Logging.Abstractions.xml

@@ -41,12 +41,20 @@ namespace IhildaWallet
 
 			string key = tp.DetermineKey ();
 
+			if (pairs.ContainsKey(key)) {
+				return;
+			}
+	    		
 			pairs.Add (key, tp);
 		}
 
 		public void RemoveTradePair (TradePair tp)
 		{
 			string key = tp.DetermineKey ();
+
+			if (!pairs.ContainsKey(key)) {
+				return;
+			}
 
 			pairs.Remove (key);
 

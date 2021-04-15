@@ -64,7 +64,7 @@ namespace IhildaWallet
 				if (DebugIhildaWallet.OpenOrdersTree) {
 					Logging.WriteLog ("ButtonReleaseEvent at x=" + args.Event.X.ToString () + " y=" + args.Event.Y.ToString ());
 				}
-				
+
 #endif
 
 				int x = Convert.ToInt32 (args.Event.X);
@@ -104,8 +104,10 @@ namespace IhildaWallet
 			if (message == null)
 				message = "";
 
-			TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
-			string s = TextHighlighter.Highlight (/*"Success : " + */message);
+			TextHighlighter highlighter = new TextHighlighter {
+				Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN
+			};
+			string s = highlighter.Highlight (/*"Success : " + */message);
 
 			Application.Invoke ((object sender, EventArgs e) => {
 				if (listStore.GetIterFromString (out TreeIter iter, path)) {
@@ -117,9 +119,10 @@ namespace IhildaWallet
 
 		public void SetFailed (string path, string message)
 		{
+			TextHighlighter highlighter = new TextHighlighter ();
 
-			TextHighlighter.Highlightcolor = TextHighlighter.RED;
-			string s = TextHighlighter.Highlight (message ?? "failed");
+			highlighter.Highlightcolor = TextHighlighter.RED;
+			string s = highlighter.Highlight (message ?? "failed");
 
 			Gtk.Application.Invoke ((object sender, EventArgs e) => {
 				if (listStore.GetIterFromString (out TreeIter iter, path)) {
@@ -142,28 +145,56 @@ namespace IhildaWallet
 			cancel.Activated += (object sender, EventArgs e) => {
 #if DEBUG
 				if (DebugIhildaWallet.OpenOrdersTree) {
-					Logging.WriteLog ("Cancel Selected");
+					Logging.WriteLog ("Cancel order " + ao.index + " selected");
 				}
 #endif
 				Task.Run (
 					delegate {
-						NetworkInterface networkInterface = NetworkController.GetNetworkInterfaceNonGUIThread ();
-						// TODO possibly use real token
-						uint se = Convert.ToUInt32 (AccountInfo.GetSequence (ao.Account, networkInterface, new CancellationToken ()));
+						tokenSource = _parent.InitTokenSource ();
 
-						RippleIdentifier rippleSeedAddress = _rippleWallet.GetDecryptedSeed ();
-						while (rippleSeedAddress.GetHumanReadableIdentifier () == null) {
-							bool should = AreYouSure.AskQuestion (
+						_parent.SetInfoBar ( ao.index + ": Cancel order selected");
+
+						NetworkInterface networkInterface = NetworkController.GetNetworkInterfaceNonGUIThread ();
+						if (networkInterface == null || !networkInterface.IsConnected()) {
+							_parent.SetInfoBar (ao.index + ": Unable to cancel order. No network connectivity");
+						}
+
+
+
+						PasswordAttempt passwordAttempt = new PasswordAttempt ();
+
+						passwordAttempt.InvalidPassEvent += (object s, EventArgs ev) =>
+						{
+							bool shou = AreYouSure.AskQuestionNonGuiThread (
 							"Invalid password",
 							"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
 							);
+						};
 
-							if (!should) {
-								return;
-							}
+						passwordAttempt.MaxPassEvent += (object s, EventArgs ev) =>
+						{
+							string mess = "Max password attempts";
 
-							rippleSeedAddress = _rippleWallet.GetDecryptedSeed ();
+							MessageDialog.ShowMessage (mess);
+							//WriteToOurputScreen ("\n" + mess + "\n");
+						};
+
+
+						// TODO token
+						DecryptResponse response = passwordAttempt.DoRequest (_rippleWallet, new CancellationTokenSource().Token);
+
+
+
+
+						RippleIdentifier rippleSeedAddress = response.Seed;
+						if (rippleSeedAddress.GetHumanReadableIdentifier () == null) {
+
+							return;
+
 						}
+
+						_parent.SetInfoBar (ao.index + ": Getting account sequence");
+						uint se = Convert.ToUInt32 (AccountInfo.GetSequence (ao.Account, networkInterface, tokenSource.Token));
 
 
 						//bool b = CancelOrderAtIndex ( _rippleWallet.GetStoredReceiveAddress(), se, networkInterface, rippleSeedAddress );
@@ -302,12 +333,18 @@ namespace IhildaWallet
 				} else if (rsa is RipplePrivateKey privateKey) {
 					signingAccount = privateKey.GetPublicKey ().GetAddress ();
 				} else {
-					throw new NotSupportedException ("Signing key type not supported\n");
+
+					string message = "Signing key type not supported";
+					_parent.SetInfoBar (off.index + ": " + message);
+					throw new NotSupportedException (message + "/n");
 				}
 				//rsa?.GetPublicRippleAddress ()?.ToString ();
 
 				if (signingAccount == null) {
-					MessageDialog.ShowMessage ("Invalid Seed", "Invalid signing address");
+					string message = "Invalid signing address";
+					MessageDialog.ShowMessage ("Invalid Seed", message);
+
+					_parent.SetInfoBar (off.index + ": " + message);
 					return false;
 				}
 
@@ -331,9 +368,9 @@ namespace IhildaWallet
 					this.SetIsSubmitted (
 
 						index.ToString (),
-						 
-						"Fee " 
-						+ (string)(e?.FeeAndLastLedger?.Fee.ToString () ?? "null") 
+
+						"Fee "
+						+ (string)(e?.FeeAndLastLedger?.Fee.ToString () ?? "null")
 						+ " is too high, waiting on lower fee");
 				};
 
@@ -385,8 +422,13 @@ namespace IhildaWallet
 
 				tx.LastLedgerSequence = (UInt32)tupe.LastLedger + lls;
 
-				if (tx.fee.amount == 0 || tx.Sequence == 0) {
-					this.SetFailed (index.ToString (), "Invalid Fee or Sequence");
+				if (tx.fee.amount == 0) {
+					this.SetFailed (index.ToString (), "Invalid Fee zero");
+					throw new Exception ();
+				}
+
+				if (tx.Sequence == 0) {
+					this.SetFailed (index.ToString (), "Invalid Sequence zero");
 					throw new Exception ();
 				}
 
@@ -402,7 +444,7 @@ namespace IhildaWallet
 					break;
 				case "RippleLibSharp":
 					this.SetIsSubmitted (index.ToString (), "Signing using RippleLibSharp");
-					tx.Sign (rsa);
+					tx.SignRippleLibSharp (rsa);
 					this.SetIsSubmitted (index.ToString (), "Signed RippleLibSharp");
 					break;
 				case "RippleDotNet":
@@ -616,7 +658,9 @@ namespace IhildaWallet
 
 					AutomatedOrder order = new AutomatedOrder (offer) {
 						Selected = offer.Selected,
-						Succeeded = offer.Succeeded
+						Succeeded = offer.Succeeded,
+						// user viewable index is one greater than array index
+						index = (index + 1).ToString()
 					};
 
 					Decimal price = order.TakerGets.GetNativeAdjustedPriceAt (order.TakerPays);
@@ -628,27 +672,49 @@ namespace IhildaWallet
 					StringBuilder paysbuilder = new StringBuilder ();
 					StringBuilder getsbuilder = new StringBuilder ();
 
-					paysbuilder.Append (order?.TakerPays?.currency ?? "null currency");
-					paysbuilder.Append (" ");
-					paysbuilder.AppendLine (order?.TakerPays?.amount.ToString() ?? "null amount");
 
-					if (order?.taker_pays?.issuer != null) {
-						paysbuilder.Append (order?.taker_pays?.issuer);
+
+
+					if (order.TakerPays != null) {
+
+						paysbuilder.Append (order?.TakerPays?.currency ?? "null currency");
+						paysbuilder.Append (" ");
+
+						if (order.TakerPays.IsNative) {
+							paysbuilder.AppendLine ((order?.TakerPays.amount / 1000000).ToString ());
+						} else {
+							paysbuilder.AppendLine (order?.TakerPays.amount.ToString ());
+						}
+
+						if (order?.taker_pays.issuer != null) {
+							paysbuilder.Append (order?.taker_pays?.issuer);
+						}
+					} else {
+						paysbuilder.Append ("taker pays is null");
 					}
 
-					getsbuilder.Append (order?.TakerGets?.currency ?? "null currency");
-					getsbuilder.Append (" ");
-					getsbuilder.AppendLine (order.taker_gets.amount.ToString() ?? "");
+					if (order.TakerGets != null) {
+						getsbuilder.Append (order?.TakerGets?.currency ?? "null currency");
+						getsbuilder.Append (" ");
 
-					if (order?.TakerGets?.issuer != null) {
-						getsbuilder.Append (order?.taker_gets.issuer);
+						if (order.TakerGets.IsNative) {
+							getsbuilder.AppendLine ((order.taker_gets.amount / 1000000).ToString ());
+						} else {
+							getsbuilder.AppendLine (order.taker_gets.amount.ToString ());
+						}
+						if (order?.TakerGets?.issuer != null) {
+							getsbuilder.Append (order?.taker_gets.issuer);
+						}
+					} else {
+
+						getsbuilder.Append ("taker gets is null");
 					}
 
 					listStore.AppendValues (
 						(index).ToString (),
 						order.Selected,
-						paysbuilder.ToString(),
-						getsbuilder.ToString(),
+						paysbuilder.ToString (),
+						getsbuilder.ToString (),
 						price.ToString (),
 						cost.ToString (),
 						order.BotMarking ?? "",
@@ -717,7 +783,7 @@ namespace IhildaWallet
 		private void ItemToggled (object sender, ToggledArgs args)
 		{
 
-			string s = args.Path;
+			//string s = args.Path;
 			int index = Convert.ToInt32 (args.Path);
 
 			if (listStore.GetIterFromString (out TreeIter iter, args.Path)) {
@@ -744,6 +810,13 @@ namespace IhildaWallet
 		{
 			this._rippleWallet = rippleWallet;
 		}
+
+		public void SetParent (OrdersTreeWidget parent)
+		{
+			this._parent = parent;
+		}
+
+		private OrdersTreeWidget _parent;
 
 		private RippleWallet _rippleWallet {
 			get { return _wallet; }

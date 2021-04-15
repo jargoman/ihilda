@@ -55,82 +55,32 @@ namespace IhildaWallet
 			this.receiveamountentry.Activated += this.OnReceiveAmountEntryActivated;
 
 			this.sendbutton.Clicked += this.OnSendButtonClicked;
-			this.addmemobutton.Clicked += (object sender, EventArgs e) => {
-
-				SelectableMemoIndice createdMemo = null;
-				using (MemoCreateDialog memoCreateDialog = new MemoCreateDialog ()) {
-					try {
-						ResponseType resp = (ResponseType)memoCreateDialog.Run ();
 
 
-						if (resp != ResponseType.Ok) {
 
-							return;
-						}
-						createdMemo = memoCreateDialog.GetMemoIndice ();
-						this.AddMemo (createdMemo);
-					} catch (Exception ee) {
-						throw ee;
-					} finally {
-						memoCreateDialog?.Destroy ();
+			Task.Factory.StartNew (() => {
+				var token = TokenSource.Token;
+				while (!token.IsCancellationRequested) {
+					if (TokenSource == null) {
+						return;
 					}
-				}
 
-
-				Task.Factory.StartNew (() => {
-					var token = TokenSource.Token;
-					while (!token.IsCancellationRequested) {
-						if (TokenSource == null) {
-							return;
-						}
-
-						for (int i = 0; i < 5; i++) {
-							WaitHandle.WaitAny (
-								new WaitHandle [] {
+					for (int i = 0; i < 5; i++) {
+						WaitHandle.WaitAny (
+							new WaitHandle [] {
 								LedgerTracker.LedgerResetEvent,
 								token.WaitHandle
-								},
-								6000
-							    );
-						}
-						UpdateCurrencies ();
-						//await Task.Delay (30000, token);
-						
+							},
+							6000
+						    );
 					}
+					UpdateCurrencies ();
+					//await Task.Delay (30000, token);
+
 				}
-			);
-
-			};
-
-			clearmemobutton.Clicked += (object sender, EventArgs e) => {
-				ListStore.Clear ();
-
-				Memos = null;
-
-			};
-
-			CellRendererToggle rendererToggle = new CellRendererToggle () {
-				Activatable = true
-			};
-
-			CellRendererText cellRendererText = new CellRendererText ();
-
-			treeview1.AppendColumn ("Enabled", rendererToggle, "active", 0);
-			treeview1.AppendColumn ("MemoType", cellRendererText, "text", 1);
-			treeview1.AppendColumn ("MemoFormat", cellRendererText, "text", 2);
-			treeview1.AppendColumn ("MemoData", cellRendererText, "text", 3);
-
-			ListStore = new ListStore (
-					typeof (bool),
-					typeof (string),
-		    			typeof (string),
-					typeof (string)
-				);
+			});
 
 
-			var memo = Program.GetClientMemo ();
-			this.AddMemo (memo);
-			//currentInstance = this;
 
 			button114.Clicked += PercentageClicked;
 			button115.Clicked += PercentageClicked;
@@ -274,10 +224,7 @@ namespace IhildaWallet
 
 		}
 
-		Gtk.ListStore ListStore {
-			get;
-			set;
-		}
+
 
 		~SendAndConvert ()
 		{
@@ -452,40 +399,9 @@ namespace IhildaWallet
 		}
 
 
-		public void AddMemo (SelectableMemoIndice indice)
-		{
-			List<SelectableMemoIndice> memoIndices = Memos?.ToList () ?? new List<SelectableMemoIndice> ();
-			indice.IsSelected = true;
-			memoIndices.Add (indice);
-
-			SetMemos (memoIndices);
-
-		}
 
 
 
-		public void SetMemos (IEnumerable<SelectableMemoIndice> Memos)
-		{
-			Gtk.Application.Invoke (
-				delegate {
-					ListStore.Clear ();
-
-					foreach (SelectableMemoIndice memoIndice in Memos) {
-						ListStore.AppendValues (
-							memoIndice.IsSelected,
-							memoIndice?.GetMemoTypeAscii (),
-							memoIndice?.GetMemoFormatAscii (),
-							memoIndice?.GetMemoDataAscii ()
-						);
-					}
-
-					this.Memos = Memos;
-					this.treeview1.Model = ListStore;
-
-				}
-			);
-
-		}
 
 
 		protected void OnComboboxentryChanged (object sender, EventArgs e)

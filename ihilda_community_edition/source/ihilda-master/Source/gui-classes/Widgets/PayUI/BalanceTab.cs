@@ -422,6 +422,7 @@ namespace IhildaWallet
 				}
 #endif
 
+				TextHighlighter highlighter = new TextHighlighter ();
 
 				ListStoreObj?.Clear ();
 
@@ -439,29 +440,29 @@ namespace IhildaWallet
 					string ba = c.amount.ToString ();
 					string lim = c.SelfLimit;
 
-					TextHighlighter.Highlightcolor = "\"grey\"";
-					lim = TextHighlighter.Highlight (lim + " limit");
+					highlighter.Highlightcolor = "\"grey\"";
+					lim = highlighter.Highlight (lim + " limit");
 
 					if (c.amount == decimal.Zero) {
-						TextHighlighter.Highlightcolor = "\"grey\"";
-						cu = TextHighlighter.Highlight (cu);
-						iss = TextHighlighter.Highlight (iss);
-						ba = TextHighlighter.Highlight (ba);
+						highlighter.Highlightcolor = "\"grey\"";
+						cu = highlighter.Highlight (cu);
+						iss = highlighter.Highlight (iss);
+						ba = highlighter.Highlight (ba);
 
 						zerovalues.Add (new Tuple<string, string, string> (cu, iss, "<b>" + ba + "</b>" + "\n" + lim ));
 					} else if (c.amount < decimal.Zero) {
-						TextHighlighter.Highlightcolor = "\"red\"";
+						highlighter.Highlightcolor = "\"red\"";
 						//cu = TextHighlighter.Highlight (cu);
 						//iss = TextHighlighter.Highlight (iss);
-						ba = TextHighlighter.Highlight (ba);
+						ba = highlighter.Highlight (ba);
 
 						values.Add (new Tuple<string, string, string> (cu, iss, "<b>" + ba + "</b>" + "\n" + lim ));
 					} else {
 
-						TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? "\"chartreuse\"" : "\"green\"";
+						highlighter.Highlightcolor = ProgramVariables.darkmode ? "\"chartreuse\"" : "\"green\"";
 						//cu = TextHighlighter.Highlight (cu);
 						//iss = TextHighlighter.Highlight (iss);
-						ba = TextHighlighter.Highlight (ba);
+						ba = highlighter.Highlight (ba);
 
 						values.Add (new Tuple<string, string, string> (cu, iss, "<b>" + ba + "</b>" + "\n" + lim ));
 					}

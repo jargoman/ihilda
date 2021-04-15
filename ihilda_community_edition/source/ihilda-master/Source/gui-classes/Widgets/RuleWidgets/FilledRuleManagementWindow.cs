@@ -10,6 +10,7 @@ using Codeplex.Data;
 using Gtk;
 using IhildaWallet.Networking;
 using IhildaWallet.Util;
+using RippleLibSharp.Commands.Accounts;
 using RippleLibSharp.Commands.Subscriptions;
 using RippleLibSharp.Keys;
 using RippleLibSharp.Network;
@@ -47,22 +48,59 @@ namespace IhildaWallet
 				ledgerconstraintswidget1.Show ();
 			}
 
+
 			ledgerconstraintswidget1.HideForward ();
 
 			//_rippleWallet = rw;
 
 			this.label6.UseMarkup = true;
 
+			// Set the "force wake" button to wake up the bot by cancelling the sleep thread
+			forcewakebutton.Clicked += (object sender, EventArgs e) => {
 
+
+
+				if (WakeTokenSource != null) {
+					WakeTokenSource?.Cancel ();
+
+					string mes = "Wake requested";
+					WriteToInfoBox (mes);
+
+					WriteToOurputScreen (mes + "\n");
+
+				} else {
+
+					string mes = "No thread to wake";
+					WriteToInfoBox (mes);
+
+					WriteToOurputScreen (mes + "\n");
+
+
+				}
+
+
+
+
+			};
+
+
+			// set the built in wallet widget and set an event to allow it to switch wallets 
+			walletswitchwidget1.SetRippleWallet (rw);
 			walletswitchwidget1.WalletChangedEvent += (object source, WalletChangedEventArgs eventArgs) => {
 
 				RippleWallet rippleWallet = eventArgs.GetRippleWallet ();
 				this.SetRippleWallet (rippleWallet);
+
+				string message = "Wallet changed to " + rippleWallet.GetStoredReceiveAddress ();
+
+				WriteToInfoBox (message);
+				WriteToOurputScreen (message + "\n");
 			};
 
 
-			walletswitchwidget1.SetRippleWallet (rw);
 
+
+			// ListStore used for the rules treeview
 			this.RuleListStore =
 				new Gtk.ListStore (
 								   typeof (bool), // active
@@ -76,6 +114,7 @@ namespace IhildaWallet
 								   typeof (string), // exponential get more
 								   typeof (string)); // speculate
 
+			// ListStore used for the sentiment treeview
 			this.SentimentStore = new Gtk.ListStore (typeof (string), typeof (string));
 
 			//TextHighlighter.Highlightcolor = TextHighlighter.GREEN;
@@ -83,46 +122,60 @@ namespace IhildaWallet
 			//label1.Markup = "Rules for " + coloredAdd;
 
 
-			CellRendererToggle toggleCell = new CellRendererToggle {
+			// reusable toggle cell for the rule treeview
+			CellRendererToggle ruleToggleCell = new CellRendererToggle {
 				Radio = false
 			};
 
-			forcewakebutton.Clicked += (object sender, EventArgs e) => {
-				WakeTokenSource?.Cancel ();
-			};
 
 
-			toggleCell.Toggled += (object o, ToggledArgs args) => {
 
+			// Tell the toggle cell how to toggle itself
+			ruleToggleCell.Toggled += (object o, ToggledArgs args) => {
 
+				// Without a rule store nothing can be done
 				if (RuleListStore == null) {
+					// TODO error scenerio
+
 					return;
 				}
 
-
+				// Get path if clicked toggle cell
 				TreePath path = new TreePath (args.Path);
 
-
+				/*
 				if (!RuleListStore.GetIter (out TreeIter iter, path)) {
 					return;
 				}
+				*/
 
+				// get toggle cell index
 				int index = path.Indices [0];
 
+				// retrieve rule from list of rules
 				OrderFilledRule ofr = this.RuleManagerObj.RulesList.ElementAt (index);
-				if (ofr == null) {
 
+				// If rule not found, return
+				if (ofr == null) {
+					// TODO error scenerio
 					return;
 				}
 
 
+				// toggle the rule in the list
 				ofr.IsActive = !ofr.IsActive;
-				toggleCell.Active = ofr.IsActive;
+
+				// toggle the cell. 
+				// I think this is wrong
+				//ruleToggleCell.Active = ofr.IsActive;
 				//Task.Run ((System.Action)this.RuleManagerObj.SaveRules);
 
 				Task.Run (
 					delegate {
+						// save rules to disk
 						this.RuleManagerObj.SaveRules ();
+
+
 						SetRules (this.RuleManagerObj.RulesList);
 					}
 				);
@@ -146,6 +199,8 @@ namespace IhildaWallet
 			cellRendererCombo.Edited += (object o, EditedArgs args) => {
 				//args.NewText;
 
+				TextHighlighter highlighter = new TextHighlighter ();
+
 				Sentiment sentiment = GetSelectedSentiment ();
 
 
@@ -157,6 +212,45 @@ namespace IhildaWallet
 				this.SentimentManagerObject.SaveSentiments ();
 				SetSentiments (this.SentimentManagerObject.SentimentList);
 
+				StringBuilder stringBuilder = new StringBuilder ();
+
+				stringBuilder.Append (sentiment.Match);
+				stringBuilder.Append (" sentiment set to ");
+
+				/*
+				switch (sentiment.GetEnum()) {
+
+				case SentimentRatingEnum.Trash:
+					highlighter.Highlightcolor = TextHighlighter.RED;
+					break;
+
+				case SentimentRatingEnum.Very_Bearish:
+				case SentimentRatingEnum.Bearish:
+					highlighter.Highlightcolor = TextHighlighter.LIGHT_RED;
+					break;
+
+				case SentimentRatingEnum.Neutral:
+					break;
+
+				case SentimentRatingEnum.Bullish:
+				case SentimentRatingEnum.Very_Bullish:
+					highlighter.Highlightcolor = TextHighlighter.GREEN;
+					break;
+
+				case SentimentRatingEnum.Mooning:
+					highlighter.Highlightcolor = TextHighlighter.PURPLE;
+					break;
+
+				}
+				*/
+
+				WriteToInfoBox (stringBuilder.ToString () + sentiment.GetMarkupString ());
+
+				stringBuilder.Append (sentiment.Rating);
+				stringBuilder.AppendLine ();
+
+				WriteToOurputScreen (stringBuilder.ToString ());
+
 			};
 
 			cellRendererCombo.Model = comboModel;
@@ -166,7 +260,7 @@ namespace IhildaWallet
 			//cellRendererCombo.Mode = CellRendererMode.Editable;
 			//cellRendererCombo.Sensitive = true;
 
-			this.treeview1.AppendColumn ("Active", toggleCell, "active", 0);
+			this.treeview1.AppendColumn ("Active", ruleToggleCell, "active", 0);
 			this.treeview1.AppendColumn ("Bought", cellRendererText, "text", 1);
 			this.treeview1.AppendColumn ("Sold", cellRendererText, "text", 2);
 			this.treeview1.AppendColumn ("Marking", cellRendererText, "markup", 3);
@@ -197,6 +291,8 @@ namespace IhildaWallet
 				OrderFilledRule rule = RuleCreateDialog.DoDialog (wallet);
 
 				if (rule == null) {
+					// TODO
+					//
 					return;
 				}
 
@@ -267,7 +363,7 @@ namespace IhildaWallet
 				if (this.tokenSource != null) {
 
 					string srmessage = "A rule script is already running\n";
-					WriteToInfoBox (srmessage);
+					WriteToOurputScreen (srmessage);
 					this.SetIsRunningUI (false);
 
 #if DEBUG
@@ -280,7 +376,7 @@ namespace IhildaWallet
 					return;
 				}
 
-				
+
 
 
 				StopWhenConvenient = false;
@@ -292,18 +388,35 @@ namespace IhildaWallet
 			};
 
 			canselbutton.Clicked += (object sender, EventArgs e) => {
+
+
+				StringBuilder stringBuilder = new StringBuilder ();
+
+
 				if (tokenSource == null) {
-					MessageDialog.ShowMessage ("Thread has already been stopped\n");
+
+					stringBuilder.Append ("Thread has already been stopped");
+
+					WriteToInfoBox (stringBuilder.ToString ());
+
+					stringBuilder.AppendLine ();
+
+					WriteToOurputScreen (stringBuilder.ToString ());
+
 					return;
 				}
+
+
 				if (tokenSource.auto) {
-					StringBuilder stringBuilder = new StringBuilder ();
+
 
 					if (!ProgramVariables.darkmode) {
 						stringBuilder.Append ("<span fgcolor=\"red\">");
 					} else {
 						stringBuilder.Append ("<span fgcolor=\"orchid\">");
 					}
+
+
 					stringBuilder.Append ("Warning :  ");
 					stringBuilder.AppendLine ("Forcing automation to stop abruptly may cause automation to lose track of progress.");
 					stringBuilder.AppendLine ("It's better to use the \"Stop When Convenient\" checkbox");
@@ -311,20 +424,53 @@ namespace IhildaWallet
 
 
 					bool should = AreYouSure.AskQuestion ("Cancel", stringBuilder.ToString ());
-					
+
+					stringBuilder.Clear ();
+
 					if (!should) {
+
+						stringBuilder.Append ("Cancellation haulted");
+
+						WriteToInfoBox (stringBuilder.ToString ());
+
+						stringBuilder.AppendLine ();
+
+						WriteToOurputScreen (stringBuilder.ToString ());
+
 						return;
 					}
 				}
 
+
+				stringBuilder.Clear ();
+
+				stringBuilder.Append ("Cancelling automation");
+
+				WriteToInfoBox (stringBuilder.ToString ());
+
+				stringBuilder.AppendLine ();
+
+				WriteToOurputScreen (stringBuilder.ToString ());
 
 				tokenSource?.Cancel ();
 				tokenSource = null;
 			};
 
 			this.button1.Clicked += (object sender, EventArgs e) => {
+
+				StringBuilder stringBuilder = new StringBuilder ();
+
 				if (tokenSource != null) {
-					MessageDialog.ShowMessage ("A thread is currently running\n");
+
+					stringBuilder.Append ("Another thread is currently running already");
+
+					WriteToInfoBox (stringBuilder.ToString ());
+
+					stringBuilder.AppendLine ();
+
+					WriteToOurputScreen (stringBuilder.ToString ());
+
+					//MessageDialog.ShowMessage ();
 					return;
 				}
 
@@ -334,14 +480,31 @@ namespace IhildaWallet
 
 				CancellationToken token = tokenSource.Token;
 
-				WriteToInfoBox ("Syncing Orders Cache.... \n");
+
+				// UI text
+				{
+					stringBuilder.Append ("Syncing Orders Cache.... ");
+					WriteToInfoBox (stringBuilder.ToString ());
+
+					stringBuilder.AppendLine ();
+					WriteToOurputScreen (stringBuilder.ToString ());
+
+					stringBuilder.Clear ();
+				}
+
 				WalletSwitchWidget walletSwitchWidget = this.walletswitchwidget1;
 
 				//progressbar1.Pulse ();
 
 				RippleWallet wallet = walletSwitchWidget?.GetRippleWallet ();
 				if (wallet == null) {
-					MessageDialog.ShowMessage ("No wallet selected\n");
+					stringBuilder.Append ("No wallet selected");
+					WriteToInfoBox (stringBuilder.ToString ());
+
+					stringBuilder.AppendLine ();
+
+					WriteToOurputScreen (stringBuilder.ToString ());
+
 					return;
 				}
 
@@ -368,44 +531,48 @@ namespace IhildaWallet
 
 						AccountSequenceCache accountSequnceCache = AccountSequenceCache.GetCacheForAccount (this.walletswitchwidget1.GetRippleWallet ().GetStoredReceiveAddress ());
 
-						Application.Invoke (delegate {
-							progressbar1.Pulse ();
 
-						});
+
+						DoPumpUI ();
 
 
 						accountSequnceCache.OnOrderCacheEvent += (object sen, OrderCachedEventArgs ocev) => {
 
-							Application.Invoke (delegate {
-								progressbar1.Pulse ();
 
-							});
+
+							DoPumpUI ();
 
 							if (ocev.UIpump) {
 								return;
 							}
 
-							TextHighlighter.Highlightcolor =
+							TextHighlighter highlighter = new TextHighlighter {
+								Highlightcolor =
 								ocev.GetSuccess ?
 								(ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN) :
-								TextHighlighter.RED;
+								TextHighlighter.RED
+							};
 
-							string message = TextHighlighter.Highlight (ocev.Message);
+							string message = highlighter.Highlight (ocev.Message);
+
 							WriteToInfoBox (message);
+
+							WriteToOurputScreen (message);
 
 						};
 
 
 
-						accountSequnceCache.SyncOrdersCache ( token);
-						Application.Invoke (delegate {
-							progressbar1.Pulse ();
+						accountSequnceCache.SyncOrdersCache (token);
+						DoPumpUI ();
 
-						});
+						string m = "Finished Syncing orders cache \n";
+						WriteToInfoBox (m);
 
-						WriteToInfoBox ("Finished Syncing orders cache \n");
+						WriteToOurputScreen (m + "\n");
+
 					} catch (Exception ex) {
-						this.WriteToInfoBox (ex.Message);
+						this.WriteToOurputScreen (ex.Message);
 					} finally {
 						this.tokenSource = null;
 						this.SetIsRunningUI (false);
@@ -419,9 +586,12 @@ namespace IhildaWallet
 							button1.Visible = true;
 						});
 
-						string message = "Automation thread has stopped\n";
+						string message = "Automation thread has stopped";
 						//MessageDialog.ShowMessage ("Automation stopped", message);
+
 						WriteToInfoBox (message);
+
+						WriteToOurputScreen (message + "\n");
 					}
 					/*
 					Gtk.Application.Invoke (
@@ -445,9 +615,14 @@ namespace IhildaWallet
 
 				string account = this.walletswitchwidget1?.GetRippleWallet ()?.GetStoredReceiveAddress ();
 				if (account == null) {
+
+					string m = "No account has been selected for cache deletion";
+
+					WriteToInfoBox (m);
+
 					MessageDialog.ShowMessage (
 						"Select an account",
-						"No account has been selected for cache deletion"
+						m
 					);
 					return;
 				}
@@ -460,6 +635,8 @@ namespace IhildaWallet
 				if (!sure) {
 					return;
 				}
+
+
 				AccountSequenceCache.DeleteSettingsFile (account);
 			};
 
@@ -569,7 +746,7 @@ namespace IhildaWallet
 
 			this.DeleteEvent += OnDeleteEvent;
 
-			
+
 			this.delAllButton.Clicked += (object sender, EventArgs e) => {
 				var sure = AreYouSure.AskQuestion ("Delete All", "<span fgcolor=\"red\">Are you sure you want to DELETE ALL WALLETS?</span>");
 				if (sure) {
@@ -578,6 +755,47 @@ namespace IhildaWallet
 				}
 			};
 
+
+			this.button1998.Clicked += (sender, e) => {
+
+				RippleWallet rippleWallet = walletswitchwidget1.GetRippleWallet ();
+
+				if (rippleWallet == null) {
+					// TODO alert user to select a wallet
+					return;
+				}
+
+				Task.Run (delegate {
+
+					NetworkInterface ni = NetworkController.GetNetworkInterfaceGuiThread ();
+
+					// TODO integrate cancel token
+					var task = AccountCurrencies.GetResult (
+						rippleWallet.GetStoredReceiveAddress (),
+						ni,
+						new CancellationTokenSource ().Token
+					);
+
+					task.Wait ();
+
+					var list = task.Result.result.receive_currencies;
+
+					foreach (var currency in list) {
+						this.SentimentManagerObject.AddSentiment (
+							new Sentiment () {
+								Match = currency,
+								Rating = nameof (SentimentRatingEnum.Neutral)
+							}
+						);
+					}
+
+					this.SentimentManagerObject.SaveSentiments ();
+
+					SetSentiments (this.SentimentManagerObject.SentimentList);
+				});
+
+
+			};
 		}
 
 		public BotSleepSettings ParseSleepSettings ()
@@ -593,7 +811,7 @@ namespace IhildaWallet
 			bool hasSleep = this.sleepseccheckbutton.Active;
 			bool hasLedge = this.sleepledgecheckbutton.Active;
 
-			if (!string.IsNullOrWhiteSpace(secondsStr)) {
+			if (!string.IsNullOrWhiteSpace (secondsStr)) {
 				bool validSeconds = UInt32.TryParse (secondsStr, out uint seconds);
 				if (!validSeconds) {
 					// TODO
@@ -620,7 +838,7 @@ namespace IhildaWallet
 			botSleepSettings.HasSleepSeconds = hasSleep;
 			botSleepSettings.HasLedgerWait = hasLedge;
 
-			
+
 
 			return botSleepSettings;
 
@@ -637,6 +855,8 @@ namespace IhildaWallet
 					return;
 				}
 			}
+
+			this.tokenSource?.Cancel ();
 
 			//base.OnDeleteEvent (a); // should this be called?
 			this.Destroy ();
@@ -670,6 +890,8 @@ namespace IhildaWallet
 		{
 
 			string account = rw.GetStoredReceiveAddress ();
+
+
 			Task.Run (delegate {
 
 
@@ -687,6 +909,7 @@ namespace IhildaWallet
 
 			});
 
+
 			Task.Run (
 				delegate {
 					SentimentManagerObject = new SentimentManager (account);
@@ -695,7 +918,10 @@ namespace IhildaWallet
 				}
 			);
 
+
+
 			Task.Run (delegate {
+
 				WalletLedgerSave ledgerSave = WalletLedgerSave.LoadLedger (rw?.BotLedgerPath);
 
 				this.ledgerconstraintswidget1.SetLastKnownLedger (ledgerSave.Ledger.ToString ());
@@ -703,7 +929,7 @@ namespace IhildaWallet
 
 			});
 
-			Task.Run ( delegate {
+			Task.Run (delegate {
 
 				BotSleepSettings settings = BotSleepSettings.Load (account);
 
@@ -732,9 +958,9 @@ namespace IhildaWallet
 			});
 		}
 
-		StringBuilder infoBoxBuffer = new StringBuilder ();
+		StringBuilder outPutScreenBuffer = new StringBuilder ();
 		List<string> lines = new List<string> ();
-		public void WriteToInfoBox (string message)
+		public void WriteToOurputScreen (string message)
 		{
 			if (message == null) {
 				return;
@@ -753,17 +979,17 @@ namespace IhildaWallet
 					lines.RemoveAt (0);
 				}
 
-				infoBoxBuffer.Clear ();
+				outPutScreenBuffer.Clear ();
 				foreach (String s in lines) {
 
-					infoBoxBuffer.Append (s);
+					outPutScreenBuffer.Append (s);
 				}
 
 				if (label6 != null) {
 					//if (infoBoxBuffer.Length > 0) {
-						label6.Markup = infoBoxBuffer.ToString ();
+					label6.Markup = outPutScreenBuffer.ToString ();
 					//}
-					
+
 				}
 
 				/*
@@ -772,6 +998,28 @@ namespace IhildaWallet
 				}
 				*/
 			});
+		}
+
+		public void WriteToInfoBox (string message)
+		{
+			Application.Invoke (
+				delegate {
+
+					infoLabel.Markup = message;
+				}
+			);
+		}
+
+
+		public void DoPumpUI ()
+		{
+			Gtk.Application.Invoke (
+				delegate {
+
+					progressbar1?.Pulse ();
+				}
+			);
+
 		}
 
 		public void SetRules (IEnumerable<OrderFilledRule> rules)
@@ -934,57 +1182,98 @@ namespace IhildaWallet
 			string method_sig = clsstr + nameof (DoLogicClicked) + DebugRippleLibSharp.both_parentheses;
 #endif
 
+
+			StringBuilder stringBuilder = new StringBuilder ();
+
 			if (this.tokenSource != null) {
-				WriteToInfoBox ("A rule script is already running\n");
+
+				stringBuilder.Append ("A rule script is already running\n");
+				WriteToInfoBox (stringBuilder.ToString ());
+
+				stringBuilder.AppendLine ();
+				WriteToOurputScreen (stringBuilder.ToString ());
+
+				Gtk.Application.Invoke (delegate {
+					this.canselbutton.Show ();
+
+				});
+
+
 				return;
 			}
 
 			try {
 
+				// set the token source for cancelling task
 				this.tokenSource = new BotCancellTokenSource () { auto = false };
 
+				// Retrieve a cancel token
 				CancellationToken token = tokenSource.Token;
+
+				// Throw an exception if the task is cancelled
 				token.ThrowIfCancellationRequested ();
 
+				// Set UI that a task is running
 				this.SetIsRunningUI (true);
 
+
+				// get network interface return if not valid
 				NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
 				if (ni == null) {
-					MessageDialog.ShowMessage ("Network Warning", "Could not connect to network");
+
+					stringBuilder.Append ("Could not connect to network");
+					WriteToInfoBox (stringBuilder.ToString ());
+
+					MessageDialog.ShowMessage ("Network Warning", stringBuilder.ToString ());
 					this.SetIsRunningUI (false);
+
+					// remove the token, redundant since finally clause does this
+					tokenSource = null;
+
 					return;
 				}
 
-
+				// get selected wallet
 				RippleWallet rw = walletswitchwidget1.GetRippleWallet ();
 				if (rw == null) {
 					string messg = "No wallet Selected";
 					MessageDialog.ShowMessage (messg);
+					WriteToOurputScreen (messg);
 					WriteToInfoBox (messg);
 					this.SetIsRunningUI (false);
 					return;
 				}
 
-				// Pro feature
+
+				/*
+				// Pro feature // will be true if MarketBot fee paid
 				bool ShouldContinue = LeIceSense.DoTrialDialog (rw, LicenseType.MARKETBOT);
 
 
 				//bool ShouldContinue = LeIceSense.LastDitchAttempt (rw, LicenseType.AUTOMATIC);
 
+				// if fee not paid exit
 				if (!ShouldContinue) {
 					// TODO print fee requirement
-					WriteToInfoBox ("This requires ihilda pro \n");
+					WriteToOurputScreen ("This requires ihilda pro \n");
 					this.SetIsRunningUI (false);
 					return;
 				}
 
+				*/
+
+				// New trading bot 
 				Robotics robot = new Robotics (this.RuleManagerObj);
 
+				// retrieve starting ledger from UI
 				long? strt = this.ledgerconstraintswidget1.GetStartFromLedger ();
 
+
+				// if retrieved start ledger is not null and repeating warn the user
+				// save the value for next run
 				if (strt != null) {
 					if (strt == previousStartLedger) {
-						StringBuilder stringBuilder = new StringBuilder ();
+						stringBuilder.Clear ();
 						stringBuilder.Append ("You've supplied the same starting ledger twice consecutively. ");
 						stringBuilder.Append ("Although this may have been intended it's a common human error. ");
 						stringBuilder.Append ("Are you sure you'd like to continue?");
@@ -1003,66 +1292,127 @@ namespace IhildaWallet
 
 				}
 
+				// retrieve end ledger from UI
 				long? endStr = this.ledgerconstraintswidget1.GetEndLedger ();
 
+				// retrieve transaction limit from UI
 				int? lim = this.ledgerconstraintswidget1.GetLimit ();
 
+				// Print progress to UI
 
-				this.WriteToInfoBox ("Polling data for " + (rw?.GetStoredReceiveAddress () ?? "null") + "\n");
+				stringBuilder.Clear ();
+				stringBuilder.AppendLine ();
+				stringBuilder.Append ("Polling data for ");
+				stringBuilder.Append (rw?.GetStoredReceiveAddress () ?? "null");
+				stringBuilder.AppendLine ();
 
+				this.WriteToInfoBox (stringBuilder.ToString ());
+				this.WriteToOurputScreen (stringBuilder.ToString ());
+
+
+				// retrieve last saved ledger from hard disk
 				WalletLedgerSave ledgerSave = WalletLedgerSave.LoadLedger (rw?.BotLedgerPath);
 				uint? lastSavedLedger = ledgerSave?.Ledger;
+
+
+				// If the specified ledger isnt null, confirm to the user their value was received
 				if (strt != null) {
-					this.WriteToInfoBox ("\nStarting from ledger " + (strt?.ToString () ?? "null") + "\n");
+
+					stringBuilder.Clear ();
+
+					stringBuilder.AppendLine ();
+					stringBuilder.Append ("Starting from ledger ");
+					stringBuilder.Append (strt?.ToString () ?? "null");
+
+					WriteToInfoBox (stringBuilder.ToString ());
+
+
+					stringBuilder.AppendLine ();
+
+					this.WriteToOurputScreen (stringBuilder.ToString ());
+
+
+
+
 				} else {
 
 
-					this.WriteToInfoBox ("\nStarting ledger is null\n Using last known ledger " + (lastSavedLedger?.ToString() ?? "null") + "\n");
-				}
+					if (lastSavedLedger == null || lastSavedLedger == 0) {
+						bool b = AreYouSure.AskQuestionNonGuiThread (
+							"Process entire transaction history?",
+							"You haven't specified a starting ledger and no previous lastledger value has been saved. " +
+							"This will cause the automation to process all transaction history and may not be what you intended" +
+							"Should the script continue?"
 
-				
+						);
 
-				if ( lastSavedLedger == null || lastSavedLedger == 0) {
-					bool b = AreYouSure.AskQuestionNonGuiThread (
-						"Process entire transaction history?",
-						"You haven't specified a starting ledger and no previous lastledger value has been saved. " +
-						"This will cause the automation to process all transaction history and may not be what you intended" +
-						"Should the script continue?"
+						if (!b) {
 
-					);
+							this.SetIsRunningUI (false);
+							return;
+						}
+					} else {
 
-					if (!b) {
 
-						this.SetIsRunningUI (false);
-						return;
+
+						stringBuilder.Clear ();
+						stringBuilder.Append ("Using last known ledger ");
+						stringBuilder.Append (lastSavedLedger?.ToString () ?? "null");
+						stringBuilder.Append (" + 1");
+
+
+						string mss = stringBuilder.ToString ();
+						WriteToInfoBox (mss);
+
+						stringBuilder.Clear ();
+
+						stringBuilder.AppendLine ("Starting ledger is null");
+						stringBuilder.AppendLine (mss);
+
+						// else tell user which ledger to start from
+						this.WriteToOurputScreen (stringBuilder.ToString ());
+
+
+
+						// add one since last ledger was already processed. 
+						//lastSavedLedger++;
 					}
 				}
 
+
+
+
+				// Tell the bot how to print to the window
 				robot.OnMessage += (object sender, MessageEventArgs e) => {
-					this.WriteToInfoBox (e.Message);
 
-					Gtk.Application.Invoke (delegate {
+					// write the bots message to the output screen
+					this.WriteToOurputScreen (e.Message);
 
-						progressbar1?.Pulse ();
-					}
-					);
+					DoPumpUI ();
 				};
 
 				var task = Task.Run (delegate {
+
+					// DoLogic is run with the U.I settings or null. 
 					return robot?.DoLogic (rw, ni, strt, endStr, lim, token); ;
 				}, token);
 
 
-				while (!token.IsCancellationRequested && ShouldContinue && !task.IsCompleted && !task.IsCanceled && !task.IsFaulted) {
+				while (
+					!token.IsCancellationRequested &&
+					    !task.IsCompleted &&
+					    !task.IsCanceled &&
+					!task.IsFaulted
+				) {
 
 					task.Wait (250, token);
-					progressbar1?.Pulse ();
+
+
+					//progressbar1?.Pulse ();
+					DoPumpUI ();
 				}
 
-				if (!ShouldContinue) {
-					tokenSource.Cancel ();
-					return;
-				}
+
 
 				if (token.IsCancellationRequested) {
 					this.SetIsRunningUI (false);
@@ -1073,39 +1423,59 @@ namespace IhildaWallet
 
 
 
-				if (token.IsCancellationRequested || !ShouldContinue) {
+				if (token.IsCancellationRequested) {
 					return;
 				}
-				
+
 
 				string title = "No filled";
-				string message = null;
+				//string message = null;
 				if (tuple == null) {
-					message = "Do logic returned null\n";
-					MessageDialog.ShowMessage (title, message);
-					WriteToInfoBox (message);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("Do logic returned null");
+
+					WriteToInfoBox (stringBuilder.ToString ());
+
+					MessageDialog.ShowMessage (title, stringBuilder.ToString ());
+					stringBuilder.AppendLine ();
+					WriteToOurputScreen (stringBuilder.ToString ());
 				} else
 
 				if (tuple.LastLedger == null) {
-					message = "Filled orders error\n";
-					MessageDialog.ShowMessage (title, message);
-					WriteToInfoBox (message);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("Filled orders error");
+					MessageDialog.ShowMessage (title, stringBuilder.ToString ());
+					stringBuilder.AppendLine ();
+					WriteToOurputScreen (stringBuilder.ToString ());
 					this.SetIsRunningUI (false);
 					return;
 				} else
-				
+
 
 				if (tuple.FilledOrders == null || !tuple.FilledOrders.Any ()) {
-					message = "There are no new filled orders\n";
-					MessageDialog.ShowMessage (title, message);
-					WriteToInfoBox (message);
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("There are no new filled orders");
+					WriteToInfoBox (stringBuilder.ToString ());
+					MessageDialog.ShowMessage (title, stringBuilder.ToString ());
+
+					stringBuilder.AppendLine ();
+					WriteToOurputScreen (stringBuilder.ToString ());
 					//return;
 				} else {
 
 					int num = tuple.FilledOrders.Count ();
 
-					message = num + " suggested orders\n";
-					WriteToInfoBox (message);
+					stringBuilder.Clear ();
+					stringBuilder.Append (num);
+					stringBuilder.Append (" suggested orders");
+
+					WriteToInfoBox (stringBuilder.ToString ());
+
+					stringBuilder.AppendLine ();
+					WriteToOurputScreen (stringBuilder.ToString ());
 				}
 
 				Application.Invoke (delegate {
@@ -1118,7 +1488,13 @@ namespace IhildaWallet
 					return;
 				}
 
-				WriteToInfoBox ("Preparing orders and order submit window\n");
+				stringBuilder.Clear ();
+				stringBuilder.Append ("Preparing orders and order submit window");
+
+				WriteToInfoBox (stringBuilder.ToString ());
+
+				stringBuilder.AppendLine ();
+				WriteToOurputScreen (stringBuilder.ToString ());
 
 
 				var finalTask = Task.Run (delegate {
@@ -1136,7 +1512,14 @@ namespace IhildaWallet
 							}
 							*/
 
+
+							/*
 							win = new OrderSubmitWindow (rw, LicenseType.MARKETBOT) {
+								Visible = false
+							};
+							*/
+
+							win = new OrderSubmitWindow (rw) {
 								Visible = false
 							};
 
@@ -1177,14 +1560,19 @@ namespace IhildaWallet
 					    && !finalTask.IsFaulted
 					&& !token.IsCancellationRequested
 				) {
-					Application.Invoke (delegate {
 
-						progressbar1.Pulse ();
-					});
+					DoPumpUI ();
 
 
 					try {
-						WriteToInfoBox ("Processing may take some time");
+						stringBuilder.Clear ();
+
+						stringBuilder.Append ("Processing orders");
+
+						WriteToInfoBox (stringBuilder.ToString ());
+						stringBuilder.Append (". This may take some time");
+
+						WriteToOurputScreen (stringBuilder.ToString ());
 						for (
 							// declaration
 							int seconds = 0;
@@ -1201,11 +1589,10 @@ namespace IhildaWallet
 
 			    				) {
 							finalTask.Wait (1000, token);
-							WriteToInfoBox (".");
-							Application.Invoke (delegate {
+							WriteToOurputScreen (".");
 
-								progressbar1.Pulse ();
-							});
+
+							DoPumpUI ();
 
 
 						}
@@ -1216,17 +1603,22 @@ namespace IhildaWallet
 
 					} finally {
 
-						Application.Invoke (delegate {
-
-							progressbar1.Pulse ();
-						});
+						DoPumpUI ();
 
 
-						WriteToInfoBox ("\n");
+						WriteToOurputScreen ("\n");
 					}
 
-					// should not print if an exceptional event occured. 
-					WriteToInfoBox ("Orders Processed\n");
+					// should not print if an exceptional event occured.
+
+					stringBuilder.Clear ();
+					stringBuilder.Append ("Orders Processed");
+
+					WriteToInfoBox (stringBuilder.ToString ());
+
+					stringBuilder.AppendLine ();
+
+					WriteToOurputScreen (stringBuilder.ToString ());
 				}
 
 			} catch (TaskCanceledException cancelException) {
@@ -1236,7 +1628,14 @@ namespace IhildaWallet
 				}
 #endif
 
-				WriteToInfoBox ("Task cancelled\n");
+
+				stringBuilder.Clear ();
+				stringBuilder.Append ("Task cancelled");
+
+				WriteToInfoBox (stringBuilder.ToString ());
+
+				stringBuilder.AppendLine ();
+				WriteToOurputScreen (stringBuilder.ToString ());
 				this.SetIsRunningUI (false);
 
 			} catch (OperationCanceledException opCanException) {
@@ -1245,8 +1644,13 @@ namespace IhildaWallet
 					Logging.ReportException (method_sig, opCanException);
 				}
 #endif
+				stringBuilder.Clear ();
+				stringBuilder.Append ("Operation cancelled");
 
-				WriteToInfoBox ("Operation cancelled\n");
+				WriteToInfoBox (stringBuilder.ToString ());
+
+				stringBuilder.AppendLine ();
+				WriteToOurputScreen (stringBuilder.ToString ());
 				this.SetIsRunningUI (false);
 			} catch (Exception e) {
 #if DEBUG
@@ -1265,9 +1669,15 @@ namespace IhildaWallet
 
 				});
 
-				string message = "Automation thread has stopped\n";
+				stringBuilder.Clear ();
+
+				stringBuilder.Append ("Automation thread has stopped");
 				//MessageDialog.ShowMessage ("Automation stopped", message);
-				WriteToInfoBox (message);
+
+				WriteToInfoBox (stringBuilder.ToString ());
+
+				stringBuilder.AppendLine ();
+				WriteToOurputScreen (stringBuilder.ToString ());
 			}
 
 		}
@@ -1293,71 +1703,109 @@ namespace IhildaWallet
 			}
 #endif
 
+			StringBuilder stringBuilder = new StringBuilder ();
 
+
+			// Create a tokensource and token for cancelling bot
 			this.tokenSource = new BotCancellTokenSource () { auto = true };
 			CancellationToken token = tokenSource.Token;
 
+			// Get the selected wallet from widget else return
 			RippleWallet rw = walletswitchwidget1.GetRippleWallet ();
 			if (rw == null) {
 
-				string nwmessage = "No wallet Selected\n";
-				MessageDialog.ShowMessage (nwmessage);
+				stringBuilder.Clear ();
+				stringBuilder.Append ("No wallet Selected");
+
+				WriteToInfoBox (stringBuilder.ToString ());
+
+				stringBuilder.AppendLine ();
+				MessageDialog.ShowMessage (stringBuilder.ToString ());
 
 #if DEBUG
 				if (DebugIhildaWallet.FilledRuleManagementWindow) {
-					Logging.WriteLog (nwmessage);
+					Logging.WriteLog (stringBuilder.ToString ());
 				}
 #endif
-				//shouldContinue = false;
+
 
 				return;
 			}
 
 
-
+			// Get network interface else return
 			NetworkInterface ni = NetworkController.GetNetworkInterfaceNonGUIThread ();
 			if (ni == null) {
 
-				string netmessage = "Could not connect to network";
-				MessageDialog.ShowMessage ("Network Warning", netmessage);
+				stringBuilder.Clear ();
+				stringBuilder.Append ("Could not connect to network");
+
+
+				MessageDialog.ShowMessage ("Network Warning", stringBuilder.ToString ());
 
 #if DEBUG
 				if (DebugIhildaWallet.FilledRuleManagementWindow) {
-					Logging.WriteLog (method_sig, netmessage);
+					Logging.WriteLog (method_sig, stringBuilder.ToString ());
 				}
 #endif
+
+				WriteToInfoBox (stringBuilder.ToString ());
+
+				stringBuilder.AppendLine ();
+
+				WriteToOurputScreen (stringBuilder.ToString ());
 
 				return;
 			}
 
+
+
+			// License hard coded to AUTOMATIC constant
 			LicenseType licenseT = LicenseType.AUTOMATIC;
 
+
+
+			// Check license for last time and return if fail
 			bool should = LeIceSense.LastDitchAttempt (rw, licenseT);
 			if (!should) {
 
 				return;
 			}
 
+
+
+			#region AUTOWARNING
 			bool cont = false;
 			using (ManualResetEvent manualResetEvent = new ManualResetEvent (false)) {
 				manualResetEvent.Reset ();
 
 				Gtk.Application.Invoke (
 				    delegate {
-			    // TODO more explicit warning
+					    // TODO more explicit warning
+					    
+					    StringBuilder warningStr = new StringBuilder ();
 
-			    progressbar1?.Pulse ();
-					    cont = AreYouSure.AskQuestion (
-				"Warning !!!",
-				(string)(ProgramVariables.darkmode ?
-				"<markup><span foreground=\"red\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>" :
-				"<markup><span foreground=\"#FFAABB\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>" )
+					    if (ProgramVariables.darkmode) {
+						    warningStr.Append ("<markup><span foreground=\"red\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>");
+					    } else {
+						    warningStr.Append ("<markup><span foreground=\"#FFAABB\"><big><b>WARNING!</b></big></span> : This <b>TRADING BOT</b> will execute orders automatically for account <b>");
+					    }
 
-				+ rw.GetStoredReceiveAddress ()
-				+ "</b></markup>");
+					    warningStr.Append (rw.GetStoredReceiveAddress ());
+					    warningStr.Append ("</b></markup>");
+
+
+
+
+
+					    progressbar1?.Pulse ();
+			    			cont = AreYouSure.AskQuestion (
+						"Warning !!!",
+						warningStr.ToString ());
+
+
 					    progressbar1?.Pulse ();
 					    manualResetEvent.Set ();
-
 
 				    }
 				);
@@ -1370,172 +1818,264 @@ namespace IhildaWallet
 				//shouldContinue = false;
 				return;
 			}
+			#endregion
 
-
+			// load sound settings from hard disk
 			SoundSettings settings = SoundSettings.LoadSoundSettings ();
 
 			try {
 
 				this.SetIsRunningUI (true);
 
-
+				// Object that can submit transactions
 				OrderSubmitter orderSubmitter = new OrderSubmitter ();
 
+
+				// tell orderSubnitter to print fee if it's too high
 				orderSubmitter.OnFeeSleep += (object sender, FeeSleepEventArgs e) => {
+					StringBuilder sb = new StringBuilder ();
+
 					switch (e.State) {
 
 					case FeeSleepState.Begin:
-						this.WriteToInfoBox (
-							"Fee " +
-							(string)(e?.FeeAndLastLedger?.Fee.ToString () ?? "null") +
-							" is too high, waiting on lower fee"
+						sb.Append ("Fee ");
+						sb.Append (e?.FeeAndLastLedger?.Fee.ToString () ?? "null");
+						sb.Append (" is too high, waiting on lower fee");
+
+						WriteToInfoBox (sb.ToString ());
+
+						this.WriteToOurputScreen (
+							sb.ToString ()
 			    			);
 						break;
 
 					case FeeSleepState.PumpUI:
-						this.WriteToInfoBox (".");
+
+
+						this.WriteToOurputScreen (".");
 						break;
 
 					case FeeSleepState.Wake:
-						this.WriteToInfoBox ("\n");
+
+						sb.Append ("Using Fee ");
+						sb.Append (e?.FeeAndLastLedger?.Fee.ToString () ?? "null");
+
+						WriteToInfoBox (sb.ToString ());
+
+						this.WriteToOurputScreen ("\n");
 						break;
 
 					}
 
-					Application.Invoke (
-						delegate {
-
-							progressbar1?.Pulse ();
-
-						}
-					);
+					DoPumpUI ();
 				};
 
+				// tell order submitter to print transaction outcome
 				orderSubmitter.OnOrderSubmitted += (object sender, OrderSubmittedEventArgs e) => {
 
-					StringBuilder stringBuilder = new StringBuilder ();
+					StringBuilder sb = new StringBuilder ();
 
-					stringBuilder.AppendLine ();
-					stringBuilder.AppendLine (e.Success ? "Submitted Order Successfully " : "Failed to submit order ");
+					string outcome = e.Success ? "Submitted Order Successfully " : "Failed to submit order ";
+					string seq = e?.RippleOfferTransaction?.Sequence.ToString () ?? "null";
 
-					stringBuilder.Append ("Sequence : ");
-					stringBuilder.AppendLine (e?.RippleOfferTransaction?.Sequence.ToString() ?? "");
+					// output screen
+					{
+						sb.AppendLine ();
+						sb.AppendLine (outcome);
 
-					stringBuilder.Append ("Hash : ");
-					stringBuilder.AppendLine (e?.RippleOfferTransaction?.hash ?? "");
+						sb.Append ("Selling ");
+						sb.Append (e.RippleOfferTransaction.TakerGets.amount.ToString ());
+						sb.Append (" ");
+						sb.AppendLine (e.RippleOfferTransaction.TakerGets.currency);
 
-					stringBuilder.AppendLine (e.Message);
+						sb.Append ("Buying ");
+						sb.Append (e.RippleOfferTransaction.TakerPays.amount.ToString ());
+						sb.Append (" ");
+						sb.AppendLine (e.RippleOfferTransaction.TakerPays.currency);
+
+						sb.Append ("Sequence : ");
+						sb.AppendLine (seq);
+
+						sb.Append ("Hash : ");
+						sb.AppendLine (e?.RippleOfferTransaction?.hash ?? "");
+
+						sb.AppendLine (e.Message);
+
+						this.WriteToOurputScreen (sb.ToString ());
+					}
+
+					sb.Clear ();
+					sb.Append (outcome);
+					sb.Append ("Sequence : ");
+					sb.Append (seq);
+					WriteToInfoBox (sb.ToString ());
 
 
-					Application.Invoke (
-						delegate {
+					DoPumpUI ();
 
-							progressbar1?.Pulse ();
-						}
-					);
 
-					this.WriteToInfoBox (stringBuilder.ToString ());
 				};
 
+
+				// tell orderSubmitter to print on order validating
 				orderSubmitter.OnVerifyingTxBegin += (object sender, VerifyEventArgs e) => {
 
-					StringBuilder stringBuilder = new StringBuilder ();
-
-					stringBuilder.AppendLine ("\nVerifying transaction ");
-					stringBuilder.Append ("Sequence : ");
-					stringBuilder.AppendLine (e?.RippleOfferTransaction?.Sequence.ToString () ?? "");
-
-					stringBuilder.Append ("Hash : ");
-					stringBuilder.AppendLine (e?.RippleOfferTransaction?.hash ?? "");
-					stringBuilder.AppendLine ();
+					StringBuilder sb = new StringBuilder ();
 
 
+					string m = "Verifying transaction ";
+					string seq = e?.RippleOfferTransaction?.Sequence.ToString () ?? "null";
+
+					// output screen
+					{
+						sb.AppendLine ();
+						sb.AppendLine (m);
+
+						sb.Append ("Selling ");
+						sb.Append (e.RippleOfferTransaction.TakerGets.amount.ToString ());
+						sb.Append (" ");
+						sb.AppendLine (e.RippleOfferTransaction.TakerGets.currency);
+
+						sb.Append ("Buying ");
+						sb.Append (e.RippleOfferTransaction.TakerPays.amount.ToString ());
+						sb.Append (" ");
+						sb.AppendLine (e.RippleOfferTransaction.TakerPays.currency);
+
+						sb.Append ("Sequence : ");
+						sb.AppendLine (seq);
+
+						sb.Append ("Hash : ");
+						sb.AppendLine (e?.RippleOfferTransaction?.hash ?? "");
+						sb.AppendLine ();
+
+						this.WriteToOurputScreen (sb.ToString ());
+
+					}
+
+					DoPumpUI ();
+
+					sb.Clear ();
+					sb.Append (m);
+					sb.Append ("Sequence : ");
+					sb.Append (seq);
+					WriteToInfoBox (sb.ToString ());
 
 
-					Application.Invoke (
-						delegate {
 
-							progressbar1?.Pulse ();
-						}
-					);
 
-					this.WriteToInfoBox (stringBuilder.ToString ());
+
 
 				};
 
 
+				// Tell orderSubmitter to print validation outcome
 				orderSubmitter.OnVerifyingTxReturn += (object sender, VerifyEventArgs e) => {
-					StringBuilder stringBuilder = new StringBuilder ();
+					StringBuilder sb = new StringBuilder ();
+
+					TextHighlighter highlighter = new TextHighlighter ();
+
+					string seq = e?.RippleOfferTransaction?.Sequence.ToString () ?? "null";
+					string hash = e?.RippleOfferTransaction?.hash ?? "";
+
 					string messg = null;
 					if (e.Success) {
-						stringBuilder.Append ("Transaction ");
-						stringBuilder.Append (e?.RippleOfferTransaction?.hash ?? "");
-						stringBuilder.AppendLine (" Verified");
 
+						string t = "Transaction ";
+						string v = " Verified";
 
-						TextHighlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
+						sb.Append (t);
+						sb.Append (seq);
+						sb.AppendLine (v);
 
+						WriteToInfoBox (sb.ToString ());
 
+						highlighter.Highlightcolor = ProgramVariables.darkmode ? TextHighlighter.CHARTREUSE : TextHighlighter.GREEN;
+
+						sb.Clear ();
+						sb.Append (t);
+						sb.Append (hash);
+						sb.AppendLine (v);
 
 
 					} else {
-						stringBuilder.Append ("Failed to validate transaction ");
-						stringBuilder.AppendLine (e?.RippleOfferTransaction?.hash ?? "");
 
-						TextHighlighter.Highlightcolor = TextHighlighter.RED;
+						string f = "Failed to validate transaction ";
+						sb.Append (f);
+						sb.Append ("with sequence");
+						sb.AppendLine (seq);
 
+
+
+						highlighter.Highlightcolor = TextHighlighter.RED;
+
+						WriteToInfoBox (sb.ToString ());
+
+						sb.Clear ();
+						sb.Append (f);
+						sb.AppendLine (hash);
 					}
 
 					//stringBuilder.AppendLine ();
 
-					messg = TextHighlighter.Highlight (stringBuilder);
+					messg = highlighter.Highlight (sb);
 
-					Application.Invoke (
-						delegate {
+					DoPumpUI ();
 
-							progressbar1?.Pulse ();
-						}
-					);
-
-					this.WriteToInfoBox (messg);
+					this.WriteToOurputScreen (messg);
 				};
 
+				// Tell orderSubmitter to print verify tx message
 				orderSubmitter.OnVerifyTxMessage += (object sender, VerifyEventArgs e) => {
 					//StringBuilder stringBuilder = new StringBuilder ();
 					//stringBuilder.Append ();
 
+					WriteToOurputScreen (e.Message);
 					WriteToInfoBox (e.Message);
 				};
 
 
-				Application.Invoke (delegate {
+				DoPumpUI ();
 
-					progressbar1?.Pulse ();
-				});
 
-				this.WriteToInfoBox (
-					"Running automation script for address " +
-					(rw?.GetStoredReceiveAddress () ?? "") +
-					"\n"
-				);
+				// print to UI
+				{
+					stringBuilder.Clear ();
+					stringBuilder.Append ("Running automation script for address ");
+					stringBuilder.Append (rw?.GetStoredReceiveAddress () ?? "");
 
+					WriteToInfoBox (stringBuilder.ToString ());
+
+					stringBuilder.AppendLine ();
+					this.WriteToOurputScreen (
+						 stringBuilder.ToString ()
+					);
+				}
+
+
+				// New trading bot
 				Robotics robot = new Robotics (this.RuleManagerObj);
 
+				// tell the bot how to print messages to the window
 				robot.OnMessage += (object sender, MessageEventArgs e) => {
+					this.WriteToOurputScreen (e?.Message);
 					this.WriteToInfoBox (e?.Message);
 				};
 
+				// get the start ledger from UI
 				Int64? strt = this.ledgerconstraintswidget1.GetStartFromLedger ();
 
+				// if start has been specified
 				if (strt != null && strt > 0) {
+
+					// if specified start is repeated
 					if (strt == previousStartLedger) {
-						StringBuilder stringBuilder = new StringBuilder ();
-						stringBuilder.Append ("You've supplied the same starting ledger twice consecutively. ");
-						stringBuilder.Append ("Although this may have been intended it's a common human error. ");
-						stringBuilder.Append ("Are you sure you'd like to continue?");
+						StringBuilder sb = new StringBuilder ();
+						sb.Append ("You've supplied the same starting ledger twice consecutively. ");
+						sb.Append ("Although this may have been intended it's a common human error. ");
+						sb.Append ("Are you sure you'd like to continue?");
 						bool GoOn = AreYouSure.AskQuestionNonGuiThread (
 							"Same start ledger",
-							stringBuilder.ToString ()
+							sb.ToString ()
 						);
 
 						if (!GoOn) {
@@ -1549,26 +2089,58 @@ namespace IhildaWallet
 
 
 
-
+				// get end ledger from UI
 				long? endStr = this.ledgerconstraintswidget1.GetEndLedger ();
 
+				// limit from UI
 				int? lim = this.ledgerconstraintswidget1.GetLimit ();
+
 
 				bool success = false;
 
-				RippleIdentifier rippleSeedAddress = rw.GetDecryptedSeed ();
-				while (rippleSeedAddress?.GetHumanReadableIdentifier () == null && !token.IsCancellationRequested && !StopWhenConvenient) {
+
+
+				PasswordAttempt passwordAttempt = new PasswordAttempt ();
+
+				passwordAttempt.InvalidPassEvent += (object sender, EventArgs e) => {
+
+					string inv = "Invalid password";
+
+					WriteToInfoBox (inv);
+
 					bool shou = AreYouSure.AskQuestionNonGuiThread (
-					"Invalid password",
+					inv,
 					"Unable to decrypt seed. Invalid password.\nWould you like to try again?"
 					);
 
-					if (!shou) {
-						return;
-					}
+				};
 
-					rippleSeedAddress = rw.GetDecryptedSeed ();
+				passwordAttempt.MaxPassEvent += (object sender, EventArgs e) => {
+					string mess = "Max password attempts";
+
+					WriteToInfoBox (mess);
+
+					MessageDialog.ShowMessage (mess);
+					WriteToOurputScreen ("\n" + mess + "\n");
+				};
+
+
+				DecryptResponse response = passwordAttempt.DoRequest (rw, token);
+
+
+				// initial decrypt attempt
+				RippleIdentifier rippleSeedAddress = response.Seed; //rw.GetDecryptedSeed ();
+
+				if (rippleSeedAddress == null) {
+					//string msg = "missing seed";
+					return;
 				}
+
+				if (StopWhenConvenient) return;
+
+
+
+
 
 
 				BotSleepSettings botSleepSettings = null;
@@ -1578,39 +2150,56 @@ namespace IhildaWallet
 					ManualResetEvent manualResetEvent = new ManualResetEvent (false);
 					manualResetEvent.Reset ();
 
-					Gtk.Application.Invoke ( delegate {
+					Gtk.Application.Invoke (delegate {
 
 						botSleepSettings = ParseSleepSettings ();
 						manualResetEvent.Set ();
-					} );
+					});
 
 
 
 
-					WaitHandle.WaitAny ( new WaitHandle [] { manualResetEvent, token.WaitHandle }, 5000); // after 5 seconds it's probably hung and sleep time is not a critical error
+					WaitHandle.WaitAny (new WaitHandle [] { manualResetEvent, token.WaitHandle }, 5000); // after 5 seconds it's probably hung and sleep time is not a critical error
 
 					if (endStr != null) {
 						if (strt > endStr) {
 							// TODO
 
-							string maxMessage = "Maximum ledger " + endStr + " reached \n";
 
 
+							stringBuilder.Clear ();
+							stringBuilder.Append ("Maximum ledger ");
+							stringBuilder.Append (endStr);
+							stringBuilder.Append (" reached");
 
-							this.WriteToInfoBox (maxMessage);
+							WriteToInfoBox (stringBuilder.ToString ());
+
+							stringBuilder.AppendLine ();
+
+							this.WriteToOurputScreen (stringBuilder.ToString ());
+
 							break;
 						}
 					}
 
-					Application.Invoke (delegate {
-						progressbar1?.Pulse ();
+					DoPumpUI ();
 
-					});
 
-					this.WriteToInfoBox (
-						"Polling data for "
-						+ (rw?.GetStoredReceiveAddress () ?? "null")
-						+ "\n");
+					stringBuilder.Clear ();
+					stringBuilder.Append ("\nPolling data for ");
+					stringBuilder.Append ((rw?.GetStoredReceiveAddress () ?? "null"));
+
+					var mm = stringBuilder.ToString ();
+
+					WriteToInfoBox (mm);
+
+					stringBuilder.Clear ();
+					stringBuilder.AppendLine ();
+
+					stringBuilder.AppendLine (mm);
+
+					this.WriteToOurputScreen (
+						stringBuilder.ToString ());
 
 
 					WalletLedgerSave ledgersave = WalletLedgerSave.LoadLedger (rw.BotLedgerPath);
@@ -1619,7 +2208,21 @@ namespace IhildaWallet
 
 					uint? last = ledgersave?.Ledger;
 					if (strt != null) {
-						this.WriteToInfoBox ("\nStarting from ledger " + (strt?.ToString () ?? "null") + "\n");
+
+						stringBuilder.Clear ();
+						stringBuilder.Append ("Starting from ledger ");
+						stringBuilder.Append (strt?.ToString () ?? "null");
+
+						WriteToInfoBox (stringBuilder.ToString ());
+
+						string mmm = stringBuilder.ToString ();
+
+						stringBuilder.Clear ();
+						stringBuilder.AppendLine ();
+						stringBuilder.AppendLine (mmm);
+
+						this.WriteToOurputScreen (stringBuilder.ToString ());
+
 					} else {
 
 
@@ -1638,7 +2241,24 @@ namespace IhildaWallet
 							}
 						}
 
-						this.WriteToInfoBox ("\nStarting ledger is null\n Using last known ledger " + last + "\n");
+
+						// print UI
+						{
+							stringBuilder.Clear ();
+							stringBuilder.Append ("Using last known ledger ");
+							stringBuilder.Append (last);
+
+							string ss = stringBuilder.ToString ();
+							WriteToInfoBox (ss);
+
+							stringBuilder.Clear ();
+							stringBuilder.AppendLine ();
+							stringBuilder.AppendLine ("Starting ledger is null");
+							stringBuilder.AppendLine ();
+							stringBuilder.AppendLine (ss);
+
+							this.WriteToOurputScreen ("\n\n Using last known ledger " + last + "\n");
+						}
 					}
 
 
@@ -1646,26 +2266,25 @@ namespace IhildaWallet
 
 
 
-					
-		    			
+
+
 					DoLogicResponse tuple = null;
 
+					// once dologic is called it's not convenient to stop
 					do {
 						tuple = robot.DoLogic (rw, ni, strt, endStr, lim, token);
 
-						Application.Invoke (delegate {
-
-							progressbar1.Pulse ();
-						});
+						DoPumpUI ();
 
 
-					} while (!token.IsCancellationRequested && tuple == null && !StopWhenConvenient);
+					} while (!token.IsCancellationRequested && tuple == null /* && !StopWhenConvenient */);
 
 
-
+					/*
 					if (token.IsCancellationRequested || StopWhenConvenient) {
 						return;
 					}
+					*/
 
 
 					if (tuple == null) {
@@ -1695,11 +2314,13 @@ namespace IhildaWallet
 
 					Application.Invoke (
 					delegate {
-						
+
 						this.ledgerconstraintswidget1.SetLastKnownLedger (tuple?.LastLedger?.ToString ());
-						progressbar1.Pulse ();
+
 					}
 					);
+
+					DoPumpUI ();
 
 					strt = tuple.LastLedger + 1;
 
@@ -1718,7 +2339,7 @@ namespace IhildaWallet
 
 							var tempToken = new CancellationTokenSource ();
 							var token2 = tempToken.Token;
-							var task = Task.Run ( 
+							var task = Task.Run (
 								delegate {
 									var w = botSleepSettings.LedgerWait ?? 10;
 									DoLedgerWait (w, token2);
@@ -1745,15 +2366,24 @@ namespace IhildaWallet
 						continue;
 					}
 
-					int numb = orders.Count ();
-					string submitMessage = "Submitting " + numb.ToString () + " orders\n";
-					this.WriteToInfoBox (submitMessage);
-					Application.Invoke (delegate {
 
-						progressbar1?.Pulse ();
-					});
+					// print to UI
+					{
+						int numb = orders.Count ();
 
-			
+						stringBuilder.Clear ();
+						stringBuilder.Append ("Submitting ");
+						stringBuilder.Append (numb.ToString ());
+						stringBuilder.Append (" orders");
+
+						WriteToInfoBox (stringBuilder.ToString ());
+
+						stringBuilder.AppendLine ();
+						this.WriteToOurputScreen (stringBuilder.ToString ());
+
+						DoPumpUI ();
+					}
+
 					MultipleOrdersSubmitResponse responses = null;
 
 					bool parallelSubmit = ProgramVariables.parallelVerify;
@@ -1768,10 +2398,7 @@ namespace IhildaWallet
 							);
 					}
 
-					Application.Invoke (delegate {
-
-						progressbar1?.Pulse ();
-					});
+					DoPumpUI ();
 
 					if (responses == null) {
 						// 
@@ -1789,22 +2416,36 @@ namespace IhildaWallet
 						}
 
 						string unexpected = "Application behaved unexpectedly";
-						MessageDialog.ShowMessage ("Scripting error", unexpected);
+
 						WriteToInfoBox (unexpected);
+
+						MessageDialog.ShowMessage ("Scripting error", unexpected);
+						WriteToOurputScreen (unexpected);
 						return;
 					}
-		    			/*
+					/*
 					if (responses.) {
 
 					}
-					*/	    
-		    			
+					*/
+
 					success = responses.Succeeded;
 					if (!success) {
-						string errMess = "Error submitting orders\n";
-						this.WriteToInfoBox (errMess);
-						this.WriteToInfoBox (responses?.Message ?? "null");
-						this.WriteToInfoBox (responses?.TroubleResponse?.Message ?? "null");
+
+						// pring UI
+						{
+							stringBuilder.Clear ();
+							stringBuilder.Append ("Error submitting orders");
+							WriteToInfoBox (stringBuilder.ToString ());
+
+							stringBuilder.AppendLine ();
+
+							this.WriteToOurputScreen (stringBuilder.ToString ());
+							this.WriteToOurputScreen (responses?.Message ?? "null");
+							this.WriteToOurputScreen (responses?.TroubleResponse?.Message ?? "null");
+						}
+
+
 						//this.WriteToInfoBox (responses?.TroubleResponse?.);
 						//shouldContinue = false;
 
@@ -1823,12 +2464,22 @@ namespace IhildaWallet
 						//return;
 					}
 
-					string successMessage = "Orders submitted successfully\n";
-					this.WriteToInfoBox (successMessage);
-					Application.Invoke (delegate {
 
-						progressbar1?.Pulse ();
-					});
+
+					// pring UI
+					{
+						stringBuilder.Clear ();
+
+						stringBuilder.Append ("Orders submitted successfully");
+
+
+						WriteToInfoBox (stringBuilder.ToString ());
+
+						stringBuilder.AppendLine ();
+						this.WriteToOurputScreen (stringBuilder.ToString ());
+
+						DoPumpUI ();
+					}
 
 					/*
 					var cache = AccountSequenceCache.GetCacheForAccount (rw.GetStoredReceiveAddress ());
@@ -1848,7 +2499,7 @@ namespace IhildaWallet
 
 			} catch (Exception e) {
 
-				this.WriteToInfoBox (e.Message);
+				this.WriteToOurputScreen (e.Message);
 
 				//SoundSettings settings = SoundSettings.LoadSoundSettings ();
 				if (settings != null && settings.HasOnAutomateFail && settings.OnAutomateFail != null) {
@@ -1878,9 +2529,13 @@ namespace IhildaWallet
 					StopWhenConvenient = false;
 				});
 
-				string message = "Automation thread has stopped\n";
-				MessageDialog.ShowMessage ("Automation stopped", message);
+				string message = "Automation thread has stopped";
+
 				WriteToInfoBox (message);
+
+				MessageDialog.ShowMessage ("Automation stopped", message);
+
+				WriteToOurputScreen (message + "\n");
 
 
 
@@ -1894,23 +2549,18 @@ namespace IhildaWallet
 		{
 
 			string infoMessage = "Waiting for " + ledgers + " ledgers ";
-			this.WriteToInfoBox (infoMessage + "\n");
+			this.WriteToOurputScreen (infoMessage + "\n");
 
 			WakeTokenSource?.Cancel ();
 			WakeTokenSource = new CancellationTokenSource ();
 			var wakeToken = WakeTokenSource.Token;
 			for (int i = 0; i < ledgers && !token.IsCancellationRequested && !wakeToken.IsCancellationRequested && !StopWhenConvenient; i++) {
-				Gtk.Application.Invoke (
-					delegate {
-						progressbar1?.Pulse ();
-
-					}
-				);
+				DoPumpUI ();
 				// TODO set max max sleep time. Example 60 seconds or 
-				WaitHandle.WaitAny ( new WaitHandle [] { LedgerTracker.LedgerResetEvent, token.WaitHandle, wakeToken.WaitHandle });
-				this.WriteToInfoBox (infoMessage + i.ToString () + "\n");
+				WaitHandle.WaitAny (new WaitHandle [] { LedgerTracker.LedgerResetEvent, token.WaitHandle, wakeToken.WaitHandle });
+				this.WriteToOurputScreen (infoMessage + i.ToString () + "\n");
 
-				
+
 			}
 		}
 
@@ -1930,9 +2580,14 @@ namespace IhildaWallet
 
 
 
-			this.WriteToInfoBox (infoMessage);
+			WriteToInfoBox (infoMessage);
+			this.WriteToOurputScreen (infoMessage);
 
 			try {
+				StringBuilder sb = new StringBuilder ();
+
+				int dots = 0;
+
 				WakeTokenSource?.Cancel ();
 				WakeTokenSource = new CancellationTokenSource ();
 				var wakeToken = WakeTokenSource.Token;
@@ -1940,16 +2595,29 @@ namespace IhildaWallet
 
 
 					if (sec % 5 == 0) {
-						this.WriteToInfoBox (".");
+						this.WriteToOurputScreen (".");
+
+						dots++;
+
+						if (dots > 5) {
+							dots = 0;
+						}
+
+						sb.Clear ();
+						sb.Append (infoMessage);
+						sb.Append (".....".Take (dots));
+
+						WriteToInfoBox (sb.ToString ());
+
+
 					}
-					
 
-					WaitHandle.WaitAny ( new WaitHandle [] { token.WaitHandle, wakeToken.WaitHandle }, 1000 );
+
+
+
+					WaitHandle.WaitAny (new WaitHandle [] { token.WaitHandle, wakeToken.WaitHandle }, 1000);
 					//Task.Delay (250).Wait ();
-					Application.Invoke (delegate {
-						progressbar1?.Pulse ();
-
-					});
+					DoPumpUI ();
 					//}
 
 
@@ -1957,7 +2625,7 @@ namespace IhildaWallet
 			} catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException) {
 				return;
 			} finally {
-				this.WriteToInfoBox ("\n");
+				this.WriteToOurputScreen ("\n");
 			}
 		}
 
@@ -2034,14 +2702,23 @@ namespace IhildaWallet
 				string serialized = DynamicJson.Serialize (settings);
 
 				File.WriteAllText (path, serialized);
+
+				string mess = "Speep settings saved";
+
+
+
 			} catch (Exception e) {
+
+#if DEBUG
+				//Logging.ReportException ();
+#endif
 
 			}
 		}
 
 		public static BotSleepSettings Load (string address)
 		{
-			string path  = Path.Combine (FileHelper.WALLET_TRACK_PATH, address + ".slp");
+			string path = Path.Combine (FileHelper.WALLET_TRACK_PATH, address + ".slp");
 
 			return LoadSettings (path);
 		}

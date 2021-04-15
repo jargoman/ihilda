@@ -4,6 +4,9 @@ using Gtk;
 
 namespace IhildaWallet
 {
+
+	// Widget for limiting range of ledgers processed with each chunk the bot processes. 
+
 	[System.ComponentModel.ToolboxItem (true)]
 	public partial class LedgerConstraintsWidget : Gtk.Bin
 	{

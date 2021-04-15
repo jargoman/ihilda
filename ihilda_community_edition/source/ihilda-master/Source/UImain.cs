@@ -73,7 +73,7 @@ namespace IhildaWallet
 
 			Application.Run ();
 
-			Logging.WriteLog ("Application Run");
+			Logging.WriteLog ("Application Run Exited");
 
 		}
 
@@ -129,6 +129,8 @@ namespace IhildaWallet
 
 				Task t1 = InitSplash ();
 
+
+				// wait until spash shows up before consuming resources
 				t1.Wait (TokenSource.Token);
 
 
@@ -145,7 +147,7 @@ namespace IhildaWallet
 				KillSplash ();
 			}
 
-			Task delayTask = Task.Delay (1000, TokenSource.Token);
+			Task splashdelayTask = Task.Delay (3000, TokenSource.Token);
 
 
 			//consoleGuiTask.Wait ();
@@ -378,7 +380,7 @@ namespace IhildaWallet
 						    TokenSource.Token
 					    );
 
-					DateTime dateTime = DateTime.Now;
+					//DateTime dateTime = DateTime.Now;
 
 
 					if (rippleCurrency != null) {
@@ -400,8 +402,21 @@ namespace IhildaWallet
 				//WalletManager.currentInstance?.UpdateUI ();
 			});
 
-			Task.WaitAny (new Task [] { delayTask, balanceTask });
+			//Task.WaitAny (new Task [] { splashdelayTask, balanceTask });
+
+			balanceTask.Wait (3000);
 			//Task.WaitAll (new Task [] { delayTask });
+
+			if (WalletManagerWidget.currentInstance != null) {
+				WalletManagerWidget.currentInstance.SetWalletManager (wlm);
+
+			} else {
+				Logging.WriteLog ("WalletManagerWidget.currentInstance == null");
+			}
+
+
+			splashdelayTask.Wait (2000);
+
 			Gtk.Application.Invoke (
 				delegate {
 					//win.Show();
@@ -425,27 +440,22 @@ namespace IhildaWallet
 
 
 			//delayTask.Wait (1000);
-			if (WalletManager.currentInstance != null) {
 
-				if (WalletManagerWidget.currentInstance != null) {
-					WalletManagerWidget.currentInstance.SetWalletManager (wlm);
 
-				} else {
-					Logging.WriteLog ("WalletManagerWidget.currentInstance == null");
-				}
 
-				if (WalletManager.currentInstance.IsEmpty ()) {
-					String isawesome = "You don't have any wallets. Would you like to create a new wallet?";
-					Gtk.Application.Invoke (delegate {
-						bool res = AreYouSure.AskQuestion ("New Wallet Wizard", isawesome);
 
-						if (res) {
-							//Program.KillSplash ();
-							WalletManagerWidget.currentInstance.New_Wallet_Wizard ();
-						}
-					});
-				}
+			if (WalletManager.currentInstance.IsEmpty ()) {
+				String isawesome = "You don't have any wallets. Would you like to create a new wallet?";
+				Gtk.Application.Invoke (delegate {
+					bool res = AreYouSure.AskQuestion ("New Wallet Wizard", isawesome);
+
+					if (res) {
+						//Program.KillSplash ();
+						WalletManagerWidget.currentInstance.New_Wallet_Wizard ();
+					}
+				});
 			}
+
 
 
 			t7.Wait (15000, TokenSource.Token);
@@ -496,49 +506,38 @@ namespace IhildaWallet
 					string method_sig = clsstr + nameof (InitSplash) + DebugRippleLibSharp.right_parentheses;
 #endif
 
-					using (EventWaitHandle whandle = new ManualResetEvent (true)) {
-						whandle.Reset ();
 
-						Gtk.Application.Invoke (delegate {
-							try {
+
+					TaskHelper.GuiInvokeSyncronous (delegate {
+
 
 #if DEBUG
-								if (DebugIhildaWallet.Program) {
-									Logging.WriteLog (method_sig + DebugIhildaWallet.gtkInvoke + DebugRippleLibSharp.beginn);
-								}
+						if (DebugIhildaWallet.Program) {
+							Logging.WriteLog (method_sig + DebugIhildaWallet.gtkInvoke + DebugRippleLibSharp.beginn);
+						}
 #endif
 
-								if (SplashWindow.isSplash) {
+						if (SplashWindow.isSplash) {
 #if DEBUG
-									if (DebugIhildaWallet.Program) {
-										Logging.WriteLog (method_sig + "Creating splash");
-									}
-#endif
-									splash = new SplashWindow ();
-								}
-#if DEBUG
-								if (DebugIhildaWallet.Program) {
-									Logging.WriteLog (method_sig + "t1 complete");
-								}
-#endif
-								//whandle.Set();	
-							} catch (Exception e) {
-#if DEBUG
-								Logging.ReportException (method_sig, e);
-#endif
-
-							} finally {
-								whandle.Set ();
+							if (DebugIhildaWallet.Program) {
+								Logging.WriteLog (method_sig + "Creating splash");
 							}
+#endif
+							splash = new SplashWindow ();
+						}
+#if DEBUG
+						if (DebugIhildaWallet.Program) {
+							Logging.WriteLog (method_sig + "t1 complete");
+						}
+#endif
+						//whandle.Set();	
 
-						});
 
-						whandle.WaitOne ();
-					}
+					});
+
+
+
 				});
-
-
-
 
 
 		}
@@ -567,15 +566,18 @@ namespace IhildaWallet
 				Notifications.StatusTrayIcon.Dispose ();
 				Notifications.StatusTrayIcon = null;
 			}
-
+	    		
+	    		/*
 			if (WalletManagerWindow.currentInstance != null) {
 				//WalletManagerWindow.currentInstance.Destroy ();
 				WalletManagerWindow.currentInstance = null;
 			}
 			Notifications = null;
+	    		*/
+			//cancelTask.Wait (5000);
+			//cancelTask2.Wait (5000);
 
-			cancelTask.Wait ();
-			cancelTask2.Wait ();
+			Task.WaitAll (new Task[] { cancelTask, cancelTask2 }, 5000);
 			TokenSource.Dispose ();
 
 
