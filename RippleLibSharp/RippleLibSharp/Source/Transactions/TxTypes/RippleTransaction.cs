@@ -19,6 +19,8 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using RippleLibSharp.Commands.Server;
 using System.Collections.Generic;
+using Org.BouncyCastle.Math;
+using Ripple.Signing.K256;
 
 namespace RippleLibSharp.Transactions.TxTypes
 {
@@ -134,8 +136,8 @@ namespace RippleLibSharp.Transactions.TxTypes
 		}
 
 
-
-		protected string SignedTransactionBlob {
+        // TODO change back to protected. Keep signing enclosed to signing classes
+		public string SignedTransactionBlob {
 			get;
 			set;
 		}
@@ -287,20 +289,20 @@ namespace RippleLibSharp.Transactions.TxTypes
 			return null;
 		}
 
-		public string Sign (RippleIdentifier signingKey)
+		public string SignRippleLibSharp (RippleIdentifier signingKey)
 		{
 			if (signingKey is RippleSeedAddress) {
-				return Sign ((RippleSeedAddress)signingKey);
+				return SignRippleLibSharp ((RippleSeedAddress)signingKey);
 			}
 
 			if (signingKey is RipplePrivateKey) {
-				return Sign ((RipplePrivateKey)signingKey);
+				return SignRippleLibSharp ((RipplePrivateKey)signingKey);
 			}
 
 			throw new NotImplementedException ("signing key type not supported");
 		}
 
-		public string Sign (RipplePrivateKey privateKey)
+		public string SignRippleLibSharp (RipplePrivateKey privateKey)
 		{
 			BinarySerializer bs = new BinarySerializer ();
 
@@ -327,7 +329,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 			return blob;
 		}
 
-		public string Sign (RippleSeedAddress seed)
+		public string SignRippleLibSharp (RippleSeedAddress seed)
 		{
 
 
@@ -414,8 +416,38 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 			//string test = "{\"test\":\"test\"}";
 			var o  = JObject.Parse (jsn);
+
+
+
+			SignedTx signedtx = null;
+			if (seed is RipplePrivateKey privateKey) {
+				var bits = privateKey.GetBytes ();
+
+
+				BigInteger bigInteger =
+				    new BigInteger (1, bits);
+
+
+				//var b = new BigInteger(0, privateKey.GetBytes());
+
+				K256KeyPair pair = new K256KeyPair (bigInteger);
+				TxSigner txsigner = TxSigner.FromKeyPair (pair);
+
+				signedtx = txsigner.SignStObject (o);
+
+
+			} else if (seed is RippleSeedAddress) {
+				signedtx = TxSigner.SignJson (o, seed.GetHumanReadableIdentifier ());
+			}
+
+
+
+
 			
-			SignedTx signedtx = TxSigner.SignJson (o, seed.GetHumanReadableIdentifier ());
+
+
+
+			
 
 			this.SignedTransactionBlob = signedtx?.TxBlob;
 			this.hash = signedtx?.Hash;

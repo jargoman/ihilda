@@ -24,6 +24,14 @@ using System.Threading;
 using RippleLibSharp.Binary;
 using System.IO;
 
+using Ripple.Signing;
+using Ripple.Signing.K256;
+using Org.BouncyCastle.Math;
+using Ripple.TxSigning;
+using Newtonsoft.Json.Linq;
+using System.Collections;
+using RippleLibSharp.Source.Mnemonics;
+
 namespace Source.UnitTesting
 {
 	public class RLSTest
@@ -44,18 +52,22 @@ namespace Source.UnitTesting
 
 			System.Console.WriteLine ("testing 1,2,3");
 
-			System.Console.WriteLine (RippleAddress.RIPPLE_ADDRESS_ICE_ISSUER);
+
+			TestMnemonic ();
+
+		
+			//System.Console.WriteLine (RippleAddress.RIPPLE_ADDRESS_ICE_ISSUER);
 
 			NetworkInterface ni = TestNetworking ();
 
 
 
-			RLSTest rlst = new RLSTest (ni);
+			//RLSTest rlst = new RLSTest (ni);
 
 			//RippleDeterministicKeyGenerator.TestVectors ();
 
 			//rlst.testTrustLines ();
-			rlst.TestOfferSignatures();
+			//rlst.TestOfferSignatures();
 
 			//rlst.TestKeyGen ();
 
@@ -63,11 +75,157 @@ namespace Source.UnitTesting
 			//rlst.
 			//rlst.AccountSubscribeTest ();
 
-			rlst.LedgerSubscribeTest ();
+			//rlst.LedgerSubscribeTest ();
+
+			//var key = Seed.FromBase58("ssBrKaAGmb6ZjQgB4BBSJcGqmLa9e").KeyPair();
+			var key = Seed.FromBase58 ("sh5NgfPpGZcKWUzbfzXKVBEAUtXiS").KeyPair ();
+
+			Console.WriteLine ("Key Id : = " + key.Id ());
+			Console.WriteLine ("key pubHash = " + Base58.ByteArrayToHexString (key.PubKeyHash ()));
+
+
+			var rseed = new RippleSeedAddress ("sh5NgfPpGZcKWUzbfzXKVBEAUtXiS");
+
+			var privateKey0 = rseed.GetPrivateKey (0);
+
+			string ppp = privateKey0.AsHex ();
+
+			var privateKey = RipplePrivateKey.FromHex (ppp);
+
+			var bi = Base58.DecodeToBigInteger (privateKey.ToString ());
+
+			Console.WriteLine ("Account 0 private key = " + privateKey.ToString ());
+
+
+			var publicKey = privateKey.GetPublicKey ();
+			Console.WriteLine ("Public key = " + publicKey);
+
+
+			var address = publicKey.GetAddress ();
+			Console.WriteLine ("Account 0 address = " + address.ToString ());
+
+			/*
+			// The private generator (aka root private key, master private key)
+			var privateGen = K256KeyGenerator.ComputePrivateGen(rseed.GetBytes());
+			var root_key =
+			    // The root keyPair
+			    new K256KeyPair(privateGen);
+
+			var secret = K256KeyGenerator.ComputeSecretKey(privateGen, (uint) 0);
+
+			var testPrivate = new RipplePrivateKey(secret);
+			var pair0 = new K256KeyPair(secret);
+			*/
+			var bits = privateKey.GetBytes ();
+
+
+			BigInteger bigInteger =
+			    new BigInteger (1, bits);
+
+
+			//var b = new BigInteger(0, privateKey.GetBytes());
+
+			K256KeyPair pair = new K256KeyPair (bigInteger);
+			var signer = TxSigner.FromKeyPair (pair);
+
+
+			var dest =
+			    new RippleAddress ("rJ8UEAvqsMtQqaRv9VdasEyrf5DauwgZSg");
+
+
+			var oneXRP = new RippleCurrency (1.0m);
+
+			RipplePaymentTransaction tx =
+			    new RipplePaymentTransaction {
+				    Destination = dest,
+				    Account = address,
+				    Amount = oneXRP
+			    };
+
+			tx.AutoRequestFee (
+			    ni,
+			    new CancellationToken ());
+
+			tx.AutoRequestSequence (
+			    address,
+			    ni,
+			    new CancellationToken ());
+
+			//tx.LastLedgerSequence = 
+
+			string jsn = tx.GetJsonTxDotNet ();
+
+			var o = JObject.Parse (jsn);
+
+			SignedTx signedTx = signer.SignStObject (o);
+
+			tx.SignedTransactionBlob = signedTx?.TxBlob;
+			tx.hash = signedTx?.Hash;
+
+			tx.signed = true;
+
+
+			var response = tx.Submit (ni, new CancellationToken ());
+
+			var stat = response.status;
+
+
+
 		}
 
+		public static void TestMnemonic ()
+		{
 
-		public static NetworkInterface TestNetworking () {
+			var wrds = new List<string> () {
+				"piano",
+				"sleep",
+		 		"fall",
+		 		"aerobic",
+		  		"under",
+		   		"glide",
+		    		"today",
+		     		"favorite",
+		      		"response",
+				"family",
+			  	"basket",
+			    	"leader",
+			      	"inquiry",
+				"unable",
+				"useless"
+	     		};
+
+
+			MnemonicIsValid valid = MnemonicWordList.IsValid (wrds);
+
+			if (!valid.IsValid) {
+				Console.WriteLine ("Not valid : ");
+				Console.WriteLine (valid.Message);
+				return;
+			} else {
+				Console.WriteLine (valid.Message);
+			}
+
+
+			/*
+			var wrds =
+			    "piano sleep fall aerobic under glide today favorite response family basket leader inquiry unable useless"
+			 ;*/
+
+			var nm = new MnemonicWordList (wrds);
+			nm.LoadKeysFromMnemonic ();
+
+			uint [] accs = { 0, 1, 2, 3, 4 };
+			var accounts = nm.GetAccounts (accs);
+
+
+			foreach (var a in accounts) {
+				Console.WriteLine (a.AsHex ());
+			}
+
+		}
+
+		public static NetworkInterface TestNetworking ()
+		{
 
 			ConnectionSettings connectInfo = new ConnectionSettings {
 
@@ -93,18 +251,19 @@ namespace Source.UnitTesting
 			bool res = connectTask.Result;
 
 			//Logging.writeLog ();
-			System.Console.WriteLine ("connected == " + res.ToString());
+			System.Console.WriteLine ("connected == " + res.ToString ());
 			return ni;
 		}
 
-		public void TestTrustLines () {
+		public void TestTrustLines ()
+		{
 			CancellationToken token = new CancellationToken ();
-			var task = AccountLines.GetResult (test_address.ToString(), NetworkInterfaceObj, token);
+			var task = AccountLines.GetResult (test_address.ToString (), NetworkInterfaceObj, token);
 			System.Console.WriteLine ("testTrustLines : waiting....\n");
 			task.Wait ();
 			System.Console.WriteLine ("\n\n testTrustLines : done waiting\n");
 
-			var taskres= task.Result;
+			var taskres = task.Result;
 
 			var accrsp = taskres.result;
 
@@ -117,25 +276,26 @@ namespace Source.UnitTesting
 			}
 		}
 
-		public void TestKeyGen () {
+		public void TestKeyGen ()
+		{
 
 			int count = 0;
 
-			Random rnd = new Random();
-			Byte[] b = new Byte[16];
+			Random rnd = new Random ();
+			Byte [] b = new Byte [16];
 			int x = 0;
 			int max = 100;
 			while (x++ < max) {
-				rnd.NextBytes(b);
+				rnd.NextBytes (b);
 
-				Console.WriteLine("The Random bytes are: ");
-				for (int i = 0; i <= b.GetUpperBound(0); i++) 
-					Console.WriteLine("{0}: {1}", i, b[i]);  
+				Console.WriteLine ("The Random bytes are: ");
+				for (int i = 0; i <= b.GetUpperBound (0); i++)
+					Console.WriteLine ("{0}: {1}", i, b [i]);
 
 
 				RippleSeedAddress rsa = new RippleSeedAddress (b);
 
-				Response< RpcWalletProposeResult > res = LocalRippledWalletPropose.GetResult (rsa.ToString());
+				Response<RpcWalletProposeResult> res = LocalRippledWalletPropose.GetResult (rsa.ToString ());
 				string account2 = res.result.account_id;
 				string account1 = rsa.GetPublicRippleAddress ();
 
@@ -153,13 +313,14 @@ namespace Source.UnitTesting
 				}
 			}
 
-			Logging.WriteLog (x.ToString() + " wallets tested\n");
-			Logging.WriteLog (count.ToString() + " wallets succeeded\n");
+			Logging.WriteLog (x.ToString () + " wallets tested\n");
+			Logging.WriteLog (count.ToString () + " wallets succeeded\n");
 
 
 		}
 
-		public void SignConsistencyTest () {
+		public void SignConsistencyTest ()
+		{
 			//rMVZ3tvY463H2Z9wStCnUnCebgAcvNi7QQ
 			//r3vrqkurd7vKVbf3BA7cVmVqqmYShRGUqd
 
@@ -183,7 +344,7 @@ namespace Source.UnitTesting
 				};
 
 
-				string signature = rpt.Sign (rsa);
+				string signature = rpt.SignRippleLibSharp (rsa);
 				string signature2 = rpt.SignLocalRippled (rsa);
 
 			}
@@ -191,13 +352,14 @@ namespace Source.UnitTesting
 
 
 
-		public void TestOfferSignatures () {
+		public void TestOfferSignatures ()
+		{
 
 			//int numberOfTests = 100;
 
-			RippleSeedAddress seed = new RippleSeedAddress("sh5HPveFez84GR64twXuwSSS6MNVj");
+			RippleSeedAddress seed = new RippleSeedAddress ("sh5HPveFez84GR64twXuwSSS6MNVj");
 
-			string[] curs = {
+			string [] curs = {
 				"ABC",
 				"DEF",
 				"GHI",
@@ -216,12 +378,12 @@ namespace Source.UnitTesting
 				"NEM"
 			};
 
-			foreach ( int takergets in Enumerable.Range(1,100) ) {
-				foreach ( int takerpays in Enumerable.Range(1,100) ) {
-					foreach ( uint sequence in Enumerable.Range(1, 100)) {
-						foreach (uint lastLedgerSequence in Enumerable.Range(1,100)) {
-							foreach ( int fee in Enumerable.Range(1, 100)) {
-								foreach ( string s in curs ) {
+			foreach (int takergets in Enumerable.Range (1, 100)) {
+				foreach (int takerpays in Enumerable.Range (1, 100)) {
+					foreach (uint sequence in Enumerable.Range (1, 100)) {
+						foreach (uint lastLedgerSequence in Enumerable.Range (1, 100)) {
+							foreach (int fee in Enumerable.Range (1, 100)) {
+								foreach (string s in curs) {
 									Offer off = new Offer {
 
 										//Account = seed.getPublicRippleAddress ();
@@ -239,10 +401,10 @@ namespace Source.UnitTesting
 
 									string dotnet = offtx.SignRippleDotNet (seed);
 									string rippled = offtx.SignLocalRippled (seed);
-									string libsharp = offtx.Sign (seed);
+									string libsharp = offtx.SignRippleLibSharp (seed);
 
-									byte [] bytes = Base58.StringToByteArray (rippled);
-									byte [] bytes2 = Base58.StringToByteArray (libsharp);
+									byte [] bytes = Base58.HexStringToByteArray (rippled);
+									byte [] bytes2 = Base58.HexStringToByteArray (libsharp);
 
 									BinarySerializer bs = new BinarySerializer ();
 									MemoryStream memoryStream = new MemoryStream (bytes);
@@ -251,14 +413,14 @@ namespace Source.UnitTesting
 									var v = bs.ReadBinaryObject (memoryStream);
 									var v2 = bs.ReadBinaryObject (memoryStream2);
 
-									byte[] sig = (byte[])v.GetField (BinaryFieldType.TxnSignature);
-									byte[] sig2 = (byte[])v2.GetField (BinaryFieldType.TxnSignature);
+									byte [] sig = (byte [])v.GetField (BinaryFieldType.TxnSignature);
+									byte [] sig2 = (byte [])v2.GetField (BinaryFieldType.TxnSignature);
 
 
 
 
 									bool sigsame = ArraysEqual (sig, sig2);
-									
+
 
 									bool m = rippled.Equals (libsharp);
 
@@ -267,8 +429,8 @@ namespace Source.UnitTesting
 
 										//throw new DataMisalignedException ();
 									} else {
-										
-										Logging.WriteLog ( "Non match : " + m.ToString() );
+
+										Logging.WriteLog ("Non match : " + m.ToString ());
 
 									}
 
@@ -277,7 +439,7 @@ namespace Source.UnitTesting
 							}
 
 						}
-					
+
 
 					}
 				}
@@ -289,15 +451,15 @@ namespace Source.UnitTesting
 
 		}
 
-		private bool ArraysEqual (byte[] one, byte[] two)
+		private bool ArraysEqual (byte [] one, byte [] two)
 		{
 			bool equal = true;
 			if (one.Length != two.Length) {
 				equal = false;
 			}
 			for (int i = 0; i < one.Length; i++) {
-				Logging.WriteLog ("bytes : " + one[i] + " " + two[i]);
-				if (one[i] != two[i]) {
+				Logging.WriteLog ("bytes : " + one [i] + " " + two [i]);
+				if (one [i] != two [i]) {
 					equal = false;
 				}
 			}
@@ -339,12 +501,14 @@ namespace Source.UnitTesting
 			//NetworkInterfaceObj.SendToServer (new byte [] { });
 
 			Task.Delay (1000 * 60 * 30).Wait ();
+
+			// TODO close connection 
 		}
 
 		public void AccountSubscribeTest ()
 		{
 
-			Thread thread = new Thread((object obj) => {
+			Thread thread = new Thread ((object obj) => {
 
 				String [] accounts = new String [] {
 					//test_address.ToString(),

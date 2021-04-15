@@ -36,6 +36,8 @@ namespace RippleLibSharp.Commands.Accounts
 			return task;
 		}
 
+
+
 		public static UInt32? GetSequence (string account, NetworkInterface ni, CancellationToken token ) {
 			Task<Response<AccountInfoResult>> t = GetResult (account, ni, token);
 

@@ -18,15 +18,29 @@ namespace RippleLibSharp.Commands.Stipulate
 				};
 			}
 
+			object d = null;
 
+			if (destination_amount.IsNative) {
+
+				d = (destination_amount.amount).ToString ();
+
+			} else {
+
+				d = new {
+					value = destination_amount.amount,
+					currency = destination_amount.currency,
+					issuer = destination_amount.issuer
+				};
+
+			}
 
 			object o = new {
 				id = identifierTag,
 				command = "path_find",
 				subcommand = "create",
-				source_account,
-				destination_account,
-				destination_amount
+				source_account = source_account,
+				destination_account = destination_account,
+				destination_amount = d
 			};
 
 			string request = DynamicJson.Serialize (o);

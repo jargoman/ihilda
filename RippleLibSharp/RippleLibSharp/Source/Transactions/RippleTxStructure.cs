@@ -149,7 +149,8 @@ namespace RippleLibSharp.Transactions
 			}
 #endif
 
-
+	    		// Utility for wrapping text in pango markup
+			TextHighlighter highlighter = new TextHighlighter ();
 
 			string account = tx.Account;
 
@@ -162,14 +163,16 @@ namespace RippleLibSharp.Transactions
 
 
 			if (queried_addr == tx.Account) {
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				account = TextHighlighter.Highlight (account);
+
+
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				account = highlighter.Highlight (account);
 
 			}
 
 			if (queried_addr == limitamount.issuer) {
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				limitissuer = TextHighlighter.Highlight (limitissuer);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				limitissuer = highlighter.Highlight (limitissuer);
 
 			}
 
@@ -252,14 +255,16 @@ namespace RippleLibSharp.Transactions
 			}
 #endif
 
+			TextHighlighter highlighter = new TextHighlighter ();
+
 			StringBuilder builder = new StringBuilder ();
 			RippleCurrency tGets = null;
 			RippleCurrency tPays = null;
 
 			string acnt = tx.Account;
 			if (queried_addr == tx.Account) {
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				acnt = TextHighlighter.Highlight (acnt); //highlight (acnt);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				acnt = highlighter.Highlight (acnt); //highlight (acnt);
 			}
 
 			RippleNode canceledOrderNode = null;
@@ -342,16 +347,17 @@ namespace RippleLibSharp.Transactions
 #if DEBUG
 			string method_sig = clsstr + nameof( GetPaymentPrintables) + DebugRippleLibSharp.left_parentheses + nameof (RippleAddress) + DebugRippleLibSharp.space_char + nameof (queried_addr) + DebugRippleLibSharp.equals + DebugRippleLibSharp.ToAssertString (queried_addr) + DebugRippleLibSharp.right_parentheses;
 #endif
+			TextHighlighter highlighter = new TextHighlighter ();
 
 			if (queried_addr == tx.Account) {
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				sending_address = TextHighlighter.Highlight (sending_address);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				sending_address = highlighter.Highlight (sending_address);
 
 			}
 
 			if (queried_addr == tx.Destination) {
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				receiving_address = TextHighlighter.Highlight (receiving_address);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				receiving_address = highlighter.Highlight (receiving_address);
 			}
 
 #if DEBUG
@@ -401,6 +407,9 @@ namespace RippleLibSharp.Transactions
 				Logging.WriteLog (method_sig + DebugRippleLibSharp.beginn);
 			}
 #endif
+
+
+			TextHighlighter highlighter = new TextHighlighter ();
 			StringBuilder buybuilder = new StringBuilder ();
 			StringBuilder sellbuilder = new StringBuilder ();
 
@@ -415,8 +424,8 @@ namespace RippleLibSharp.Transactions
 
 
 			if (queried_addr == tx.Account) {
-				TextHighlighter.Highlightcolor = TextHighlighter.RED;
-				account = TextHighlighter.Highlight (account);
+				highlighter.Highlightcolor = TextHighlighter.RED;
+				account = highlighter.Highlight (account);
 			}
 
 			buybuilder.Append (account);

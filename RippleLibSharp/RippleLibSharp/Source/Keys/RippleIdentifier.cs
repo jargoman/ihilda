@@ -20,6 +20,7 @@ using System.Security;
 
 namespace RippleLibSharp.Keys
 {
+
 	public class RippleIdentifier
 	{
 #pragma warning disable RECS0122 // Initializing field with default value is redundant
@@ -44,7 +45,7 @@ namespace RippleLibSharp.Keys
 			byte [] payloadBytes, 
 			byte identifierType)
 		{
-			this.PayloadBytes = payloadBytes;
+			this.PayloadBytes = payloadBytes ?? throw new ArgumentNullException (nameof (payloadBytes));
 			this.identifierType = identifierType;
 
 			//this.humanReadableIdentifier = ToString ();
@@ -201,6 +202,11 @@ namespace RippleLibSharp.Keys
 		public byte [] GetBytes ()
 		{
 			return PayloadBytes;
+		}
+
+		public string AsHex ()
+		{
+			return Base58.ByteArrayToHexString (this.GetBytes ());
 		}
 
 		/*

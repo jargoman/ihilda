@@ -31,6 +31,8 @@ namespace RippleLibSharp.Keys
 		public const string RIPPLE_ADDRESS_JARGOMAN = "rBuDDpdVBt57JbyfXbs8gjWvp4ScKssHzx";
 		public const string RIPPLE_ADDRESS_ICE_ISSUER = "r4H3F9dDaYPFwbrUsusvNAHLz2sEZk4wE5";
 		public const string RIPPLE_ADDRESS_DAHLIOO = "rDR4DBpWi5oc9pi6ARRQbR4Yre8fxgiXSx";
+		public const string RIPPLE_ADDRESS_GRAVBALLE = "rsTFj8GnAGS2an2YsPpaSP1eaWFBLYsiCa";
+		public const string RIPPLE_ADDRESS_DISRUPTOR = "rhVPqUMjrKFYVwsdGBowa35royomvCPUh6";
 
 		/*
 		public static readonly string RIPPLE_ROOT_ACCOUNT ="rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh";

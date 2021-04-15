@@ -70,59 +70,59 @@ namespace RippleLibSharp.Binary
 				break;
 
 			case 0x01:  //BinaryType.UINT16:
-				this.str = "UINT16";
+				this.str = nameof(BinaryType.UINT16);
 				break;
 
 			case 0x02:  //BinaryType.UINT32:
-				this.str = "UINT32";
+				this.str = nameof(BinaryType.UINT32);
 				break;
 
 			case 0x03:  //BinaryType.UINT64:
-				this.str = "UINT64";
+				this.str = nameof (BinaryType.UINT64);
 				break;
 
 			case 0x04: //BinaryType.HASH128:
-				this.str = "HASH128";
+				this.str = nameof(BinaryType.HASH128); //"HASH128";
 				break;
 
 			case 0x05: // BinaryType.HASH256:
-				this.str = "HASH256";
+				this.str = nameof(BinaryType.HASH256);
 				break;
 
 			case 0x06: //BinaryType.AMOUNT:
-				this.str = "AMOUNT";
+				this.str = nameof (BinaryType.AMOUNT);
 				break;
 
 			case 0x07:  // BinaryType.VARIABLE_LENGTH:
-				this.str = "VARIABLE_LENGTH";
+				this.str = nameof(BinaryType.VARIABLE_LENGTH);
 				break;
 
 			case 0x08:  // BinaryType.ACCOUNT:
-				this.str = "ACCOUNT";
+				this.str = nameof(BinaryType.ACCOUNT);
 				break;
 
 			case 0x0e:  // BinaryType.OBJECT:
-				this.str = "OBJECT";
+				this.str = nameof(BinaryType.OBJECT);
 				break;
 
 			case 0x0f:  // BinaryType.ARRAY:
-				this.str = "ARRAY";
+				this.str = nameof(BinaryType.ARRAY);
 				break;
 
 			case 0x10:  // BinaryType.UINT8:
-				this.str = "UINT8";
+				this.str = nameof(BinaryType.UINT8);
 				break;
 
 			case 0x11:  // BinaryType.HASH160:
-				this.str = "HASH160";
+				this.str = nameof(BinaryType.HASH160);
 				break;
 
 			case 0x12:  // BinaryType.PATHSET:
-				this.str = "PATHSET";
+				this.str = nameof(BinaryType.PATHSET);
 				break;
 
 			case 0x13:  // BinaryType.VECTOR256:
-				this.str = "VECTOR256";
+				this.str = nameof(BinaryType.VECTOR256);
 				break;
 
 			default:
@@ -212,7 +212,7 @@ namespace RippleLibSharp.Binary
 
 		public bool Equals (BinaryType type)
 		{
-			if ((Object)type == null) {
+			if (type is null) {
 				return false;
 			}
 
@@ -234,6 +234,7 @@ namespace RippleLibSharp.Binary
 
 		public int CompareTo (object obj)
 		{
+
 			if (obj == null) {
 				throw new ArgumentNullException();
 			}

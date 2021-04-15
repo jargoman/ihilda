@@ -102,26 +102,24 @@ namespace RippleLibSharp.Binary
 
 		public Object GetField (BinaryFieldType transactiontype) // why variable named transaction type O_o
 		{
-#pragma warning disable IDE0018 // Inline variable declaration
-			Object obj = null;
-#pragma warning restore IDE0018 // Inline variable declaration
-			fields.TryGetValue (transactiontype, out obj);
 
-			if (obj == null) {
-				return null; // TODO refactor with Maybe object?
+			if (fields.TryGetValue (transactiontype, out object obj)) {
+				return obj; // TODO refactor with Maybe object?
 			}
-			return obj;
+			return null;
 		}
 
 		public void PutField (BinaryFieldType field, Object value)
 		{
+
+
 #if DEBUG
 			StringBuilder stringBuilder = new StringBuilder ();
 			stringBuilder.Append (clsstr);
 
-			stringBuilder.Append (nameof (PutField));
+			stringBuilder.Append (nameof (PutField)); // use function name 
 
-			stringBuilder.Append (DebugRippleLibSharp.left_parentheses);
+			stringBuilder.Append (DebugRippleLibSharp.left_parentheses); // (
 
 			stringBuilder.Append (nameof (BinaryFieldType));
 			stringBuilder.Append (DebugRippleLibSharp.space_char);
@@ -137,7 +135,7 @@ namespace RippleLibSharp.Binary
 			stringBuilder.Append (DebugRippleLibSharp.space_char);
 			stringBuilder.Append (nameof (value));
 			stringBuilder.Append (DebugRippleLibSharp.equals);
-			stringBuilder.Append ((DebugRippleLibSharp.allowInsecureDebugging ? value.ToString () : "hidden"));
+			stringBuilder.Append ((DebugRippleLibSharp.allowInsecureDebugging ? (value?.ToString () ?? "null") : "hidden"));
 			stringBuilder.Append (DebugRippleLibSharp.right_parentheses);
 
 			string method_sig =  stringBuilder.ToString(); 
@@ -145,6 +143,8 @@ namespace RippleLibSharp.Binary
 				Logging.WriteLog(method_sig + DebugRippleLibSharp.beginn);
 			}
 #endif
+
+
 
 			if (value == null) {
 #if DEBUG
@@ -156,6 +156,8 @@ namespace RippleLibSharp.Binary
 				// 
 				//throw new ArgumentNullException(field.ToString(), "Can not set BinaryFieldType " + field.ToString() + "to null");
 			}
+
+	    		// TODO
 			fields.Add (field, value);
 		}
 

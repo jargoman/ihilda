@@ -85,7 +85,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 			}
 
 			if (this.MessageKey != null) {
-				stringBuilder.Append ("\"MessageKey\": " + MessageKey.ToString () + ",");
+				stringBuilder.Append ("\"MessageKey\": \"" + MessageKey.ToString () + "\"");
 			}
 
 
@@ -94,7 +94,7 @@ namespace RippleLibSharp.Transactions.TxTypes
 			}
 
 
-			stringBuilder.Append ("\"Sequence\": " + Sequence.ToString ());
+			//stringBuilder.Append ("\"Sequence\": " + Sequence.ToString ());
 
 
 

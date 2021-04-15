@@ -5,6 +5,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math.EC.Abc;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Crypto.Generators;
+using RippleLibSharp.Binary;
 
 // done
 
@@ -152,6 +153,16 @@ namespace RippleLibSharp.Keys
 
 			return privKey;
 		}
-	}
+
+
+        
+
+        public static RipplePrivateKey FromHex( string hex )
+        {
+            byte[] bytes = Base58.HexStringToByteArray(hex);
+
+
+            return new RipplePrivateKey(bytes);
+        }	}
 }
 

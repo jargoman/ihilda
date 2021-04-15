@@ -1,29 +1,36 @@
 ﻿<Properties StartupConfiguration="{E5AE1E9D-3996-42A3-9198-E3E86DEBA932}|Default">
   <MonoDevelop.Ide.ItemProperties.RippleLibSharp PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="RippleLibSharp/Source/Transactions/TxTypes/RippleTransaction.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="RippleLibSharp/Source/Unit-Testing/TestResult.cs">
     <Files>
-      <File FileName="RippleLibSharp/Source/Transactions/TxTypes/RippleTransaction.cs" Line="383" Column="27" />
+      <File FileName="RippleLibSharp/Source/Unit-Testing/RLSTest.cs" Line="68" Column="1" />
+      <File FileName="RippleLibSharp/Source/Mnemonics/MnemonicWordList.cs" Line="64" Column="30" />
+      <File FileName="RippleLibSharp/Source/Unit-Testing/TestResult.cs" Line="9" Column="13" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="RippleLibSharp" expanded="True">
             <Node name="RippleLibSharp" expanded="True">
-              <Node name="Source" expanded="True">
-                <Node name="Transactions" expanded="True">
-                  <Node name="TxTypes" expanded="True">
-                    <Node name="RippleTransaction.cs" selected="True" />
-                  </Node>
+              <Node name="References" expanded="True">
+                <Node name="From Packages" expanded="True">
+                  <Node name="NBitcoin" selected="True" />
                 </Node>
+              </Node>
+              <Node name="Packages" expanded="True" />
+              <Node name="Source" expanded="True">
+                <Node name="Unit-Testing" expanded="True" />
               </Node>
             </Node>
           </Node>
         </State>
       </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

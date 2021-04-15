@@ -25,7 +25,7 @@ namespace RippleLibSharp.Network
 		public bool HasError () {
 
 			if (status == null) {
-				return false;
+				return true;
 			}
 
 			return "error".Equals (status);

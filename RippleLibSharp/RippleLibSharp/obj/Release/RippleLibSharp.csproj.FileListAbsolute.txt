@@ -3,11 +3,15 @@
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/BouncyCastle.Crypto.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/log4net.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/Microsoft.CSharp.dll
+/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/Microsoft.Extensions.Logging.Abstractions.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/Mono.Posix.dll
+/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/NBitcoin.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/Newtonsoft.Json.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/QRCoder.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/SuperSocket.ClientEngine.dll
+/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/System.Buffers.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/System.dll
+/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/System.Runtime.InteropServices.RuntimeInformation.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/System.Runtime.Serialization.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/System.Security.dll
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/System.Xml.dll
@@ -17,8 +21,10 @@
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/Newtonsoft.Json.xml
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/log4net.xml
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/websocket-sharp.xml
+/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/System.Buffers.xml
+/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/Microsoft.Extensions.Logging.Abstractions.xml
+/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/bin/Release/NBitcoin.xml
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Release/riplibsharp.exe.config
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Release/RippleLibSharp.csproj.CoreCompileInputs.cache
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Release/RippleLibSharp.csproj.CopyComplete
 /home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Release/riplibsharp.exe
-/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/obj/Release/RippleLibSharp.csprojAssemblyReference.cache

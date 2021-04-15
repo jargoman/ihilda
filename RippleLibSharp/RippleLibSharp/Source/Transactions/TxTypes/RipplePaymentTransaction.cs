@@ -122,6 +122,11 @@ namespace RippleLibSharp.Transactions.TxTypes
 				this.SendMax = (RippleCurrency)sm;
 			}
 
+			object memos = serObj.GetField (BinaryFieldType.Memos);
+			if (memos != null) {
+				MemoFolder m = (MemoFolder)memos;
+				this.Memos = m.Memos;
+			}
 			//int[] s = new int[0];
 		}
 
@@ -152,8 +157,11 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 			rbo.PutField (BinaryFieldType.DestinationTag, this.DestinationTag);
 
+			if (this.Memos != null) {
 
-
+				var folder = new MemoFolder () { Memos = this.Memos };
+				rbo.PutField (BinaryFieldType.Memos, folder);
+			}
 
 
 			return rbo;
@@ -180,6 +188,11 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 				var pth = DynamicJson.Serialize (Paths);
 				stringBuilder.Append ("\"Paths\": " + pth + ",");
+			}
+
+			if (Memos != null) {
+				var memos = DynamicJson.Serialize (Memos);
+				stringBuilder.Append ("\"Memos\": " + memos + ",");
 			}
 
 			if (DestinationTag != null) {
@@ -218,6 +231,11 @@ namespace RippleLibSharp.Transactions.TxTypes
 
 				var pth = DynamicJson.Serialize (Paths);
 				stringBuilder.Append ("\"Paths\": " + pth + ",");
+			}
+
+			if (Memos != null) {
+				var memos = DynamicJson.Serialize (Memos);
+				stringBuilder.Append ("\"Memos\": " + memos + ",");
 			}
 
 			if (DestinationTag != null) {
@@ -296,6 +314,14 @@ namespace RippleLibSharp.Transactions.TxTypes
 		}
 
 
+	}
+
+	public class MemoFolder {
+		public MemoFolder () { 
+		
+		}
+
+		public MemoIndice [] Memos { get; set; }
 	}
 }
 

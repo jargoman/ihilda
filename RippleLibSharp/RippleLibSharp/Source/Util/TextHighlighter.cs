@@ -5,38 +5,46 @@ namespace RippleLibSharp.Util
 {
 	public class TextHighlighter
 	{
-		/*
+
 		public TextHighlighter ()
 		{
 		}
-		*/
 
-		public static string Highlight (string s)
+		public TextHighlighter (string color) {
+			this.Highlightcolor = color;
+		}
+
+		public string Highlight (string s)
 		{
 			string str = null;
-			lock (lockObj) {
+
+			if (Highlightcolor != null) {
+				lock (lockObj) {
+
+					StringBuilder stringBuilder = _stringBuilder;
+					stringBuilder.Clear ();
+
+					stringBuilder.Append ("<span foreground = ");
+					stringBuilder.Append (Highlightcolor);
+					stringBuilder.Append (">");
+					stringBuilder.Append (s);
+					stringBuilder.Append ("</span>");
+
+					str = stringBuilder.ToString ();
+					stringBuilder.Clear ();
+				}
 				
-				StringBuilder stringBuilder = _stringBuilder;
-				stringBuilder.Clear ();
-
-				stringBuilder.Append ("<span foreground = ");
-				stringBuilder.Append (Highlightcolor);
-				stringBuilder.Append (">");
-				stringBuilder.Append (s);
-				stringBuilder.Append ("</span>");
-
-				str = stringBuilder.ToString ();
-				stringBuilder.Clear ();
 			}
-
 
 
 			return  str;
 		}
 
-		public static string Highlight (StringBuilder s)
+		public string Highlight (StringBuilder s)
 		{
+
 			string str = null;
+
 			lock (lockObj) {
 
 				StringBuilder stringBuilder = _stringBuilder;
@@ -58,9 +66,18 @@ namespace RippleLibSharp.Util
 		}
 
 
+		public static string MakeBold (string s)
+		{
+			StringBuilder stringBuilder = new StringBuilder ();
 
+			stringBuilder.Append ("<b>");
+			stringBuilder.Append (s);
+			stringBuilder.Append ("</b>");
 
-		public static string Highlightcolor {
+			return stringBuilder.ToString ();
+		}
+
+		public string Highlightcolor {
 			get;
 			set;
 		}
@@ -76,8 +93,9 @@ namespace RippleLibSharp.Util
 		public static string ORANGE = "\"orange\"";
 		public static string CHARTREUSE = "\"chartreuse\"";
 
-		private static object lockObj = new object ();
-		private static StringBuilder _stringBuilder = new StringBuilder();
+		private readonly object lockObj = new object ();
+
+		private readonly StringBuilder _stringBuilder = new StringBuilder();
 
 
 #if DEBUG

@@ -320,7 +320,7 @@ namespace RippleLibSharp.Binary
 				return null;
 			}
 
-			byte [] bytes = StringToByteArray (hex);
+			byte [] bytes = HexStringToByteArray (hex);
 
 			return Encoding.ASCII.GetString (bytes);
 
@@ -328,7 +328,7 @@ namespace RippleLibSharp.Binary
 
 		}
 
-		public static byte [] StringToByteArray (string hex)
+		public static byte [] HexStringToByteArray (string hex)
 		{
 			return Enumerable.Range (0, hex.Length)
 					 .Where (x => x % 2 == 0)

@@ -110,6 +110,8 @@ namespace RippleLibSharp.Nodes
 			}
 
 
+			TextHighlighter highlighter = new TextHighlighter ();
+
 			RippleCurrency pays = FinalFields.TakerPays;
 			RippleCurrency gets = FinalFields.TakerGets;
 
@@ -121,9 +123,9 @@ namespace RippleLibSharp.Nodes
 
 			string account = addr.ToString ();
 
-			TextHighlighter.Highlightcolor = TextHighlighter.RED;
+			highlighter.Highlightcolor = TextHighlighter.RED;
 
-			account = TextHighlighter.Highlight (account);
+			account = highlighter.Highlight (account);
 
 			StringBuilder sb = new StringBuilder ();
 			StringBuilder sb2 = new StringBuilder ();
@@ -211,7 +213,7 @@ namespace RippleLibSharp.Nodes
 				return null;
 			}
 
-
+			TextHighlighter highlighter = new TextHighlighter ();
 
 			RippleCurrency pays = PreviousFields.TakerPays - this.FinalFields.TakerPays;
 			RippleCurrency gets = PreviousFields.TakerGets - this.FinalFields.TakerGets;
@@ -219,8 +221,8 @@ namespace RippleLibSharp.Nodes
 
 			string account = addr.ToString ();
 
-			TextHighlighter.Highlightcolor = TextHighlighter.RED;
-			account = TextHighlighter.Highlight (account);
+			highlighter.Highlightcolor = TextHighlighter.RED;
+			account = highlighter.Highlight (account);
 
 
 

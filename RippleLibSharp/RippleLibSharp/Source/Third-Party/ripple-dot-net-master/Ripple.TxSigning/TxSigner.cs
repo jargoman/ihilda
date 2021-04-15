@@ -20,6 +20,7 @@ namespace Ripple.TxSigning
         private TxSigner(IKeyPair keyPair)
         {
             _keyPair = keyPair;
+			
         }
         private TxSigner(string secret) :
             this(Seed.FromBase58(secret).KeyPair())
