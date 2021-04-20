@@ -1,0 +1,688 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CA53CCC7-77CC-4338-A888-7F0ED71810AB}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>IhildaWallet</RootNamespace>
+    <StartupObject>IhildaWallet.Program</StartupObject>
+    <ReleaseVersion>1.0.4</ReleaseVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <AssemblyName>ihilda</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <EnvironmentVariables>
+      <EnvironmentVariables>
+        <Variable name="LIBOVERLAY_SCROLLBAR" value="0" />
+      </EnvironmentVariables>
+    </EnvironmentVariables>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <PlatformTarget>x86</PlatformTarget>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <NoStdLib>true</NoStdLib>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <NoStdLib>true</NoStdLib>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <NoStdLib>true</NoStdLib>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
+    <StartAction>Project</StartAction>
+    <StartArguments>darkmode=true linq=true parallelOrderSubmit=true</StartArguments>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Posix">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Dynamic" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Core">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <SpecificVersion>False</SpecificVersion>
+      <Package>gtk-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Management" />
+    <Reference Include="Mono.CSharp">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cairo" />
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="gtk-dotnet, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-dotnet-2.0</Package>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>glib-sharp-2.0</Package>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Microsoft.CSharp">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="mscorlib">
+      <HintPath>..\..\..\..\..\..\..\usr\lib\mono\4.5-api\mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="SuperSocket.ClientEngine">
+      <HintPath>packages\SuperSocket.ClientEngine.Core.0.10.0\lib\net45\SuperSocket.ClientEngine.dll</HintPath>
+      <Aliases>SupermanSocket</Aliases>
+    </Reference>
+    <Reference Include="WebSocket4Net">
+      <HintPath>packages\WebSocket4Net.0.15.2\lib\net45\WebSocket4Net.dll</HintPath>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>packages\BouncyCastle.1.8.9\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="QRCoder">
+      <HintPath>packages\QRCoder.1.4.1\lib\net40\QRCoder.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp-gdi">
+      <HintPath>packages\PDFsharp-gdi.1.51.5185-beta\lib\net20\PdfSharp-gdi.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Charting-gdi">
+      <HintPath>packages\PDFsharp-gdi.1.51.5185-beta\lib\net20\PdfSharp.Charting-gdi.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Client">
+      <HintPath>packages\Microsoft.AspNet.SignalR.Client.2.4.1\lib\net45\Microsoft.AspNet.SignalR.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Web" />
+    <Reference Include="Microsoft.Dynamic">
+      <HintPath>packages\DynamicLanguageRuntime.1.3.0\lib\net45\Microsoft.Dynamic.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Scripting">
+      <HintPath>packages\DynamicLanguageRuntime.1.3.0\lib\net45\Microsoft.Scripting.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Scripting.Metadata">
+      <HintPath>packages\DynamicLanguageRuntime.1.3.0\lib\net45\Microsoft.Scripting.Metadata.dll</HintPath>
+    </Reference>
+    <Reference Include="IronPython">
+      <HintPath>packages\IronPython.2.7.11\lib\net45\IronPython.dll</HintPath>
+    </Reference>
+    <Reference Include="IronPython.Modules">
+      <HintPath>packages\IronPython.2.7.11\lib\net45\IronPython.Modules.dll</HintPath>
+    </Reference>
+    <Reference Include="IronPython.SQLite">
+      <HintPath>packages\IronPython.2.7.11\lib\net45\IronPython.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="IronPython.Wpf">
+      <HintPath>packages\IronPython.2.7.11\lib\net45\IronPython.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation">
+      <HintPath>packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="riplibsharp">
+      <HintPath>..\..\..\RippleLibSharp\RippleLibSharp\bin\Debug\riplibsharp.exe</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="gtk-gui\gui.stetic">
+      <LogicalName>gui.stetic</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\ice_splash.png">
+      <DeployService-UseProjectRelativePath>True</DeployService-UseProjectRelativePath>
+      <DeployService-Deploy>True</DeployService-Deploy>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\cooltext116146681719140.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\cooltext116146681747416.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\cooltext116146681755544.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\cooltext116146681700407.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Files\networkSettingsDefault.jsn" />
+    <EmbeddedResource Include="Files\testnetsettings.jsn" />
+    <EmbeddedResource Include="Images\ih_alpha.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Sounds\cash_register_x.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\xrp_crunched.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\xrp_25x22.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\ajax-loader-200x200.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\cooltext119289343591674.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\cooltext119298857483375.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\xrp-symbol-black-25x25.png" />
+    <EmbeddedResource Include="Images\earthfrommoonsided.png" />
+    <EmbeddedResource Include="Images\ihildabright.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\ihildaplain.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\ihildaplain-100-wide.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\coolio-medium.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="gtk-gui\generated.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.NetworkSettings.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.Console.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.SendRipple.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.ReceiveWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.PasswordDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.PasswordCreateDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.MessageDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.AreYouSure.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.SendIce.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.RandomSeedGenerator.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TrustSetter.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.CurrencyWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.BalanceWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.BalanceTab.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.SplashWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OptionsWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.BalanceTabOptionsWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.SplashOptionsWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OrderBookTableWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.WalletWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.WalletManagerWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.FromSecretDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.WalletManagerWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.WalletTree.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.WalletUtil.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.FromScriptDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.ProcessSplash.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.PagerWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.NewButtonDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.NetworkSettingsDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TradeWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TradePairWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.BuyWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.SellWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OrderBookWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.SpreadWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.CurrencyWidgetSelector.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.ChatWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OptionsWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TrustManagementWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.AddressDisplayWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.AddressProfile.cs" />
+    <Compile Include="Source\NameMaker.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.PairPopup.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.DenominatedIssuedPopup.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.ConsoleWindow.cs" />
+    <Compile Include="Source\WindowsFix.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.RoboticsWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TxViewWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TxWindow.cs" />
+    <Compile Include="Source\AccountChange.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TxWidget.cs" />
+    <Compile Include="Source\TxSummary.cs" />
+    <Compile Include="Source\BalanceChange.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.AccountLinesWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.WalletShowWidget.cs" />
+    <Compile Include="Source\AddressCacheObject.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OrdersWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OrderWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.PaymentWindow.cs" />
+    <Compile Include="Source\gui-classes\AddressProfile.cs" />
+    <Compile Include="Source\util\DebugIhildaWallet.cs" />
+    <Compile Include="Source\gui-classes\RippledController.cs" />
+    <Compile Include="Source\util\Logging.cs" />
+    <Compile Include="Source\console\ConsoleInterpreter.cs" />
+    <Compile Include="Source\console\CSharpInterpreter.cs" />
+    <Compile Include="Source\console\IceJargonInterpreter.cs" />
+    <Compile Include="Source\console\HistoryRecall.cs" />
+    <Compile Include="Source\plugin-system\PluginType.cs" />
+    <Compile Include="Source\plugin-system\IPlugin.cs" />
+    <Compile Include="Source\plugin-system\Plugin.cs" />
+    <Compile Include="Source\plugin-system\PluginController.cs" />
+    <Compile Include="Source\encryption\IEncrypt.cs" />
+    <Compile Include="Source\console\Interpreters.cs" />
+    <Compile Include="Source\encryption\Rijndaelio.cs" />
+    <Compile Include="Source\gui-classes\WalletUtil.cs" />
+    <Compile Include="Source\gui-classes\Widgets\AddressDisplayWidget.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\AreYouSure.cs" />
+    <Compile Include="Source\gui-classes\Widgets\CurrencyWidgetSelector.cs" />
+    <Compile Include="Source\gui-classes\Widgets\CurrencyWidget.cs" />
+    <Compile Include="Source\gui-classes\Windows\ConsoleWindow.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\MessageDialog.cs" />
+    <Compile Include="Source\gui-classes\Windows\WalletManagerWindow.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\FromSecretDialog.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\FromScriptDialog.cs" />
+    <Compile Include="Source\gui-classes\Widgets\OrderBookTableWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\Console.cs" />
+    <Compile Include="Source\gui-classes\Widgets\PagerWidget.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\PasswordDialog.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\PasswordCreateDialog.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\RandomSeedGenerator.cs" />
+    <Compile Include="Source\gui-classes\Windows\PaymentWindow.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\NewButtonDialog.cs" />
+    <Compile Include="Source\gui-classes\Windows\OptionsWindow.cs" />
+    <Compile Include="Source\gui-classes\Windows\RoboticsWindow.cs" />
+    <Compile Include="Source\gui-classes\Windows\TradeWindow.cs" />
+    <Compile Include="Source\gui-classes\Widgets\SpreadWidget.cs" />
+    <Compile Include="Source\gui-classes\Windows\TxWindow.cs" />
+    <Compile Include="Source\gui-classes\Widgets\WalletWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\OrderBookWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\ReceiveWidget.cs" />
+    <Compile Include="Source\gui-classes\Windows\TrustManagementWindow.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\NetworkSettingsDialog.cs" />
+    <Compile Include="Source\util\PageCache.cs" />
+    <Compile Include="Source\util\CommandLineParser.cs" />
+    <Compile Include="Source\bot\Robotics.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\DenominatedIssuedPopup.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\PairPopup.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\ProcessSplash.cs" />
+    <Compile Include="Source\gui-classes\Widgets\WalletShowWidget.cs" />
+    <Compile Include="Source\multithreading\ThreadedBackgroundWorker.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Source\Trade\TradePair.cs" />
+    <Compile Include="Source\Trade\BuyOffer.cs" />
+    <Compile Include="Source\Trade\SellOffer.cs" />
+    <Compile Include="Source\Trade\OrderEnum.cs" />
+    <Compile Include="Source\contacts\AddressBook.cs" />
+    <Compile Include="Source\contacts\AddressBookEntry.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.ServerInfoWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.AccountsViewSelector.cs" />
+    <Compile Include="Source\TrustLineTableRow.cs" />
+    <Compile Include="Source\util\WalletManager.cs" />
+    <Compile Include="Source\gui-classes\Widgets\Views\TxViewWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\Views\AccountLinesWidget.cs" />
+    <Compile Include="Source\JsonWallet.cs" />
+    <Compile Include="Source\util\FileHelper.cs" />
+    <Compile Include="Source\Networking\NetworkController.cs" />
+    <Compile Include="Source\util\AssemblyDebug.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.ConnectedDisplayWidget.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\RemoveTrustDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.CascadedBuyWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TradePairTree.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\TradePairCreateDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TradePairCreateDialog.cs" />
+    <Compile Include="Source\gui-classes\Windows\TradePairManagerWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TradePairEntryWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TradePairManagerWindow.cs" />
+    <Compile Include="Source\util\TradePairManager.cs" />
+    <Compile Include="Source\gui-classes\Windows\OrderBookWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OrderBookWindow.cs" />
+    <Compile Include="Source\gui-classes\Splashes\LoadingWindow.cs" />
+    <Compile Include="Source\gui-classes\Splashes\SplashWindow.cs" />
+    <Compile Include="Source\gui-classes\Splashes\SpinWait.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.Splashes.LoadingWindow.cs" />
+    <Compile Include="Source\util\Profiteer.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.CascadedSellWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\OptionSettingsWidget\SplashOptionsWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\OptionSettingsWidget\OptionsWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\NetworkOptions\NetworkSettings.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TradeUI\BuyWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TradeUI\CascadedBuyWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TradeUI\CascadedSellWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TradeUI\OrderBookLabel.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TradeUI\OrderWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TradeUI\SellWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\PayUI\SendAndConvert.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TradeUI\ChatWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\Trees\TradePairTree.cs" />
+    <Compile Include="Source\gui-classes\Widgets\PayUI\SendIce.cs" />
+    <Compile Include="Source\gui-classes\Widgets\PayUI\SendRipple.cs" />
+    <Compile Include="Source\gui-classes\Widgets\PayUI\SendIOU.cs" />
+    <Compile Include="Source\gui-classes\Widgets\Trees\WalletTree.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TrustUI\TrustSetter.cs" />
+    <Compile Include="Source\gui-classes\Widgets\OptionSettingsWidget\ConsoleOptionsWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\OptionSettingsWidget\FeeOptionsWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.FeeOptionsWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.ConsoleOptionsWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TradeUI\TradePairEntryWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TradeUI\TradePairWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\Views\AccountsViewSelector.cs" />
+    <Compile Include="Source\gui-classes\Widgets\PayUI\BalanceTab.cs" />
+    <Compile Include="Source\gui-classes\Widgets\PayUI\BalanceWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\unused\BalanceTabOptionsWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TransactionsWidgets\TxWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\NetworkOptions\ServerInfoWidget.cs" />
+    <Compile Include="Source\bot\AutomatedOrder.cs" />
+    <Compile Include="Source\gui-classes\Widgets\WalletUI\WalletManagerWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\Views\OrdersWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\OrderPreviewSubmitWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OrderPreviewSubmitWidget.cs" />
+    <Compile Include="Source\bot\OrderManagementBot.cs" />
+    <Compile Include="Source\bot\OrderFilledRule.cs" />
+    <Compile Include="Source\gui-classes\Widgets\RuleWidgets\FilledRuleManagementWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.FilledRuleManagementWindow.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\RuleCreateDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.RuleCreateDialog.cs" />
+    <Compile Include="Source\bot\RuleManager.cs" />
+    <Compile Include="Source\bot\ProfitStrategy.cs" />
+    <Compile Include="Source\gui-classes\Widgets\OptionSettingsWidget\SignOptionsWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.SignOptionsWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TransactionsWidgets\CancelTxWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TransactionsWidgets\ConnectedDisplayWidget.cs" />
+    <Compile Include="Source\gui-classes\Windows\OrderSubmitWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OrderSubmitWindow.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\TrippleEntenteDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TrippleEntenteDialog.cs" />
+    <Compile Include="Source\encryption\TrippleEntente.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\TrippleEntenteCreationDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TrippleEntenteCreationDialog.cs" />
+    <Compile Include="Source\gui-classes\Widgets\PinCodeWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.PinCodeWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\PrismWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.PrismWidget.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\EncryptionTypeDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.EncryptionTypeDialog.cs" />
+    <Compile Include="Source\encryption\EncryptionType.cs" />
+    <Compile Include="Source\Identification\Identity.cs" />
+    <Compile Include="Source\util\LeIceSense.cs" />
+    <Compile Include="Source\gui-classes\Widgets\Trees\OpenOrdersTree.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OpenOrdersTree.cs" />
+    <Compile Include="Source\gui-classes\Widgets\Trees\PathsTree.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.PathsTree.cs" />
+    <Compile Include="Source\gui-classes\Widgets\PathFindWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.PathFindWidget.cs" />
+    <Compile Include="Source\gui-classes\Windows\IceBox.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.IceBox.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\FreeTrialAlertDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.FreeTrialAlertDialog.cs" />
+    <Compile Include="Source\gui-classes\Widgets\LicenseSelectWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.LicenseSelectWidget.cs" />
+    <Compile Include="Source\bot\RoboMem.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\IssuerSubmitDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.IssuerSubmitDialog.cs" />
+    <Compile Include="Source\gui-classes\Widgets\EntryWidgets\AddressEntry.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.AddressEntry.cs" />
+    <Compile Include="Source\gui-classes\Widgets\Charting\DepthChartWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.DepthChartWidget.cs" />
+    <Compile Include="Source\util\URLexplorer.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TradeUI\AutomatedBuyWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.AutomatedBuyWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TradeUI\AutomatedSellWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.AutomatedSellWidget.cs" />
+    <Compile Include="Source\gui-classes\Windows\DepthChartWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.DepthChartWindow.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TxCancelPreviewWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TxCancelPreviewWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\Views\OrdersTreeWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OrdersTreeWidget.cs" />
+    <Compile Include="Source\NotificationSystem\NotificationThread.cs" />
+    <Compile Include="Source\gui-classes\Widgets\LedgerConstraintsWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.LedgerConstraintsWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\Trees\PaymentsTree.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.PaymentsTree.cs" />
+    <Compile Include="Source\gui-classes\Widgets\PaymentPreviewSubmitWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.PaymentPreviewSubmitWidget.cs" />
+    <Compile Include="Source\gui-classes\Windows\PaymentSubmitWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.PaymentSubmitWindow.cs" />
+    <Compile Include="Source\gui-classes\Widgets\PayUI\DividendWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.DividendWidget.cs" />
+    <Compile Include="Source\Program.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\CustomPopupWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.CustomPopupWindow.cs" />
+    <Compile Include="Source\gui-classes\Widgets\PayUI\MassPaymentWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.MassPaymentWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.SpinWait.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.SendIOU.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.SendAndConvert.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\FeeOptionsDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.FeeOptionsDialog.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\SignOptionsDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.SignOptionsDialog.cs" />
+    <Compile Include="Source\bot\OrderSubmitter.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\WalletSelectDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.WalletSelectDialog.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\WalletConfirmDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.WalletConfirmDialog.cs" />
+    <Compile Include="Source\gui-classes\Widgets\WalletSwitchWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.WalletSwitchWidget.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\AutomatedPurchaseWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.AutomatedPurchaseWindow.cs" />
+    <Compile Include="Source\gui-classes\Windows\TransactionSubmitWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TransactionSubmitWindow.cs" />
+    <Compile Include="Source\gui-classes\Widgets\WalletUI\TransactionSubmitWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TransactionSubmitWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.DebugTreeWidget.cs" />
+    <Compile Include="Source\gui-classes\Windows\DebuggingOptionsDialogWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.DebuggingOptionsDialogWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.DebugLibraryWidget.cs" />
+    <Compile Include="Source\bot\Sentiment.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\SentementCreateDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.SentementCreateDialog.cs" />
+    <Compile Include="Source\bot\SentimentManager.cs" />
+    <Compile Include="Source\WalletClasses\RippleWalletTypeEnum.cs" />
+    <Compile Include="Source\gui-classes\Windows\AccountRCLSettingsWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.AccountRCLSettingsWindow.cs" />
+    <Compile Include="Source\bot\MarkAsCommand.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\SeedFromHexDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.SeedFromHexDialog.cs" />
+    <Compile Include="Source\gui-classes\Windows\PaperWalletWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.PaperWalletWindow.cs" />
+    <Compile Include="Source\util\EZFontResolver.cs" />
+    <Compile Include="Source\WalletClasses\RippleWallet.cs" />
+    <Compile Include="Source\gui-classes\Widgets\OrderClusterCreateWizard.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OrderClusterCreateWizard.cs" />
+    <Compile Include="Source\gui-classes\Widgets\OrderClusterWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OrderClusterWidget.cs" />
+    <Compile Include="Source\bot\AccountSequenceCache.cs" />
+    <Compile Include="Source\util\Compliance.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\AggreementDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.AggreementDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.CancelTxWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\OptionSettingsWidget\OrderBookOptionsWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.OrderBookOptionsWidget.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\MemoCreateDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.MemoCreateDialog.cs" />
+    <Compile Include="Source\Winter\Winter.cs" />
+    <Compile Include="Source\encryption\rsaEncryption.cs" />
+    <Compile Include="Source\signalR.cs" />
+    <Compile Include="Source\ProgramVariables.cs" />
+    <Compile Include="Source\gui-classes\Widgets\TradeUI\TrollBoxWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.TrollBoxWindow.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\PairingDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.PairingDialog.cs" />
+    <Compile Include="Source\Winter\RsaKeyRequest.cs" />
+    <Compile Include="Source\Winter\ApiResult.cs" />
+    <Compile Include="Source\Winter\EncryptedPayload.cs" />
+    <Compile Include="Source\UImain.cs" />
+    <Compile Include="Source\ConsoleMain.cs" />
+    <Compile Include="Source\WalletClasses\RippleWalletVariables.cs" />
+    <Compile Include="Source\WalletClasses\WalletLedgerSave.cs" />
+    <Compile Include="Source\gui-classes\Widgets\WalletUI\WalletViewWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.WalletViewWindow.cs" />
+    <Compile Include="Source\gui-classes\Windows\WebLinksWindow.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.WebLinksWindow.cs" />
+    <Compile Include="Source\util\TaskHelper.cs" />
+    <Compile Include="Source\gui-classes\Widgets\Trees\WalletTreeModel.cs" />
+    <Compile Include="Source\Security\PasswordSettings.cs" />
+    <Compile Include="Source\gui-classes\Widgets\PayUI\MemoWidget.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.MemoWidget.cs" />
+    <Compile Include="Source\Security\ScamAddress.cs" />
+    <Compile Include="Source\gui-classes\Widgets\DebugWidgets\DebugLibraryWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\DebugWidgets\DebugTreeWidget.cs" />
+    <Compile Include="Source\gui-classes\Widgets\WordListInnitiateDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.WordListInnitiateDialog.cs" />
+    <Compile Include="Source\gui-classes\Dialogs\PrivateKeySelectDialog.cs" />
+    <Compile Include="gtk-gui\IhildaWallet.PrivateKeySelectDialog.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="README.txt" />
+    <None Include="LICENSE.txt" />
+    <None Include="packages.config" />
+    <None Include="Files\CommandLineHelpText.txt" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Images\icebutton.png">
+      <DeployService-UseProjectRelativePath>True</DeployService-UseProjectRelativePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Source\gui-classes\" />
+    <Folder Include="Source\util\" />
+    <Folder Include="Source\plugin-system\" />
+    <Folder Include="Source\console\" />
+    <Folder Include="Source\encryption\" />
+    <Folder Include="Source\gui-classes\Windows\" />
+    <Folder Include="Source\gui-classes\Widgets\" />
+    <Folder Include="Source\gui-classes\Dialogs\" />
+    <Folder Include="Source\bot\" />
+    <Folder Include="Source\multithreading\" />
+    <Folder Include="Source\Trade\" />
+    <Folder Include="Source\contacts\" />
+    <Folder Include="Source\gui-classes\Widgets\Views\" />
+    <Folder Include="Source\Networking\" />
+    <Folder Include="Files\" />
+    <Folder Include="Source\gui-classes\Splashes\" />
+    <Folder Include="Source\gui-classes\Widgets\OptionSettingsWidget\" />
+    <Folder Include="Source\gui-classes\Widgets\NetworkOptions\" />
+    <Folder Include="Source\gui-classes\Widgets\TradeUI\" />
+    <Folder Include="Source\gui-classes\Widgets\PayUI\" />
+    <Folder Include="Source\gui-classes\Widgets\Trees\" />
+    <Folder Include="Source\gui-classes\Widgets\TrustUI\" />
+    <Folder Include="Source\gui-classes\Widgets\unused\" />
+    <Folder Include="Source\gui-classes\Widgets\TransactionsWidgets\" />
+    <Folder Include="Source\gui-classes\Widgets\WalletUI\" />
+    <Folder Include="Source\gui-classes\Widgets\EntryWidgets\" />
+    <Folder Include="Source\gui-classes\Widgets\RuleWidgets\" />
+    <Folder Include="Source\Identification\" />
+    <Folder Include="Source\gui-classes\Widgets\Charting\" />
+    <Folder Include="Source\NotificationSystem\" />
+    <Folder Include="Sounds\" />
+    <Folder Include="Source\WalletClasses\" />
+    <Folder Include="Source\ThirdParty\" />
+    <Folder Include="Source\Winter\" />
+    <Folder Include="Source\Python\" />
+    <Folder Include="Source\Security\" />
+    <Folder Include="Source\gui-classes\Widgets\DebugWidgets\" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <DotNetNamingPolicy DirectoryNamespaceAssociation="None" ResourceNamePolicy="MSBuild" />
+          <NameConventionPolicy>
+            <Rules>
+              <NamingRule Name="Namespaces" AffectedEntity="Namespace" VisibilityMask="VisibilityMask" NamingStyle="PascalCase" IncludeInstanceMembers="True" IncludeStaticEntities="True" />
+              <NamingRule Name="Types" AffectedEntity="Class, Struct, Enum, Delegate" VisibilityMask="VisibilityMask" NamingStyle="PascalCase" IncludeInstanceMembers="True" IncludeStaticEntities="True" />
+              <NamingRule Name="Interfaces" AffectedEntity="Interface" VisibilityMask="VisibilityMask" NamingStyle="PascalCase" IncludeInstanceMembers="True" IncludeStaticEntities="True">
+                <RequiredPrefixes>
+                  <String>I</String>
+                </RequiredPrefixes>
+              </NamingRule>
+              <NamingRule Name="Attributes" AffectedEntity="CustomAttributes" VisibilityMask="VisibilityMask" NamingStyle="PascalCase" IncludeInstanceMembers="True" IncludeStaticEntities="True">
+                <RequiredSuffixes>
+                  <String>Attribute</String>
+                </RequiredSuffixes>
+              </NamingRule>
+              <NamingRule Name="Event Arguments" AffectedEntity="CustomEventArgs" VisibilityMask="VisibilityMask" NamingStyle="PascalCase" IncludeInstanceMembers="True" IncludeStaticEntities="True">
+                <RequiredSuffixes>
+                  <String>EventArgs</String>
+                </RequiredSuffixes>
+              </NamingRule>
+              <NamingRule Name="Exceptions" AffectedEntity="CustomExceptions" VisibilityMask="VisibilityMask" NamingStyle="PascalCase" IncludeInstanceMembers="True" IncludeStaticEntities="True">
+                <RequiredSuffixes>
+                  <String>Exception</String>
+                </RequiredSuffixes>
+              </NamingRule>
+              <NamingRule Name="Methods" AffectedEntity="Methods" VisibilityMask="VisibilityMask" NamingStyle="PascalCase" IncludeInstanceMembers="True" IncludeStaticEntities="True" />
+              <NamingRule Name="Static Readonly Fields" AffectedEntity="ReadonlyField" VisibilityMask="Internal, Protected, Public" NamingStyle="PascalCase" IncludeInstanceMembers="False" IncludeStaticEntities="True" />
+              <NamingRule Name="Fields (Non Private)" AffectedEntity="Field" VisibilityMask="Internal, Protected, Public" NamingStyle="PascalCase" IncludeInstanceMembers="True" IncludeStaticEntities="True" />
+              <NamingRule Name="ReadOnly Fields (Non Private)" AffectedEntity="ReadonlyField" VisibilityMask="Internal, Protected, Public" NamingStyle="PascalCase" IncludeInstanceMembers="True" IncludeStaticEntities="False" />
+              <NamingRule Name="Fields (Private)" AffectedEntity="Field, ReadonlyField" VisibilityMask="Private" NamingStyle="CamelCase" IncludeInstanceMembers="True" IncludeStaticEntities="False">
+                <AllowedPrefixes>
+                  <String>_</String>
+                  <String>m_</String>
+                </AllowedPrefixes>
+              </NamingRule>
+              <NamingRule Name="Static Fields (Private)" AffectedEntity="Field" VisibilityMask="Private" NamingStyle="CamelCase" IncludeInstanceMembers="False" IncludeStaticEntities="True" />
+              <NamingRule Name="ReadOnly Fields (Private)" AffectedEntity="ReadonlyField" VisibilityMask="Private" NamingStyle="CamelCase" IncludeInstanceMembers="True" IncludeStaticEntities="False">
+                <AllowedPrefixes>
+                  <String>_</String>
+                  <String>m_</String>
+                </AllowedPrefixes>
+              </NamingRule>
+              <NamingRule Name="Constant Fields" AffectedEntity="ConstantField" VisibilityMask="VisibilityMask" NamingStyle="PascalCase" IncludeInstanceMembers="True" IncludeStaticEntities="True" />
+              <NamingRule Name="Properties" AffectedEntity="Property" VisibilityMask="VisibilityMask" NamingStyle="PascalCase" IncludeInstanceMembers="True" IncludeStaticEntities="True" />
+              <NamingRule Name="Events" AffectedEntity="Event" VisibilityMask="VisibilityMask" NamingStyle="PascalCase" IncludeInstanceMembers="True" IncludeStaticEntities="True" />
+              <NamingRule Name="Enum Members" AffectedEntity="EnumMember" VisibilityMask="VisibilityMask" NamingStyle="PascalCase" IncludeInstanceMembers="True" IncludeStaticEntities="True" />
+              <NamingRule Name="Parameters" AffectedEntity="Parameter" VisibilityMask="VisibilityMask" NamingStyle="CamelCase" IncludeInstanceMembers="True" IncludeStaticEntities="True" />
+              <NamingRule Name="Type Parameters" AffectedEntity="TypeParameter" VisibilityMask="VisibilityMask" NamingStyle="PascalCase" IncludeInstanceMembers="True" IncludeStaticEntities="True">
+                <RequiredPrefixes>
+                  <String>T</String>
+                </RequiredPrefixes>
+              </NamingRule>
+            </Rules>
+          </NameConventionPolicy>
+        </Policies>
+        <Deployment.LinuxDeployData generateScript="False" />
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+</Project>
