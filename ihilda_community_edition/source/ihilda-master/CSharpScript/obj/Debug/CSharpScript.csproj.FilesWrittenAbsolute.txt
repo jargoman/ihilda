@@ -1,1 +1,0 @@
-/home/kmam/Documents/backup data/iceclient_0.10.2_alpha/source/ripple-client-gtk-master/CSharpScript/obj/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
