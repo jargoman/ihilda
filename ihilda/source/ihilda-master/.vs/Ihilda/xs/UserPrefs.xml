@@ -18,19 +18,7 @@
           <Node name="Ihilda" expanded="True">
             <Node name="IhildaWallet" expanded="True">
               <Node name="Source" expanded="True">
-                <Node name="gui-classes" expanded="True" />
                 <Node name="NameMaker.cs" selected="True" />
-              </Node>
-            </Node>
-            <Node name="RippleLibSharp" expanded="True">
-              <Node name="Source" expanded="True">
-                <Node name="Third-Party" expanded="True">
-                  <Node name="ripple-dot-net-master" expanded="True">
-                    <Node name="Ripple.Core" expanded="True">
-                      <Node name="Types" expanded="True" />
-                    </Node>
-                  </Node>
-                </Node>
               </Node>
             </Node>
           </Node>
@@ -42,7 +30,7 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/home/karim/Documents/ihilda-current/ihilda_community_edition/source/ihilda-master/Source/gui-classes/Windows/TradePairManagerWindow.cs" relfile="Source/gui-classes/Windows/TradePairManagerWindow.cs" line="72" column="1" />
+      <Breakpoint file="/home/karim/Documents/ihilda-current/ihilda/source/ihilda-master/Source/gui-classes/Windows/TradePairManagerWindow.cs" relfile="Source/gui-classes/Windows/TradePairManagerWindow.cs" line="72" column="1" />
       <Breakpoint file="/home/karim/Documents/ihilda-current/RippleLibSharp/RippleLibSharp/Source/Binary/BinaryType.cs" line="238" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
