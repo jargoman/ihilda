@@ -1,0 +1,23 @@
+# Maintainer: jargoman
+
+
+pkgname=ihilda-bin
+_pkgname=ihilda
+pkgver=1.0.4
+pkgrel=1
+pkgdesc="Ihilda is a wallet for the ripple consensus protocol (XRP ledger)"
+arch=('any')
+url="https://github.com/jargoman"
+license=('proprietary')
+provides=('ihilda')
+conflicts=('ihilda')
+depends=('gtk-sharp-2' 'mono')
+source=("https://github.com/jargoman/ihilda/raw/master/ihilda/Binaries/Ihilda-${pkgver}.tar.gz")
+sha256sums=('61aa54532f40128b8350355950814f9f80549dc369e34eee8c2788d891b3482f')
+
+package() {
+	install -Dm755 Ihilda-${pkgver}/ihildawallet_sys ${pkgdir}/usr/bin/ihildawallet
+	install -d -Dm755 ${pkgdir}/usr/share/${_pkgname}/all
+	cp -rf Ihilda-${pkgver}/* ${pkgdir}/usr/share/${_pkgname}/all
+}
+
